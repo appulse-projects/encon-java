@@ -20,6 +20,7 @@ import static lombok.AccessLevel.PRIVATE;
 
 import java.net.InetAddress;
 import java.net.UnknownHostException;
+
 import lombok.AllArgsConstructor;
 import lombok.EqualsAndHashCode;
 import lombok.SneakyThrows;
@@ -54,10 +55,6 @@ public class NodeDescriptor {
                    ? str
                    : shortName + '@' + LOCALHOST.getHostName();
 
-//        val dot = fullName.indexOf('.');
-//        if (dot != -1) {
-//            fullName = fullName.substring(0, dot);
-//        }
     val address = tokens.length == 2
                   ? InetAddress.getByName(tokens[1])
                   : LOCALHOST;
