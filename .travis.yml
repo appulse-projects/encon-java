@@ -7,11 +7,6 @@ jdk:
 services:
   - docker
 
-# Install Erlang for integration tests
-before_install:
-  - sudo apt-get update -qq
-  - sudo apt-get install erlang -y
-
 install:
   mvn --settings .settings.xml install -DskipTests=true -Dmaven.javadoc.skip=true -Dgpg.skip -B -V
 
