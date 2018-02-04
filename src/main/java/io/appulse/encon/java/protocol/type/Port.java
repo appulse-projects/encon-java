@@ -16,7 +16,13 @@
 
 package io.appulse.encon.java.protocol.type;
 
+import static io.appulse.encon.java.protocol.TermType.PORT;
+import static java.util.Optional.ofNullable;
 import static lombok.AccessLevel.PRIVATE;
+
+import io.appulse.encon.java.protocol.TermType;
+import io.appulse.encon.java.protocol.term.ErlangTerm;
+import io.appulse.utils.Bytes;
 
 import lombok.Builder;
 import lombok.Getter;
@@ -24,10 +30,15 @@ import lombok.NonNull;
 import lombok.ToString;
 import lombok.experimental.FieldDefaults;
 
+/**
+ *
+ * @author Artem Labazin
+ * @since 0.0.1
+ */
 @Getter
 @ToString
 @FieldDefaults(level = PRIVATE)
-public final class Port {
+public class Port extends ErlangTerm {
 
   String node;
 
@@ -35,10 +46,66 @@ public final class Port {
 
   int creation;
 
+  public Port (TermType type) {
+    super(type);
+  }
+
   @Builder
-  public Port (@NonNull String node, int id, int creation) {
+  private Port (TermType type, @NonNull String node, int id, int creation) {
+    this(ofNullable(type).orElse(PORT));
     this.node = node;
-    this.id = id & 0xFFFFFFF; // 28 bits
-    this.creation = creation & 0x3; // 2 bits
+
+    switch (getType()) {
+    case PORT:
+      this.id = id & 0xFFFFFFF; // 28 bits
+      this.creation = creation & 0x3; // 2 bits
+      break;
+    case NEW_PORT:
+      this.id = id;
+      this.creation = creation;
+      break;
+    default:
+      throw new RuntimeException();
+    }
+  }
+
+  @Override
+  public String asText (String defaultValue) {
+    return toString();
+  }
+
+  @Override
+  protected void read (@NonNull Bytes buffer) {
+    Atom atom = ErlangTerm.newInstance(buffer);
+    node = atom.asText();
+    id = buffer.getInt();
+
+    switch (getType()) {
+    case PORT:
+      creation = buffer.getByte();
+      break;
+    case NEW_PORT:
+      creation = buffer.getInt();
+      break;
+    default:
+      throw new RuntimeException();
+    }
+  }
+
+  @Override
+  protected void write (@NonNull Bytes buffer) {
+    // buffer.putTerm(new Atom(node));
+    buffer.put4B(id);
+
+    switch (getType()) {
+    case PORT:
+      buffer.put1B(creation);
+      break;
+    case NEW_PORT:
+      buffer.put4B(creation);
+      break;
+    default:
+      throw new RuntimeException();
+    }
   }
 }
