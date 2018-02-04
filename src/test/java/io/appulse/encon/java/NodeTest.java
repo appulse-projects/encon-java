@@ -21,12 +21,12 @@ import static io.appulse.epmd.java.core.model.NodeType.R6_ERLANG;
 import static io.appulse.epmd.java.core.model.Protocol.TCP;
 import static io.appulse.epmd.java.core.model.Version.R6;
 
+import io.appulse.encon.java.util.TestEpmdServer;
+
 import org.assertj.core.api.SoftAssertions;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
-
-import io.appulse.encon.java.util.TestEpmdServer;
 import lombok.val;
 
 public class NodeTest {

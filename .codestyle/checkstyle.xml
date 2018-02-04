@@ -53,9 +53,9 @@ limitations under the License.
 
 
   <!--http://checkstyle.sourceforge.net/config_sizes.html#FileLength-->
-  <module name="FileLength">
+  <!-- <module name="FileLength">
     <property name="max" value="300"/>
-  </module>
+  </module> -->
 
 
   <!--http://checkstyle.sourceforge.net/config_whitespace.html#FileTabCharacter-->
@@ -70,7 +70,14 @@ limitations under the License.
   <module name="UniqueProperties"/>
 
 
+  <module name="SuppressWarningsFilter" />
+
+
   <module name="TreeWalker">
+
+
+    <module name="SuppressWarningsHolder" />
+
 
     <!-- Checks for Javadoc comments.                     -->
     <!-- See http://checkstyle.sf.net/config_javadoc.html -->
@@ -191,7 +198,7 @@ limitations under the License.
     </module>
     <module name="MethodLength">
       <property name="tokens" value="METHOD_DEF"/>
-      <property name="max" value="30"/>
+      <property name="max" value="50"/>
       <property name="countEmpty" value="false"/>
     </module>
     <module name="ParameterNumber">

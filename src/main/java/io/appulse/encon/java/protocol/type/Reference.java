@@ -16,20 +16,32 @@
 
 package io.appulse.encon.java.protocol.type;
 
+import static io.appulse.encon.java.protocol.TermType.NEW_REFERENCE;
+import static java.util.Optional.ofNullable;
 import static lombok.AccessLevel.PRIVATE;
 
-import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
+import java.util.stream.IntStream;
+
+import io.appulse.encon.java.protocol.TermType;
+import io.appulse.encon.java.protocol.term.ErlangTerm;
+import io.appulse.utils.Bytes;
+
 import lombok.Builder;
 import lombok.Getter;
 import lombok.NonNull;
 import lombok.ToString;
 import lombok.experimental.FieldDefaults;
+import lombok.val;
 
+/**
+ *
+ * @author Artem Labazin
+ * @since 0.0.1
+ */
 @Getter
 @ToString
 @FieldDefaults(level = PRIVATE)
-@SuppressFBWarnings("EI_EXPOSE_REP")
-public final class Reference {
+public class Reference extends ErlangTerm {
 
   String node;
 
@@ -37,12 +49,121 @@ public final class Reference {
 
   int creation;
 
+  public Reference (TermType type) {
+    super(type);
+  }
+
   @Builder
-  public Reference (@NonNull String node, int id, int[] ids, int creation) {
+  public Reference (TermType type, @NonNull String node, int id, int[] ids, int creation) {
+    this(ofNullable(type).orElse(NEW_REFERENCE));
     this.node = node;
-    this.ids = ids == null
-               ? new int[] { id }
-               : ids;
-    this.creation = creation & 0x3; // 2 bits
+    this.ids = ofNullable(ids)
+        .map(it -> {
+          int[] result = new int[] { 0, 0, 0 };
+          int length = it.length > 3
+                 ? 3
+                 : it.length;
+          System.arraycopy(it, 0, result, 0, length);
+          return result;
+        })
+        .orElseGet(() -> new int[] { id });
+
+    switch (getType()) {
+    case NEW_REFERENCE:
+      this.creation = creation & 0x3;
+      this.ids[0] &= 0x3FFFF;
+      break;
+    case REFERENCE:
+    case NEWER_REFERENCE:
+      this.creation = creation;
+      break;
+    default:
+      throw new RuntimeException();
+    }
+  }
+
+  /**
+   * Returns id.
+   *
+   * @return id
+   */
+  public int getId () {
+    return ids[0];
+  }
+
+  @Override
+  public String asText (String defaultValue) {
+    return toString();
+  }
+
+  @Override
+  protected void read (@NonNull Bytes buffer) {
+    switch (getType()) {
+    case REFERENCE:
+      Atom atom = ErlangTerm.newInstance(buffer);
+      node = atom.asText();
+      ids = new int[] { buffer.getInt() & 0x3FFFF };
+      creation = buffer.getByte() & 0x03;
+      return;
+    case NEW_REFERENCE:
+    case NEWER_REFERENCE:
+      break;
+    default:
+      throw new IllegalArgumentException("");
+    }
+
+    val arity = buffer.getShort();
+    if (arity > 3) {
+      throw new RuntimeException();
+    }
+
+    Atom atom = ErlangTerm.newInstance(buffer);
+    node = atom.asText();
+
+    if (getType() == NEW_REFERENCE) {
+      creation = buffer.getByte();
+    } else {
+      creation = buffer.getInt();
+    }
+
+    ids = IntStream.range(0, arity)
+        .map(it -> buffer.getInt())
+        .toArray();
+  }
+
+  @Override
+  protected void write (@NonNull Bytes buffer) {
+    switch (getType()) {
+    case REFERENCE:
+      buffer.put(new Atom(node).toBytes());
+      buffer.put4B(ids[0] & 0x3FFFF);
+      buffer.put1B(creation);
+      return;
+    case NEW_REFERENCE:
+    case NEWER_REFERENCE:
+      break;
+    default:
+      throw new IllegalArgumentException("");
+    }
+
+    buffer.put2B(ids.length);
+    buffer.put(new Atom(node).toBytes());
+
+    switch (getType()) {
+    case NEW_REFERENCE:
+      buffer.put1B(creation);
+      buffer.put4B(ids[0] & 0x3FFFF);
+      break;
+    case NEWER_REFERENCE:
+      buffer.put4B(creation);
+      buffer.put4B(ids[0]);
+      break;
+    default:
+      throw new RuntimeException();
+    }
+
+    IntStream.of(ids)
+        .skip(1)
+        .forEachOrdered(buffer::put4B);
   }
 }
