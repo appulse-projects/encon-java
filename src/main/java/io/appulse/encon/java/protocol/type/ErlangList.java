@@ -21,6 +21,7 @@ import static java.util.Optional.empty;
 import static java.util.Optional.of;
 import static java.util.Optional.ofNullable;
 import static lombok.AccessLevel.PRIVATE;
+import static java.util.Arrays.asList;
 
 import java.util.Iterator;
 import java.util.List;
@@ -33,6 +34,7 @@ import io.appulse.encon.java.protocol.term.ErlangTerm;
 import io.appulse.utils.Bytes;
 
 import lombok.Builder;
+import lombok.EqualsAndHashCode;
 import lombok.Getter;
 import lombok.NonNull;
 import lombok.ToString;
@@ -46,6 +48,7 @@ import lombok.val;
  */
 @ToString
 @FieldDefaults(level = PRIVATE)
+@EqualsAndHashCode(callSuper = true)
 public class ErlangList extends ErlangTerm {
 
   ErlangTerm[] elements;
@@ -55,6 +58,10 @@ public class ErlangList extends ErlangTerm {
 
   public ErlangList (TermType type) {
     super(type);
+  }
+
+  public ErlangList (ErlangTerm... elements) {
+    this(asList(elements));
   }
 
   public ErlangList (@NonNull List<ErlangTerm> elements) {
@@ -137,6 +144,6 @@ public class ErlangList extends ErlangTerm {
     if (tail == null) {
       tail = new Nil();
     }
-    // buffer.putTerm(tail);
+    buffer.put(tail.toBytes());
   }
 }
