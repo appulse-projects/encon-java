@@ -84,7 +84,7 @@ public abstract class ErlangTerm implements IntegralNumberTerm,
 
     val uncompressedSize = bytes.getInt();
     val result = new byte[uncompressedSize];
-    val byteArrayInputStream = new ByteArrayInputStream(bytes.array(bytes.position()));
+    val byteArrayInputStream = new ByteArrayInputStream(bytes.getBytes());
     val inflaterInputStream = new InflaterInputStream(byteArrayInputStream, new Inflater(), uncompressedSize);
 
     int cursorPosition = 0;

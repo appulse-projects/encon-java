@@ -112,4 +112,15 @@ public class NodeTest {
     assertThatThrownBy(() -> node.generatePort())
         .isInstanceOf(NullPointerException.class);
   }
+
+  @Test
+  public void ping () {
+    val node = Node.builder()
+        .name("popa")
+        .port(8971)
+        .build();
+
+    assertThat(node.ping("popa")).isTrue();
+    assertThat(node.ping("no-popa")).isFalse();
+  }
 }

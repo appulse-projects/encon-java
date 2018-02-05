@@ -26,6 +26,8 @@ import java.nio.file.Files;
 import java.nio.file.Paths;
 import java.util.Objects;
 
+import javax.management.Descriptor;
+
 import io.appulse.encon.java.exception.NodeAlreadyRegisteredException;
 import io.appulse.epmd.java.client.EpmdClient;
 import io.appulse.epmd.java.core.model.request.Registration;
@@ -94,6 +96,11 @@ public final class Node implements Closeable {
     }
     epmd = new EpmdClient(epmdPort);
     return selfRegistration();
+  }
+
+  public boolean ping (@NonNull String node) {
+    val remote = NodeDescriptor.from(node);
+    return descriptor.equals(remote);
   }
 
   @Override
