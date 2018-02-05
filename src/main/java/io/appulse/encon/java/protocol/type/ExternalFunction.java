@@ -24,6 +24,7 @@ import io.appulse.encon.java.protocol.term.ErlangTerm;
 import io.appulse.utils.Bytes;
 
 import lombok.Builder;
+import lombok.EqualsAndHashCode;
 import lombok.Getter;
 import lombok.NonNull;
 import lombok.ToString;
@@ -37,6 +38,7 @@ import lombok.experimental.FieldDefaults;
 @Getter
 @ToString
 @FieldDefaults(level = PRIVATE)
+@EqualsAndHashCode(callSuper = true)
 public class ExternalFunction extends ErlangTerm {
 
   String module;
