@@ -30,7 +30,7 @@ import java.util.stream.IntStream;
 import io.appulse.encon.java.protocol.TermType;
 import io.appulse.encon.java.protocol.term.ErlangTerm;
 import io.appulse.utils.Bytes;
-
+import lombok.EqualsAndHashCode;
 import lombok.NonNull;
 import lombok.ToString;
 import lombok.experimental.FieldDefaults;
@@ -43,6 +43,7 @@ import lombok.val;
  */
 @ToString
 @FieldDefaults(level = PRIVATE)
+@EqualsAndHashCode(callSuper = true)
 public class IntegralNumber extends ErlangTerm {
 
   private static final int MAX_INTEGER;
@@ -70,8 +71,8 @@ public class IntegralNumber extends ErlangTerm {
 
   public static IntegralNumber from (int number) {
     return number > MAX_CACHE || number < MIN_CACHE
-         ? new IntegralNumber(number)
-         : CACHE[number - MIN_CACHE];
+           ? new IntegralNumber(number)
+           : CACHE[number - MIN_CACHE];
   }
 
   BigInteger value;
@@ -249,8 +250,8 @@ public class IntegralNumber extends ErlangTerm {
         buffer.put4B(length); // length
       }
       val sign = value.signum() < 0
-             ? 1
-             : 0;
+                 ? 1
+                 : 0;
       buffer.put1B(sign);
       buffer.put(magnitude);
       break;

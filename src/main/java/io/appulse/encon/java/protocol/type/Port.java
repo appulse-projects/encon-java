@@ -25,6 +25,7 @@ import io.appulse.encon.java.protocol.term.ErlangTerm;
 import io.appulse.utils.Bytes;
 
 import lombok.Builder;
+import lombok.EqualsAndHashCode;
 import lombok.Getter;
 import lombok.NonNull;
 import lombok.ToString;
@@ -38,6 +39,7 @@ import lombok.experimental.FieldDefaults;
 @Getter
 @ToString
 @FieldDefaults(level = PRIVATE)
+@EqualsAndHashCode(callSuper = true)
 public class Port extends ErlangTerm {
 
   String node;
@@ -94,7 +96,7 @@ public class Port extends ErlangTerm {
 
   @Override
   protected void write (@NonNull Bytes buffer) {
-    // buffer.putTerm(new Atom(node));
+    buffer.put(new Atom(node).toBytes());
     buffer.put4B(id);
 
     switch (getType()) {
