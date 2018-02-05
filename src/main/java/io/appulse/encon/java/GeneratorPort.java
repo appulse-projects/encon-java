@@ -40,7 +40,7 @@ class GeneratorPort {
 
   AtomicInteger count = new AtomicInteger(0);
 
-  public Port generate () {
+  public Port generatePort () {
     return Port.builder()
         .node(nodeName)
         .id(nextId())

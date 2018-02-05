@@ -17,6 +17,7 @@
 package io.appulse.encon.java;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static io.appulse.epmd.java.core.model.NodeType.R6_ERLANG;
 import static io.appulse.epmd.java.core.model.Protocol.TCP;
 import static io.appulse.epmd.java.core.model.Version.R6;
@@ -53,7 +54,17 @@ public class NodeTest {
         .build()
         .register(epmd.getPort());
 
-    assertThat(node.isRegistered()).isTrue();
+    assertThat(node.isRegistered())
+        .isTrue();
+
+    assertThat(node.generatePid())
+        .isNotNull();
+
+    assertThat(node.generatePort())
+        .isNotNull();
+
+    assertThat(node.generateReference())
+        .isNotNull();
 
     val optional = epmd.lookup("popa");
     assertThat(optional).isPresent();
@@ -83,5 +94,22 @@ public class NodeTest {
 
     node.close();
     assertThat(node.isRegistered()).isFalse();
+  }
+
+  @Test
+  public void generatorsFailsWithputRegistration () {
+    val node = Node.builder()
+        .name("popa")
+        .port(8971)
+        .build();
+
+    assertThatThrownBy(() -> node.generatePid())
+        .isInstanceOf(NullPointerException.class);
+
+    assertThatThrownBy(() -> node.generateReference())
+        .isInstanceOf(NullPointerException.class);
+
+    assertThatThrownBy(() -> node.generatePort())
+        .isInstanceOf(NullPointerException.class);
   }
 }

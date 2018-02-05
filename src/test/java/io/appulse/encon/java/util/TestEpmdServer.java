@@ -17,7 +17,6 @@
 package io.appulse.encon.java.util;
 
 import static lombok.AccessLevel.PRIVATE;
-import static java.util.Optional.empty;
 
 import java.util.Optional;
 import java.util.concurrent.ExecutorService;
@@ -29,6 +28,7 @@ import io.appulse.epmd.java.server.cli.CommonOptions;
 import io.appulse.epmd.java.server.command.server.ServerCommandExecutor;
 import io.appulse.epmd.java.server.command.server.ServerCommandOptions;
 import io.appulse.utils.SocketUtils;
+
 import lombok.NonNull;
 import lombok.val;
 import lombok.experimental.FieldDefaults;

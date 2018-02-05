@@ -34,7 +34,7 @@ public class GeneratorReferenceTest {
   public void generate () {
     GeneratorReference generator = new GeneratorReference("popa", 1);
 
-    Reference reference = generator.generate();
+    Reference reference = generator.generateReference();
     assertThat(reference).isNotNull();
 
     SoftAssertions.assertSoftly(softly -> {

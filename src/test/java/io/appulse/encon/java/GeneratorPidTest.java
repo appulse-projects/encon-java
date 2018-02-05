@@ -34,7 +34,7 @@ public class GeneratorPidTest {
   public void generate () {
     GeneratorPid generator = new GeneratorPid("popa", 1);
 
-    Pid pid = generator.generate();
+    Pid pid = generator.generatePid();
     assertThat(pid).isNotNull();
 
     SoftAssertions.assertSoftly(softly -> {

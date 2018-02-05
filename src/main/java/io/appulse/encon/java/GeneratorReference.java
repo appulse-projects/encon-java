@@ -45,7 +45,7 @@ class GeneratorReference {
 
   AtomicInteger id3 = new AtomicInteger(0);
 
-  public Reference generate () {
+  public Reference generateReference () {
     val nextId1 = nextId1();
 
     val nextId2 = nextId1 == 0

@@ -42,7 +42,7 @@ class GeneratorPid {
 
   AtomicInteger serial = new AtomicInteger(0);
 
-  public Pid generate () {
+  public Pid generatePid () {
     int nextId = nextId();
     int nextSerial = nextSerial(nextId);
 
