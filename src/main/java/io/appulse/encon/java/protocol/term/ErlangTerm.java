@@ -17,11 +17,19 @@
 package io.appulse.encon.java.protocol.term;
 
 import static lombok.AccessLevel.PRIVATE;
+import static java.util.zip.Deflater.BEST_COMPRESSION;
 
+import java.io.ByteArrayInputStream;
+import java.io.ByteArrayOutputStream;
 import java.lang.reflect.Constructor;
 import java.nio.ByteBuffer;
+import java.util.zip.Deflater;
+import java.util.zip.DeflaterOutputStream;
+import java.util.zip.Inflater;
+import java.util.zip.InflaterInputStream;
 
 import io.appulse.encon.java.protocol.TermType;
+import io.appulse.epmd.java.core.model.Tag;
 import io.appulse.utils.Bytes;
 
 import lombok.EqualsAndHashCode;
@@ -65,6 +73,56 @@ public abstract class ErlangTerm implements IntegralNumberTerm,
     T result = (T) constructor.newInstance(type);
     result.read(buffer);
     return result;
+  }
+
+  @SneakyThrows
+  public static byte[] decompress (@NonNull Bytes bytes) {
+    if (bytes.getByte() != 80) {
+      // no compression tag
+      return bytes.array();
+    }
+
+    val uncompressedSize = bytes.getInt();
+    val result = new byte[uncompressedSize];
+    val byteArrayInputStream = new ByteArrayInputStream(bytes.array(bytes.position()));
+    val inflaterInputStream = new InflaterInputStream(byteArrayInputStream, new Inflater(), uncompressedSize);
+
+    int cursorPosition = 0;
+    while (cursorPosition < uncompressedSize) {
+      val readed = inflaterInputStream.read(result, cursorPosition, uncompressedSize - cursorPosition);
+      if (readed == -1) {
+        break;
+      }
+      cursorPosition += readed;
+    }
+
+    return result;
+  }
+
+  @SneakyThrows
+  public static byte[] compress (@NonNull byte[] bytes) {
+    /*
+     * similar to erts_term_to_binary() in external.c: We don't want to
+     * compress if compression actually increases the size. Since
+     * compression uses 5 extra bytes (COMPRESSED tag + size), don't
+     * compress if the original term is smaller.
+     */
+    if (bytes.length < 5) {
+      return bytes;
+    }
+    val deflater = new Deflater(BEST_COMPRESSION);
+    val byteArrayOutputStream = new ByteArrayOutputStream();
+    try (val deflaterOutputStream = new DeflaterOutputStream(byteArrayOutputStream, deflater)) {
+      deflaterOutputStream.write(bytes);
+      deflaterOutputStream.flush();
+    }
+    deflater.end();
+
+    return Bytes.allocate(3)
+        .put1B(80)
+        .put4B(bytes.length)
+        .put(byteArrayOutputStream.toByteArray())
+        .array();
   }
 
   TermType type;
