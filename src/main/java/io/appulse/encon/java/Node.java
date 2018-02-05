@@ -33,6 +33,7 @@ import io.appulse.epmd.java.core.model.request.Registration;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.NonNull;
+import lombok.experimental.Delegate;
 import lombok.experimental.FieldDefaults;
 import lombok.extern.slf4j.Slf4j;
 import lombok.val;
@@ -57,10 +58,13 @@ public final class Node implements Closeable {
 
   EpmdClient epmd;
 
+  @Delegate
   GeneratorPid generatorPid;
 
+  @Delegate
   GeneratorPort generatorPort;
 
+  @Delegate
   GeneratorReference generatorReference;
 
   @Builder
@@ -97,6 +101,10 @@ public final class Node implements Closeable {
     epmd.stop(descriptor.getShortName());
     epmd.close();
     epmd = null;
+
+    generatorPid = null;
+    generatorPort = null;
+    generatorReference = null;
 
     log.debug("Node '{}' was closed", descriptor.getFullName());
   }

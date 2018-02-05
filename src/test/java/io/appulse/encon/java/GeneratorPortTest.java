@@ -34,7 +34,7 @@ public class GeneratorPortTest {
   public void generate () {
     GeneratorPort generator = new GeneratorPort("popa", 1);
 
-    Port port = generator.generate();
+    Port port = generator.generatePort();
     assertThat(port).isNotNull();
 
     SoftAssertions.assertSoftly(softly -> {
