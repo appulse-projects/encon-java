@@ -22,10 +22,15 @@ import java.net.Socket;
 
 import io.appulse.encon.java.Node;
 import io.appulse.encon.java.RemoteNode;
+import io.appulse.encon.java.protocol.control.ControlMessage;
+import io.appulse.encon.java.protocol.control.SendControlMessage;
 import io.appulse.encon.java.protocol.term.ErlangTerm;
-
+import io.appulse.encon.java.protocol.type.Pid;
+import io.appulse.utils.Bytes;
 import lombok.NonNull;
 import lombok.RequiredArgsConstructor;
+import lombok.SneakyThrows;
+import lombok.val;
 import lombok.experimental.FieldDefaults;
 
 @RequiredArgsConstructor
@@ -43,5 +48,23 @@ public class Connection {
 
   public void send (@NonNull String mailbox, @NonNull ErlangTerm term) {
 
+  }
+
+  @SneakyThrows
+  public void send (@NonNull Pid to, @NonNull ErlangTerm message) {
+    send(new SendControlMessage(to), message);
+  }
+
+  @SneakyThrows
+  public void send (@NonNull ControlMessage controlMessage, @NonNull ErlangTerm message) {
+    val bytes = Bytes.allocate()
+        .put4B(0)
+        .put(new byte[0]) // distribution header
+        .put(controlMessage.toBytes()) // control message
+        .put(message.toBytes());
+
+    val array = bytes.put4B(0, bytes.limit() - Integer.BYTES).array();
+
+    socket.getOutputStream().write(array);
   }
 }

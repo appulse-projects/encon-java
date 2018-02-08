@@ -21,6 +21,11 @@ import static io.appulse.encon.java.protocol.TermType.NEW_PORT;
 import static io.appulse.encon.java.protocol.TermType.PID;
 import static io.appulse.encon.java.protocol.TermType.PORT;
 
+import io.appulse.encon.java.protocol.type.Atom;
+import io.appulse.encon.java.protocol.type.Pid;
+import io.appulse.encon.java.protocol.type.Port;
+import io.appulse.encon.java.protocol.type.Reference;
+
 /**
  *
  * @author Artem Labazin
@@ -58,12 +63,24 @@ public interface SpecificTerm extends ValueTerm {
     }
   }
 
+  default Reference asReference () {
+    return null;
+  }
+
   default boolean isPid () {
     return getType() == PID || getType() == NEW_PID;
   }
 
+  default Pid asPid () {
+    return null;
+  }
+
   default boolean isPort () {
     return getType() == PORT || getType() == NEW_PORT;
+  }
+
+  default Port asPort () {
+    return null;
   }
 
   default boolean isAtom () {
@@ -76,5 +93,9 @@ public interface SpecificTerm extends ValueTerm {
     default:
       return false;
     }
+  }
+
+  default Atom asAtom () {
+    return null;
   }
 }

@@ -29,7 +29,6 @@ import java.util.zip.Inflater;
 import java.util.zip.InflaterInputStream;
 
 import io.appulse.encon.java.protocol.TermType;
-import io.appulse.epmd.java.core.model.Tag;
 import io.appulse.utils.Bytes;
 
 import lombok.EqualsAndHashCode;
