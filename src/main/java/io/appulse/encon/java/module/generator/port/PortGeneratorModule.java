@@ -14,13 +14,14 @@
  * limitations under the License.
  */
 
-package io.appulse.encon.java;
+package io.appulse.encon.java.module.generator.port;
 
 import static lombok.AccessLevel.PRIVATE;
 
 import java.util.concurrent.atomic.AtomicInteger;
 
-import io.appulse.encon.java.protocol.type.Pid;
+import io.appulse.encon.java.module.NodeInternalApi;
+import io.appulse.encon.java.protocol.type.Port;
 
 import lombok.RequiredArgsConstructor;
 import lombok.experimental.FieldDefaults;
@@ -32,25 +33,18 @@ import lombok.experimental.FieldDefaults;
  */
 @RequiredArgsConstructor
 @FieldDefaults(level = PRIVATE, makeFinal = true)
-class GeneratorPid {
+public class PortGeneratorModule implements PortGeneratorModuleApi {
 
-  String nodeName;
-
-  int creation;
+  NodeInternalApi internal;
 
   AtomicInteger count = new AtomicInteger(0);
 
-  AtomicInteger serial = new AtomicInteger(0);
-
-  public Pid generatePid () {
-    int nextId = nextId();
-    int nextSerial = nextSerial(nextId);
-
-    return Pid.builder()
-        .node(nodeName)
-        .id(nextId)
-        .serial(nextSerial)
-        .creation(creation)
+  @Override
+  public Port generatePort () {
+    return Port.builder()
+        .node(internal.node().getDescriptor().getFullName())
+        .id(nextId())
+        .creation(internal.creation())
         .build();
   }
 
@@ -59,22 +53,8 @@ class GeneratorPid {
     int next;
     do {
       current = count.get();
-      next = (current + 1) % 0x7FFF;
+      next = (current + 1) % 0xFFFFFFF; // 28 bits
     } while (!count.compareAndSet(current, next));
-    return next;
-  }
-
-  private int nextSerial (int id) {
-    if (id != 0) {
-      return serial.get();
-    }
-
-    int current;
-    int next;
-    do {
-      current = serial.get();
-      next = (current + 1) % 0x1FFF; // 13 bits
-    } while (!serial.compareAndSet(current, next));
     return next;
   }
 }

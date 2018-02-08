@@ -97,7 +97,7 @@ public class NodeTest {
   }
 
   @Test
-  public void generatorsFailsWithputRegistration () {
+  public void generatorsFailsWithoutRegistration () {
     val node = Node.builder()
         .name("popa")
         .port(8971)
@@ -111,16 +111,34 @@ public class NodeTest {
 
     assertThatThrownBy(() -> node.generatePort())
         .isInstanceOf(NullPointerException.class);
+
+    node.close();
   }
 
   @Test
   public void ping () {
-    val node = Node.builder()
-        .name("popa")
+    Node node1 = Node.builder()
+        .name("node-1")
         .port(8971)
-        .build();
+        .build()
+        .register(epmd.getPort());
 
-    assertThat(node.ping("popa")).isTrue();
-    assertThat(node.ping("no-popa")).isFalse();
+    assertThat(node1.ping("node-1"))
+        .isCompletedWithValue(true);
+
+    assertThat(node1.ping("node-2"))
+        .isCompletedWithValue(false);
+
+    // val node2 = Node.builder()
+    //     .name("node-2")
+    //     .port(8972)
+    //     .build()
+    //     .register(epmd.getPort());
+    // assertThat(node1.ping("node-2"))
+    //     .isCompletedWithValue(true);
+    // assertThat(node2.ping("node-1"))
+    //     .isCompletedWithValue(true);
+    node1.close();
+    // node2.close();
   }
 }

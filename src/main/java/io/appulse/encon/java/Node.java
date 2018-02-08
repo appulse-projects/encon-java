@@ -26,12 +26,24 @@ import java.nio.file.Files;
 import java.nio.file.Paths;
 import java.util.Objects;
 
-import javax.management.Descriptor;
-
 import io.appulse.encon.java.exception.NodeAlreadyRegisteredException;
+import io.appulse.encon.java.module.NodeInternalApi;
+import io.appulse.encon.java.module.connection.ConnectionModule;
+import io.appulse.encon.java.module.connection.ConnectionModuleApi;
+import io.appulse.encon.java.module.generator.pid.PidGeneratorModule;
+import io.appulse.encon.java.module.generator.pid.PidGeneratorModuleApi;
+import io.appulse.encon.java.module.generator.port.PortGeneratorModule;
+import io.appulse.encon.java.module.generator.port.PortGeneratorModuleApi;
+import io.appulse.encon.java.module.generator.reference.ReferenceGeneratorModule;
+import io.appulse.encon.java.module.generator.reference.ReferenceGeneratorModuleApi;
+import io.appulse.encon.java.module.lookup.LookupModule;
+import io.appulse.encon.java.module.lookup.LookupModuleApi;
+import io.appulse.encon.java.module.mailbox.MailboxModule;
+import io.appulse.encon.java.module.mailbox.MailboxModuleApi;
+import io.appulse.encon.java.module.ping.PingModule;
+import io.appulse.encon.java.module.ping.PingModuleApi;
 import io.appulse.epmd.java.client.EpmdClient;
 import io.appulse.epmd.java.core.model.request.Registration;
-
 import lombok.Builder;
 import lombok.Getter;
 import lombok.NonNull;
@@ -48,7 +60,7 @@ import lombok.val;
 @Slf4j
 @Getter
 @FieldDefaults(level = PRIVATE)
-public final class Node implements Closeable {
+public final class Node implements PingModuleApi, Closeable {
 
   final NodeDescriptor descriptor;
 
@@ -60,14 +72,26 @@ public final class Node implements Closeable {
 
   EpmdClient epmd;
 
-  @Delegate
-  GeneratorPid generatorPid;
+  @Delegate(types = PingModuleApi.class)
+  PingModule pingModule;
 
-  @Delegate
-  GeneratorPort generatorPort;
+  @Delegate(types = LookupModuleApi.class)
+  LookupModule lookupModule;
 
-  @Delegate
-  GeneratorReference generatorReference;
+  @Delegate(types = PidGeneratorModuleApi.class)
+  PidGeneratorModule pidGeneratorModule;
+
+  @Delegate(types = PortGeneratorModuleApi.class)
+  PortGeneratorModule portGeneratorModule;
+
+  @Delegate(types = ReferenceGeneratorModuleApi.class)
+  ReferenceGeneratorModule referenceGeneratorModule;
+
+  @Delegate(types = MailboxModuleApi.class)
+  MailboxModule mailboxModule;
+
+  @Delegate(types = ConnectionModuleApi.class)
+  ConnectionModule connectionModule;
 
   @Builder
   private Node (@NonNull String name, String cookie, int port, Meta meta) {
@@ -98,20 +122,25 @@ public final class Node implements Closeable {
     return selfRegistration();
   }
 
-  public boolean ping (@NonNull String node) {
-    val remote = NodeDescriptor.from(node);
-    return descriptor.equals(remote);
-  }
-
   @Override
   public void close () {
-    epmd.stop(descriptor.getShortName());
-    epmd.close();
-    epmd = null;
+    if (mailboxModule != null) {
+      mailboxModule.close();
+      mailboxModule = null;
+    }
+    if (connectionModule != null) {
+      connectionModule.close();
+      connectionModule = null;
+    }
+    if (epmd != null) {
+      epmd.stop(descriptor.getShortName());
+      epmd.close();
+      epmd = null;
+    }
 
-    generatorPid = null;
-    generatorPort = null;
-    generatorReference = null;
+    pidGeneratorModule = null;
+    portGeneratorModule = null;
+    referenceGeneratorModule = null;
 
     log.debug("Node '{}' was closed", descriptor.getFullName());
   }
@@ -127,9 +156,43 @@ public final class Node implements Closeable {
         .build()
     );
 
-    generatorPid = new GeneratorPid(descriptor.getFullName(), creation);
-    generatorPort = new GeneratorPort(descriptor.getFullName(), creation);
-    generatorReference = new GeneratorReference(descriptor.getFullName(), creation);
+    NodeInternalApi internal = new NodeInternalApi() {
+
+      @Override
+      public Node node () {
+        return Node.this;
+      }
+
+      @Override
+      public MailboxModule mailboxes () {
+        return mailboxModule;
+      }
+
+      @Override
+      public EpmdClient epmd () {
+        return epmd;
+      }
+
+      @Override
+      public int creation () {
+        return creation;
+      }
+
+      @Override
+      public ConnectionModule connections () {
+        return connectionModule;
+      }
+    };
+
+    pidGeneratorModule = new PidGeneratorModule(internal);
+    portGeneratorModule = new PortGeneratorModule(internal);
+    referenceGeneratorModule = new ReferenceGeneratorModule(internal);
+
+    pingModule = new PingModule(internal);
+    lookupModule = new LookupModule(internal);
+
+    mailboxModule = new MailboxModule(internal);
+    connectionModule = new ConnectionModule(internal);
 
     return this;
   }

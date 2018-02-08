@@ -14,10 +14,15 @@
  * limitations under the License.
  */
 
-package io.appulse.encon.java;
+package io.appulse.encon.java.module.generator.pid;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.when;
 
+import io.appulse.encon.java.Node;
+import io.appulse.encon.java.NodeDescriptor;
+import io.appulse.encon.java.module.NodeInternalApi;
 import org.assertj.core.api.SoftAssertions;
 import org.junit.Test;
 
@@ -28,19 +33,28 @@ import io.appulse.encon.java.protocol.type.Pid;
  * @author Artem Labazin
  * @since 0.0.1
  */
-public class GeneratorPidTest {
+public class PidGeneratorModuleTest {
 
   @Test
   public void generate () {
-    GeneratorPid generator = new GeneratorPid("popa", 1);
+    NodeDescriptor descriptor = NodeDescriptor.from("popa");
+
+    Node node = mock(Node.class);
+    when(node.getDescriptor()).thenReturn(descriptor);
+
+    NodeInternalApi internal = mock(NodeInternalApi.class);
+    when(internal.node()).thenReturn(node);
+    when(internal.creation()).thenReturn(1);
+
+    PidGeneratorModule generator = new PidGeneratorModule(internal);
 
     Pid pid = generator.generatePid();
     assertThat(pid).isNotNull();
 
     SoftAssertions.assertSoftly(softly -> {
-      softly.assertThat(pid.getNode())
+      softly.assertThat(pid.getDescriptor().getFullName())
           .isNotNull()
-          .isEqualTo("popa");
+          .isEqualTo(descriptor.getFullName());
 
       softly.assertThat(pid.getId())
           .isEqualTo(1);

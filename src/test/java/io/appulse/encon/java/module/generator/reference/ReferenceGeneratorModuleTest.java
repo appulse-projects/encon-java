@@ -14,10 +14,15 @@
  * limitations under the License.
  */
 
-package io.appulse.encon.java;
+package io.appulse.encon.java.module.generator.reference;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.when;
 
+import io.appulse.encon.java.Node;
+import io.appulse.encon.java.NodeDescriptor;
+import io.appulse.encon.java.module.NodeInternalApi;
 import org.assertj.core.api.SoftAssertions;
 import org.junit.Test;
 
@@ -28,11 +33,20 @@ import io.appulse.encon.java.protocol.type.Reference;
  * @author Artem Labazin
  * @since 0.0.1
  */
-public class GeneratorReferenceTest {
+public class ReferenceGeneratorModuleTest {
 
   @Test
-  public void generate () {
-    GeneratorReference generator = new GeneratorReference("popa", 1);
+  public void generateReference () {
+    NodeDescriptor descriptor = NodeDescriptor.from("popa");
+
+    Node node = mock(Node.class);
+    when(node.getDescriptor()).thenReturn(descriptor);
+
+    NodeInternalApi internal = mock(NodeInternalApi.class);
+    when(internal.node()).thenReturn(node);
+    when(internal.creation()).thenReturn(1);
+
+    ReferenceGeneratorModule generator = new ReferenceGeneratorModule(internal);
 
     Reference reference = generator.generateReference();
     assertThat(reference).isNotNull();
@@ -40,7 +54,7 @@ public class GeneratorReferenceTest {
     SoftAssertions.assertSoftly(softly -> {
       softly.assertThat(reference.getNode())
           .isNotNull()
-          .isEqualTo("popa");
+          .isEqualTo(descriptor.getFullName());
 
       softly.assertThat(reference.getIds())
           .isNotNull()

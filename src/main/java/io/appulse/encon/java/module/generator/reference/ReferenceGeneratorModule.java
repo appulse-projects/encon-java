@@ -14,12 +14,13 @@
  * limitations under the License.
  */
 
-package io.appulse.encon.java;
+package io.appulse.encon.java.module.generator.reference;
 
 import static lombok.AccessLevel.PRIVATE;
 
 import java.util.concurrent.atomic.AtomicInteger;
 
+import io.appulse.encon.java.module.NodeInternalApi;
 import io.appulse.encon.java.protocol.type.Reference;
 
 import lombok.RequiredArgsConstructor;
@@ -33,11 +34,9 @@ import lombok.val;
  */
 @RequiredArgsConstructor
 @FieldDefaults(level = PRIVATE, makeFinal = true)
-class GeneratorReference {
+public class ReferenceGeneratorModule implements ReferenceGeneratorModuleApi {
 
-  String nodeName;
-
-  int creation;
+  NodeInternalApi internal;
 
   AtomicInteger id1 = new AtomicInteger(0);
 
@@ -45,6 +44,7 @@ class GeneratorReference {
 
   AtomicInteger id3 = new AtomicInteger(0);
 
+  @Override
   public Reference generateReference () {
     val nextId1 = nextId1();
 
@@ -57,9 +57,9 @@ class GeneratorReference {
                 : id3.get();
 
     return Reference.builder()
-        .node(nodeName)
+        .node(internal.node().getDescriptor().getFullName())
         .ids(new int[] { nextId1, nextId2, nextId3 })
-        .creation(creation)
+        .creation(internal.creation())
         .build();
   }
 

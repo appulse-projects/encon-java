@@ -20,6 +20,7 @@ import static io.appulse.encon.java.protocol.TermType.PID;
 import static java.util.Optional.ofNullable;
 import static lombok.AccessLevel.PRIVATE;
 
+import io.appulse.encon.java.NodeDescriptor;
 import io.appulse.encon.java.protocol.TermType;
 import io.appulse.encon.java.protocol.term.ErlangTerm;
 import io.appulse.utils.Bytes;
@@ -42,7 +43,7 @@ import lombok.experimental.FieldDefaults;
 @EqualsAndHashCode(callSuper = true)
 public class Pid extends ErlangTerm {
 
-  String node;
+  NodeDescriptor descriptor;
 
   int id;
 
@@ -57,7 +58,7 @@ public class Pid extends ErlangTerm {
   @Builder
   private Pid (TermType type, @NonNull String node, int id, int serial, int creation) {
     this(ofNullable(type).orElse(PID));
-    this.node = node;
+    descriptor = NodeDescriptor.from(node);
 
     switch (getType()) {
     case PID:
@@ -84,7 +85,7 @@ public class Pid extends ErlangTerm {
   @Override
   protected void read (@NonNull Bytes buffer) {
     Atom atom = ErlangTerm.newInstance(buffer);
-    node = atom.asText();
+    descriptor = NodeDescriptor.from(atom.asText());
 
     id = buffer.getInt();
     serial = buffer.getInt();
@@ -103,7 +104,7 @@ public class Pid extends ErlangTerm {
 
   @Override
   protected void write (@NonNull Bytes buffer) {
-    buffer.put(new Atom(node).toBytes());
+    buffer.put(new Atom(descriptor.getFullName()).toBytes());
     buffer.put4B(id);
     buffer.put4B(serial);
 
