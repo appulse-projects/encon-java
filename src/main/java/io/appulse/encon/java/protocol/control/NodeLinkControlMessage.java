@@ -16,35 +16,34 @@
 
 package io.appulse.encon.java.protocol.control;
 
-import java.util.stream.Stream;
+import static io.appulse.encon.java.protocol.control.ControlMessageTag.NODE_LINK;
 
 import io.appulse.encon.java.protocol.term.ErlangTerm;
-import io.appulse.encon.java.protocol.type.IntegralNumber;
-import io.appulse.encon.java.protocol.type.Nil;
 import io.appulse.encon.java.protocol.type.Tuple;
-import io.appulse.encon.java.protocol.type.Tuple.TupleBuilder;
+
+import lombok.EqualsAndHashCode;
+import lombok.NoArgsConstructor;
 
 /**
  *
  * @author Artem Labazin
  * @since 0.0.1
  */
-public abstract class ControlMessage {
+@NoArgsConstructor
+@EqualsAndHashCode(callSuper = true)
+public class NodeLinkControlMessage extends ControlMessage {
 
-  protected static final ErlangTerm UNUSED = new Nil();
-
-  public Tuple toTuple () {
-    TupleBuilder builder = Tuple.builder();
-    builder.add(IntegralNumber.from(getTag().getCode()));
-    Stream.of(elements()).forEach(builder::add);
-    return builder.build();
+  public NodeLinkControlMessage (Tuple tuple) {
+    // empty body
   }
 
-  public byte[] toBytes () {
-    return toTuple().toBytes();
+  @Override
+  public ControlMessageTag getTag () {
+    return NODE_LINK;
   }
 
-  protected abstract ControlMessageTag getTag ();
-
-  protected abstract ErlangTerm[] elements ();
+  @Override
+  public ErlangTerm[] elements () {
+    return new ErlangTerm[0];
+  }
 }

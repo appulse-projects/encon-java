@@ -16,35 +16,33 @@
 
 package io.appulse.encon.java.protocol.control;
 
-import java.util.stream.Stream;
+import static io.appulse.encon.java.protocol.control.ControlMessageTag.EXIT2_TT;
 
 import io.appulse.encon.java.protocol.term.ErlangTerm;
-import io.appulse.encon.java.protocol.type.IntegralNumber;
-import io.appulse.encon.java.protocol.type.Nil;
+import io.appulse.encon.java.protocol.type.Pid;
 import io.appulse.encon.java.protocol.type.Tuple;
-import io.appulse.encon.java.protocol.type.Tuple.TupleBuilder;
+
+import lombok.EqualsAndHashCode;
+import lombok.NonNull;
 
 /**
  *
  * @author Artem Labazin
  * @since 0.0.1
  */
-public abstract class ControlMessage {
+@EqualsAndHashCode(callSuper = true)
+public class Exit2TraceTokenControlMessage extends ExitTraceTokenControlMessage {
 
-  protected static final ErlangTerm UNUSED = new Nil();
-
-  public Tuple toTuple () {
-    TupleBuilder builder = Tuple.builder();
-    builder.add(IntegralNumber.from(getTag().getCode()));
-    Stream.of(elements()).forEach(builder::add);
-    return builder.build();
+  public Exit2TraceTokenControlMessage (@NonNull Pid from, @NonNull Pid to, @NonNull ErlangTerm traceToken, @NonNull ErlangTerm reason) {
+    super(from, to, traceToken, reason);
   }
 
-  public byte[] toBytes () {
-    return toTuple().toBytes();
+  public Exit2TraceTokenControlMessage (@NonNull Tuple tuple) {
+    super(tuple);
   }
 
-  protected abstract ControlMessageTag getTag ();
-
-  protected abstract ErlangTerm[] elements ();
+  @Override
+  public ControlMessageTag getTag () {
+    return EXIT2_TT;
+  }
 }
