@@ -18,6 +18,7 @@ package io.appulse.encon.java;
 
 import static java.util.stream.Collectors.toSet;
 
+import java.util.Collection;
 import java.util.Set;
 import java.util.stream.Stream;
 
@@ -86,11 +87,15 @@ public enum DistributionFlag {
   }
 
   public static int bitwiseOr (DistributionFlag... flags) {
-    int result = 0;
-    for (DistributionFlag flag : flags) {
-      result |= flag.getCode();
-    }
-    return result;
+    return Stream.of(flags)
+        .map(DistributionFlag::getCode)
+        .reduce(0, (left, right) -> left | right);
+  }
+
+  public static int bitwiseOr (Collection<DistributionFlag> flags) {
+    return flags.stream()
+        .map(DistributionFlag::getCode)
+        .reduce(0, (left, right) -> left | right);
   }
 
   public static Set<DistributionFlag> parse (int number) {

@@ -22,6 +22,7 @@ import static io.appulse.encon.java.protocol.TermType.NEW_PORT;
 
 import java.util.stream.IntStream;
 
+import io.appulse.encon.java.NodeDescriptor;
 import io.appulse.encon.java.protocol.term.ErlangTerm;
 import io.appulse.utils.Bytes;
 
@@ -50,7 +51,7 @@ public class PidTest {
     assertThat(pid).isNotNull();
 
     SoftAssertions.assertSoftly(softly -> {
-      softly.assertThat(pid.getNode())
+      softly.assertThat(pid.getDescriptor().getShortName())
           .isEqualTo(node);
 
       softly.assertThat(pid.getId())
@@ -73,7 +74,7 @@ public class PidTest {
 
     val expected = Bytes.allocate()
         .put1B(PID.getCode())
-        .put(new Atom(node).toBytes())
+        .put(new Atom(NodeDescriptor.from(node).getFullName()).toBytes())
         .put4B(id & 0x7FFF)
         .put4B(serial & 0x1FFF)
         .put1B(creation & 0x3)

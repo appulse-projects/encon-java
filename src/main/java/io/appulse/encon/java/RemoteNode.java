@@ -16,37 +16,44 @@
 
 package io.appulse.encon.java;
 
-import static org.assertj.core.api.Assertions.assertThat;
+import io.appulse.epmd.java.core.model.NodeType;
+import io.appulse.epmd.java.core.model.Protocol;
+import io.appulse.epmd.java.core.model.Version;
 
-import org.assertj.core.api.SoftAssertions;
-import org.junit.Test;
-
-import io.appulse.encon.java.protocol.type.Port;
+import lombok.Builder;
+import lombok.EqualsAndHashCode;
+import lombok.NonNull;
+import lombok.Value;
 
 /**
  *
  * @author Artem Labazin
  * @since 0.0.1
  */
-public class GeneratorPortTest {
+@Value
+@Builder
+@EqualsAndHashCode(of = {
+    "descriptor",
+    "protocol"
+})
+public class RemoteNode {
 
-  @Test
-  public void generate () {
-    GeneratorPort generator = new GeneratorPort("popa", 1);
+  @NonNull
+  NodeDescriptor descriptor;
 
-    Port port = generator.generatePort();
-    assertThat(port).isNotNull();
+  @NonNull
+  Protocol protocol;
 
-    SoftAssertions.assertSoftly(softly -> {
-      softly.assertThat(port.getNode())
-          .isNotNull()
-          .isEqualTo("popa");
+  @NonNull
+  NodeType type;
 
-      softly.assertThat(port.getId())
-          .isEqualTo(1);
+  @NonNull
+  Version high;
 
-      softly.assertThat(port.getCreation())
-          .isEqualTo(1);
-    });
-  }
+  @NonNull
+  Version low;
+
+  int port;
+
+  byte[] extra;
 }
