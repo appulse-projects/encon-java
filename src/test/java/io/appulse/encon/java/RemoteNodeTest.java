@@ -102,7 +102,7 @@ public class RemoteNodeTest {
         // .register(epmd.getPort());
         .register(4369);
 
-    assertThat(node.ping("echo@IB-ALABAZIN-M.local"))
+    assertThat(node.ping("echo@localhost"))
         .isCompletedWithValue(true);
   }
 
@@ -129,7 +129,7 @@ public class RemoteNodeTest {
         .makeTuple()
             .add(mailbox.getPid())
             .add("Hello world!")
-        .send("echo@IB-ALABAZIN-M.local", "echo_server");
+        .send("echo@localhost", "echo_server");
 
     assertThat(future)
         .isCompletedWithValue("Hello world!");
