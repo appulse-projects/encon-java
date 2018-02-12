@@ -102,7 +102,11 @@ public class RemoteNodeTest {
         // .register(epmd.getPort());
         .register(4369);
 
-    assertThat(node.ping("echo@localhost"))
+    CompletableFuture<Boolean> future = node.ping("echo@localhost");
+
+    TimeUnit.SECONDS.sleep(3);
+
+    assertThat(future)
         .isCompletedWithValue(true);
   }
 
