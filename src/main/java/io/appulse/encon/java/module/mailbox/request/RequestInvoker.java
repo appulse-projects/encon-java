@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package io.appulse.encon.java.protocol.request;
+package io.appulse.encon.java.module.mailbox.request;
 
 import static lombok.AccessLevel.PACKAGE;
 import static lombok.AccessLevel.PRIVATE;

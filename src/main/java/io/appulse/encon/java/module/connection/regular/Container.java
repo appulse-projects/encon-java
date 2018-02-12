@@ -16,7 +16,7 @@
 
 package io.appulse.encon.java.module.connection.regular;
 
-import io.appulse.encon.java.protocol.control.ControlMessage;
+import io.appulse.encon.java.module.connection.control.ControlMessage;
 import io.appulse.encon.java.protocol.term.ErlangTerm;
 import lombok.Value;
 

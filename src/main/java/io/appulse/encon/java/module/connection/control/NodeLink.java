@@ -14,9 +14,9 @@
  * limitations under the License.
  */
 
-package io.appulse.encon.java.protocol.control;
+package io.appulse.encon.java.module.connection.control;
 
-import static io.appulse.encon.java.protocol.control.ControlMessageTag.NODE_LINK;
+import static io.appulse.encon.java.module.connection.control.ControlMessageTag.NODE_LINK;
 
 import io.appulse.encon.java.protocol.term.ErlangTerm;
 import io.appulse.encon.java.protocol.type.ErlangTuple;
@@ -31,9 +31,9 @@ import lombok.NoArgsConstructor;
  */
 @NoArgsConstructor
 @EqualsAndHashCode(callSuper = true)
-public class NodeLinkControlMessage extends ControlMessage {
+public class NodeLink extends ControlMessage {
 
-  public NodeLinkControlMessage (ErlangTuple tuple) {
+  public NodeLink (ErlangTuple tuple) {
     // empty body
   }
 

@@ -22,7 +22,7 @@ import java.util.Optional;
 
 import io.appulse.encon.java.module.NodeInternalApi;
 import io.appulse.encon.java.module.mailbox.Mailbox;
-import io.appulse.encon.java.protocol.control.SendControlMessage;
+import io.appulse.encon.java.module.connection.control.Send;
 import io.netty.channel.Channel;
 import io.netty.channel.ChannelHandlerContext;
 import io.netty.channel.ChannelInboundHandlerAdapter;
@@ -71,7 +71,7 @@ public class ClientRegularHandler extends ChannelInboundHandlerAdapter {
 
     switch (controlMessage.getTag()) {
     case SEND:
-      val destination = ((SendControlMessage) controlMessage).getTo();
+      val destination = ((Send) controlMessage).getTo();
       val mailboxes = internal.mailboxes();
       Optional<Mailbox> optional;
       if (destination.isAtom()) {

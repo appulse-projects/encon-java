@@ -29,9 +29,9 @@ import io.appulse.encon.java.module.connection.regular.ClientRegularDecoder;
 import io.appulse.encon.java.module.connection.regular.ClientRegularEncoder;
 import io.appulse.encon.java.module.connection.regular.ClientRegularHandler;
 import io.appulse.encon.java.module.connection.regular.Container;
-import io.appulse.encon.java.protocol.control.ControlMessage;
-import io.appulse.encon.java.protocol.control.RegistrationSendControlMessage;
-import io.appulse.encon.java.protocol.control.SendControlMessage;
+import io.appulse.encon.java.module.connection.control.ControlMessage;
+import io.appulse.encon.java.module.connection.control.SendToRegisteredProcess;
+import io.appulse.encon.java.module.connection.control.Send;
 import io.appulse.encon.java.protocol.term.ErlangTerm;
 import io.appulse.encon.java.protocol.type.ErlangAtom;
 import io.appulse.encon.java.protocol.type.ErlangPid;
@@ -117,11 +117,11 @@ public class RemoteConnection implements Closeable {
   }
 
   public void sendReg (@NonNull ErlangPid from, @NonNull ErlangAtom mailbox, @NonNull ErlangTerm message) {
-    send(new RegistrationSendControlMessage(from, mailbox), message);
+    send(new SendToRegisteredProcess(from, mailbox), message);
   }
 
   public void send (@NonNull ErlangPid to, @NonNull ErlangTerm message) {
-    send(new SendControlMessage(to), message);
+    send(new Send(to), message);
   }
 
   @SneakyThrows
