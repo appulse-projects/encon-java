@@ -227,7 +227,7 @@ public class IntegralNumber extends ErlangTerm {
   protected void write (@NonNull Bytes buffer) {
     switch (getType()) {
     case SMALL_INTEGER:
-      buffer.put2B(value.shortValue());
+      buffer.put1B(value.shortValue());
       break;
     case INTEGER:
       buffer.put4B(value.intValue());

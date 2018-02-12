@@ -99,6 +99,11 @@ public class Reference extends ErlangTerm {
   }
 
   @Override
+  public Reference asReference () {
+    return this;
+  }
+
+  @Override
   protected void read (@NonNull Bytes buffer) {
     switch (getType()) {
     case REFERENCE:

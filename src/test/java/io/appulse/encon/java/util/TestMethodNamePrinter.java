@@ -14,27 +14,20 @@
  * limitations under the License.
  */
 
-package io.appulse.encon.java.module;
+package io.appulse.encon.java.util;
 
-import io.appulse.encon.java.Node;
-import io.appulse.encon.java.module.connection.ConnectionModule;
-import io.appulse.encon.java.module.mailbox.MailboxModule;
-import io.appulse.epmd.java.client.EpmdClient;
+import org.junit.rules.TestWatcher;
+import org.junit.runner.Description;
 
 /**
  *
  * @author Artem Labazin
  * @since 0.0.1
  */
-public interface NodeInternalApi {
+public class TestMethodNamePrinter extends TestWatcher {
 
-  int creation ();
-
-  Node node ();
-
-  EpmdClient epmd ();
-
-  MailboxModule mailboxes ();
-
-  ConnectionModule connections ();
+  @Override
+  protected void starting (Description description) {
+    System.out.println("\nRUNNING TEST: " + description.getMethodName() + '\n');
+  }
 }

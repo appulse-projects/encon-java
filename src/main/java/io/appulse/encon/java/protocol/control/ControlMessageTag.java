@@ -26,25 +26,28 @@ import lombok.Getter;
 @Getter
 public enum ControlMessageTag {
 
-  LINK(1),
-  SEND(2),
-  EXIT(3),
-  UNLINK(4),
-  NODE_LINK(5),
-  REG_SEND(6),
-  GROUP_LEADER(7),
-  EXIT2(8),
-  SEND_TT(12),
-  EXIT_TT(13),
-  REG_SEND_TT(16),
-  EXIT2_TT(18),
-  MONITOR_P(19),
-  DEMONITOR_P(20),
-  MONITOR_P_EXIT(21);
+  LINK(1, LinkControlMessage.class),
+  SEND(2, SendControlMessage.class),
+  EXIT(3, ExitControlMessage.class),
+  UNLINK(4, UnlinkControlMessage.class),
+  NODE_LINK(5, NodeLinkControlMessage.class),
+  REG_SEND(6, RegistrationSendControlMessage.class),
+  GROUP_LEADER(7, GroupLeaderControlMessage.class),
+  EXIT2(8, Exit2ControlMessage.class),
+  SEND_TT(12, SendTraceTokenControlMessage.class),
+  EXIT_TT(13, ExitTraceTokenControlMessage.class),
+  REG_SEND_TT(16, RegistrationSendTraceTokenControlMessage.class),
+  EXIT2_TT(18, Exit2TraceTokenControlMessage.class),
+  MONITOR_P(19, MonitorProcessControlMessage.class),
+  DEMONITOR_P(20, DemonitorProcessControlMessage.class),
+  MONITOR_P_EXIT(21, MonitorProcessExitControlMessage.class);
 
   private final int code;
 
-  ControlMessageTag (int code) {
+  private final Class<? extends ControlMessage> type;
+
+  ControlMessageTag (int code, Class<? extends ControlMessage> type) {
     this.code = code;
+    this.type = type;
   }
 }

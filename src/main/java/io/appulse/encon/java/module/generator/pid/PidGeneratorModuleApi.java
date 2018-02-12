@@ -18,6 +18,11 @@ package io.appulse.encon.java.module.generator.pid;
 
 import io.appulse.encon.java.protocol.type.Pid;
 
+/**
+ *
+ * @author Artem Labazin
+ * @since 0.0.1
+ */
 public interface PidGeneratorModuleApi {
 
   Pid generatePid ();

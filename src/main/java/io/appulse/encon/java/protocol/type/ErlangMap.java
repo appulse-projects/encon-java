@@ -61,6 +61,11 @@ public class ErlangMap extends ErlangTerm {
   }
 
   @Override
+  public ErlangMap asMap () {
+    return this;
+  }
+
+  @Override
   public Iterator<ErlangTerm> elements () {
     return map.values().iterator();
   }

@@ -36,16 +36,18 @@ import lombok.Builder;
 import lombok.EqualsAndHashCode;
 import lombok.Getter;
 import lombok.NonNull;
-import lombok.Setter;
-import lombok.val;
 import lombok.experimental.FieldDefaults;
 import lombok.experimental.NonFinal;
+import lombok.extern.slf4j.Slf4j;
+import lombok.Setter;
+import lombok.val;
 
 /**
  *
  * @author Artem Labazin
  * @since 0.0.1
  */
+@Slf4j
 @Builder
 @EqualsAndHashCode
 @AllArgsConstructor
@@ -78,6 +80,7 @@ public class Mailbox implements Closeable {
   }
 
   public void request (Object obj) {
+    log.debug("Uh?");
   }
 
   public void send (@NonNull Pid pid, @NonNull ErlangTerm message) {
@@ -113,12 +116,15 @@ public class Mailbox implements Closeable {
 
   public void send (@NonNull RemoteNode remote, @NonNull String mailbox, @NonNull ErlangTerm message) {
     if (internal.node().getDescriptor().equals(remote.getDescriptor())) {
+      log.debug("Sending message to local mailbox {}", mailbox);
       send(mailbox, message);
     } else {
+      log.debug("Sending message to remote {} mailbox {}", remote, mailbox);
       internal.connections()
           .connect(remote)
-          .send(mailbox, message);
+          .sendReg(pid, mailbox, message);
     }
+    log.debug("Message was sent");
   }
 
   public void inbox (ErlangTerm message) {
@@ -127,6 +133,7 @@ public class Mailbox implements Closeable {
 
   @Override
   public void close () {
+    log.debug("Closing mailbox '{}:{}'...", name, pid);
     executor.shutdown();
     name = null;
   }

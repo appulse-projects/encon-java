@@ -33,6 +33,11 @@ import lombok.NonNull;
 import lombok.val;
 import lombok.experimental.FieldDefaults;
 
+/**
+ *
+ * @author Artem Labazin
+ * @since 0.0.1
+ */
 @FieldDefaults(level = PRIVATE)
 public class TestEpmdServer {
 
