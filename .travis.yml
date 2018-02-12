@@ -16,7 +16,7 @@ before_script:
   - git clone https://github.com/appulse-projects/echo-service-elixir.git
   - (cd echo-service-elixir/; mix escript.build)
   - epmd -daemon
-  - echo-service-elixir/echo --cookie=secret --name=echo@localhost
+  - echo-service-elixir/echo --cookie=secret --name=echo@localhost &
 
 script:
   mvn --settings .settings.xml clean verify -DskipTests=false -Dmaven.javadoc.skip=true -Dgpg.skip -B -U
