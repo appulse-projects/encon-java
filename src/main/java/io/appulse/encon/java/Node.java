@@ -42,8 +42,6 @@ import io.appulse.encon.java.module.mailbox.MailboxModule;
 import io.appulse.encon.java.module.mailbox.MailboxModuleApi;
 import io.appulse.encon.java.module.ping.PingModule;
 import io.appulse.encon.java.module.ping.PingModuleApi;
-import io.appulse.encon.java.module.server.ServerModule;
-import io.appulse.encon.java.module.server.ServerModuleApi;
 import io.appulse.epmd.java.client.EpmdClient;
 import io.appulse.epmd.java.core.model.request.Registration;
 
@@ -106,9 +104,8 @@ public final class Node implements PingModuleApi, Closeable {
   @Delegate(types = ConnectionModuleApi.class)
   ConnectionModule connectionModule;
 
-  @Delegate(types = ServerModuleApi.class)
-  ServerModule serverModule;
-
+//  @Delegate(types = ServerModuleApi.class)
+//  ServerModule serverModule;
   @Builder
   private Node (@NonNull String name, String cookie, int port, Meta meta) {
     descriptor = NodeDescriptor.from(name);
@@ -148,10 +145,10 @@ public final class Node implements PingModuleApi, Closeable {
       connectionModule.close();
       connectionModule = null;
     }
-    if (serverModule != null) {
-      serverModule.close();
-      serverModule = null;
-    }
+//    if (serverModule != null) {
+//      serverModule.close();
+//      serverModule = null;
+//    }
     if (epmd != null) {
       epmd.stop(descriptor.getShortName());
       epmd.close();
@@ -213,8 +210,8 @@ public final class Node implements PingModuleApi, Closeable {
 
     mailboxModule = new MailboxModule(internal);
     connectionModule = new ConnectionModule(internal);
-    serverModule = new ServerModule(internal);
-    serverModule.start(port);
+//    serverModule = new ServerModule(internal);
+//    serverModule.start(port);
 
     return this;
   }
