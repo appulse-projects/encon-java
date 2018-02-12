@@ -27,7 +27,7 @@ import io.appulse.encon.java.Node;
 import io.appulse.encon.java.NodeDescriptor;
 import io.appulse.encon.java.RemoteNode;
 import io.appulse.encon.java.module.NodeInternalApi;
-import io.appulse.encon.java.protocol.request.RequestBuilder;
+import io.appulse.encon.java.module.mailbox.request.RequestBuilder;
 import io.appulse.encon.java.protocol.term.ErlangTerm;
 import io.appulse.encon.java.protocol.type.ErlangPid;
 

@@ -23,7 +23,7 @@ import java.math.BigDecimal;
  * @author Artem Labazin
  * @since 0.0.1
  */
-public interface FloatingPointNumberTerm extends NumberTerm {
+public interface FloatTerm extends NumberTerm {
 
   default boolean isFloatingPointNumber () {
     switch (getType()) {

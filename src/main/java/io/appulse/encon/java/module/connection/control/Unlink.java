@@ -14,11 +14,11 @@
  * limitations under the License.
  */
 
-package io.appulse.encon.java.protocol.control;
+package io.appulse.encon.java.module.connection.control;
 
-import static io.appulse.encon.java.protocol.control.ControlMessageTag.UNLINK;
+import static io.appulse.encon.java.module.connection.control.ControlMessageTag.UNLINK;
 
-import io.appulse.encon.java.protocol.control.exception.ControlMessageParsingException;
+import io.appulse.encon.java.module.connection.control.exception.ControlMessageParsingException;
 import io.appulse.encon.java.protocol.term.ErlangTerm;
 import io.appulse.encon.java.protocol.type.ErlangPid;
 import io.appulse.encon.java.protocol.type.ErlangTuple;
@@ -36,7 +36,7 @@ import lombok.Value;
 @Value
 @AllArgsConstructor
 @EqualsAndHashCode(callSuper = true)
-public class UnlinkControlMessage extends ControlMessage {
+public class Unlink extends ControlMessage {
 
   @NonNull
   ErlangPid from;
@@ -44,7 +44,7 @@ public class UnlinkControlMessage extends ControlMessage {
   @NonNull
   ErlangPid to;
 
-  public UnlinkControlMessage (@NonNull ErlangTuple tuple) {
+  public Unlink (@NonNull ErlangTuple tuple) {
     from = tuple.get(1)
         .filter(ErlangTerm::isPid)
         .map(ErlangTerm::asPid)

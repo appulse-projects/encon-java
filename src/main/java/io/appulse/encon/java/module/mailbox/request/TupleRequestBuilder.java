@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package io.appulse.encon.java.protocol.request;
+package io.appulse.encon.java.module.mailbox.request;
 
 import io.appulse.encon.java.module.mailbox.Mailbox;
 import io.appulse.encon.java.protocol.type.ErlangTuple;

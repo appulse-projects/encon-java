@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package io.appulse.encon.java.protocol.control.exception;
+package io.appulse.encon.java.module.connection.control.exception;
 
 /**
  *

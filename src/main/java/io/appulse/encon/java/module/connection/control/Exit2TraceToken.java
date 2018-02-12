@@ -14,9 +14,9 @@
  * limitations under the License.
  */
 
-package io.appulse.encon.java.protocol.control;
+package io.appulse.encon.java.module.connection.control;
 
-import static io.appulse.encon.java.protocol.control.ControlMessageTag.EXIT2_TT;
+import static io.appulse.encon.java.module.connection.control.ControlMessageTag.EXIT2_TT;
 
 import io.appulse.encon.java.protocol.term.ErlangTerm;
 import io.appulse.encon.java.protocol.type.ErlangPid;
@@ -31,13 +31,13 @@ import lombok.NonNull;
  * @since 0.0.1
  */
 @EqualsAndHashCode(callSuper = true)
-public class Exit2TraceTokenControlMessage extends ExitTraceTokenControlMessage {
+public class Exit2TraceToken extends ExitTraceToken {
 
-  public Exit2TraceTokenControlMessage (@NonNull ErlangPid from, @NonNull ErlangPid to, @NonNull ErlangTerm traceToken, @NonNull ErlangTerm reason) {
+  public Exit2TraceToken (@NonNull ErlangPid from, @NonNull ErlangPid to, @NonNull ErlangTerm traceToken, @NonNull ErlangTerm reason) {
     super(from, to, traceToken, reason);
   }
 
-  public Exit2TraceTokenControlMessage (@NonNull ErlangTuple tuple) {
+  public Exit2TraceToken (@NonNull ErlangTuple tuple) {
     super(tuple);
   }
 

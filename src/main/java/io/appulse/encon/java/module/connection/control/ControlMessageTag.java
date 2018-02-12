@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package io.appulse.encon.java.protocol.control;
+package io.appulse.encon.java.module.connection.control;
 
 import lombok.Getter;
 
@@ -26,21 +26,21 @@ import lombok.Getter;
 @Getter
 public enum ControlMessageTag {
 
-  LINK(1, LinkControlMessage.class),
-  SEND(2, SendControlMessage.class),
-  EXIT(3, ExitControlMessage.class),
-  UNLINK(4, UnlinkControlMessage.class),
-  NODE_LINK(5, NodeLinkControlMessage.class),
-  REG_SEND(6, RegistrationSendControlMessage.class),
-  GROUP_LEADER(7, GroupLeaderControlMessage.class),
-  EXIT2(8, Exit2ControlMessage.class),
-  SEND_TT(12, SendTraceTokenControlMessage.class),
-  EXIT_TT(13, ExitTraceTokenControlMessage.class),
-  REG_SEND_TT(16, RegistrationSendTraceTokenControlMessage.class),
-  EXIT2_TT(18, Exit2TraceTokenControlMessage.class),
-  MONITOR_P(19, MonitorProcessControlMessage.class),
-  DEMONITOR_P(20, DemonitorProcessControlMessage.class),
-  MONITOR_P_EXIT(21, MonitorProcessExitControlMessage.class);
+  LINK(1, Link.class),
+  SEND(2, Send.class),
+  EXIT(3, Exit.class),
+  UNLINK(4, Unlink.class),
+  NODE_LINK(5, NodeLink.class),
+  REG_SEND(6, SendToRegisteredProcess.class),
+  GROUP_LEADER(7, GroupLeader.class),
+  EXIT2(8, Exit2.class),
+  SEND_TT(12, SendTraceToken.class),
+  EXIT_TT(13, ExitTraceToken.class),
+  REG_SEND_TT(16, SendToRegisteredProcessTraceToken.class),
+  EXIT2_TT(18, Exit2TraceToken.class),
+  MONITOR_P(19, MonitorProcess.class),
+  DEMONITOR_P(20, DemonitorProcess.class),
+  MONITOR_P_EXIT(21, MonitorProcessExit.class);
 
   private final int code;
 

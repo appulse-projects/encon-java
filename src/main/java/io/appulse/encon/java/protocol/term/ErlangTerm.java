@@ -46,8 +46,8 @@ import lombok.val;
 @Getter
 @EqualsAndHashCode
 @FieldDefaults(level = PRIVATE, makeFinal = true)
-public abstract class ErlangTerm implements IntegralNumberTerm,
-                                            FloatingPointNumberTerm,
+public abstract class ErlangTerm implements IntegerTerm,
+                                            FloatTerm,
                                             BooleanTerm,
                                             StringTerm,
                                             ContainerTerm,

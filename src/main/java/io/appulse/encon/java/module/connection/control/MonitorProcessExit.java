@@ -14,11 +14,11 @@
  * limitations under the License.
  */
 
-package io.appulse.encon.java.protocol.control;
+package io.appulse.encon.java.module.connection.control;
 
-import static io.appulse.encon.java.protocol.control.ControlMessageTag.MONITOR_P_EXIT;
+import static io.appulse.encon.java.module.connection.control.ControlMessageTag.MONITOR_P_EXIT;
 
-import io.appulse.encon.java.protocol.control.exception.ControlMessageParsingException;
+import io.appulse.encon.java.module.connection.control.exception.ControlMessageParsingException;
 import io.appulse.encon.java.protocol.term.ErlangTerm;
 import io.appulse.encon.java.protocol.type.ErlangPid;
 import io.appulse.encon.java.protocol.type.ErlangReference;
@@ -37,7 +37,7 @@ import lombok.Value;
 @Value
 @AllArgsConstructor
 @EqualsAndHashCode(callSuper = true)
-public class MonitorProcessExitControlMessage extends ControlMessage {
+public class MonitorProcessExit extends ControlMessage {
 
   @NonNull
   ErlangPid from;
@@ -51,7 +51,7 @@ public class MonitorProcessExitControlMessage extends ControlMessage {
   @NonNull
   ErlangTerm reason;
 
-  public MonitorProcessExitControlMessage (@NonNull ErlangTuple tuple) {
+  public MonitorProcessExit (@NonNull ErlangTuple tuple) {
     from = tuple.get(1)
         .filter(ErlangTerm::isPid)
         .map(ErlangTerm::asPid)

@@ -23,7 +23,7 @@ import java.math.BigInteger;
  * @author Artem Labazin
  * @since 0.0.1
  */
-public interface IntegralNumberTerm extends NumberTerm {
+public interface IntegerTerm extends NumberTerm {
 
   default boolean isIntegralNumber () {
     switch (getType()) {

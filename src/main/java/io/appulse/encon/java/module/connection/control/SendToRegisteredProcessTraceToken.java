@@ -14,11 +14,11 @@
  * limitations under the License.
  */
 
-package io.appulse.encon.java.protocol.control;
+package io.appulse.encon.java.module.connection.control;
 
-import static io.appulse.encon.java.protocol.control.ControlMessageTag.REG_SEND_TT;
+import static io.appulse.encon.java.module.connection.control.ControlMessageTag.REG_SEND_TT;
 
-import io.appulse.encon.java.protocol.control.exception.ControlMessageParsingException;
+import io.appulse.encon.java.module.connection.control.exception.ControlMessageParsingException;
 import io.appulse.encon.java.protocol.term.ErlangTerm;
 import io.appulse.encon.java.protocol.type.ErlangAtom;
 import io.appulse.encon.java.protocol.type.ErlangPid;
@@ -37,7 +37,7 @@ import lombok.Value;
 @Value
 @AllArgsConstructor
 @EqualsAndHashCode(callSuper = true)
-public class RegistrationSendTraceTokenControlMessage extends ControlMessage {
+public class SendToRegisteredProcessTraceToken extends ControlMessage {
 
   @NonNull
   ErlangPid from;
@@ -48,7 +48,7 @@ public class RegistrationSendTraceTokenControlMessage extends ControlMessage {
   @NonNull
   ErlangTerm traceToken;
 
-  public RegistrationSendTraceTokenControlMessage (@NonNull ErlangTuple tuple) {
+  public SendToRegisteredProcessTraceToken (@NonNull ErlangTuple tuple) {
     from = tuple.get(1)
         .filter(ErlangTerm::isPid)
         .map(ErlangTerm::asPid)

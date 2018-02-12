@@ -14,11 +14,11 @@
  * limitations under the License.
  */
 
-package io.appulse.encon.java.protocol.control;
+package io.appulse.encon.java.module.connection.control;
 
-import static io.appulse.encon.java.protocol.control.ControlMessageTag.DEMONITOR_P;
+import static io.appulse.encon.java.module.connection.control.ControlMessageTag.DEMONITOR_P;
 
-import io.appulse.encon.java.protocol.control.exception.ControlMessageParsingException;
+import io.appulse.encon.java.module.connection.control.exception.ControlMessageParsingException;
 import io.appulse.encon.java.protocol.term.ErlangTerm;
 import io.appulse.encon.java.protocol.type.ErlangPid;
 import io.appulse.encon.java.protocol.type.ErlangReference;
@@ -37,7 +37,7 @@ import lombok.Value;
 @Value
 @AllArgsConstructor
 @EqualsAndHashCode(callSuper = true)
-public class DemonitorProcessControlMessage extends ControlMessage {
+public class DemonitorProcess extends ControlMessage {
 
   @NonNull
   ErlangPid from;
@@ -48,7 +48,7 @@ public class DemonitorProcessControlMessage extends ControlMessage {
   @NonNull
   ErlangReference reference;
 
-  public DemonitorProcessControlMessage (@NonNull ErlangTuple tuple) {
+  public DemonitorProcess (@NonNull ErlangTuple tuple) {
     from = tuple.get(1)
         .filter(ErlangTerm::isPid)
         .map(ErlangTerm::asPid)

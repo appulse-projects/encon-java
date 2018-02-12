@@ -16,7 +16,7 @@
 
 package io.appulse.encon.java.module.ping;
 
-import static io.appulse.encon.java.protocol.request.ArrayItems.items;
+import static io.appulse.encon.java.module.mailbox.request.ArrayItems.items;
 import static java.lang.Boolean.TRUE;
 import static java.lang.Boolean.FALSE;
 import static lombok.AccessLevel.PRIVATE;
