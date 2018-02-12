@@ -31,12 +31,12 @@ public class ErlangListTest {
 
   @Test
   public void newInstance () {
-    val value = new Nil();
+    val value = new ErlangNil();
     val bytes = Bytes.allocate()
         .put1B(LIST.getCode())
         .put4B(1)
         .put(value.toBytes())
-        .put(new Nil().toBytes())
+        .put(new ErlangNil().toBytes())
         .array();
 
     ErlangList list = ErlangTerm.newInstance(bytes);
@@ -57,18 +57,18 @@ public class ErlangListTest {
           .isEqualTo(1);
 
       softly.assertThat(list.getTail())
-          .isEqualTo(new Nil());
+          .isEqualTo(new ErlangNil());
     });
   }
 
   @Test
   public void toBytes () {
-    val value = new Nil();
+    val value = new ErlangNil();
     val expected = Bytes.allocate()
         .put1B(LIST.getCode())
         .put4B(1)
         .put(value.toBytes())
-        .put(new Nil().toBytes())
+        .put(new ErlangNil().toBytes())
         .array();
 
     assertThat(new ErlangList(value).toBytes())

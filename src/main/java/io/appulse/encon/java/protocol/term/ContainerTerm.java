@@ -29,7 +29,7 @@ import java.util.Optional;
 
 import io.appulse.encon.java.protocol.type.ErlangList;
 import io.appulse.encon.java.protocol.type.ErlangMap;
-import io.appulse.encon.java.protocol.type.Tuple;
+import io.appulse.encon.java.protocol.type.ErlangTuple;
 
 /**
  *
@@ -83,7 +83,7 @@ public interface ContainerTerm extends ValueTerm, Iterable<ErlangTerm> {
     return getType() == SMALL_TUPLE || getType() == LARGE_TUPLE;
   }
 
-  default Tuple asTuple () {
+  default ErlangTuple asTuple () {
     return null;
   }
 

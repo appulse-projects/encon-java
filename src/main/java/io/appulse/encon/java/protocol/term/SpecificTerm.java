@@ -21,10 +21,10 @@ import static io.appulse.encon.java.protocol.TermType.NEW_PORT;
 import static io.appulse.encon.java.protocol.TermType.PID;
 import static io.appulse.encon.java.protocol.TermType.PORT;
 
-import io.appulse.encon.java.protocol.type.Atom;
-import io.appulse.encon.java.protocol.type.Pid;
-import io.appulse.encon.java.protocol.type.Port;
-import io.appulse.encon.java.protocol.type.Reference;
+import io.appulse.encon.java.protocol.type.ErlangAtom;
+import io.appulse.encon.java.protocol.type.ErlangPid;
+import io.appulse.encon.java.protocol.type.ErlangPort;
+import io.appulse.encon.java.protocol.type.ErlangReference;
 
 /**
  *
@@ -63,7 +63,7 @@ public interface SpecificTerm extends ValueTerm {
     }
   }
 
-  default Reference asReference () {
+  default ErlangReference asReference () {
     return null;
   }
 
@@ -71,7 +71,7 @@ public interface SpecificTerm extends ValueTerm {
     return getType() == PID || getType() == NEW_PID;
   }
 
-  default Pid asPid () {
+  default ErlangPid asPid () {
     return null;
   }
 
@@ -79,7 +79,7 @@ public interface SpecificTerm extends ValueTerm {
     return getType() == PORT || getType() == NEW_PORT;
   }
 
-  default Port asPort () {
+  default ErlangPort asPort () {
     return null;
   }
 
@@ -95,7 +95,7 @@ public interface SpecificTerm extends ValueTerm {
     }
   }
 
-  default Atom asAtom () {
+  default ErlangAtom asAtom () {
     return null;
   }
 }

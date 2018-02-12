@@ -41,17 +41,17 @@ import lombok.val;
 @ToString
 @FieldDefaults(level = PRIVATE)
 @EqualsAndHashCode(callSuper = true)
-public class Atom extends ErlangTerm {
+public class ErlangAtom extends ErlangTerm {
 
   private static final int MAX_LENGTH = 255;
 
   String value;
 
-  public Atom (TermType type) {
+  public ErlangAtom (TermType type) {
     super(type);
   }
 
-  public Atom (String value) {
+  public ErlangAtom (String value) {
     this(value.getBytes(UTF_8).length < 256
          ? SMALL_ATOM_UTF8
          : ATOM_UTF8);
@@ -59,7 +59,7 @@ public class Atom extends ErlangTerm {
     this.value = trim(value);
   }
 
-  public Atom (boolean value) {
+  public ErlangAtom (boolean value) {
     this(SMALL_ATOM_UTF8);
     this.value = Boolean.toString(value);
   }
@@ -75,7 +75,7 @@ public class Atom extends ErlangTerm {
   }
 
   @Override
-  public Atom asAtom () {
+  public ErlangAtom asAtom () {
     return this;
   }
 

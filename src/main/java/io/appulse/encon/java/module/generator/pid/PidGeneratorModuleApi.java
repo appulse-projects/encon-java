@@ -16,7 +16,7 @@
 
 package io.appulse.encon.java.module.generator.pid;
 
-import io.appulse.encon.java.protocol.type.Pid;
+import io.appulse.encon.java.protocol.type.ErlangPid;
 
 /**
  *
@@ -25,5 +25,5 @@ import io.appulse.encon.java.protocol.type.Pid;
  */
 public interface PidGeneratorModuleApi {
 
-  Pid generatePid ();
+  ErlangPid generatePid ();
 }

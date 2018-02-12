@@ -19,8 +19,8 @@ package io.appulse.encon.java.protocol.control;
 import static io.appulse.encon.java.protocol.control.ControlMessageTag.EXIT2;
 
 import io.appulse.encon.java.protocol.term.ErlangTerm;
-import io.appulse.encon.java.protocol.type.Pid;
-import io.appulse.encon.java.protocol.type.Tuple;
+import io.appulse.encon.java.protocol.type.ErlangPid;
+import io.appulse.encon.java.protocol.type.ErlangTuple;
 
 import lombok.EqualsAndHashCode;
 import lombok.NonNull;
@@ -33,11 +33,11 @@ import lombok.NonNull;
 @EqualsAndHashCode(callSuper = true)
 public class Exit2ControlMessage extends ExitControlMessage {
 
-  public Exit2ControlMessage (@NonNull Pid from, @NonNull Pid to, @NonNull ErlangTerm reason) {
+  public Exit2ControlMessage (@NonNull ErlangPid from, @NonNull ErlangPid to, @NonNull ErlangTerm reason) {
     super(from, to, reason);
   }
 
-  public Exit2ControlMessage (@NonNull Tuple tuple) {
+  public Exit2ControlMessage (@NonNull ErlangTuple tuple) {
     super(tuple);
   }
 

@@ -21,7 +21,7 @@ import static lombok.AccessLevel.PRIVATE;
 import java.util.concurrent.atomic.AtomicInteger;
 
 import io.appulse.encon.java.module.NodeInternalApi;
-import io.appulse.encon.java.protocol.type.Port;
+import io.appulse.encon.java.protocol.type.ErlangPort;
 
 import lombok.RequiredArgsConstructor;
 import lombok.experimental.FieldDefaults;
@@ -40,8 +40,8 @@ public class PortGeneratorModule implements PortGeneratorModuleApi {
   AtomicInteger count = new AtomicInteger(0);
 
   @Override
-  public Port generatePort () {
-    return Port.builder()
+  public ErlangPort generatePort () {
+    return ErlangPort.builder()
         .node(internal.node().getDescriptor().getFullName())
         .id(nextId())
         .creation(internal.creation())

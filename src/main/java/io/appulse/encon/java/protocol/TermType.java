@@ -19,21 +19,21 @@ package io.appulse.encon.java.protocol;
 import java.util.stream.Stream;
 
 import io.appulse.encon.java.protocol.term.ErlangTerm;
-import io.appulse.encon.java.protocol.type.Atom;
-import io.appulse.encon.java.protocol.type.Binary;
-import io.appulse.encon.java.protocol.type.BitString;
+import io.appulse.encon.java.protocol.type.ErlangAtom;
+import io.appulse.encon.java.protocol.type.ErlangBinary;
+import io.appulse.encon.java.protocol.type.ErlangBitString;
 import io.appulse.encon.java.protocol.type.ErlangList;
 import io.appulse.encon.java.protocol.type.ErlangMap;
 import io.appulse.encon.java.protocol.type.ErlangString;
-import io.appulse.encon.java.protocol.type.ExternalFunction;
-import io.appulse.encon.java.protocol.type.FloatingPointNumber;
-import io.appulse.encon.java.protocol.type.Function;
-import io.appulse.encon.java.protocol.type.IntegralNumber;
-import io.appulse.encon.java.protocol.type.Nil;
-import io.appulse.encon.java.protocol.type.Pid;
-import io.appulse.encon.java.protocol.type.Port;
-import io.appulse.encon.java.protocol.type.Reference;
-import io.appulse.encon.java.protocol.type.Tuple;
+import io.appulse.encon.java.protocol.type.ErlangExternalFunction;
+import io.appulse.encon.java.protocol.type.ErlangFloat;
+import io.appulse.encon.java.protocol.type.ErlangFunction;
+import io.appulse.encon.java.protocol.type.ErlangInteger;
+import io.appulse.encon.java.protocol.type.ErlangNil;
+import io.appulse.encon.java.protocol.type.ErlangPid;
+import io.appulse.encon.java.protocol.type.ErlangPort;
+import io.appulse.encon.java.protocol.type.ErlangReference;
+import io.appulse.encon.java.protocol.type.ErlangTuple;
 
 import lombok.Getter;
 
@@ -83,7 +83,7 @@ public enum TermType {
    * <p>
    * Unsigned 8-bit integer.
    */
-  SMALL_INTEGER(97, IntegralNumber.class),
+  SMALL_INTEGER(97, ErlangInteger.class),
 
   /**
    * The tag used for integer.
@@ -103,7 +103,7 @@ public enum TermType {
    * <p>
    * Signed 32-bit integer in big-endian format.
    */
-  INTEGER(98, IntegralNumber.class),
+  INTEGER(98, ErlangInteger.class),
 
   /**
    * The tag used for small big numbers.
@@ -133,7 +133,7 @@ public enum TermType {
    * <p>
    * {@code (d0*B^0 + d1*B^1 + d2*B^2 + ... d(N-1)*B^(n-1))}
    */
-  SMALL_BIG(110, IntegralNumber.class),
+  SMALL_BIG(110, ErlangInteger.class),
 
   /**
    * The tag used for large big numbers.
@@ -159,7 +159,7 @@ public enum TermType {
    * <p>
    * @see TermType#SMALL_BIG
    */
-  LARGE_BIG(111, IntegralNumber.class),
+  LARGE_BIG(111, ErlangInteger.class),
 
   /**
    * The tag used for float.
@@ -184,7 +184,7 @@ public enum TermType {
    * <p>
    * @see TermType#NEW_FLOAT
    */
-  FLOAT(99, FloatingPointNumber.class),
+  FLOAT(99, ErlangFloat.class),
 
   /**
    * The tag used for new float.
@@ -206,7 +206,7 @@ public enum TermType {
    * <p>
    * This term is used in minor version 1 of the external format.
    */
-  NEW_FLOAT(70, FloatingPointNumber.class),
+  NEW_FLOAT(70, ErlangFloat.class),
 
   /**
    * The tag used for reference.
@@ -239,7 +239,7 @@ public enum TermType {
    * <p>
    * @see TermType#NEW_REFERENCE
    */
-  REFERENCE(101, Reference.class),
+  REFERENCE(101, ErlangReference.class),
 
   /**
    * The tag used for new style reference.
@@ -277,8 +277,8 @@ public enum TermType {
    * <p>
    * @see TermType#REFERENCE
    */
-  NEW_REFERENCE(114, Reference.class),
-  NEWER_REFERENCE(90, Reference.class),
+  NEW_REFERENCE(114, ErlangReference.class),
+  NEWER_REFERENCE(90, ErlangReference.class),
 
   /**
    * The tag used for port.
@@ -306,8 +306,8 @@ public enum TermType {
    * <p>
    * @see TermType#REFERENCE
    */
-  PORT(102, Port.class),
-  NEW_PORT(89, Port.class),
+  PORT(102, ErlangPort.class),
+  NEW_PORT(89, ErlangPort.class),
 
   /**
    * The tag used for pid.
@@ -337,8 +337,8 @@ public enum TermType {
    * <p>
    * @see TermType#REFERENCE
    */
-  PID(103, Pid.class),
-  NEW_PID(88, Pid.class),
+  PID(103, ErlangPid.class),
+  NEW_PID(88, ErlangPid.class),
 
   /**
    * The tag used for small tuple.
@@ -361,7 +361,7 @@ public enum TermType {
    * Encodes a tuple. The arity field is an unsigned byte that determines how many elements that follows in section
    * Elements.
    */
-  SMALL_TUPLE(104, Tuple.class),
+  SMALL_TUPLE(104, ErlangTuple.class),
 
   /**
    * The tag used for large tuple.
@@ -385,7 +385,7 @@ public enum TermType {
    * <p>
    * @see TermType#SMALL_TUPLE
    */
-  LARGE_TUPLE(105, Tuple.class),
+  LARGE_TUPLE(105, ErlangTuple.class),
 
   /**
    * The tag used for map.
@@ -429,7 +429,7 @@ public enum TermType {
    * <p>
    * The representation for an empty list, that is, the Erlang syntax {@code []}.
    */
-  NIL(106, Nil.class),
+  NIL(106, ErlangNil.class),
 
   /**
    * The tag used for string.
@@ -507,7 +507,7 @@ public enum TermType {
    * {@code erlang:list_to_binary/1}, {@code erlang:term_to_binary/1}, or as input from binary ports. The Len length
    * field is an unsigned 4 byte integer (big-endian).
    */
-  BINARY(109, Binary.class),
+  BINARY(109, ErlangBinary.class),
 
   /**
    * This is the encoding of internal functions.
@@ -577,7 +577,7 @@ public enum TermType {
    * </tr>
    * </table>
    */
-  FUNCTION(117, Function.class),
+  FUNCTION(117, ErlangFunction.class),
 
   /**
    * This is the new encoding of internal funs: fun F/A and fun(Arg1,..) -> ... end.
@@ -684,7 +684,7 @@ public enum TermType {
    * </tr>
    * </table>
    */
-  NEW_FUNCTION(112, Function.class),
+  NEW_FUNCTION(112, ErlangFunction.class),
 
   /**
    * The tag used for external functions.
@@ -721,7 +721,7 @@ public enum TermType {
    * <p>
    * @see TermType#SMALL_INTEGER
    */
-  EXTERNAL_FUNCTION(113, ExternalFunction.class),
+  EXTERNAL_FUNCTION(113, ErlangExternalFunction.class),
 
   /**
    * The tag used for bitstring.
@@ -747,7 +747,7 @@ public enum TermType {
    * unsigned 4 byte integer (big-endian). The Bits field is the number of bits (1-8) that are used in the last byte
    * in the data field, counting from the most significant bit to the least significant.
    */
-  BIT_BINNARY(77, BitString.class),
+  BIT_BINNARY(77, ErlangBitString.class),
 
   /**
    * The tag used for UTF8 encoded atom.
@@ -774,7 +774,7 @@ public enum TermType {
    * <a href="http://erlang.org/doc/apps/erts/erl_ext_dist.html#utf8_atoms">note on UTF-8 encoded atoms</a> in the
    * beginning of this section.
    */
-  ATOM_UTF8(118, Atom.class),
+  ATOM_UTF8(118, ErlangAtom.class),
 
   /**
    * The tag used for small UTF8 encoded atom.
@@ -801,7 +801,7 @@ public enum TermType {
    * <a href="http://erlang.org/doc/apps/erts/erl_ext_dist.html#utf8_atoms">note on UTF-8 encoded atoms</a> in the
    * beginning of this section.
    */
-  SMALL_ATOM_UTF8(119, Atom.class),
+  SMALL_ATOM_UTF8(119, ErlangAtom.class),
 
   /**
    * The tag used for atom.
@@ -826,7 +826,7 @@ public enum TermType {
    * <p>
    * @deprecated
    */
-  ATOM(100, Atom.class),
+  ATOM(100, ErlangAtom.class),
 
   /**
    * The tag used for small atom.
@@ -856,7 +856,7 @@ public enum TermType {
    * <p>
    * @deprecated
    */
-  SMALL_ATOM(115, Atom.class),
+  SMALL_ATOM(115, ErlangAtom.class),
 
   /**
    * The tag used for compressed term.

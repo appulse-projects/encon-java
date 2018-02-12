@@ -29,7 +29,7 @@ import io.appulse.encon.java.RemoteNode;
 import io.appulse.encon.java.module.NodeInternalApi;
 import io.appulse.encon.java.protocol.request.RequestBuilder;
 import io.appulse.encon.java.protocol.term.ErlangTerm;
-import io.appulse.encon.java.protocol.type.Pid;
+import io.appulse.encon.java.protocol.type.ErlangPid;
 
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -67,7 +67,7 @@ public class Mailbox implements Closeable {
 
   @Getter
   @NonNull
-  Pid pid;
+  ErlangPid pid;
 
   ExecutorService executor = Executors.newSingleThreadExecutor();
 
@@ -83,7 +83,7 @@ public class Mailbox implements Closeable {
     log.debug("Uh?");
   }
 
-  public void send (@NonNull Pid pid, @NonNull ErlangTerm message) {
+  public void send (@NonNull ErlangPid pid, @NonNull ErlangTerm message) {
     val remoteAddress = pid.getDescriptor().getAddress();
     val localAddress = internal.node().getDescriptor().getAddress();
     if (remoteAddress.equals(localAddress)) {

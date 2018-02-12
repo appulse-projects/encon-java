@@ -22,15 +22,15 @@ import static lombok.AccessLevel.PRIVATE;
 import java.math.BigInteger;
 
 import io.appulse.encon.java.protocol.term.ErlangTerm;
-import io.appulse.encon.java.protocol.type.Atom;
-import io.appulse.encon.java.protocol.type.Binary;
+import io.appulse.encon.java.protocol.type.ErlangAtom;
+import io.appulse.encon.java.protocol.type.ErlangBinary;
 import io.appulse.encon.java.protocol.type.ErlangString;
-import io.appulse.encon.java.protocol.type.FloatingPointNumber;
-import io.appulse.encon.java.protocol.type.IntegralNumber;
-import io.appulse.encon.java.protocol.type.Nil;
-import io.appulse.encon.java.protocol.type.Pid;
-import io.appulse.encon.java.protocol.type.Port;
-import io.appulse.encon.java.protocol.type.Reference;
+import io.appulse.encon.java.protocol.type.ErlangFloat;
+import io.appulse.encon.java.protocol.type.ErlangInteger;
+import io.appulse.encon.java.protocol.type.ErlangNil;
+import io.appulse.encon.java.protocol.type.ErlangPid;
+import io.appulse.encon.java.protocol.type.ErlangPort;
+import io.appulse.encon.java.protocol.type.ErlangReference;
 
 import lombok.Getter;
 import lombok.NonNull;
@@ -48,67 +48,67 @@ import lombok.Value;
 public class MapItem {
 
   public static MapItem atom (boolean value) {
-    return new MapItem(new Atom(value));
+    return new MapItem(new ErlangAtom(value));
   }
 
   public static MapItem number (char value) {
-    return new MapItem(new IntegralNumber(value));
+    return new MapItem(new ErlangInteger(value));
   }
 
   public static MapItem number (byte value) {
-    return new MapItem(new IntegralNumber(value));
+    return new MapItem(new ErlangInteger(value));
   }
 
   public static MapItem binary (@NonNull byte[] value) {
-    return new MapItem(new Binary(value));
+    return new MapItem(new ErlangBinary(value));
   }
 
   public static MapItem number (short value) {
-    return new MapItem(new IntegralNumber(value));
+    return new MapItem(new ErlangInteger(value));
   }
 
   public static MapItem number (int value) {
-    return new MapItem(new IntegralNumber(value));
+    return new MapItem(new ErlangInteger(value));
   }
 
   public static MapItem number (long value) {
-    return new MapItem(new IntegralNumber(value));
+    return new MapItem(new ErlangInteger(value));
   }
 
   public static MapItem number (@NonNull BigInteger value) {
-    return new MapItem(new IntegralNumber(value));
+    return new MapItem(new ErlangInteger(value));
   }
 
   public static MapItem number (float value) {
-    return new MapItem(new FloatingPointNumber(value));
+    return new MapItem(new ErlangFloat(value));
   }
 
   public static MapItem number (double value) {
-    return new MapItem(new FloatingPointNumber(value));
+    return new MapItem(new ErlangFloat(value));
   }
 
   public static MapItem atom (@NonNull String value) {
-    return new MapItem(new Atom(value));
+    return new MapItem(new ErlangAtom(value));
   }
 
   public static MapItem string (@NonNull String value) {
     return new MapItem(new ErlangString(value)); // List/BitString?
   }
 
-  public static MapItem pid (@NonNull Pid value) {
+  public static MapItem pid (@NonNull ErlangPid value) {
     return new MapItem(value);
   }
 
-  public static MapItem port (@NonNull Port value) {
+  public static MapItem port (@NonNull ErlangPort value) {
     return new MapItem(value);
   }
 
-  public static MapItem reference (@NonNull Reference value) {
+  public static MapItem reference (@NonNull ErlangReference value) {
     return new MapItem(value);
   }
 
   public static MapItem nil () {
-    return new MapItem(new Nil());
+    return new MapItem(new ErlangNil());
   }
 
   ErlangTerm term;

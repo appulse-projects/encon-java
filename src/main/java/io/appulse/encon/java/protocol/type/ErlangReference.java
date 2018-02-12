@@ -43,7 +43,7 @@ import lombok.val;
 @ToString
 @FieldDefaults(level = PRIVATE)
 @EqualsAndHashCode(callSuper = true)
-public class Reference extends ErlangTerm {
+public class ErlangReference extends ErlangTerm {
 
   String node;
 
@@ -51,12 +51,12 @@ public class Reference extends ErlangTerm {
 
   int creation;
 
-  public Reference (TermType type) {
+  public ErlangReference (TermType type) {
     super(type);
   }
 
   @Builder
-  public Reference (TermType type, @NonNull String node, int id, int[] ids, int creation) {
+  public ErlangReference (TermType type, @NonNull String node, int id, int[] ids, int creation) {
     this(ofNullable(type).orElse(NEW_REFERENCE));
     this.node = node;
     this.ids = ofNullable(ids)
@@ -99,7 +99,7 @@ public class Reference extends ErlangTerm {
   }
 
   @Override
-  public Reference asReference () {
+  public ErlangReference asReference () {
     return this;
   }
 
@@ -107,7 +107,7 @@ public class Reference extends ErlangTerm {
   protected void read (@NonNull Bytes buffer) {
     switch (getType()) {
     case REFERENCE:
-      Atom atom = ErlangTerm.newInstance(buffer);
+      ErlangAtom atom = ErlangTerm.newInstance(buffer);
       node = atom.asText();
       ids = new int[] { buffer.getInt() & 0x3FFFF };
       creation = buffer.getByte() & 0x03;
@@ -124,7 +124,7 @@ public class Reference extends ErlangTerm {
       throw new RuntimeException();
     }
 
-    Atom atom = ErlangTerm.newInstance(buffer);
+    ErlangAtom atom = ErlangTerm.newInstance(buffer);
     node = atom.asText();
 
     if (getType() == NEW_REFERENCE) {
@@ -142,7 +142,7 @@ public class Reference extends ErlangTerm {
   protected void write (@NonNull Bytes buffer) {
     switch (getType()) {
     case REFERENCE:
-      buffer.put(new Atom(node).toBytes());
+      buffer.put(new ErlangAtom(node).toBytes());
       buffer.put4B(ids[0] & 0x3FFFF);
       buffer.put1B(creation);
       return;
@@ -154,7 +154,7 @@ public class Reference extends ErlangTerm {
     }
 
     buffer.put2B(ids.length);
-    buffer.put(new Atom(node).toBytes());
+    buffer.put(new ErlangAtom(node).toBytes());
 
     switch (getType()) {
     case NEW_REFERENCE:

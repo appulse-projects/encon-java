@@ -38,13 +38,13 @@ public class PidTest {
 
     val bytes = Bytes.allocate()
         .put1B(PID.getCode())
-        .put(new Atom(node).toBytes())
+        .put(new ErlangAtom(node).toBytes())
         .put4B(id & 0x7FFF)
         .put4B(serial & 0x1FFF)
         .put1B(creation & 0x3)
         .array();
 
-    Pid pid = ErlangTerm.newInstance(bytes);
+    ErlangPid pid = ErlangTerm.newInstance(bytes);
     assertThat(pid).isNotNull();
 
     SoftAssertions.assertSoftly(softly -> {
@@ -71,13 +71,13 @@ public class PidTest {
 
     val expected = Bytes.allocate()
         .put1B(PID.getCode())
-        .put(new Atom(NodeDescriptor.from(node).getFullName()).toBytes())
+        .put(new ErlangAtom(NodeDescriptor.from(node).getFullName()).toBytes())
         .put4B(id & 0x7FFF)
         .put4B(serial & 0x1FFF)
         .put1B(creation & 0x3)
         .array();
 
-    assertThat(Pid.builder()
+    assertThat(ErlangPid.builder()
             .node(node)
             .id(id)
             .serial(serial)

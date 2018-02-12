@@ -19,7 +19,7 @@ package io.appulse.encon.java.protocol.request;
 import io.appulse.encon.java.module.mailbox.Mailbox;
 import io.appulse.encon.java.NodeDescriptor;
 import io.appulse.encon.java.RemoteNode;
-import io.appulse.encon.java.protocol.type.Pid;
+import io.appulse.encon.java.protocol.type.ErlangPid;
 
 import lombok.NonNull;
 
@@ -35,7 +35,7 @@ abstract class AbstractPrepareMessageBeforeSendRequestBuilder extends RequestInv
   }
 
   @Override
-  public void send (@NonNull Pid pid) {
+  public void send (@NonNull ErlangPid pid) {
     prepareMessage();
     super.send(pid);
   }

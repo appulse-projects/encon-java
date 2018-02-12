@@ -16,10 +16,10 @@
 
 package io.appulse.encon.java.protocol;
 
-import io.appulse.encon.java.protocol.type.IntegralNumber;
-import io.appulse.encon.java.protocol.type.Nil;
-import io.appulse.encon.java.protocol.type.Pid;
-import io.appulse.encon.java.protocol.type.Tuple;
+import io.appulse.encon.java.protocol.type.ErlangInteger;
+import io.appulse.encon.java.protocol.type.ErlangNil;
+import io.appulse.encon.java.protocol.type.ErlangPid;
+import io.appulse.encon.java.protocol.type.ErlangTuple;
 import io.appulse.utils.Bytes;
 
 public class DistributionHeader {
@@ -30,10 +30,10 @@ public class DistributionHeader {
         .put1B(131)
         .put1B(68)
         // control message
-        .put(Tuple.builder()
-            .add(new IntegralNumber(2))
-            .add(new Nil())
-            .add(new Pid(null))
+        .put(ErlangTuple.builder()
+            .add(new ErlangInteger(2))
+            .add(new ErlangNil())
+            .add(new ErlangPid(null))
             .build()
             .toBytes()
         )

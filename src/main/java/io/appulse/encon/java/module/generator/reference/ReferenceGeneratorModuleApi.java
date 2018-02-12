@@ -16,7 +16,7 @@
 
 package io.appulse.encon.java.module.generator.reference;
 
-import io.appulse.encon.java.protocol.type.Reference;
+import io.appulse.encon.java.protocol.type.ErlangReference;
 
 /**
  *
@@ -25,5 +25,5 @@ import io.appulse.encon.java.protocol.type.Reference;
  */
 public interface ReferenceGeneratorModuleApi {
 
-  Reference generateReference ();
+  ErlangReference generateReference ();
 }

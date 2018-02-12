@@ -21,7 +21,7 @@ import static lombok.AccessLevel.PRIVATE;
 import java.util.concurrent.atomic.AtomicInteger;
 
 import io.appulse.encon.java.module.NodeInternalApi;
-import io.appulse.encon.java.protocol.type.Pid;
+import io.appulse.encon.java.protocol.type.ErlangPid;
 
 import lombok.RequiredArgsConstructor;
 import lombok.experimental.FieldDefaults;
@@ -42,11 +42,11 @@ public class PidGeneratorModule implements PidGeneratorModuleApi {
   AtomicInteger serial = new AtomicInteger(0);
 
   @Override
-  public Pid generatePid () {
+  public ErlangPid generatePid () {
     int nextId = nextId();
     int nextSerial = nextSerial(nextId);
 
-    return Pid.builder()
+    return ErlangPid.builder()
         .node(internal.node().getDescriptor().getFullName())
         .id(nextId)
         .serial(nextSerial)

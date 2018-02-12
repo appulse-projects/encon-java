@@ -20,10 +20,10 @@ import java.lang.reflect.Constructor;
 import java.util.stream.Stream;
 
 import io.appulse.encon.java.protocol.term.ErlangTerm;
-import io.appulse.encon.java.protocol.type.IntegralNumber;
-import io.appulse.encon.java.protocol.type.Nil;
-import io.appulse.encon.java.protocol.type.Tuple;
-import io.appulse.encon.java.protocol.type.Tuple.TupleBuilder;
+import io.appulse.encon.java.protocol.type.ErlangInteger;
+import io.appulse.encon.java.protocol.type.ErlangNil;
+import io.appulse.encon.java.protocol.type.ErlangTuple;
+import io.appulse.encon.java.protocol.type.ErlangTuple.ErlangTupleBuilder;
 import lombok.NonNull;
 import lombok.SneakyThrows;
 import lombok.val;
@@ -35,7 +35,7 @@ import lombok.val;
  */
 public abstract class ControlMessage {
 
-  protected static final ErlangTerm UNUSED = new Nil();
+  protected static final ErlangTerm UNUSED = new ErlangNil();
 
   @SneakyThrows
   @SuppressWarnings("unchecked")
@@ -56,13 +56,13 @@ public abstract class ControlMessage {
         .orElseThrow(() -> new RuntimeException());
 
     Class<T> type = (Class<T>) tag.getType();
-    Constructor<T> constructor = type.getConstructor(Tuple.class);
+    Constructor<T> constructor = type.getConstructor(ErlangTuple.class);
     return constructor.newInstance(tuple);
   }
 
-  public Tuple toTuple () {
-    TupleBuilder builder = Tuple.builder();
-    builder.add(IntegralNumber.from(getTag().getCode()));
+  public ErlangTuple toTuple () {
+    ErlangTupleBuilder builder = ErlangTuple.builder();
+    builder.add(ErlangInteger.from(getTag().getCode()));
     Stream.of(elements()).forEach(builder::add);
     return builder.build();
   }

@@ -33,8 +33,8 @@ import io.appulse.encon.java.protocol.control.ControlMessage;
 import io.appulse.encon.java.protocol.control.RegistrationSendControlMessage;
 import io.appulse.encon.java.protocol.control.SendControlMessage;
 import io.appulse.encon.java.protocol.term.ErlangTerm;
-import io.appulse.encon.java.protocol.type.Atom;
-import io.appulse.encon.java.protocol.type.Pid;
+import io.appulse.encon.java.protocol.type.ErlangAtom;
+import io.appulse.encon.java.protocol.type.ErlangPid;
 import io.netty.bootstrap.Bootstrap;
 import io.netty.channel.ChannelInitializer;
 import io.netty.channel.ChannelOutboundHandler;
@@ -112,15 +112,15 @@ public class RemoteConnection implements Closeable {
     bootstrap.connect(remote.getDescriptor().getAddress(), remote.getPort());
   }
 
-  public void sendReg (@NonNull Pid from, @NonNull String mailbox, @NonNull ErlangTerm message) {
-    sendReg(from, new Atom(mailbox), message);
+  public void sendReg (@NonNull ErlangPid from, @NonNull String mailbox, @NonNull ErlangTerm message) {
+    sendReg(from, new ErlangAtom(mailbox), message);
   }
 
-  public void sendReg (@NonNull Pid from, @NonNull Atom mailbox, @NonNull ErlangTerm message) {
+  public void sendReg (@NonNull ErlangPid from, @NonNull ErlangAtom mailbox, @NonNull ErlangTerm message) {
     send(new RegistrationSendControlMessage(from, mailbox), message);
   }
 
-  public void send (@NonNull Pid to, @NonNull ErlangTerm message) {
+  public void send (@NonNull ErlangPid to, @NonNull ErlangTerm message) {
     send(new SendControlMessage(to), message);
   }
 

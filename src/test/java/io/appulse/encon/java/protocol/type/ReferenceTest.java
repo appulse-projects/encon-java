@@ -32,7 +32,7 @@ public class ReferenceTest {
 
   @Test
   public void instantiate () {
-    assertThat(Reference.builder()
+    assertThat(ErlangReference.builder()
             .node("popa")
             .id(3)
             .creation(3)
@@ -51,7 +51,7 @@ public class ReferenceTest {
     val builder = Bytes.allocate()
         .put1B(NEW_REFERENCE.getCode())
         .put2B(ids.length)
-        .put(new Atom(node).toBytes())
+        .put(new ErlangAtom(node).toBytes())
         .put1B(creation)
         .put4B(ids[0] & 0x3FFFF);
 
@@ -61,7 +61,7 @@ public class ReferenceTest {
 
     val expected = builder.array();
 
-    Reference reference = ErlangTerm.newInstance(expected);
+    ErlangReference reference = ErlangTerm.newInstance(expected);
     assertThat(reference).isNotNull();
 
     SoftAssertions.assertSoftly(softly -> {
@@ -88,7 +88,7 @@ public class ReferenceTest {
     val builder = Bytes.allocate()
         .put1B(NEW_REFERENCE.getCode())
         .put2B(ids.length)
-        .put(new Atom(node).toBytes())
+        .put(new ErlangAtom(node).toBytes())
         .put1B(creation & 0x3)
         .put4B(ids[0] & 0x3FFFF);
 
@@ -98,7 +98,7 @@ public class ReferenceTest {
 
     val expected = builder.array();
 
-    assertThat(Reference.builder()
+    assertThat(ErlangReference.builder()
             .node(node)
             .ids(ids)
             .creation(creation)

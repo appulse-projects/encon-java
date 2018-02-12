@@ -87,12 +87,12 @@ public class ErlangMap extends ErlangTerm {
 
   @Override
   public Optional<ErlangTerm> get (int index) {
-    return get(new IntegralNumber(index));
+    return get(new ErlangInteger(index));
   }
 
   @Override
   public Optional<ErlangTerm> getByAtom (String fieldName) {
-    return get(new Atom(fieldName));
+    return get(new ErlangAtom(fieldName));
   }
 
   @Override

@@ -32,7 +32,7 @@ public class BinaryTest {
   public void instantiate () {
     val value = new byte[] { 1, 2, 3 };
 
-    assertThat(new Binary(value).asBinary())
+    assertThat(new ErlangBinary(value).asBinary())
         .isEqualTo(value);
   }
 
@@ -46,7 +46,7 @@ public class BinaryTest {
         .put(value)
         .array();
 
-    Binary binary = ErlangTerm.newInstance(bytes);
+    ErlangBinary binary = ErlangTerm.newInstance(bytes);
     assertThat(binary).isNotNull();
 
     SoftAssertions.assertSoftly(softly -> {
@@ -68,7 +68,7 @@ public class BinaryTest {
         .put(value)
         .array();
 
-    assertThat(new Binary(value).toBytes())
+    assertThat(new ErlangBinary(value).toBytes())
         .isEqualTo(expected);
   }
 }

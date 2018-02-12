@@ -16,7 +16,7 @@
 
 package io.appulse.encon.java.module.generator.port;
 
-import io.appulse.encon.java.protocol.type.Port;
+import io.appulse.encon.java.protocol.type.ErlangPort;
 
 /**
  *
@@ -24,5 +24,5 @@ import io.appulse.encon.java.protocol.type.Port;
  * @since 0.0.1
  */
 public interface PortGeneratorModuleApi {
-  Port generatePort ();
+  ErlangPort generatePort ();
 }

@@ -25,15 +25,15 @@ import java.util.LinkedList;
 import java.util.List;
 
 import io.appulse.encon.java.protocol.term.ErlangTerm;
-import io.appulse.encon.java.protocol.type.Atom;
-import io.appulse.encon.java.protocol.type.Binary;
+import io.appulse.encon.java.protocol.type.ErlangAtom;
+import io.appulse.encon.java.protocol.type.ErlangBinary;
 import io.appulse.encon.java.protocol.type.ErlangString;
-import io.appulse.encon.java.protocol.type.FloatingPointNumber;
-import io.appulse.encon.java.protocol.type.IntegralNumber;
-import io.appulse.encon.java.protocol.type.Nil;
-import io.appulse.encon.java.protocol.type.Pid;
-import io.appulse.encon.java.protocol.type.Port;
-import io.appulse.encon.java.protocol.type.Reference;
+import io.appulse.encon.java.protocol.type.ErlangFloat;
+import io.appulse.encon.java.protocol.type.ErlangInteger;
+import io.appulse.encon.java.protocol.type.ErlangNil;
+import io.appulse.encon.java.protocol.type.ErlangPid;
+import io.appulse.encon.java.protocol.type.ErlangPort;
+import io.appulse.encon.java.protocol.type.ErlangReference;
 
 import lombok.Getter;
 import lombok.NonNull;
@@ -56,62 +56,62 @@ public abstract class AbstractArrayRequestBuilder extends AbstractPrepareMessage
   }
 
   public AbstractArrayRequestBuilder add (boolean value) {
-    terms.add(new Atom(value));
+    terms.add(new ErlangAtom(value));
     return this;
   }
 
   public AbstractArrayRequestBuilder add (char value) {
-    terms.add(new IntegralNumber(value));
+    terms.add(new ErlangInteger(value));
     return this;
   }
 
   public AbstractArrayRequestBuilder add (byte value) {
-    terms.add(new IntegralNumber(value));
+    terms.add(new ErlangInteger(value));
     return this;
   }
 
   public AbstractArrayRequestBuilder add (@NonNull byte[] value) {
-    terms.add(new Binary(value));
+    terms.add(new ErlangBinary(value));
     return this;
   }
 
   public AbstractArrayRequestBuilder add (short value) {
-    terms.add(new IntegralNumber(value));
+    terms.add(new ErlangInteger(value));
     return this;
   }
 
   public AbstractArrayRequestBuilder add (int value) {
-    terms.add(new IntegralNumber(value));
+    terms.add(new ErlangInteger(value));
     return this;
   }
 
   public AbstractArrayRequestBuilder add (long value) {
-    terms.add(new IntegralNumber(value));
+    terms.add(new ErlangInteger(value));
     return this;
   }
 
   public AbstractArrayRequestBuilder add (@NonNull BigInteger value) {
-    terms.add(new IntegralNumber(value));
+    terms.add(new ErlangInteger(value));
     return this;
   }
 
   public AbstractArrayRequestBuilder add (float value) {
-    terms.add(new FloatingPointNumber(value));
+    terms.add(new ErlangFloat(value));
     return this;
   }
 
   public AbstractArrayRequestBuilder add (double value) {
-    terms.add(new FloatingPointNumber(value));
+    terms.add(new ErlangFloat(value));
     return this;
   }
 
   public AbstractArrayRequestBuilder addAtom (@NonNull String value) {
-    terms.add(new Atom(value));
+    terms.add(new ErlangAtom(value));
     return this;
   }
 
   public AbstractArrayRequestBuilder addNil () {
-    terms.add(new Nil());
+    terms.add(new ErlangNil());
     return this;
   }
 
@@ -120,17 +120,17 @@ public abstract class AbstractArrayRequestBuilder extends AbstractPrepareMessage
     return this;
   }
 
-  public AbstractArrayRequestBuilder add (@NonNull Pid value) {
+  public AbstractArrayRequestBuilder add (@NonNull ErlangPid value) {
     terms.add(value);
     return this;
   }
 
-  public AbstractArrayRequestBuilder add (@NonNull Port value) {
+  public AbstractArrayRequestBuilder add (@NonNull ErlangPort value) {
     terms.add(value);
     return this;
   }
 
-  public AbstractArrayRequestBuilder add (@NonNull Reference value) {
+  public AbstractArrayRequestBuilder add (@NonNull ErlangReference value) {
     terms.add(value);
     return this;
   }

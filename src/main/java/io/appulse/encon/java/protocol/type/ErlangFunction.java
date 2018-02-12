@@ -43,9 +43,9 @@ import lombok.experimental.FieldDefaults;
 @ToString
 @FieldDefaults(level = PRIVATE)
 @EqualsAndHashCode(callSuper = true)
-public class Function extends ErlangTerm {
+public class ErlangFunction extends ErlangTerm {
 
-  Pid pid;
+  ErlangPid pid;
 
   String module;
 
@@ -61,12 +61,12 @@ public class Function extends ErlangTerm {
 
   int oldIndex;
 
-  public Function (TermType type) {
+  public ErlangFunction (TermType type) {
     super(type);
   }
 
   @Builder
-  private Function (Pid pid, String module, int index, int unique, ErlangTerm[] variables,
+  private ErlangFunction (ErlangPid pid, String module, int index, int unique, ErlangTerm[] variables,
               int arity, byte[] md5, int oldIndex) {
     super(md5 == null
         ? FUNCTION
@@ -91,13 +91,13 @@ public class Function extends ErlangTerm {
 
       pid = ErlangTerm.newInstance(buffer);
 
-      Atom atomModule = ErlangTerm.newInstance(buffer);
+      ErlangAtom atomModule = ErlangTerm.newInstance(buffer);
       module = atomModule.asText();
 
-      IntegralNumber numberIndex = ErlangTerm.newInstance(buffer);
+      ErlangInteger numberIndex = ErlangTerm.newInstance(buffer);
       index = numberIndex.asInt();
 
-      IntegralNumber numberUnique = ErlangTerm.newInstance(buffer);
+      ErlangInteger numberUnique = ErlangTerm.newInstance(buffer);
       unique = numberUnique.asInt();
 
     } else if (getType() == NEW_FUNCTION) {
@@ -111,13 +111,13 @@ public class Function extends ErlangTerm {
 
       freeVariablesCount = buffer.getInt();
 
-      Atom atomModule = ErlangTerm.newInstance(buffer);
+      ErlangAtom atomModule = ErlangTerm.newInstance(buffer);
       module = atomModule.asText();
 
-      IntegralNumber numberOldIndex = ErlangTerm.newInstance(buffer);
+      ErlangInteger numberOldIndex = ErlangTerm.newInstance(buffer);
       oldIndex = numberOldIndex.asInt();
 
-      IntegralNumber numberUnique = ErlangTerm.newInstance(buffer);
+      ErlangInteger numberUnique = ErlangTerm.newInstance(buffer);
       unique = numberUnique.asInt();
 
       pid = ErlangTerm.newInstance(buffer);
@@ -135,9 +135,9 @@ public class Function extends ErlangTerm {
     case FUNCTION:
       buffer.put4B(variables.length);
       buffer.put(pid.toBytes());
-      buffer.put(new Atom(module).toBytes());
-      buffer.put(new IntegralNumber(index).toBytes());
-      buffer.put(new IntegralNumber(unique).toBytes());
+      buffer.put(new ErlangAtom(module).toBytes());
+      buffer.put(new ErlangInteger(index).toBytes());
+      buffer.put(new ErlangInteger(unique).toBytes());
       Stream.of(variables)
           .map(ErlangTerm::toBytes)
           .forEach(buffer::put);
@@ -149,9 +149,9 @@ public class Function extends ErlangTerm {
       buffer.put(md5);
       buffer.put4B(index);
       buffer.put4B(variables.length);
-      buffer.put(new Atom(module).toBytes());
-      buffer.put(new IntegralNumber(oldIndex).toBytes());
-      buffer.put(new IntegralNumber(unique).toBytes());
+      buffer.put(new ErlangAtom(module).toBytes());
+      buffer.put(new ErlangInteger(oldIndex).toBytes());
+      buffer.put(new ErlangInteger(unique).toBytes());
       buffer.put(pid.toBytes());
       Stream.of(variables)
           .map(ErlangTerm::toBytes)

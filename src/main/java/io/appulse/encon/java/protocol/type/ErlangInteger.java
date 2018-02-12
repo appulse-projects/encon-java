@@ -44,7 +44,7 @@ import lombok.val;
 @ToString
 @FieldDefaults(level = PRIVATE)
 @EqualsAndHashCode(callSuper = true)
-public class IntegralNumber extends ErlangTerm {
+public class ErlangInteger extends ErlangTerm {
 
   private static final int MAX_INTEGER;
 
@@ -54,7 +54,7 @@ public class IntegralNumber extends ErlangTerm {
 
   private static final int MAX_CACHE;
 
-  private static final IntegralNumber[] CACHE;
+  private static final ErlangInteger[] CACHE;
 
   static {
     MAX_INTEGER = (1 << 27) - 1;
@@ -65,39 +65,39 @@ public class IntegralNumber extends ErlangTerm {
 
     CACHE = IntStream.range(MIN_CACHE, MAX_CACHE)
         .boxed()
-        .map(IntegralNumber::new)
-        .toArray(IntegralNumber[]::new);
+        .map(ErlangInteger::new)
+        .toArray(ErlangInteger[]::new);
   }
 
-  public static IntegralNumber from (int number) {
+  public static ErlangInteger from (int number) {
     return number > MAX_CACHE || number < MIN_CACHE
-           ? new IntegralNumber(number)
+           ? new ErlangInteger(number)
            : CACHE[number - MIN_CACHE];
   }
 
   BigInteger value;
 
-  public IntegralNumber (TermType type) {
+  public ErlangInteger (TermType type) {
     super(type);
   }
 
-  public IntegralNumber (char value) {
+  public ErlangInteger (char value) {
     this((long) value);
   }
 
-  public IntegralNumber (byte value) {
+  public ErlangInteger (byte value) {
     this((long) value);
   }
 
-  public IntegralNumber (short value) {
+  public ErlangInteger (short value) {
     this((long) value);
   }
 
-  public IntegralNumber (int value) {
+  public ErlangInteger (int value) {
     this((long) value);
   }
 
-  public IntegralNumber (long value) {
+  public ErlangInteger (long value) {
     this(
         (value & 0xFFL) == value
         ? SMALL_INTEGER
@@ -108,7 +108,7 @@ public class IntegralNumber extends ErlangTerm {
     this.value = BigInteger.valueOf(value);
   }
 
-  public IntegralNumber (BigInteger value) {
+  public ErlangInteger (BigInteger value) {
     this(
         value.abs().toByteArray().length < 256
         ? SMALL_BIG
@@ -124,7 +124,7 @@ public class IntegralNumber extends ErlangTerm {
 
   @Override
   public boolean isInt () {
-    return (value.bitLength() + 1) <= Integer.SIZE;
+    return (value.bitLength() + 1) <= java.lang.Integer.SIZE;
   }
 
   @Override

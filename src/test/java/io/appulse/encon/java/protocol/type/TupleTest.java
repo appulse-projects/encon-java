@@ -34,28 +34,28 @@ public class TupleTest {
 
   @Test
   public void instantiate () {
-    assertThat(new Tuple(new Nil()).getType())
+    assertThat(new ErlangTuple(new ErlangNil()).getType())
         .isEqualTo(SMALL_TUPLE);
 
     val elements = IntStream.range(0, 257)
         .boxed()
-        .map(it -> new Nil())
+        .map(it -> new ErlangNil())
         .toArray(ErlangTerm[]::new);
 
-    assertThat(new Tuple(elements).getType())
+    assertThat(new ErlangTuple(elements).getType())
         .isEqualTo(LARGE_TUPLE);
   }
 
   @Test
   public void newInstance () {
-    val value = new Nil();
+    val value = new ErlangNil();
     val bytes = Bytes.allocate()
         .put1B(SMALL_TUPLE.getCode())
         .put1B(1)
         .put(value.toBytes())
         .array();
 
-    Tuple tuple = ErlangTerm.newInstance(bytes);
+    ErlangTuple tuple = ErlangTerm.newInstance(bytes);
     assertThat(tuple).isNotNull();
 
     SoftAssertions.assertSoftly(softly -> {
@@ -76,14 +76,14 @@ public class TupleTest {
 
   @Test
   public void toBytes () {
-    val value = new Nil();
+    val value = new ErlangNil();
     val expected = Bytes.allocate()
         .put1B(SMALL_TUPLE.getCode())
         .put1B(1)
         .put(value.toBytes())
         .array();
 
-    assertThat(new Tuple(value).toBytes())
+    assertThat(new ErlangTuple(value).toBytes())
         .isEqualTo(expected);
   }
 }

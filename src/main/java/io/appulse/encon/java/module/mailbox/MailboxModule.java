@@ -27,7 +27,7 @@ import java.util.concurrent.ConcurrentHashMap;
 
 import io.appulse.encon.java.module.NodeInternalApi;
 import io.appulse.encon.java.module.mailbox.Mailbox.InboxHandler;
-import io.appulse.encon.java.protocol.type.Pid;
+import io.appulse.encon.java.protocol.type.ErlangPid;
 
 import lombok.NonNull;
 import lombok.RequiredArgsConstructor;
@@ -45,7 +45,7 @@ public class MailboxModule implements MailboxModuleApi, Closeable {
 
   NodeInternalApi internal;
 
-  Map<Pid, WeakReference<Mailbox>> pids = new ConcurrentHashMap<>();
+  Map<ErlangPid, WeakReference<Mailbox>> pids = new ConcurrentHashMap<>();
 
   Map<String, WeakReference<Mailbox>> names = new ConcurrentHashMap<>();
 
@@ -97,7 +97,7 @@ public class MailboxModule implements MailboxModuleApi, Closeable {
         .map(WeakReference::get);
   }
 
-  public Optional<Mailbox> getMailbox (Pid pid) {
+  public Optional<Mailbox> getMailbox (ErlangPid pid) {
     return ofNullable(pids.get(pid))
         .map(WeakReference::get);
   }

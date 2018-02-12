@@ -20,7 +20,7 @@ import static io.appulse.encon.java.protocol.control.ControlMessageTag.SEND;
 
 import io.appulse.encon.java.protocol.control.exception.ControlMessageParsingException;
 import io.appulse.encon.java.protocol.term.ErlangTerm;
-import io.appulse.encon.java.protocol.type.Tuple;
+import io.appulse.encon.java.protocol.type.ErlangTuple;
 
 import lombok.AllArgsConstructor;
 import lombok.EqualsAndHashCode;
@@ -40,7 +40,7 @@ public class SendControlMessage extends ControlMessage {
   @NonNull
   ErlangTerm to; // atom or pid
 
-  public SendControlMessage (@NonNull Tuple tuple) {
+  public SendControlMessage (@NonNull ErlangTuple tuple) {
     to = tuple.get(2)
         .filter(it -> it.isAtom() || it.isPid())
         .orElseThrow(ControlMessageParsingException::new);

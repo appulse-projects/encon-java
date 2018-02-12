@@ -33,7 +33,7 @@ public class NilTest {
         .put1B(NIL.getCode())
         .array();
 
-    Nil nil = ErlangTerm.newInstance(bytes);
+    ErlangNil nil = ErlangTerm.newInstance(bytes);
     assertThat(nil).isNotNull();
     assertThat(nil.getType())
         .isEqualTo(NIL);
@@ -45,7 +45,7 @@ public class NilTest {
         .put1B(NIL.getCode())
         .array();
 
-    assertThat(new Nil().toBytes())
+    assertThat(new ErlangNil().toBytes())
         .isEqualTo(expected);
   }
 }

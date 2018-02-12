@@ -37,15 +37,15 @@ import lombok.val;
 @ToString
 @FieldDefaults(level = PRIVATE)
 @EqualsAndHashCode(callSuper = true)
-public class Binary extends ErlangTerm {
+public class ErlangBinary extends ErlangTerm {
 
   byte[] bytes;
 
-  public Binary (TermType type) {
+  public ErlangBinary (TermType type) {
     super(type);
   }
 
-  public Binary (@NonNull byte[] bytes) {
+  public ErlangBinary (@NonNull byte[] bytes) {
     this(BINARY);
 
     this.bytes = new byte[bytes.length];

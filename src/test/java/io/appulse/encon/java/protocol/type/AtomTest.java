@@ -32,13 +32,13 @@ public class AtomTest {
 
   @Test
   public void instantiate () {
-    assertThat(new Atom("hello").getType())
+    assertThat(new ErlangAtom("hello").getType())
         .isEqualTo(SMALL_ATOM_UTF8);
 
-    assertThat(new Atom(new String(new char[256])).getType())
+    assertThat(new ErlangAtom(new String(new char[256])).getType())
         .isEqualTo(ATOM_UTF8);
 
-    assertThat(new Atom(true).getType())
+    assertThat(new ErlangAtom(true).getType())
         .isEqualTo(SMALL_ATOM_UTF8);
   }
 
@@ -51,7 +51,7 @@ public class AtomTest {
         .put(value.getBytes(UTF_8))
         .array();
 
-    Atom atom = ErlangTerm.newInstance(bytes);
+    ErlangAtom atom = ErlangTerm.newInstance(bytes);
     assertThat(atom).isNotNull();
 
     SoftAssertions.assertSoftly(softly -> {
@@ -75,7 +75,7 @@ public class AtomTest {
         .put(value.getBytes(UTF_8))
         .array();
 
-    assertThat(new Atom(value).toBytes())
+    assertThat(new ErlangAtom(value).toBytes())
         .isEqualTo(expected);
   }
 }
