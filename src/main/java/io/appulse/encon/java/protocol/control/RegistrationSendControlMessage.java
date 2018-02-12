@@ -64,6 +64,7 @@ public class RegistrationSendControlMessage extends ControlMessage {
 
   @Override
   public ErlangTerm[] elements () {
-    return new ErlangTerm[] { from, UNUSED, name };
+    // TODO: Atom or Nil?
+    return new ErlangTerm[] { from, new Atom(""), name };
   }
 }

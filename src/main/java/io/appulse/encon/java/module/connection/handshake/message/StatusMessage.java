@@ -98,7 +98,7 @@ public class StatusMessage extends Message {
 
     public static Status of (@NonNull String string) {
       return Stream.of(values())
-          .filter(it -> it.name().equals(string))
+          .filter(it -> it.name().equalsIgnoreCase(string))
           .findAny()
           .orElse(UNDEFINED);
     }

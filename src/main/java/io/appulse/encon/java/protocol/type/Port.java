@@ -77,6 +77,11 @@ public class Port extends ErlangTerm {
   }
 
   @Override
+  public Port asPort () {
+    return this;
+  }
+
+  @Override
   protected void read (@NonNull Bytes buffer) {
     Atom atom = ErlangTerm.newInstance(buffer);
     node = atom.asText();

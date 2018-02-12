@@ -21,6 +21,11 @@ import java.util.concurrent.CompletableFuture;
 import io.appulse.encon.java.NodeDescriptor;
 import io.appulse.encon.java.RemoteNode;
 
+/**
+ *
+ * @author Artem Labazin
+ * @since 0.0.1
+ */
 public interface PingModuleApi {
 
   /**

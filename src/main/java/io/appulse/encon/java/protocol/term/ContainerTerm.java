@@ -27,6 +27,10 @@ import java.util.Iterator;
 import java.util.Map;
 import java.util.Optional;
 
+import io.appulse.encon.java.protocol.type.ErlangList;
+import io.appulse.encon.java.protocol.type.ErlangMap;
+import io.appulse.encon.java.protocol.type.Tuple;
+
 /**
  *
  * @author Artem Labazin
@@ -65,6 +69,10 @@ public interface ContainerTerm extends ValueTerm, Iterable<ErlangTerm> {
     return getType() == LIST;
   }
 
+  default ErlangList asList () {
+    return null;
+  }
+
   /**
    * Method that returns true if this term is an {@link io.appulse.encon.java.protocol.TermType#SMALL_TUPLE} or
    * {@link io.appulse.encon.java.protocol.TermType#LARGE_TUPLE} term, false otherwise.
@@ -75,6 +83,10 @@ public interface ContainerTerm extends ValueTerm, Iterable<ErlangTerm> {
     return getType() == SMALL_TUPLE || getType() == LARGE_TUPLE;
   }
 
+  default Tuple asTuple () {
+    return null;
+  }
+
   /**
    * Method that returns true if this term is a {@link io.appulse.encon.java.protocol.TermType#MAP} term,
    * false otherwise.
@@ -83,6 +95,10 @@ public interface ContainerTerm extends ValueTerm, Iterable<ErlangTerm> {
    */
   default boolean isMap () {
     return getType() == MAP;
+  }
+
+  default ErlangMap asMap () {
+    return null;
   }
 
   /**

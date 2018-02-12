@@ -83,6 +83,11 @@ public class Pid extends ErlangTerm {
   }
 
   @Override
+  public Pid asPid () {
+    return this;
+  }
+
+  @Override
   protected void read (@NonNull Bytes buffer) {
     Atom atom = ErlangTerm.newInstance(buffer);
     descriptor = NodeDescriptor.from(atom.asText());

@@ -21,6 +21,7 @@ import static lombok.AccessLevel.PRIVATE;
 import java.nio.ByteBuffer;
 
 import io.appulse.utils.Bytes;
+
 import lombok.Getter;
 import lombok.NonNull;
 import lombok.SneakyThrows;

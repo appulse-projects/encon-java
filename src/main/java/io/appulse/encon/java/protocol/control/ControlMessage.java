@@ -16,6 +16,7 @@
 
 package io.appulse.encon.java.protocol.control;
 
+import java.lang.reflect.Constructor;
 import java.util.stream.Stream;
 
 import io.appulse.encon.java.protocol.term.ErlangTerm;
@@ -23,6 +24,9 @@ import io.appulse.encon.java.protocol.type.IntegralNumber;
 import io.appulse.encon.java.protocol.type.Nil;
 import io.appulse.encon.java.protocol.type.Tuple;
 import io.appulse.encon.java.protocol.type.Tuple.TupleBuilder;
+import lombok.NonNull;
+import lombok.SneakyThrows;
+import lombok.val;
 
 /**
  *
@@ -32,6 +36,29 @@ import io.appulse.encon.java.protocol.type.Tuple.TupleBuilder;
 public abstract class ControlMessage {
 
   protected static final ErlangTerm UNUSED = new Nil();
+
+  @SneakyThrows
+  @SuppressWarnings("unchecked")
+  public static <T extends ControlMessage> T parse (@NonNull ErlangTerm term) {
+    if (!term.isTuple()) {
+      throw new RuntimeException();
+    }
+    val tuple = term.asTuple();
+
+    val code = tuple.get(0)
+        .filter(ErlangTerm::isNumber)
+        .map(ErlangTerm::asInt)
+        .orElseThrow(RuntimeException::new);
+
+    val tag = Stream.of(ControlMessageTag.values())
+        .filter(it -> it.getCode() == code)
+        .findFirst()
+        .orElseThrow(() -> new RuntimeException());
+
+    Class<T> type = (Class<T>) tag.getType();
+    Constructor<T> constructor = type.getConstructor(Tuple.class);
+    return constructor.newInstance(tuple);
+  }
 
   public Tuple toTuple () {
     TupleBuilder builder = Tuple.builder();
@@ -44,7 +71,7 @@ public abstract class ControlMessage {
     return toTuple().toBytes();
   }
 
-  protected abstract ControlMessageTag getTag ();
+  public abstract ControlMessageTag getTag ();
 
   protected abstract ErlangTerm[] elements ();
 }

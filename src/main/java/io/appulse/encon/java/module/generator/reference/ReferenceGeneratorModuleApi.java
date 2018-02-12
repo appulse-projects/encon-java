@@ -18,6 +18,11 @@ package io.appulse.encon.java.module.generator.reference;
 
 import io.appulse.encon.java.protocol.type.Reference;
 
+/**
+ *
+ * @author Artem Labazin
+ * @since 0.0.1
+ */
 public interface ReferenceGeneratorModuleApi {
 
   Reference generateReference ();

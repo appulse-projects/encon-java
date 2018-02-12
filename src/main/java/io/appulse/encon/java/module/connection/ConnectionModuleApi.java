@@ -16,6 +16,11 @@
 
 package io.appulse.encon.java.module.connection;
 
+/**
+ *
+ * @author Artem Labazin
+ * @since 0.0.1
+ */
 public interface ConnectionModuleApi {
 
 }

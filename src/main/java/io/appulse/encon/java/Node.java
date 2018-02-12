@@ -42,11 +42,15 @@ import io.appulse.encon.java.module.mailbox.MailboxModule;
 import io.appulse.encon.java.module.mailbox.MailboxModuleApi;
 import io.appulse.encon.java.module.ping.PingModule;
 import io.appulse.encon.java.module.ping.PingModuleApi;
+import io.appulse.encon.java.module.server.ServerModule;
+import io.appulse.encon.java.module.server.ServerModuleApi;
 import io.appulse.epmd.java.client.EpmdClient;
 import io.appulse.epmd.java.core.model.request.Registration;
+
 import lombok.Builder;
 import lombok.Getter;
 import lombok.NonNull;
+import lombok.ToString;
 import lombok.experimental.Delegate;
 import lombok.experimental.FieldDefaults;
 import lombok.extern.slf4j.Slf4j;
@@ -58,16 +62,25 @@ import lombok.val;
  * @since 0.0.1
  */
 @Slf4j
-@Getter
+@ToString(of = {
+  "descriptor",
+  "cookie",
+  "port",
+  "meta"
+})
 @FieldDefaults(level = PRIVATE)
 public final class Node implements PingModuleApi, Closeable {
 
+  @Getter
   final NodeDescriptor descriptor;
 
+  @Getter
   final String cookie;
 
+  @Getter
   final int port;
 
+  @Getter
   final Meta meta;
 
   EpmdClient epmd;
@@ -92,6 +105,9 @@ public final class Node implements PingModuleApi, Closeable {
 
   @Delegate(types = ConnectionModuleApi.class)
   ConnectionModule connectionModule;
+
+  @Delegate(types = ServerModuleApi.class)
+  ServerModule serverModule;
 
   @Builder
   private Node (@NonNull String name, String cookie, int port, Meta meta) {
@@ -131,6 +147,10 @@ public final class Node implements PingModuleApi, Closeable {
     if (connectionModule != null) {
       connectionModule.close();
       connectionModule = null;
+    }
+    if (serverModule != null) {
+      serverModule.close();
+      serverModule = null;
     }
     if (epmd != null) {
       epmd.stop(descriptor.getShortName());
@@ -193,6 +213,8 @@ public final class Node implements PingModuleApi, Closeable {
 
     mailboxModule = new MailboxModule(internal);
     connectionModule = new ConnectionModule(internal);
+    serverModule = new ServerModule(internal);
+    serverModule.start(port);
 
     return this;
   }

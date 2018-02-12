@@ -16,12 +16,16 @@
 
 package io.appulse.encon.java.module.lookup;
 
-import io.appulse.encon.java.RemoteNode;
-
 import java.util.Optional;
 
+import io.appulse.encon.java.RemoteNode;
 import io.appulse.encon.java.NodeDescriptor;
 
+/**
+ *
+ * @author Artem Labazin
+ * @since 0.0.1
+ */
 public interface LookupModuleApi {
 
   Optional<RemoteNode> lookup (String node);

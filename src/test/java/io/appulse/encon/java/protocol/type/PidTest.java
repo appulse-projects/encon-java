@@ -18,9 +18,6 @@ package io.appulse.encon.java.protocol.type;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static io.appulse.encon.java.protocol.TermType.PID;
-import static io.appulse.encon.java.protocol.TermType.NEW_PORT;
-
-import java.util.stream.IntStream;
 
 import io.appulse.encon.java.NodeDescriptor;
 import io.appulse.encon.java.protocol.term.ErlangTerm;

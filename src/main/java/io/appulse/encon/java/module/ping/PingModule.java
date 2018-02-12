@@ -28,11 +28,19 @@ import io.appulse.encon.java.NodeDescriptor;
 import io.appulse.encon.java.RemoteNode;
 import io.appulse.encon.java.module.NodeInternalApi;
 import io.appulse.encon.java.module.mailbox.Mailbox;
+
 import lombok.NonNull;
 import lombok.RequiredArgsConstructor;
 import lombok.val;
 import lombok.experimental.FieldDefaults;
+import lombok.extern.slf4j.Slf4j;
 
+/**
+ *
+ * @author Artem Labazin
+ * @since 0.0.1
+ */
+@Slf4j
 @RequiredArgsConstructor
 @FieldDefaults(level = PRIVATE, makeFinal = true)
 public class PingModule implements PingModuleApi {
@@ -41,16 +49,19 @@ public class PingModule implements PingModuleApi {
 
   @Override
   public CompletableFuture<Boolean> ping (@NonNull String node) {
+    log.debug("Ping node name: {}", node);
     val remoteDescriptor = NodeDescriptor.from(node);
     return ping(remoteDescriptor);
   }
 
   @Override
   public CompletableFuture<Boolean> ping (@NonNull NodeDescriptor remoteDescriptor) {
+    log.debug("Ping descriptor: {}", remoteDescriptor);
     if (internal.node().getDescriptor().equals(remoteDescriptor)) {
       return CompletableFuture.completedFuture(TRUE);
     }
     Optional<RemoteNode> optional = internal.node().lookup(remoteDescriptor);
+    log.debug("Lookup result is present: {}", optional.isPresent());
     return optional.isPresent()
            ? ping(optional.get())
            : CompletableFuture.completedFuture(FALSE);
@@ -58,13 +69,20 @@ public class PingModule implements PingModuleApi {
 
   @Override
   public CompletableFuture<Boolean> ping (@NonNull RemoteNode remote) {
+    log.debug("Ping remote node: {}", remote);
     if (!internal.connections().isAvailable(remote)) {
+      log.debug("Remote node {} is not available", remote);
       return CompletableFuture.completedFuture(FALSE);
     }
+    log.debug("Remote node {} is available", remote);
 
     CompletableFuture<Boolean> future = new CompletableFuture<>();
-    Mailbox mailbox = internal.node().createMailbox((self, message) -> future.complete(TRUE));
+    Mailbox mailbox = internal.node().createMailbox((self, message) -> {
+      log.debug("Incoming message: {}", message);
+      future.complete(TRUE);
+    });
     CompletableFuture<Boolean> result = future.whenComplete((response, exception) -> {
+      log.debug("Removing mailbox: {}", mailbox);
       internal.node().remove(mailbox);
     });
 
@@ -80,6 +98,7 @@ public class PingModule implements PingModuleApi {
         )
         .send(remote, "net_kernel");
 
+    log.debug("Returning from ping method");
     return result;
   }
 }

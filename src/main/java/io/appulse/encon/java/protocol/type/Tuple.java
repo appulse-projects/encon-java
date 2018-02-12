@@ -21,8 +21,8 @@ import static io.appulse.encon.java.protocol.TermType.SMALL_TUPLE;
 import static java.util.Optional.empty;
 import static java.util.Optional.of;
 import static lombok.AccessLevel.PRIVATE;
-import static java.util.Arrays.asList;
 
+import java.util.Arrays;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Optional;
@@ -57,7 +57,7 @@ public class Tuple extends ErlangTerm {
   }
 
   public Tuple (ErlangTerm... elements) {
-    this(asList(elements));
+    this(Arrays.asList(elements));
   }
 
   @Builder
@@ -67,6 +67,11 @@ public class Tuple extends ErlangTerm {
          : LARGE_TUPLE);
 
     this.elements = adds.toArray(new ErlangTerm[adds.size()]);
+  }
+
+  @Override
+  public Tuple asTuple () {
+    return this;
   }
 
   @Override

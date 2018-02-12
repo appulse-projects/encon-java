@@ -14,17 +14,14 @@
  * limitations under the License.
  */
 
-package io.appulse.encon.java.module.lookup;
+package io.appulse.encon.java.module.server;
 
 import static lombok.AccessLevel.PRIVATE;
 
-import java.util.Optional;
+import java.net.Socket;
 
-import io.appulse.encon.java.NodeDescriptor;
-import io.appulse.encon.java.RemoteNode;
 import io.appulse.encon.java.module.NodeInternalApi;
-import io.appulse.epmd.java.core.model.response.NodeInfo;
-
+import io.appulse.utils.SocketUtils;
 import lombok.NonNull;
 import lombok.RequiredArgsConstructor;
 import lombok.val;
@@ -39,30 +36,22 @@ import lombok.extern.slf4j.Slf4j;
 @Slf4j
 @RequiredArgsConstructor
 @FieldDefaults(level = PRIVATE, makeFinal = true)
-public class LookupModule implements LookupModuleApi {
+public class ServerWorker implements Runnable {
 
+  @NonNull
+  Socket socket;
+
+  @NonNull
   NodeInternalApi internal;
 
   @Override
-  public Optional<RemoteNode> lookup (@NonNull String node) {
-    val descriptor = NodeDescriptor.from(node);
-    return lookup(descriptor);
-  }
+  public void run () {
+    log.debug("Start server worker");
 
-  @Override
-  public Optional<RemoteNode> lookup (@NonNull NodeDescriptor descriptor) {
-    log.debug("Looking up: {}", descriptor);
-    return internal.epmd()
-        .lookup(descriptor.getShortName(), descriptor.getAddress())
-        .filter(NodeInfo::isOk)
-        .map(it -> RemoteNode.builder()
-            .descriptor(descriptor)
-            .protocol(it.getProtocol().get())
-            .type(it.getType().get())
-            .high(it.getHigh().get())
-            .low(it.getLow().get())
-            .port(it.getPort().get())
-            .build()
-        );
+    val length = SocketUtils.readBytes(socket, Integer.BYTES).getInt();
+    log.debug("Incoming message length is: {}", length);
+
+    val body = SocketUtils.read(socket, length);
+    log.debug("Readed message body ({} bytes)", body.length);
   }
 }

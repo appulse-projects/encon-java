@@ -30,6 +30,11 @@ import org.junit.Before;
 import org.junit.Test;
 import lombok.val;
 
+/**
+ *
+ * @author Artem Labazin
+ * @since 0.0.1
+ */
 public class NodeTest {
 
   TestEpmdServer epmd;
@@ -134,10 +139,12 @@ public class NodeTest {
     //     .port(8972)
     //     .build()
     //     .register(epmd.getPort());
+
     // assertThat(node1.ping("node-2"))
     //     .isCompletedWithValue(true);
     // assertThat(node2.ping("node-1"))
     //     .isCompletedWithValue(true);
+
     node1.close();
     // node2.close();
   }

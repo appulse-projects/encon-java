@@ -18,8 +18,6 @@ package io.appulse.encon.java.protocol.type;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
-import java.util.stream.IntStream;
-
 import static io.appulse.encon.java.protocol.TermType.LIST;
 
 import io.appulse.encon.java.protocol.term.ErlangTerm;

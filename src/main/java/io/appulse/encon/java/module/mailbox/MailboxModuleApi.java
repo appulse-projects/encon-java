@@ -21,6 +21,11 @@ import java.util.Optional;
 import io.appulse.encon.java.module.mailbox.Mailbox.InboxHandler;
 import io.appulse.encon.java.protocol.type.Pid;
 
+/**
+ *
+ * @author Artem Labazin
+ * @since 0.0.1
+ */
 public interface MailboxModuleApi {
 
   Mailbox createMailbox (InboxHandler handler);

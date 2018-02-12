@@ -17,6 +17,7 @@
 package io.appulse.encon.java.module.connection.handshake.message;
 
 import java.util.stream.Stream;
+
 import lombok.Getter;
 
 /**

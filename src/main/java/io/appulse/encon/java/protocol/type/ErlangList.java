@@ -21,8 +21,8 @@ import static java.util.Optional.empty;
 import static java.util.Optional.of;
 import static java.util.Optional.ofNullable;
 import static lombok.AccessLevel.PRIVATE;
-import static java.util.Arrays.asList;
 
+import java.util.Arrays;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Optional;
@@ -61,7 +61,7 @@ public class ErlangList extends ErlangTerm {
   }
 
   public ErlangList (ErlangTerm... elements) {
-    this(asList(elements));
+    this(Arrays.asList(elements));
   }
 
   public ErlangList (@NonNull List<ErlangTerm> elements) {
@@ -104,6 +104,11 @@ public class ErlangList extends ErlangTerm {
         .toArray();
 
     return new String(codePoints, 0, codePoints.length);
+  }
+
+  @Override
+  public ErlangList asList () {
+    return this;
   }
 
   @Override

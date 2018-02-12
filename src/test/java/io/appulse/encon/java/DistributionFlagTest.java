@@ -25,6 +25,11 @@ import java.util.stream.Stream;
 
 import org.junit.Test;
 
+/**
+ *
+ * @author Artem Labazin
+ * @since 0.0.1
+ */
 public class DistributionFlagTest {
 
   @Test

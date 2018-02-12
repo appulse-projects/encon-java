@@ -53,8 +53,8 @@ public class Atom extends ErlangTerm {
 
   public Atom (String value) {
     this(value.getBytes(UTF_8).length < 256
-       ? SMALL_ATOM_UTF8
-       : ATOM_UTF8);
+         ? SMALL_ATOM_UTF8
+         : ATOM_UTF8);
 
     this.value = trim(value);
   }
@@ -72,6 +72,11 @@ public class Atom extends ErlangTerm {
   @Override
   public String asText (String defaultValue) {
     return value;
+  }
+
+  @Override
+  public Atom asAtom () {
+    return this;
   }
 
   @Override

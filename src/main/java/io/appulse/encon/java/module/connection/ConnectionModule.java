@@ -23,35 +23,44 @@ import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 
 import io.appulse.encon.java.RemoteNode;
-import io.appulse.encon.java.module.connection.handshake.HandshakeStrategy;
+import io.netty.channel.EventLoopGroup;
+import io.netty.channel.nio.NioEventLoopGroup;
 import io.appulse.encon.java.module.NodeInternalApi;
+
 import lombok.NonNull;
 import lombok.RequiredArgsConstructor;
 import lombok.val;
 import lombok.experimental.FieldDefaults;
 
+/**
+ *
+ * @author Artem Labazin
+ * @since 0.0.1
+ */
 @RequiredArgsConstructor
 @FieldDefaults(level = PRIVATE, makeFinal = true)
 public class ConnectionModule implements ConnectionModuleApi, Closeable {
 
+  @NonNull
   NodeInternalApi internal;
 
-  Map<RemoteNode, Connection> cache = new ConcurrentHashMap<>();
+  Map<RemoteNode, RemoteConnection> cache = new ConcurrentHashMap<>();
 
-  HandshakeStrategy handshakeStrategy = new HandshakeStrategy();
+  EventLoopGroup workerGroup = new NioEventLoopGroup(4);
 
   @Override
   public void close() {
     cache.clear();
   }
 
-  public Connection connect (@NonNull RemoteNode remote) {
+  public RemoteConnection connect (@NonNull RemoteNode remote) {
     return cache.compute(remote, (key, value) -> {
       if (value != null) {
         return value;
       }
-      val socket = handshakeStrategy.handshake(internal.node(), key);
-      return new Connection(internal.node(), key, socket);
+      val connection = new RemoteConnection(internal.node(), key, workerGroup);
+      connection.start(internal);
+      return connection;
     });
   }
 
