@@ -19,7 +19,7 @@ package io.appulse.encon.java.protocol.control;
 import static io.appulse.encon.java.protocol.control.ControlMessageTag.NODE_LINK;
 
 import io.appulse.encon.java.protocol.term.ErlangTerm;
-import io.appulse.encon.java.protocol.type.Tuple;
+import io.appulse.encon.java.protocol.type.ErlangTuple;
 
 import lombok.EqualsAndHashCode;
 import lombok.NoArgsConstructor;
@@ -33,7 +33,7 @@ import lombok.NoArgsConstructor;
 @EqualsAndHashCode(callSuper = true)
 public class NodeLinkControlMessage extends ControlMessage {
 
-  public NodeLinkControlMessage (Tuple tuple) {
+  public NodeLinkControlMessage (ErlangTuple tuple) {
     // empty body
   }
 

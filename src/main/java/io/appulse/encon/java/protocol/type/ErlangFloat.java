@@ -40,20 +40,20 @@ import lombok.val;
 @ToString
 @FieldDefaults(level = PRIVATE)
 @EqualsAndHashCode(callSuper = true)
-public class FloatingPointNumber extends ErlangTerm {
+public class ErlangFloat extends ErlangTerm {
 
   double value;
 
-  public FloatingPointNumber (TermType type) {
+  public ErlangFloat (TermType type) {
     super(type);
   }
 
-  public FloatingPointNumber (double value) {
+  public ErlangFloat (double value) {
     this(NEW_FLOAT);
     this.value = value;
   }
 
-  public FloatingPointNumber (float value) {
+  public ErlangFloat (float value) {
     this(NEW_FLOAT);
     this.value = value;
   }

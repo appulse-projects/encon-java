@@ -30,13 +30,13 @@ import lombok.ToString;
  * @since 0.0.1
  */
 @ToString
-public class Nil extends ErlangTerm {
+public class ErlangNil extends ErlangTerm {
 
-  public Nil () {
+  public ErlangNil () {
     this(NIL);
   }
 
-  public Nil (TermType type) {
+  public ErlangNil (TermType type) {
     super(type);
   }
 

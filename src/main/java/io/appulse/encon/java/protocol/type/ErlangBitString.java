@@ -42,18 +42,18 @@ import lombok.val;
 @ToString
 @FieldDefaults(level = PRIVATE)
 @EqualsAndHashCode(callSuper = true)
-public class BitString extends ErlangTerm {
+public class ErlangBitString extends ErlangTerm {
 
   byte[] bits;
 
   int pad;
 
-  public BitString (TermType type) {
+  public ErlangBitString (TermType type) {
     super(type);
   }
 
   @Builder
-  public BitString (@NonNull byte[] bits, int pad) {
+  public ErlangBitString (@NonNull byte[] bits, int pad) {
     this(BIT_BINNARY);
 
     this.bits = new byte[bits.length];

@@ -20,9 +20,9 @@ import static io.appulse.encon.java.protocol.control.ControlMessageTag.MONITOR_P
 
 import io.appulse.encon.java.protocol.control.exception.ControlMessageParsingException;
 import io.appulse.encon.java.protocol.term.ErlangTerm;
-import io.appulse.encon.java.protocol.type.Pid;
-import io.appulse.encon.java.protocol.type.Reference;
-import io.appulse.encon.java.protocol.type.Tuple;
+import io.appulse.encon.java.protocol.type.ErlangPid;
+import io.appulse.encon.java.protocol.type.ErlangReference;
+import io.appulse.encon.java.protocol.type.ErlangTuple;
 
 import lombok.AllArgsConstructor;
 import lombok.EqualsAndHashCode;
@@ -40,15 +40,15 @@ import lombok.Value;
 public class MonitorProcessControlMessage extends ControlMessage {
 
   @NonNull
-  Pid from;
+  ErlangPid from;
 
   @NonNull
   ErlangTerm to; // atom or pid
 
   @NonNull
-  Reference reference;
+  ErlangReference reference;
 
-  public MonitorProcessControlMessage (@NonNull Tuple tuple) {
+  public MonitorProcessControlMessage (@NonNull ErlangTuple tuple) {
     from = tuple.get(1)
         .filter(ErlangTerm::isPid)
         .map(ErlangTerm::asPid)

@@ -48,20 +48,20 @@ import lombok.experimental.FieldDefaults;
 @ToString
 @FieldDefaults(level = PRIVATE)
 @EqualsAndHashCode(callSuper = true)
-public class Tuple extends ErlangTerm {
+public class ErlangTuple extends ErlangTerm {
 
   ErlangTerm[] elements;
 
-  public Tuple (TermType type) {
+  public ErlangTuple (TermType type) {
     super(type);
   }
 
-  public Tuple (ErlangTerm... elements) {
+  public ErlangTuple (ErlangTerm... elements) {
     this(Arrays.asList(elements));
   }
 
   @Builder
-  private Tuple (@Singular List<ErlangTerm> adds) {
+  private ErlangTuple (@Singular List<ErlangTerm> adds) {
     this(adds.size() < 256
          ? SMALL_TUPLE
          : LARGE_TUPLE);
@@ -70,7 +70,7 @@ public class Tuple extends ErlangTerm {
   }
 
   @Override
-  public Tuple asTuple () {
+  public ErlangTuple asTuple () {
     return this;
   }
 

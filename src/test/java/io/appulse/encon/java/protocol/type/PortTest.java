@@ -36,12 +36,12 @@ public class PortTest {
 
     val bytes = Bytes.allocate()
         .put1B(PORT.getCode())
-        .put(new Atom(node).toBytes())
+        .put(new ErlangAtom(node).toBytes())
         .put4B(id & 0xFFFFFFF)
         .put1B(creation & 0x3)
         .array();
 
-    Port port = ErlangTerm.newInstance(bytes);
+    ErlangPort port = ErlangTerm.newInstance(bytes);
     assertThat(port).isNotNull();
 
     SoftAssertions.assertSoftly(softly -> {
@@ -64,12 +64,12 @@ public class PortTest {
 
     val expected = Bytes.allocate()
         .put1B(PORT.getCode())
-        .put(new Atom(node).toBytes())
+        .put(new ErlangAtom(node).toBytes())
         .put4B(id & 0xFFFFFFF)
         .put1B(creation & 0x3)
         .array();
 
-    assertThat(Port.builder()
+    assertThat(ErlangPort.builder()
             .node(node)
             .id(id)
             .creation(creation)

@@ -39,7 +39,7 @@ import lombok.experimental.FieldDefaults;
 @ToString
 @FieldDefaults(level = PRIVATE)
 @EqualsAndHashCode(callSuper = true)
-public class ExternalFunction extends ErlangTerm {
+public class ErlangExternalFunction extends ErlangTerm {
 
   String module;
 
@@ -47,12 +47,12 @@ public class ExternalFunction extends ErlangTerm {
 
   int arity;
 
-  public ExternalFunction (TermType type) {
+  public ErlangExternalFunction (TermType type) {
     super(type);
   }
 
   @Builder
-  private ExternalFunction (@NonNull String module, @NonNull String name, int arity) {
+  private ErlangExternalFunction (@NonNull String module, @NonNull String name, int arity) {
     this(EXTERNAL_FUNCTION);
 
     this.module = module;
@@ -62,13 +62,13 @@ public class ExternalFunction extends ErlangTerm {
 
   @Override
   protected void read (@NonNull Bytes buffer) {
-    Atom atomModule = ErlangTerm.newInstance(buffer);
+    ErlangAtom atomModule = ErlangTerm.newInstance(buffer);
     module = atomModule.asText();
 
-    Atom atomName = ErlangTerm.newInstance(buffer);
+    ErlangAtom atomName = ErlangTerm.newInstance(buffer);
     name = atomName.asText();
 
-    IntegralNumber numberArity = ErlangTerm.newInstance(buffer);
+    ErlangInteger numberArity = ErlangTerm.newInstance(buffer);
     arity = numberArity.asInt();
   }
 

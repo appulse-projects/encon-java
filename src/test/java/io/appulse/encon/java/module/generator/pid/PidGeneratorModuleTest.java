@@ -26,7 +26,7 @@ import io.appulse.encon.java.module.NodeInternalApi;
 import org.assertj.core.api.SoftAssertions;
 import org.junit.Test;
 
-import io.appulse.encon.java.protocol.type.Pid;
+import io.appulse.encon.java.protocol.type.ErlangPid;
 
 /**
  *
@@ -48,7 +48,7 @@ public class PidGeneratorModuleTest {
 
     PidGeneratorModule generator = new PidGeneratorModule(internal);
 
-    Pid pid = generator.generatePid();
+    ErlangPid pid = generator.generatePid();
     assertThat(pid).isNotNull();
 
     SoftAssertions.assertSoftly(softly -> {

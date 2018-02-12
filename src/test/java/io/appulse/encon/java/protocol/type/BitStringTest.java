@@ -32,11 +32,11 @@ public class BitStringTest {
 
   @Test
   public void erlangTermValidationException () {
-    assertThatThrownBy(() -> new BitString(new byte[] { 1 }, -1))
+    assertThatThrownBy(() -> new ErlangBitString(new byte[] { 1 }, -1))
         .isInstanceOf(ErlangTermValidationException.class)
         .hasMessage("Padding must be in range 0..7");
 
-    assertThatThrownBy(() -> new BitString(new byte[0], 1))
+    assertThatThrownBy(() -> new ErlangBitString(new byte[0], 1))
         .isInstanceOf(ErlangTermValidationException.class)
         .hasMessage("Padding on zero length BitString");
   }
@@ -53,7 +53,7 @@ public class BitStringTest {
         .put(value)
         .array();
 
-    BitString bitString = ErlangTerm.newInstance(bytes);
+    ErlangBitString bitString = ErlangTerm.newInstance(bytes);
     assertThat(bitString).isNotNull();
 
     SoftAssertions.assertSoftly(softly -> {
@@ -77,7 +77,7 @@ public class BitStringTest {
         .put(new byte[] { 1, 2, 0 })
         .array();
 
-    assertThat(new BitString(bytes, pad).toBytes())
+    assertThat(new ErlangBitString(bytes, pad).toBytes())
         .isEqualTo(expected);
   }
 }

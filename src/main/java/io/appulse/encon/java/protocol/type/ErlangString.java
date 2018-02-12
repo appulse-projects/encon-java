@@ -66,15 +66,15 @@ public class ErlangString extends ErlangTerm {
     val length = value.length();
 
     if (length == 0) {
-      buffer.put(new Nil().toBytes());
+      buffer.put(new ErlangNil().toBytes());
     } else if (length <= 65535 && is8bitString(value)) {
       buffer.put2B((short) length);
       buffer.put(value.getBytes(ISO_8859_1));
     } else {
       val elements = value.codePoints()
           .boxed()
-          .map(IntegralNumber::from)
-          .toArray(IntegralNumber[]::new);
+          .map(ErlangInteger::from)
+          .toArray(ErlangInteger[]::new);
 
       buffer.put(ErlangList.builder()
           .elements(elements)

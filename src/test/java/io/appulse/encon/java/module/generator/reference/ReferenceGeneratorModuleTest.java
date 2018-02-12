@@ -26,7 +26,7 @@ import io.appulse.encon.java.module.NodeInternalApi;
 import org.assertj.core.api.SoftAssertions;
 import org.junit.Test;
 
-import io.appulse.encon.java.protocol.type.Reference;
+import io.appulse.encon.java.protocol.type.ErlangReference;
 
 /**
  *
@@ -48,7 +48,7 @@ public class ReferenceGeneratorModuleTest {
 
     ReferenceGeneratorModule generator = new ReferenceGeneratorModule(internal);
 
-    Reference reference = generator.generateReference();
+    ErlangReference reference = generator.generateReference();
     assertThat(reference).isNotNull();
 
     SoftAssertions.assertSoftly(softly -> {

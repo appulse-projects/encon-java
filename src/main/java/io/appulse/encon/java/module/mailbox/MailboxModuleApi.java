@@ -19,7 +19,7 @@ package io.appulse.encon.java.module.mailbox;
 import java.util.Optional;
 
 import io.appulse.encon.java.module.mailbox.Mailbox.InboxHandler;
-import io.appulse.encon.java.protocol.type.Pid;
+import io.appulse.encon.java.protocol.type.ErlangPid;
 
 /**
  *
@@ -38,7 +38,7 @@ public interface MailboxModuleApi {
 
   Optional<Mailbox> getMailbox (String name);
 
-  Optional<Mailbox> getMailbox (Pid pid);
+  Optional<Mailbox> getMailbox (ErlangPid pid);
 
   void remove (Mailbox mailbox);
 }

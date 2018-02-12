@@ -20,8 +20,8 @@ import static io.appulse.encon.java.protocol.control.ControlMessageTag.EXIT;
 
 import io.appulse.encon.java.protocol.control.exception.ControlMessageParsingException;
 import io.appulse.encon.java.protocol.term.ErlangTerm;
-import io.appulse.encon.java.protocol.type.Pid;
-import io.appulse.encon.java.protocol.type.Tuple;
+import io.appulse.encon.java.protocol.type.ErlangPid;
+import io.appulse.encon.java.protocol.type.ErlangTuple;
 
 import lombok.AllArgsConstructor;
 import lombok.EqualsAndHashCode;
@@ -41,15 +41,15 @@ import lombok.experimental.NonFinal;
 public class ExitControlMessage extends ControlMessage {
 
   @NonNull
-  Pid from;
+  ErlangPid from;
 
   @NonNull
-  Pid to;
+  ErlangPid to;
 
   @NonNull
   ErlangTerm reason;
 
-  public ExitControlMessage (@NonNull Tuple tuple) {
+  public ExitControlMessage (@NonNull ErlangTuple tuple) {
     from = tuple.get(1)
         .filter(ErlangTerm::isPid)
         .map(ErlangTerm::asPid)

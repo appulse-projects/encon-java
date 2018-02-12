@@ -20,9 +20,9 @@ import static io.appulse.encon.java.protocol.control.ControlMessageTag.REG_SEND_
 
 import io.appulse.encon.java.protocol.control.exception.ControlMessageParsingException;
 import io.appulse.encon.java.protocol.term.ErlangTerm;
-import io.appulse.encon.java.protocol.type.Atom;
-import io.appulse.encon.java.protocol.type.Pid;
-import io.appulse.encon.java.protocol.type.Tuple;
+import io.appulse.encon.java.protocol.type.ErlangAtom;
+import io.appulse.encon.java.protocol.type.ErlangPid;
+import io.appulse.encon.java.protocol.type.ErlangTuple;
 
 import lombok.AllArgsConstructor;
 import lombok.EqualsAndHashCode;
@@ -40,15 +40,15 @@ import lombok.Value;
 public class RegistrationSendTraceTokenControlMessage extends ControlMessage {
 
   @NonNull
-  Pid from;
+  ErlangPid from;
 
   @NonNull
-  Atom name;
+  ErlangAtom name;
 
   @NonNull
   ErlangTerm traceToken;
 
-  public RegistrationSendTraceTokenControlMessage (@NonNull Tuple tuple) {
+  public RegistrationSendTraceTokenControlMessage (@NonNull ErlangTuple tuple) {
     from = tuple.get(1)
         .filter(ErlangTerm::isPid)
         .map(ErlangTerm::asPid)

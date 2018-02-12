@@ -23,17 +23,17 @@ import java.util.LinkedList;
 import java.util.List;
 
 import io.appulse.encon.java.protocol.term.ErlangTerm;
-import io.appulse.encon.java.protocol.type.Atom;
-import io.appulse.encon.java.protocol.type.Binary;
+import io.appulse.encon.java.protocol.type.ErlangAtom;
+import io.appulse.encon.java.protocol.type.ErlangBinary;
 import io.appulse.encon.java.protocol.type.ErlangList;
 import io.appulse.encon.java.protocol.type.ErlangString;
-import io.appulse.encon.java.protocol.type.FloatingPointNumber;
-import io.appulse.encon.java.protocol.type.IntegralNumber;
-import io.appulse.encon.java.protocol.type.Nil;
-import io.appulse.encon.java.protocol.type.Pid;
-import io.appulse.encon.java.protocol.type.Port;
-import io.appulse.encon.java.protocol.type.Reference;
-import io.appulse.encon.java.protocol.type.Tuple;
+import io.appulse.encon.java.protocol.type.ErlangFloat;
+import io.appulse.encon.java.protocol.type.ErlangInteger;
+import io.appulse.encon.java.protocol.type.ErlangNil;
+import io.appulse.encon.java.protocol.type.ErlangPid;
+import io.appulse.encon.java.protocol.type.ErlangPort;
+import io.appulse.encon.java.protocol.type.ErlangReference;
+import io.appulse.encon.java.protocol.type.ErlangTuple;
 
 import lombok.NonNull;
 import lombok.experimental.FieldDefaults;
@@ -53,62 +53,62 @@ public class ArrayItems {
   List<ErlangTerm> terms = new LinkedList<>();
 
   public ArrayItems add (boolean value) {
-    terms.add(new Atom(value));
+    terms.add(new ErlangAtom(value));
     return this;
   }
 
   public ArrayItems add (char value) {
-    terms.add(new IntegralNumber(value));
+    terms.add(new ErlangInteger(value));
     return this;
   }
 
   public ArrayItems add (byte value) {
-    terms.add(new IntegralNumber(value));
+    terms.add(new ErlangInteger(value));
     return this;
   }
 
   public ArrayItems add (@NonNull byte[] value) {
-    terms.add(new Binary(value));
+    terms.add(new ErlangBinary(value));
     return this;
   }
 
   public ArrayItems add (short value) {
-    terms.add(new IntegralNumber(value));
+    terms.add(new ErlangInteger(value));
     return this;
   }
 
   public ArrayItems add (int value) {
-    terms.add(new IntegralNumber(value));
+    terms.add(new ErlangInteger(value));
     return this;
   }
 
   public ArrayItems add (long value) {
-    terms.add(new IntegralNumber(value));
+    terms.add(new ErlangInteger(value));
     return this;
   }
 
   public ArrayItems add (@NonNull BigInteger value) {
-    terms.add(new IntegralNumber(value));
+    terms.add(new ErlangInteger(value));
     return this;
   }
 
   public ArrayItems add (float value) {
-    terms.add(new FloatingPointNumber(value));
+    terms.add(new ErlangFloat(value));
     return this;
   }
 
   public ArrayItems add (double value) {
-    terms.add(new FloatingPointNumber(value));
+    terms.add(new ErlangFloat(value));
     return this;
   }
 
   public ArrayItems addAtom (@NonNull String value) {
-    terms.add(new Atom(value));
+    terms.add(new ErlangAtom(value));
     return this;
   }
 
   public ArrayItems addNil () {
-    terms.add(new Nil());
+    terms.add(new ErlangNil());
     return this;
   }
 
@@ -117,17 +117,17 @@ public class ArrayItems {
     return this;
   }
 
-  public ArrayItems add (@NonNull Pid value) {
+  public ArrayItems add (@NonNull ErlangPid value) {
     terms.add(value);
     return this;
   }
 
-  public ArrayItems add (@NonNull Port value) {
+  public ArrayItems add (@NonNull ErlangPort value) {
     terms.add(value);
     return this;
   }
 
-  public ArrayItems add (@NonNull Reference value) {
+  public ArrayItems add (@NonNull ErlangReference value) {
     terms.add(value);
     return this;
   }
@@ -147,8 +147,8 @@ public class ArrayItems {
     return this;
   }
 
-  Tuple toTuple () {
-    return Tuple.builder()
+  ErlangTuple toTuple () {
+    return ErlangTuple.builder()
         .adds(terms)
         .build();
   }

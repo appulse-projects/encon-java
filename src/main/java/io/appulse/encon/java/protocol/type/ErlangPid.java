@@ -16,10 +16,11 @@
 
 package io.appulse.encon.java.protocol.type;
 
-import static io.appulse.encon.java.protocol.TermType.PORT;
+import static io.appulse.encon.java.protocol.TermType.PID;
 import static java.util.Optional.ofNullable;
 import static lombok.AccessLevel.PRIVATE;
 
+import io.appulse.encon.java.NodeDescriptor;
 import io.appulse.encon.java.protocol.TermType;
 import io.appulse.encon.java.protocol.term.ErlangTerm;
 import io.appulse.utils.Bytes;
@@ -40,30 +41,35 @@ import lombok.experimental.FieldDefaults;
 @ToString
 @FieldDefaults(level = PRIVATE)
 @EqualsAndHashCode(callSuper = true)
-public class Port extends ErlangTerm {
+public class ErlangPid extends ErlangTerm {
 
-  String node;
+  NodeDescriptor descriptor;
 
   int id;
 
+  int serial;
+
   int creation;
 
-  public Port (TermType type) {
+  public ErlangPid (TermType type) {
     super(type);
   }
 
   @Builder
-  private Port (TermType type, @NonNull String node, int id, int creation) {
-    this(ofNullable(type).orElse(PORT));
-    this.node = node;
+  private ErlangPid (TermType type, @NonNull String node, int id, int serial, int creation) {
+    this(ofNullable(type).orElse(PID));
+    descriptor = NodeDescriptor.from(node);
 
     switch (getType()) {
-    case PORT:
-      this.id = id & 0xFFFFFFF; // 28 bits
-      this.creation = creation & 0x3; // 2 bits
+    case PID:
+      this.id = id & 0x7FFF; // 15 bits
+      this.serial = serial & 0x1FFF; // 13 bits
+      this.creation = creation & 0x03; // 2 bits
       break;
-    case NEW_PORT:
+    case NEW_PID:
+      // allow all 32 bits for NEW_PID
       this.id = id;
+      this.serial = serial;
       this.creation = creation;
       break;
     default:
@@ -77,21 +83,23 @@ public class Port extends ErlangTerm {
   }
 
   @Override
-  public Port asPort () {
+  public ErlangPid asPid () {
     return this;
   }
 
   @Override
   protected void read (@NonNull Bytes buffer) {
-    Atom atom = ErlangTerm.newInstance(buffer);
-    node = atom.asText();
+    ErlangAtom atom = ErlangTerm.newInstance(buffer);
+    descriptor = NodeDescriptor.from(atom.asText());
+
     id = buffer.getInt();
+    serial = buffer.getInt();
 
     switch (getType()) {
-    case PORT:
+    case PID:
       creation = buffer.getByte();
       break;
-    case NEW_PORT:
+    case NEW_PID:
       creation = buffer.getInt();
       break;
     default:
@@ -101,14 +109,15 @@ public class Port extends ErlangTerm {
 
   @Override
   protected void write (@NonNull Bytes buffer) {
-    buffer.put(new Atom(node).toBytes());
+    buffer.put(new ErlangAtom(descriptor.getFullName()).toBytes());
     buffer.put4B(id);
+    buffer.put4B(serial);
 
     switch (getType()) {
-    case PORT:
+    case PID:
       buffer.put1B(creation);
       break;
-    case NEW_PORT:
+    case NEW_PID:
       buffer.put4B(creation);
       break;
     default:

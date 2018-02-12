@@ -26,7 +26,7 @@ import io.appulse.encon.java.module.NodeInternalApi;
 import org.assertj.core.api.SoftAssertions;
 import org.junit.Test;
 
-import io.appulse.encon.java.protocol.type.Port;
+import io.appulse.encon.java.protocol.type.ErlangPort;
 
 /**
  *
@@ -48,7 +48,7 @@ public class PortGeneratorModuleTest {
 
     PortGeneratorModule generator = new PortGeneratorModule(internal);
 
-    Port port = generator.generatePort();
+    ErlangPort port = generator.generatePort();
     assertThat(port).isNotNull();
 
     SoftAssertions.assertSoftly(softly -> {

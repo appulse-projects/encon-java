@@ -147,7 +147,7 @@ public class ErlangList extends ErlangTerm {
         .forEachOrdered(buffer::put);
 
     if (tail == null) {
-      tail = new Nil();
+      tail = new ErlangNil();
     }
     buffer.put(tail.toBytes());
   }

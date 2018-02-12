@@ -17,7 +17,7 @@
 package io.appulse.encon.java.protocol.request;
 
 import io.appulse.encon.java.module.mailbox.Mailbox;
-import io.appulse.encon.java.protocol.type.Tuple;
+import io.appulse.encon.java.protocol.type.ErlangTuple;
 
 import lombok.NonNull;
 import lombok.val;
@@ -35,7 +35,7 @@ class TupleRequestBuilder extends AbstractArrayRequestBuilder {
 
   @Override
   protected void prepareMessage () {
-    val tuple = Tuple.builder()
+    val tuple = ErlangTuple.builder()
         .adds(getTerms())
         .build();
 

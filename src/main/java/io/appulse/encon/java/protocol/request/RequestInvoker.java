@@ -24,7 +24,7 @@ import io.appulse.encon.java.NodeDescriptor;
 import io.appulse.encon.java.RemoteNode;
 import io.appulse.encon.java.module.mailbox.Mailbox;
 import io.appulse.encon.java.protocol.term.ErlangTerm;
-import io.appulse.encon.java.protocol.type.Pid;
+import io.appulse.encon.java.protocol.type.ErlangPid;
 
 import lombok.AllArgsConstructor;
 import lombok.NonNull;
@@ -47,7 +47,7 @@ public class RequestInvoker {
   @Setter(PROTECTED)
   ErlangTerm message;
 
-  public void send (@NonNull Pid pid) {
+  public void send (@NonNull ErlangPid pid) {
     mailbox.send(pid, message);
   }
 
