@@ -12,7 +12,7 @@ before_script:
   - wget https://packages.erlang-solutions.com/erlang-solutions_1.0_all.deb
   - sudo dpkg -i erlang-solutions_1.0_all.deb
   - sudo apt-get update -qq
-  - sudo apt-get install esl-erlang elixir git -y
+  - sudo apt-get install elixir git -y
   - git clone https://github.com/appulse-projects/echo-service-elixir.git
   - (cd echo-service-elixir/; mix escript.build)
   - echo-service-elixir/echo --cookie=secret --name=echo@localhost
