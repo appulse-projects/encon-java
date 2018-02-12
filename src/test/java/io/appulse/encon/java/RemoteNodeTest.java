@@ -19,6 +19,7 @@ package io.appulse.encon.java;
 import static org.assertj.core.api.Assertions.assertThat;
 
 import java.util.concurrent.CompletableFuture;
+import java.util.concurrent.Future;
 import java.util.concurrent.TimeUnit;
 
 import static java.util.concurrent.TimeUnit.SECONDS;
@@ -33,6 +34,7 @@ import org.junit.rules.TestRule;
 import org.testcontainers.containers.GenericContainer;
 import org.testcontainers.containers.output.OutputFrame;
 
+import io.appulse.encon.java.module.mailbox.Mailbox;
 import io.appulse.encon.java.util.TestEpmdServer;
 import io.appulse.encon.java.util.TestMethodNamePrinter;
 import io.appulse.epmd.java.core.model.NodeType;
@@ -102,5 +104,34 @@ public class RemoteNodeTest {
 
     assertThat(node.ping("echo@IB-ALABAZIN-M.local"))
         .isCompletedWithValue(true);
+  }
+
+  // @Test
+  public void send () {
+    node = Node.builder()
+        .name("gurka")
+        .port(8500)
+        .cookie("secret")
+        .meta(Meta.builder()
+            .type(NodeType.R3_ERLANG)
+            .build()
+        )
+        .build()
+        // .register(epmd.getPort());
+        .register(4369);
+
+    CompletableFuture<String> future = new CompletableFuture<>();
+    Mailbox mailbox =  node.createMailbox((self, message) -> {
+        future.complete(message.asTuple().get(1).get().asText());
+    });
+
+    mailbox.request()
+        .makeTuple()
+            .add(mailbox.getPid())
+            .add("Hello world!")
+        .send("echo@IB-ALABAZIN-M.local", "echo_server");
+
+    assertThat(future)
+        .isCompletedWithValue("Hello world!");
   }
 }

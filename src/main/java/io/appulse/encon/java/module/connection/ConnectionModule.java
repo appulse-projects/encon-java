@@ -50,6 +50,7 @@ public class ConnectionModule implements ConnectionModuleApi, Closeable {
 
   @Override
   public void close() {
+    cache.values().forEach(RemoteConnection::close);
     cache.clear();
   }
 
