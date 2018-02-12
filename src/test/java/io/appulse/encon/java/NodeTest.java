@@ -18,16 +18,19 @@ package io.appulse.encon.java;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
+
+import java.util.concurrent.CompletableFuture;
+import java.util.concurrent.TimeUnit;
+
 import static io.appulse.epmd.java.core.model.NodeType.R6_ERLANG;
 import static io.appulse.epmd.java.core.model.Protocol.TCP;
 import static io.appulse.epmd.java.core.model.Version.R6;
 
-import io.appulse.encon.java.util.TestEpmdServer;
-
 import org.assertj.core.api.SoftAssertions;
 import org.junit.After;
-import org.junit.Before;
 import org.junit.Test;
+
+import io.appulse.encon.java.module.mailbox.Mailbox;
 import lombok.val;
 
 /**
@@ -37,27 +40,25 @@ import lombok.val;
  */
 public class NodeTest {
 
-  TestEpmdServer epmd;
+  private static final int DEFAULT_EPMD_PORT = 4369;
 
-  @Before
-  public void before () {
-    epmd = new TestEpmdServer();
-    epmd.start();
-  }
+  Node node;
 
   @After
   public void after () {
-    epmd.stop();
-    epmd = null;
+    if (node != null) {
+      node.close();
+      node = null;
+    }
   }
 
   @Test
   public void register () {
-    val node = Node.builder()
+    node = Node.builder()
         .name("popa")
         .port(8971)
         .build()
-        .register(epmd.getPort());
+        .register(DEFAULT_EPMD_PORT);
 
     assertThat(node.isRegistered())
         .isTrue();
@@ -71,39 +72,39 @@ public class NodeTest {
     assertThat(node.generateReference())
         .isNotNull();
 
-    val optional = epmd.lookup("popa");
+    val optional = node.lookup("popa");
     assertThat(optional).isPresent();
 
     val nodeInfo = optional.get();
     SoftAssertions.assertSoftly(softly -> {
       softly.assertThat(nodeInfo.getPort())
-          .isPresent()
-          .hasValue(8971);
+          .isEqualTo(8971);
 
       softly.assertThat(nodeInfo.getType())
-          .isPresent()
-          .hasValue(R6_ERLANG);
+          .isEqualTo(R6_ERLANG);
 
       softly.assertThat(nodeInfo.getProtocol())
-          .isPresent()
-          .hasValue(TCP);
+          .isEqualTo(TCP);
 
       softly.assertThat(nodeInfo.getHigh())
-          .isPresent()
-          .hasValue(R6);
+          .isEqualTo(R6);
 
       softly.assertThat(nodeInfo.getLow())
-          .isPresent()
-          .hasValue(R6);
+          .isEqualTo(R6);
+
+      softly.assertThat(nodeInfo.getExtra())
+          .isNull();
     });
 
     node.close();
+
     assertThat(node.isRegistered()).isFalse();
+    node = null;
   }
 
   @Test
   public void generatorsFailsWithoutRegistration () {
-    val node = Node.builder()
+    node = Node.builder()
         .name("popa")
         .port(8971)
         .build();
@@ -116,23 +117,29 @@ public class NodeTest {
 
     assertThatThrownBy(() -> node.generatePort())
         .isInstanceOf(NullPointerException.class);
-
-    node.close();
   }
 
   @Test
-  public void ping () {
-    Node node1 = Node.builder()
+  public void ping () throws Exception {
+    node = Node.builder()
         .name("node-1")
         .port(8971)
+        .cookie("secret")
         .build()
-        .register(epmd.getPort());
+        .register(DEFAULT_EPMD_PORT);
 
-    assertThat(node1.ping("node-1"))
+    assertThat(node.ping("node-1"))
         .isCompletedWithValue(true);
 
-    assertThat(node1.ping("node-2"))
+    assertThat(node.ping("node-2"))
         .isCompletedWithValue(false);
+
+    CompletableFuture<Boolean> future = node.ping("echo@localhost");
+
+    TimeUnit.SECONDS.sleep(3);
+
+    assertThat(future)
+        .isCompletedWithValue(true);
 
     // val node2 = Node.builder()
     //     .name("node-2")
@@ -145,7 +152,31 @@ public class NodeTest {
     // assertThat(node2.ping("node-1"))
     //     .isCompletedWithValue(true);
 
-    node1.close();
+    // node1.close();
     // node2.close();
+  }
+
+  // @Test
+  public void send () {
+    node = Node.builder()
+        .name("gurka")
+        .port(8500)
+        .cookie("secret")
+        .build()
+        .register(DEFAULT_EPMD_PORT);
+
+    CompletableFuture<String> future = new CompletableFuture<>();
+    Mailbox mailbox =  node.createMailbox((self, message) -> {
+        future.complete(message.asTuple().get(1).get().asText());
+    });
+
+    mailbox.request()
+        .makeTuple()
+            .add(mailbox.getPid())
+            .add("Hello world!")
+        .send("echo@localhost", "echo_server");
+
+    assertThat(future)
+        .isCompletedWithValue("Hello world!");
   }
 }
