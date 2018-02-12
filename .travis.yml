@@ -15,7 +15,8 @@ before_script:
   - sudo apt-get install elixir git -y
   - git clone https://github.com/appulse-projects/echo-service-elixir.git
   - (cd echo-service-elixir/; mix escript.build)
-  - echo-service-elixir/echo --cookie=secret --name=echo
+  - epmd -debug
+  - echo-service-elixir/echo --cookie=secret --name=echo@localhost
 
 script:
   mvn --settings .settings.xml clean verify -DskipTests=false -Dmaven.javadoc.skip=true -Dgpg.skip -B -U
