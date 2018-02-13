@@ -17,6 +17,9 @@
 package io.appulse.encon.java.protocol.type;
 
 import static org.assertj.core.api.Assertions.assertThat;
+
+import java.util.stream.IntStream;
+
 import static io.appulse.encon.java.protocol.TermType.ATOM_UTF8;
 import static io.appulse.encon.java.protocol.TermType.SMALL_ATOM_UTF8;
 import static java.nio.charset.StandardCharsets.UTF_8;
@@ -26,16 +29,19 @@ import io.appulse.utils.Bytes;
 
 import org.assertj.core.api.SoftAssertions;
 import org.junit.Test;
+
+import erlang.OtpOutputStream;
+import lombok.SneakyThrows;
 import lombok.val;
 
-public class AtomTest {
+public class ErlangAtomTest {
 
   @Test
   public void instantiate () {
     assertThat(new ErlangAtom("hello").getType())
         .isEqualTo(SMALL_ATOM_UTF8);
 
-    assertThat(new ErlangAtom(new String(new char[256])).getType())
+    assertThat(new ErlangAtom(repeat("попа", 300)).getType())
         .isEqualTo(ATOM_UTF8);
 
     assertThat(new ErlangAtom(true).getType())
@@ -77,5 +83,52 @@ public class AtomTest {
 
     assertThat(new ErlangAtom(value).toBytes())
         .isEqualTo(expected);
+  }
+
+  @Test
+  public void encode () {
+    val smallValue = "popa";
+    val smallAtom = new ErlangAtom(smallValue);
+
+    assertThat(smallAtom.getType())
+        .isEqualTo(SMALL_ATOM_UTF8);
+
+    assertThat(smallAtom.toBytes())
+        .isEqualTo(bytes(smallValue));
+
+
+    val value = repeat(" ", 300);
+    val valueAtom = new ErlangAtom(value);
+
+    assertThat(valueAtom.getType())
+        .isEqualTo(SMALL_ATOM_UTF8);
+
+    assertThat(valueAtom.toBytes())
+        .isEqualTo(bytes(value));
+
+
+    val bigValue = repeat("попа", 300);
+    val bigAtom = new ErlangAtom(bigValue);
+
+    assertThat(bigAtom.getType())
+        .isEqualTo(ATOM_UTF8);
+
+    assertThat(bigAtom.toBytes())
+        .isEqualTo(bytes(bigValue));
+  }
+
+  private String repeat (String string, int times) {
+    StringBuilder sb = new StringBuilder(string.length() * times);
+    IntStream.range(0, times).forEach(it -> sb.append(string));
+    return sb.toString();
+  }
+
+  @SneakyThrows
+  private byte[] bytes (String value) {
+    try (OtpOutputStream output = new OtpOutputStream()) {
+      output.write_atom(value);
+      output.trimToSize();
+      return output.toByteArray();
+    }
   }
 }

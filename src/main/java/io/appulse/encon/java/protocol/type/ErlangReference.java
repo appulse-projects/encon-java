@@ -68,7 +68,7 @@ public class ErlangReference extends ErlangTerm {
           System.arraycopy(it, 0, result, 0, length);
           return result;
         })
-        .orElseGet(() -> new int[] { id });
+        .orElseGet(() -> new int[] { id, 0, 0 });
 
     switch (getType()) {
     case NEW_REFERENCE:

@@ -18,6 +18,7 @@ package io.appulse.encon.java.protocol.term;
 
 import static lombok.AccessLevel.PRIVATE;
 import static java.util.zip.Deflater.BEST_COMPRESSION;
+import static lombok.AccessLevel.PROTECTED;
 
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
@@ -30,10 +31,10 @@ import java.util.zip.InflaterInputStream;
 
 import io.appulse.encon.java.protocol.TermType;
 import io.appulse.utils.Bytes;
-
 import lombok.EqualsAndHashCode;
 import lombok.Getter;
 import lombok.NonNull;
+import lombok.Setter;
 import lombok.SneakyThrows;
 import lombok.experimental.FieldDefaults;
 import lombok.val;
@@ -45,7 +46,7 @@ import lombok.val;
  */
 @Getter
 @EqualsAndHashCode
-@FieldDefaults(level = PRIVATE, makeFinal = true)
+@FieldDefaults(level = PRIVATE)
 public abstract class ErlangTerm implements IntegerTerm,
                                             FloatTerm,
                                             BooleanTerm,
@@ -124,6 +125,7 @@ public abstract class ErlangTerm implements IntegerTerm,
         .array();
   }
 
+  @Setter(PROTECTED)
   TermType type;
 
   protected ErlangTerm (@NonNull TermType type) {

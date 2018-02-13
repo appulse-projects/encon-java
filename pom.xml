@@ -162,13 +162,6 @@ limitations under the License.
       <version>0.3.2</version>
       <scope>test</scope>
     </dependency>
-
-    <dependency>
-      <groupId>org.testcontainers</groupId>
-      <artifactId>testcontainers</artifactId>
-      <version>1.6.0</version>
-      <scope>test</scope>
-    </dependency>
   </dependencies>
 
   <build>

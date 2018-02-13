@@ -28,7 +28,7 @@ import org.assertj.core.api.SoftAssertions;
 import org.junit.Test;
 import lombok.val;
 
-public class BitStringTest {
+public class ErlangBitStringTest {
 
   @Test
   public void erlangTermValidationException () {

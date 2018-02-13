@@ -16,8 +16,9 @@
 
 package io.appulse.encon.java.protocol.type;
 
-import static org.assertj.core.api.Assertions.assertThat;
 import static io.appulse.encon.java.protocol.TermType.PID;
+import static io.appulse.encon.java.protocol.TermType.NEW_PID;
+import static org.assertj.core.api.Assertions.assertThat;
 
 import io.appulse.encon.java.NodeDescriptor;
 import io.appulse.encon.java.protocol.term.ErlangTerm;
@@ -25,9 +26,13 @@ import io.appulse.utils.Bytes;
 
 import org.assertj.core.api.SoftAssertions;
 import org.junit.Test;
+
+import erlang.OtpErlangPid;
+import erlang.OtpOutputStream;
+import lombok.SneakyThrows;
 import lombok.val;
 
-public class PidTest {
+public class ErlangPidTest {
 
   @Test
   public void newInstance () {
@@ -86,5 +91,39 @@ public class PidTest {
             .toBytes()
         )
         .isEqualTo(expected);
+  }
+
+  @Test
+  public void encode () {
+    assertThat(ErlangPid.builder()
+        .node("popa@localhost")
+        .id(1)
+        .serial(27)
+        .creation(3)
+        .build()
+        .toBytes()
+    )
+    .isEqualTo(bytes(PID.getCode(), "popa@localhost", 1, 27, 3));
+
+    assertThat(ErlangPid.builder()
+        .node("popa@localhost")
+        .type(NEW_PID)
+        .id(1)
+        .serial(27)
+        .creation(3)
+        .build()
+        .toBytes()
+    )
+    .isEqualTo(bytes(NEW_PID.getCode(), "popa@localhost", 1, 27, 3));
+  }
+
+  @SneakyThrows
+  private byte[] bytes (int tag, String node, int id, int serial, int creation) {
+    OtpErlangPid pid = new OtpErlangPid(tag, node, id, serial, creation);
+    try (OtpOutputStream output = new OtpOutputStream()) {
+      output.write_pid(pid);
+      output.trimToSize();
+      return output.toByteArray();
+    }
   }
 }

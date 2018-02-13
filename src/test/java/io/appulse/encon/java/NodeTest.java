@@ -16,22 +16,22 @@
 
 package io.appulse.encon.java;
 
+import static io.appulse.encon.java.module.mailbox.request.ArrayItems.items;
+import static io.appulse.epmd.java.core.model.NodeType.R6_ERLANG;
+import static io.appulse.epmd.java.core.model.Protocol.TCP;
+import static io.appulse.epmd.java.core.model.Version.R6;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.TimeUnit;
 
-import static io.appulse.epmd.java.core.model.NodeType.R6_ERLANG;
-import static io.appulse.epmd.java.core.model.Protocol.TCP;
-import static io.appulse.epmd.java.core.model.Version.R6;
-
+import io.appulse.encon.java.module.mailbox.Mailbox;
+import io.appulse.encon.java.protocol.term.ErlangTerm;
+import lombok.val;
 import org.assertj.core.api.SoftAssertions;
 import org.junit.After;
 import org.junit.Test;
-
-import io.appulse.encon.java.module.mailbox.Mailbox;
-import lombok.val;
 
 /**
  *
@@ -156,27 +156,81 @@ public class NodeTest {
     // node2.close();
   }
 
-  // @Test
-  public void send () {
+  @Test
+  public void send () throws Exception {
     node = Node.builder()
-        .name("gurka")
+        .name("popa")
         .port(8500)
         .cookie("secret")
         .build()
         .register(DEFAULT_EPMD_PORT);
 
-    CompletableFuture<String> future = new CompletableFuture<>();
+    CompletableFuture<ErlangTerm> future = new CompletableFuture<>();
     Mailbox mailbox =  node.createMailbox((self, message) -> {
-        future.complete(message.asTuple().get(1).get().asText());
+        future.complete(message.asTuple().get(1).get());
     });
 
     mailbox.request()
         .makeTuple()
             .add(mailbox.getPid())
-            .add("Hello world!")
+            .addTuple(items()
+                .add("hello, world")
+                .addAtom("popa")
+                .add(false)
+                .add(42)
+            )
         .send("echo@localhost", "echo_server");
 
+    TimeUnit.SECONDS.sleep(3);
+
     assertThat(future)
-        .isCompletedWithValue("Hello world!");
+        .isCompleted()
+        .isCompletedWithValueMatching(it -> it.isTuple(), "It is not a tuple")
+        .isCompletedWithValueMatching(it -> {
+            val optional = it.get(0);
+            if (!optional.isPresent()) {
+                return false;
+            }
+            if (!optional.get().isTextual()) {
+                return false;
+            }
+            return optional.get()
+                .asText()
+                .equals("hello, world");
+        }, "Tuple(0)")
+        .isCompletedWithValueMatching(it -> {
+            val optional = it.get(1);
+            if (!optional.isPresent()) {
+                return false;
+            }
+            if (!optional.get().isAtom()) {
+                return false;
+            }
+            return optional.get()
+                .asText()
+                .equals("popa");
+        }, "Tuple(1)")
+        .isCompletedWithValueMatching(it -> {
+            val optional = it.get(2);
+            if (!optional.isPresent()) {
+                return false;
+            }
+            if (!optional.get().isBoolean()) {
+                return false;
+            }
+            return optional.get()
+                .asBoolean() == false;
+        }, "Tuple(2)")
+        .isCompletedWithValueMatching(it -> {
+            val optional = it.get(3);
+            if (!optional.isPresent()) {
+                return false;
+            }
+            if (!optional.get().isInt()) {
+                return false;
+            }
+            return optional.get()
+                .asInt() == 42;
+        }, "Tuple(3)");
   }
 }

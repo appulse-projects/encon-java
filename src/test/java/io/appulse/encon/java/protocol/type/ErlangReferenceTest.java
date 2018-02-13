@@ -18,6 +18,7 @@ package io.appulse.encon.java.protocol.type;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static io.appulse.encon.java.protocol.TermType.NEW_REFERENCE;
+import static io.appulse.encon.java.protocol.TermType.NEWER_REFERENCE;
 
 import java.util.stream.IntStream;
 
@@ -26,9 +27,13 @@ import io.appulse.utils.Bytes;
 
 import org.assertj.core.api.SoftAssertions;
 import org.junit.Test;
+
+import erlang.OtpErlangRef;
+import erlang.OtpOutputStream;
+import lombok.SneakyThrows;
 import lombok.val;
 
-public class ReferenceTest {
+public class ErlangReferenceTest {
 
   @Test
   public void instantiate () {
@@ -106,5 +111,46 @@ public class ReferenceTest {
             .toBytes()
         )
         .isEqualTo(expected);
+  }
+
+  @Test
+  public void encode () {
+    assertThat(ErlangReference.builder()
+        .node("popa@localhost")
+        .ids(new int[] { 1 })
+        .creation(4)
+        .build()
+        .toBytes()
+    )
+    .isEqualTo(bytes(NEW_REFERENCE.getCode(), "popa@localhost", new int[] { 1 }, 4));
+
+    assertThat(ErlangReference.builder()
+        .node("popa@localhost")
+        .type(NEWER_REFERENCE)
+        .ids(new int[] { 1 })
+        .creation(4)
+        .build()
+        .toBytes()
+    )
+    .isEqualTo(bytes(NEWER_REFERENCE.getCode(), "popa@localhost", new int[] { 1 }, 4));
+
+    assertThat(ErlangReference.builder()
+        .node("popa@localhost")
+        .id(42)
+        .creation(4)
+        .build()
+        .toBytes()
+    )
+    .isEqualTo(bytes(NEW_REFERENCE.getCode(), "popa@localhost", new int[] { 42 }, 4));
+  }
+
+  @SneakyThrows
+  private byte[] bytes (int tag, String node, int[] ids, int creation) {
+    OtpErlangRef reference = new OtpErlangRef(tag, node, ids, creation);
+    try (OtpOutputStream output = new OtpOutputStream()) {
+      output.write_ref(reference);
+      output.trimToSize();
+      return output.toByteArray();
+    }
   }
 }
