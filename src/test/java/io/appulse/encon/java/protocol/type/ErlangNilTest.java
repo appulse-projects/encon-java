@@ -17,65 +17,53 @@
 package io.appulse.encon.java.protocol.type;
 
 import static org.assertj.core.api.Assertions.assertThat;
-import static io.appulse.encon.java.protocol.TermType.PORT;
+import static io.appulse.encon.java.protocol.TermType.NIL;
 
 import io.appulse.encon.java.protocol.term.ErlangTerm;
 import io.appulse.utils.Bytes;
 
-import org.assertj.core.api.SoftAssertions;
 import org.junit.Test;
+
+import erlang.OtpOutputStream;
+import lombok.SneakyThrows;
 import lombok.val;
 
-public class PortTest {
+public class ErlangNilTest {
 
   @Test
   public void newInstance () {
-    val node = "popa";
-    val id = 500;
-    val creation = 42;
-
     val bytes = Bytes.allocate()
-        .put1B(PORT.getCode())
-        .put(new ErlangAtom(node).toBytes())
-        .put4B(id & 0xFFFFFFF)
-        .put1B(creation & 0x3)
+        .put1B(NIL.getCode())
         .array();
 
-    ErlangPort port = ErlangTerm.newInstance(bytes);
-    assertThat(port).isNotNull();
-
-    SoftAssertions.assertSoftly(softly -> {
-      softly.assertThat(port.getNode())
-          .isEqualTo(node);
-
-      softly.assertThat(port.getId())
-          .isEqualTo(id & 0xFFFFFFF);
-
-      softly.assertThat(port.getCreation())
-          .isEqualTo(creation & 0x3);
-    });
+    ErlangNil nil = ErlangTerm.newInstance(bytes);
+    assertThat(nil).isNotNull();
+    assertThat(nil.getType())
+        .isEqualTo(NIL);
   }
 
   @Test
   public void toBytes () {
-    val node = "popa";
-    val id = 500;
-    val creation = 42;
-
     val expected = Bytes.allocate()
-        .put1B(PORT.getCode())
-        .put(new ErlangAtom(node).toBytes())
-        .put4B(id & 0xFFFFFFF)
-        .put1B(creation & 0x3)
+        .put1B(NIL.getCode())
         .array();
 
-    assertThat(ErlangPort.builder()
-            .node(node)
-            .id(id)
-            .creation(creation)
-            .build()
-            .toBytes()
-        )
+    assertThat(new ErlangNil().toBytes())
         .isEqualTo(expected);
+  }
+
+  @Test
+  public void encode () {
+    assertThat(new ErlangNil().toBytes())
+        .isEqualTo(bytes());
+  }
+
+  @SneakyThrows
+  private byte[] bytes () {
+    try (OtpOutputStream output = new OtpOutputStream()) {
+      output.write_nil();
+      output.trimToSize();
+      return output.toByteArray();
+    }
   }
 }

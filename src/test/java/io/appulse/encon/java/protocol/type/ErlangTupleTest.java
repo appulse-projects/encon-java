@@ -17,7 +17,11 @@
 package io.appulse.encon.java.protocol.type;
 
 import static org.assertj.core.api.Assertions.assertThat;
-import static io.appulse.encon.java.protocol.TermType.BINARY;
+
+import java.util.stream.IntStream;
+
+import static io.appulse.encon.java.protocol.TermType.LARGE_TUPLE;
+import static io.appulse.encon.java.protocol.TermType.SMALL_TUPLE;
 
 import io.appulse.encon.java.protocol.term.ErlangTerm;
 import io.appulse.utils.Bytes;
@@ -26,49 +30,60 @@ import org.assertj.core.api.SoftAssertions;
 import org.junit.Test;
 import lombok.val;
 
-public class BinaryTest {
+public class ErlangTupleTest {
 
   @Test
   public void instantiate () {
-    val value = new byte[] { 1, 2, 3 };
+    assertThat(new ErlangTuple(new ErlangNil()).getType())
+        .isEqualTo(SMALL_TUPLE);
 
-    assertThat(new ErlangBinary(value).asBinary())
-        .isEqualTo(value);
+    val elements = IntStream.range(0, 257)
+        .boxed()
+        .map(it -> new ErlangNil())
+        .toArray(ErlangTerm[]::new);
+
+    assertThat(new ErlangTuple(elements).getType())
+        .isEqualTo(LARGE_TUPLE);
   }
 
   @Test
   public void newInstance () {
-    val value = new byte[] { 1, 2, 3 };
-
+    val value = new ErlangNil();
     val bytes = Bytes.allocate()
-        .put1B(BINARY.getCode())
-        .put4B(value.length)
-        .put(value)
+        .put1B(SMALL_TUPLE.getCode())
+        .put1B(1)
+        .put(value.toBytes())
         .array();
 
-    ErlangBinary binary = ErlangTerm.newInstance(bytes);
-    assertThat(binary).isNotNull();
+    ErlangTuple tuple = ErlangTerm.newInstance(bytes);
+    assertThat(tuple).isNotNull();
 
     SoftAssertions.assertSoftly(softly -> {
-      softly.assertThat(binary.isBinary())
+      softly.assertThat(tuple.isContainerTerm())
           .isTrue();
 
-      softly.assertThat(binary.asBinary())
-          .isEqualTo(value);
+      softly.assertThat(tuple.isTuple())
+          .isTrue();
+
+      softly.assertThat(tuple.get(0))
+          .isPresent()
+          .hasValue(value);
+
+      softly.assertThat(tuple.size())
+          .isEqualTo(1);
     });
   }
 
   @Test
   public void toBytes () {
-    val value = new byte[] { 1, 2, 3 };
-
+    val value = new ErlangNil();
     val expected = Bytes.allocate()
-        .put1B(BINARY.getCode())
-        .put4B(value.length)
-        .put(value)
+        .put1B(SMALL_TUPLE.getCode())
+        .put1B(1)
+        .put(value.toBytes())
         .array();
 
-    assertThat(new ErlangBinary(value).toBytes())
+    assertThat(new ErlangTuple(value).toBytes())
         .isEqualTo(expected);
   }
 }

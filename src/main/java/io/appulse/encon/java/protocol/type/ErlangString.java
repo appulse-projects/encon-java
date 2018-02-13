@@ -48,10 +48,15 @@ public class ErlangString extends ErlangTerm {
   }
 
   public ErlangString (String value) {
-    this(value.length() <= 65535 && value.codePoints().allMatch(it -> it < 0 || it > 255)
-       ? STRING
-       : LIST);
+    this(value.length() <= 65535 && value.codePoints().allMatch(it -> it >= 0 && it <= 255)
+         ? STRING
+         : LIST);
     this.value = value;
+  }
+
+  @Override
+  public String asText () {
+    return value;
   }
 
   @Override
@@ -85,6 +90,6 @@ public class ErlangString extends ErlangTerm {
   }
 
   private boolean is8bitString (String string) {
-    return string.codePoints().allMatch(it -> it < 0 || it > 255);
+    return string.codePoints().allMatch(it -> it >= 0 && it <= 255);
   }
 }

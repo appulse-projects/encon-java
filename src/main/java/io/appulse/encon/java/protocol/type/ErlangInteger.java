@@ -25,6 +25,7 @@ import static lombok.AccessLevel.PRIVATE;
 
 import java.math.BigDecimal;
 import java.math.BigInteger;
+import java.util.Arrays;
 import java.util.stream.IntStream;
 
 import io.appulse.encon.java.protocol.TermType;
@@ -86,7 +87,7 @@ public class ErlangInteger extends ErlangTerm {
   }
 
   public ErlangInteger (byte value) {
-    this((long) value);
+    this((long) (value & 0xFFL));
   }
 
   public ErlangInteger (short value) {
@@ -98,23 +99,31 @@ public class ErlangInteger extends ErlangTerm {
   }
 
   public ErlangInteger (long value) {
-    this(
-        (value & 0xFFL) == value
-        ? SMALL_INTEGER
-        : value < MIN_INTEGER || value > MAX_INTEGER
-          ? SMALL_BIG
-          : INTEGER
-    );
+    this(SMALL_INTEGER);
     this.value = BigInteger.valueOf(value);
+    setupType(value);
   }
 
   public ErlangInteger (BigInteger value) {
-    this(
-        value.abs().toByteArray().length < 256
-        ? SMALL_BIG
-        : LARGE_BIG
-    );
+    this(SMALL_BIG);
     this.value = value;
+    if (value.bitLength() < 64) {
+      setupType(value.longValue());
+    } else if (value.abs().toByteArray().length < 256) {
+      setType(SMALL_BIG);
+    } else {
+      setType(LARGE_BIG);
+    }
+  }
+
+  private void setupType (long longValue) {
+    if ((longValue & 0xFFL) == longValue) {
+      setType(SMALL_INTEGER);
+    } else if (longValue >= MIN_INTEGER && longValue <= MAX_INTEGER) {
+      setType(INTEGER);
+    } else if (value.abs().toByteArray().length < 256) {
+      setType(SMALL_BIG);
+    }
   }
 
   @Override
@@ -234,7 +243,13 @@ public class ErlangInteger extends ErlangTerm {
       break;
     case SMALL_BIG:
     case LARGE_BIG:
-      byte[] magnitude = value.abs().toByteArray();
+      byte[] bytes = value.abs().toByteArray();
+      int index = 0;
+      for (; index < bytes.length && bytes[index] == 0; index++) {
+        // skip leading zeros
+      }
+
+      byte[] magnitude = Arrays.copyOfRange(bytes, index, bytes.length);
       int length = magnitude.length;
       // Reverse the array to make it little endian.
       for (int i = 0, j = length; i < j--; i++) {

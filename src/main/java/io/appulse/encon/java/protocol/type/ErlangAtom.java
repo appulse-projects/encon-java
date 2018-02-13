@@ -52,16 +52,22 @@ public class ErlangAtom extends ErlangTerm {
   }
 
   public ErlangAtom (String value) {
-    this(value.getBytes(UTF_8).length < 256
-         ? SMALL_ATOM_UTF8
-         : ATOM_UTF8);
+    super(SMALL_ATOM_UTF8);
 
     this.value = trim(value);
+    if (this.value.getBytes(UTF_8).length >= 256) {
+      setType(ATOM_UTF8);
+    }
   }
 
   public ErlangAtom (boolean value) {
     this(SMALL_ATOM_UTF8);
     this.value = Boolean.toString(value);
+  }
+
+  @Override
+  public boolean isBoolean() {
+    return "true".equalsIgnoreCase(value) || "false".equalsIgnoreCase(value);
   }
 
   @Override
@@ -103,7 +109,6 @@ public class ErlangAtom extends ErlangTerm {
   @Override
   protected void write (@NonNull Bytes buffer) {
     val bytes = value.getBytes(UTF_8);
-
     switch (getType()) {
     case SMALL_ATOM_UTF8:
       buffer.put1B(bytes.length);
