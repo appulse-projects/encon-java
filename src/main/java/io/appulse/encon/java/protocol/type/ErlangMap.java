@@ -121,8 +121,8 @@ public class ErlangMap extends ErlangTerm {
   protected void write (@NonNull Bytes buffer) {
     buffer.put4B(map.size());
     map.entrySet().forEach(it -> {
-    //   buffer.putTerm(it.getKey());
-    //   buffer.putTerm(it.getValue());
+        buffer.put(it.getKey().toBytes());
+        buffer.put(it.getValue().toBytes());
     });
   }
 }

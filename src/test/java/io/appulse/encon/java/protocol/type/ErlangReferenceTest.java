@@ -148,7 +148,7 @@ public class ErlangReferenceTest {
   private byte[] bytes (int tag, String node, int[] ids, int creation) {
     OtpErlangRef reference = new OtpErlangRef(tag, node, ids, creation);
     try (OtpOutputStream output = new OtpOutputStream()) {
-      output.write_ref(reference);
+      reference.encode(output);
       output.trimToSize();
       return output.toByteArray();
     }

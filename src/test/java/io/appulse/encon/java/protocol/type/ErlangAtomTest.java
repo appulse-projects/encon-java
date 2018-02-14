@@ -30,6 +30,7 @@ import io.appulse.utils.Bytes;
 import org.assertj.core.api.SoftAssertions;
 import org.junit.Test;
 
+import erlang.OtpErlangAtom;
 import erlang.OtpOutputStream;
 import lombok.SneakyThrows;
 import lombok.val;

@@ -121,7 +121,7 @@ public class ErlangPidTest {
   private byte[] bytes (int tag, String node, int id, int serial, int creation) {
     OtpErlangPid pid = new OtpErlangPid(tag, node, id, serial, creation);
     try (OtpOutputStream output = new OtpOutputStream()) {
-      output.write_pid(pid);
+      pid.encode(output);
       output.trimToSize();
       return output.toByteArray();
     }

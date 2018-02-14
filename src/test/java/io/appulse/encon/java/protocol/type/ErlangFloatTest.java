@@ -20,6 +20,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 
 import org.junit.Test;
 
+import erlang.OtpErlangDouble;
 import erlang.OtpOutputStream;
 import lombok.SneakyThrows;
 
@@ -49,7 +50,8 @@ public class ErlangFloatTest {
   @SneakyThrows
   private byte[] bytes (double value) {
     try (OtpOutputStream output = new OtpOutputStream()) {
-      output.write_double(value);
+      OtpErlangDouble doub = new OtpErlangDouble(value);
+      doub.encode(output);
       output.trimToSize();
       return output.toByteArray();
     }

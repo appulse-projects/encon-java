@@ -48,10 +48,12 @@ public class ErlangString extends ErlangTerm {
   }
 
   public ErlangString (String value) {
-    this(value.length() <= 65535 && value.codePoints().allMatch(it -> it >= 0 && it <= 255)
-         ? STRING
-         : LIST);
+    this(STRING);
     this.value = value;
+
+    if (value.length() > 65535 || !is8bitString()) {
+      setType(LIST);
+    }
   }
 
   @Override
@@ -68,28 +70,36 @@ public class ErlangString extends ErlangTerm {
 
   @Override
   protected void write (@NonNull Bytes buffer) {
-    val length = value.length();
+    val positionBefore = buffer.position() - 1;
+    if (value.isEmpty()) {
+      buffer.put(positionBefore, new ErlangNil().toBytes());
+      return;
+    }
 
-    if (length == 0) {
-      buffer.put(new ErlangNil().toBytes());
-    } else if (length <= 65535 && is8bitString(value)) {
-      buffer.put2B((short) length);
+    val length = value.length();
+    switch (getType()) {
+    case STRING:
+      buffer.put2B(length);
       buffer.put(value.getBytes(ISO_8859_1));
-    } else {
+      break;
+    case LIST:
       val elements = value.codePoints()
           .boxed()
           .map(ErlangInteger::from)
           .toArray(ErlangInteger[]::new);
 
-      buffer.put(ErlangList.builder()
+      buffer.put(positionBefore, ErlangList.builder()
           .elements(elements)
           .build()
           .toBytes()
       );
+      break;
+    default:
+      buffer.put(positionBefore, new ErlangNil().toBytes());
     }
   }
 
-  private boolean is8bitString (String string) {
-    return string.codePoints().allMatch(it -> it >= 0 && it <= 255);
+  private boolean is8bitString () {
+    return value.codePoints().allMatch(it -> it >= 0 && it <= 255);
   }
 }
