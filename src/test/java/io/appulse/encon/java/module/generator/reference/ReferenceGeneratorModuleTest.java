@@ -52,7 +52,7 @@ public class ReferenceGeneratorModuleTest {
     assertThat(reference).isNotNull();
 
     SoftAssertions.assertSoftly(softly -> {
-      softly.assertThat(reference.getNode())
+      softly.assertThat(reference.getDescriptor().getFullName())
           .isNotNull()
           .isEqualTo(descriptor.getFullName());
 

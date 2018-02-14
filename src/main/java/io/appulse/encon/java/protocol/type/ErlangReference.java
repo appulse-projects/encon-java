@@ -22,6 +22,7 @@ import static lombok.AccessLevel.PRIVATE;
 
 import java.util.stream.IntStream;
 
+import io.appulse.encon.java.NodeDescriptor;
 import io.appulse.encon.java.protocol.TermType;
 import io.appulse.encon.java.protocol.term.ErlangTerm;
 import io.appulse.utils.Bytes;
@@ -45,7 +46,7 @@ import lombok.val;
 @EqualsAndHashCode(callSuper = true)
 public class ErlangReference extends ErlangTerm {
 
-  String node;
+  NodeDescriptor descriptor;
 
   int[] ids;
 
@@ -58,7 +59,7 @@ public class ErlangReference extends ErlangTerm {
   @Builder
   public ErlangReference (TermType type, @NonNull String node, int id, int[] ids, int creation) {
     this(ofNullable(type).orElse(NEW_REFERENCE));
-    this.node = node;
+    descriptor = NodeDescriptor.from(node);
     this.ids = ofNullable(ids)
         .map(it -> {
           int[] result = new int[] { 0, 0, 0 };
@@ -108,7 +109,7 @@ public class ErlangReference extends ErlangTerm {
     switch (getType()) {
     case REFERENCE:
       ErlangAtom atom = ErlangTerm.newInstance(buffer);
-      node = atom.asText();
+      descriptor = NodeDescriptor.from(atom.asText());
       ids = new int[] { buffer.getInt() & 0x3FFFF };
       creation = buffer.getByte() & 0x03;
       return;
@@ -125,10 +126,10 @@ public class ErlangReference extends ErlangTerm {
     }
 
     ErlangAtom atom = ErlangTerm.newInstance(buffer);
-    node = atom.asText();
+    descriptor = NodeDescriptor.from(atom.asText());
 
     if (getType() == NEW_REFERENCE) {
-      creation = buffer.getByte();
+      creation = buffer.getByte() & 0x3;
     } else {
       creation = buffer.getInt();
     }
@@ -136,13 +137,17 @@ public class ErlangReference extends ErlangTerm {
     ids = IntStream.range(0, arity)
         .map(it -> buffer.getInt())
         .toArray();
+
+    if (getType() == NEW_REFERENCE) {
+      ids[0] &= 0x3FFFF;
+    }
   }
 
   @Override
   protected void write (@NonNull Bytes buffer) {
     switch (getType()) {
     case REFERENCE:
-      buffer.put(new ErlangAtom(node).toBytes());
+      buffer.put(new ErlangAtom(descriptor.getFullName()).toBytes());
       buffer.put4B(ids[0] & 0x3FFFF);
       buffer.put1B(creation);
       return;
@@ -154,7 +159,7 @@ public class ErlangReference extends ErlangTerm {
     }
 
     buffer.put2B(ids.length);
-    buffer.put(new ErlangAtom(node).toBytes());
+    buffer.put(new ErlangAtom(descriptor.getFullName()).toBytes());
 
     switch (getType()) {
     case NEW_REFERENCE:

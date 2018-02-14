@@ -28,6 +28,7 @@ import org.assertj.core.api.SoftAssertions;
 import org.junit.Test;
 
 import erlang.OtpErlangBitstr;
+import erlang.OtpInputStream;
 import erlang.OtpOutputStream;
 import lombok.SneakyThrows;
 import lombok.val;
@@ -71,18 +72,18 @@ public class ErlangBitStringTest {
 
   @Test
   public void toBytes () {
-    val bytes = new byte[] { 1, 2, 3 };
+    val bits = new byte[] { 1, 2, 3 };
     val pad = 3;
 
-    val expected = Bytes.allocate()
+    val bytes = Bytes.allocate()
         .put1B(BIT_BINNARY.getCode())
-        .put4B(bytes.length)
+        .put4B(bits.length)
         .put1B(8 - pad)
         .put(new byte[] { 1, 2, 0 })
         .array();
 
-    assertThat(new ErlangBitString(bytes, pad).toBytes())
-        .isEqualTo(expected);
+    assertThat(new ErlangBitString(bits, pad).toBytes())
+        .isEqualTo(bytes);
   }
 
   @Test
@@ -97,6 +98,25 @@ public class ErlangBitStringTest {
 
     assertThat(new ErlangBitString(binary, 0).toBytes())
         .isEqualTo(bytes(binary, 0));
+  }
+
+  @Test
+  public void decode () throws Exception {
+    val bits = new byte[] { 1, 2, 3 };
+    val pad = 3;
+
+    val bytes = Bytes.allocate()
+        .put1B(BIT_BINNARY.getCode())
+        .put4B(bits.length)
+        .put1B(8 - pad)
+        .put(new byte[] { 1, 2, 0 })
+        .array();
+
+    try (val input = new OtpInputStream(bytes)) {
+      ErlangBitString bitString = ErlangTerm.newInstance(bytes);
+      assertThat(bitString.getBits())
+          .isEqualTo(input.read_bitstr(new int[1]));
+    }
   }
 
   @SneakyThrows

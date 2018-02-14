@@ -28,6 +28,7 @@ import org.assertj.core.api.SoftAssertions;
 import org.junit.Test;
 
 import erlang.OtpErlangPid;
+import erlang.OtpInputStream;
 import erlang.OtpOutputStream;
 import lombok.SneakyThrows;
 import lombok.val;
@@ -115,6 +116,59 @@ public class ErlangPidTest {
         .toBytes()
     )
     .isEqualTo(bytes(NEW_PID.getCode(), "popa@localhost", 1, 27, 3));
+  }
+
+  @Test
+  public void decode () throws Exception {
+    byte[] bytes1 = Bytes.allocate()
+        .put1B(PID.getCode())
+        .put(new ErlangAtom("popa@localhost").toBytes())
+        .put4B(Integer.MAX_VALUE)
+        .put4B(Integer.MAX_VALUE)
+        .put1B(Integer.MAX_VALUE)
+        .array();
+
+    try (val input = new OtpInputStream(bytes1)) {
+      ErlangPid pid = ErlangTerm.newInstance(bytes1);
+      OtpErlangPid otpPid = input.read_pid();
+
+      assertThat(pid.getDescriptor().getFullName())
+          .isEqualTo(otpPid.node());
+
+      assertThat(pid.getId())
+          .isEqualTo(otpPid.id());
+
+      assertThat(pid.getCreation())
+          .isEqualTo(otpPid.creation());
+
+      assertThat(pid.getSerial())
+          .isEqualTo(otpPid.serial());
+    }
+
+    byte[] bytes2 = Bytes.allocate()
+        .put1B(NEW_PID.getCode())
+        .put(new ErlangAtom("popa@localhost").toBytes())
+        .put4B(Integer.MAX_VALUE)
+        .put4B(Integer.MAX_VALUE)
+        .put4B(Integer.MAX_VALUE)
+        .array();
+
+    try (val input = new OtpInputStream(bytes2)) {
+      ErlangPid pid = ErlangTerm.newInstance(bytes2);
+      OtpErlangPid otpPid = input.read_pid();
+
+      assertThat(pid.getDescriptor().getFullName())
+          .isEqualTo(otpPid.node());
+
+      assertThat(pid.getId())
+          .isEqualTo(otpPid.id());
+
+      assertThat(pid.getCreation())
+          .isEqualTo(otpPid.creation());
+
+      assertThat(pid.getSerial())
+          .isEqualTo(otpPid.serial());
+    }
   }
 
   @SneakyThrows

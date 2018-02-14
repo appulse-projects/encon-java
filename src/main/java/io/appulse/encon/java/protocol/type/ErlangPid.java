@@ -60,21 +60,11 @@ public class ErlangPid extends ErlangTerm {
     this(ofNullable(type).orElse(PID));
     descriptor = NodeDescriptor.from(node);
 
-    switch (getType()) {
-    case PID:
-      this.id = id & 0x7FFF; // 15 bits
-      this.serial = serial & 0x1FFF; // 13 bits
-      this.creation = creation & 0x03; // 2 bits
-      break;
-    case NEW_PID:
-      // allow all 32 bits for NEW_PID
-      this.id = id;
-      this.serial = serial;
-      this.creation = creation;
-      break;
-    default:
-      throw new RuntimeException();
-    }
+    this.id = id;
+    this.serial = serial;
+    this.creation = creation;
+
+    validate();
   }
 
   @Override
@@ -105,6 +95,7 @@ public class ErlangPid extends ErlangTerm {
     default:
       throw new RuntimeException();
     }
+    validate();
   }
 
   @Override
@@ -122,6 +113,14 @@ public class ErlangPid extends ErlangTerm {
       break;
     default:
       throw new RuntimeException();
+    }
+  }
+
+  private void validate () {
+    if (getType() == PID) {
+      id = id & 0x7FFF; // 15 bits
+      serial = serial & 0x1FFF; // 13 bits
+      creation = creation & 0x03; // 2 bits;
     }
   }
 }

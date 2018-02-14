@@ -16,13 +16,22 @@
 
 package io.appulse.encon.java.protocol.type;
 
+import static io.appulse.encon.java.protocol.TermType.FLOAT;
+import static io.appulse.encon.java.protocol.TermType.NEW_FLOAT;
+import static java.nio.charset.StandardCharsets.ISO_8859_1;
 import static org.assertj.core.api.Assertions.assertThat;
 
 import org.junit.Test;
 
+import io.appulse.encon.java.protocol.term.ErlangTerm;
+import io.appulse.utils.Bytes;
+
 import erlang.OtpErlangDouble;
+import erlang.OtpErlangFloat;
+import erlang.OtpInputStream;
 import erlang.OtpOutputStream;
 import lombok.SneakyThrows;
+import lombok.val;
 
 public class ErlangFloatTest {
 
@@ -45,6 +54,42 @@ public class ErlangFloatTest {
 
     assertThat(new ErlangFloat(Double.MIN_VALUE).toBytes())
         .isEqualTo(bytes(Double.MIN_VALUE));
+  }
+
+  @Test
+  public void decode () throws Exception {
+    val bytes1 = Bytes.allocate()
+        .put1B(FLOAT.getCode())
+        .put(String.format("%031.20e", Float.MAX_VALUE).getBytes(ISO_8859_1))
+        .array();
+
+    try (val input = new OtpInputStream(bytes1)) {
+      ErlangFloat fl = ErlangTerm.newInstance(bytes1);
+      assertThat(fl.asFloat())
+          .isEqualTo(input.read_float());
+    }
+
+
+    val bytes2 = Bytes.allocate()
+        .put1B(NEW_FLOAT.getCode())
+        .put8B(Double.doubleToLongBits(Double.MIN_VALUE))
+        .array();
+
+    try (val input = new OtpInputStream(bytes2)) {
+      ErlangFloat fl = ErlangTerm.newInstance(bytes2);
+      assertThat(fl.asDouble())
+          .isEqualTo(input.read_double());
+    }
+  }
+
+  @SneakyThrows
+  private byte[] bytes (float value) {
+    try (OtpOutputStream output = new OtpOutputStream()) {
+      OtpErlangFloat floa = new OtpErlangFloat(value);
+      floa.encode(output);
+      output.trimToSize();
+      return output.toByteArray();
+    }
   }
 
   @SneakyThrows

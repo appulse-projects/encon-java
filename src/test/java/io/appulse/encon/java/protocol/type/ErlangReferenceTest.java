@@ -17,6 +17,7 @@
 package io.appulse.encon.java.protocol.type;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static io.appulse.encon.java.protocol.TermType.REFERENCE;
 import static io.appulse.encon.java.protocol.TermType.NEW_REFERENCE;
 import static io.appulse.encon.java.protocol.TermType.NEWER_REFERENCE;
 
@@ -29,6 +30,7 @@ import org.assertj.core.api.SoftAssertions;
 import org.junit.Test;
 
 import erlang.OtpErlangRef;
+import erlang.OtpInputStream;
 import erlang.OtpOutputStream;
 import lombok.SneakyThrows;
 import lombok.val;
@@ -49,7 +51,7 @@ public class ErlangReferenceTest {
 
   @Test
   public void newInstance () {
-    val node = "popa";
+    val node = "popa@localhost";
     val ids = new int[] { 1, 0, 0 };
     val creation = 42;
 
@@ -58,7 +60,7 @@ public class ErlangReferenceTest {
         .put2B(ids.length)
         .put(new ErlangAtom(node).toBytes())
         .put1B(creation)
-        .put4B(ids[0] & 0x3FFFF);
+        .put4B(ids[0]);
 
     IntStream.of(ids)
         .skip(1)
@@ -70,7 +72,7 @@ public class ErlangReferenceTest {
     assertThat(reference).isNotNull();
 
     SoftAssertions.assertSoftly(softly -> {
-      softly.assertThat(reference.getNode())
+      softly.assertThat(reference.getDescriptor().getFullName())
           .isEqualTo(node);
 
       softly.assertThat(reference.getIds())
@@ -80,13 +82,13 @@ public class ErlangReferenceTest {
           .isEqualTo(ids[0]);
 
       softly.assertThat(reference.getCreation())
-          .isEqualTo(creation);
+          .isEqualTo(creation & 0x3);
     });
   }
 
   @Test
   public void toBytes () {
-    val node = "popa";
+    val node = "popa@localhost";
     val ids = new int[] { 1, 0, 0 };
     val creation = 42;
 
@@ -142,6 +144,87 @@ public class ErlangReferenceTest {
         .toBytes()
     )
     .isEqualTo(bytes(NEW_REFERENCE.getCode(), "popa@localhost", new int[] { 42 }, 4));
+  }
+
+  @Test
+  public void decode () throws Exception {
+    byte[] bytes1 = Bytes.allocate()
+        .put1B(REFERENCE.getCode())
+        .put(new ErlangAtom("popa@localhost").toBytes())
+        .put4B(Integer.MAX_VALUE)
+        .put1B(Integer.MAX_VALUE)
+        .array();
+
+    try (val input = new OtpInputStream(bytes1)) {
+      ErlangReference reference = ErlangTerm.newInstance(bytes1);
+      OtpErlangRef otpRef = input.read_ref();
+
+      assertThat(reference.getDescriptor().getFullName())
+          .isEqualTo(otpRef.node());
+
+      assertThat(reference.getId())
+          .isEqualTo(otpRef.id());
+
+      assertThat(reference.getIds())
+          .isEqualTo(otpRef.ids());
+
+      assertThat(reference.getCreation())
+          .isEqualTo(otpRef.creation());
+    }
+
+    byte[] bytes2 = Bytes.allocate()
+        .put1B(NEW_REFERENCE.getCode())
+        .put2B(3)
+        .put(new ErlangAtom("popa@localhost").toBytes())
+        .put1B(Integer.MAX_VALUE)
+        .put4B(Integer.MAX_VALUE)
+        .put4B(Integer.MAX_VALUE)
+        .put4B(Integer.MAX_VALUE)
+        .array();
+
+    try (val input = new OtpInputStream(bytes2)) {
+      ErlangReference reference = ErlangTerm.newInstance(bytes2);
+      OtpErlangRef otpRef = input.read_ref();
+
+      assertThat(reference.getDescriptor().getFullName())
+          .isEqualTo(otpRef.node());
+
+      assertThat(reference.getId())
+          .isEqualTo(otpRef.id());
+
+      assertThat(reference.getIds())
+          .isEqualTo(otpRef.ids());
+
+      assertThat(reference.getCreation())
+          .isEqualTo(otpRef.creation());
+    }
+
+    byte[] bytes3 = Bytes.allocate()
+        .put1B(NEW_REFERENCE.getCode())
+        .put2B(3)
+        .put(new ErlangAtom("popa@localhost").toBytes())
+        .put4B(Integer.MAX_VALUE)
+        .put4B(Integer.MAX_VALUE)
+        .put4B(Integer.MAX_VALUE)
+        .put4B(Integer.MAX_VALUE)
+        .array();
+
+    try (val input = new OtpInputStream(bytes3)) {
+      ErlangReference reference = ErlangTerm.newInstance(bytes3);
+      OtpErlangRef otpRef = input.read_ref();
+
+      assertThat(reference.getDescriptor().getFullName())
+          .isEqualTo(otpRef.node());
+
+      assertThat(reference.getId())
+          .isEqualTo(otpRef.id());
+
+      assertThat(reference.getIds())
+          .isEqualTo(otpRef.ids());
+
+      assertThat(reference.getCreation())
+          .isEqualTo(otpRef.creation());
+    }
   }
 
   @SneakyThrows

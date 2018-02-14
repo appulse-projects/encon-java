@@ -139,7 +139,7 @@ public class ErlangFloat extends ErlangTerm {
   protected void write (@NonNull Bytes buffer) {
     switch (getType()) {
     case FLOAT:
-      val string = String.format("%.20e", value);
+      val string = String.format("%031.20e", value);
       val bytes = string.getBytes(ISO_8859_1);
       buffer.put(bytes);
       break;
