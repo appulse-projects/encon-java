@@ -26,6 +26,7 @@ import org.assertj.core.api.SoftAssertions;
 import org.junit.Test;
 
 import erlang.OtpErlangBinary;
+import erlang.OtpInputStream;
 import erlang.OtpOutputStream;
 import lombok.SneakyThrows;
 import lombok.val;
@@ -81,6 +82,23 @@ public class ErlangBinaryTest {
     val binary = new byte[] { 1, 2, 3, 4, 5 };
     assertThat(new ErlangBinary(binary).toBytes())
         .isEqualTo(bytes(binary));
+  }
+
+  @Test
+  public void decode () throws Exception {
+    val value = new byte[] { 1, 2, 3 };
+
+    val bytes = Bytes.allocate()
+        .put1B(BINARY.getCode())
+        .put4B(value.length)
+        .put(value)
+        .array();
+
+    try (val input = new OtpInputStream(bytes)) {
+      ErlangBinary binary = ErlangTerm.newInstance(bytes);
+      assertThat(binary.asBinary())
+          .isEqualTo(input.read_binary());
+    }
   }
 
   @SneakyThrows

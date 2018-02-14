@@ -151,6 +151,10 @@ public class ErlangInteger extends ErlangTerm {
     return value;
   }
 
+  public byte[] asBinary(byte[] defaultValue) {
+    return value.toByteArray();
+  }
+
   @Override
   public boolean asBoolean (boolean defaultValue) {
     return value.equals(ZERO);
@@ -202,7 +206,7 @@ public class ErlangInteger extends ErlangTerm {
     int sign = -1;
     switch (getType()) {
     case SMALL_INTEGER:
-      value = BigInteger.valueOf(buffer.getByte());
+      value = BigInteger.valueOf(buffer.getUnsignedByte());
       break;
     case INTEGER:
       value = BigInteger.valueOf(buffer.getInt());

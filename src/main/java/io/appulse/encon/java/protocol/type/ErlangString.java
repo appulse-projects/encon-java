@@ -80,7 +80,7 @@ public class ErlangString extends ErlangTerm {
     switch (getType()) {
     case STRING:
       buffer.put2B(length);
-      buffer.put(value.getBytes(ISO_8859_1));
+      buffer.put(value, ISO_8859_1);
       break;
     case LIST:
       val elements = value.codePoints()

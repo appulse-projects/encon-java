@@ -20,6 +20,7 @@ import static io.appulse.encon.java.protocol.TermType.PORT;
 import static java.util.Optional.ofNullable;
 import static lombok.AccessLevel.PRIVATE;
 
+import io.appulse.encon.java.NodeDescriptor;
 import io.appulse.encon.java.protocol.TermType;
 import io.appulse.encon.java.protocol.term.ErlangTerm;
 import io.appulse.utils.Bytes;
@@ -42,7 +43,7 @@ import lombok.experimental.FieldDefaults;
 @EqualsAndHashCode(callSuper = true)
 public class ErlangPort extends ErlangTerm {
 
-  String node;
+  NodeDescriptor descriptor;
 
   int id;
 
@@ -55,20 +56,12 @@ public class ErlangPort extends ErlangTerm {
   @Builder
   private ErlangPort (TermType type, @NonNull String node, int id, int creation) {
     this(ofNullable(type).orElse(PORT));
-    this.node = node;
+    descriptor = NodeDescriptor.from(node);
 
-    switch (getType()) {
-    case PORT:
-      this.id = id & 0xFFFFFFF; // 28 bits
-      this.creation = creation & 0x3; // 2 bits
-      break;
-    case NEW_PORT:
-      this.id = id;
-      this.creation = creation;
-      break;
-    default:
-      throw new RuntimeException();
-    }
+    this.id = id;
+    this.creation = creation;
+
+    validate();
   }
 
   @Override
@@ -84,7 +77,7 @@ public class ErlangPort extends ErlangTerm {
   @Override
   protected void read (@NonNull Bytes buffer) {
     ErlangAtom atom = ErlangTerm.newInstance(buffer);
-    node = atom.asText();
+    descriptor = NodeDescriptor.from(atom.asText());
     id = buffer.getInt();
 
     switch (getType()) {
@@ -97,11 +90,12 @@ public class ErlangPort extends ErlangTerm {
     default:
       throw new RuntimeException();
     }
+    validate();
   }
 
   @Override
   protected void write (@NonNull Bytes buffer) {
-    buffer.put(new ErlangAtom(node).toBytes());
+    buffer.put(new ErlangAtom(descriptor.getFullName()).toBytes());
     buffer.put4B(id);
 
     switch (getType()) {
@@ -113,6 +107,13 @@ public class ErlangPort extends ErlangTerm {
       break;
     default:
       throw new RuntimeException();
+    }
+  }
+
+  private void validate () {
+    if (getType() == PORT) {
+      id = id & 0xFFFFFFF; // 28 bits
+      creation = creation & 0x3; // 2 bits
     }
   }
 }

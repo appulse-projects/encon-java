@@ -52,7 +52,7 @@ public class PortGeneratorModuleTest {
     assertThat(port).isNotNull();
 
     SoftAssertions.assertSoftly(softly -> {
-      softly.assertThat(port.getNode())
+      softly.assertThat(port.getDescriptor().getFullName())
           .isNotNull()
           .isEqualTo(descriptor.getFullName());
 

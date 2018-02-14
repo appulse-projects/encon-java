@@ -24,6 +24,7 @@ import io.appulse.encon.java.protocol.term.ErlangTerm;
 import io.appulse.utils.Bytes;
 
 import erlang.OtpErlangPort;
+import erlang.OtpInputStream;
 import erlang.OtpOutputStream;
 import org.assertj.core.api.SoftAssertions;
 import org.junit.Test;
@@ -34,7 +35,7 @@ public class ErlangPortTest {
 
   @Test
   public void newInstance () {
-    val node = "popa";
+    val node = "popa@localhost";
     val id = 500;
     val creation = 42;
 
@@ -49,7 +50,7 @@ public class ErlangPortTest {
     assertThat(port).isNotNull();
 
     SoftAssertions.assertSoftly(softly -> {
-      softly.assertThat(port.getNode())
+      softly.assertThat(port.getDescriptor().getFullName())
           .isEqualTo(node);
 
       softly.assertThat(port.getId())
@@ -62,7 +63,7 @@ public class ErlangPortTest {
 
   @Test
   public void toBytes () {
-    val node = "popa";
+    val node = "popa@localhost";
     val id = 500;
     val creation = 42;
 
@@ -105,6 +106,50 @@ public class ErlangPortTest {
     .isEqualTo(bytes(NEW_PORT.getCode(), "popa@localhost", 1, 3));
   }
 
+  @Test
+  public void decode () throws Exception {
+    byte[] bytes1 = Bytes.allocate()
+        .put1B(PORT.getCode())
+        .put(new ErlangAtom("popa@localhost").toBytes())
+        .put4B(Integer.MAX_VALUE)
+        .put1B(Integer.MAX_VALUE)
+        .array();
+
+    try (val input = new OtpInputStream(bytes1)) {
+      ErlangPort port = ErlangTerm.newInstance(bytes1);
+      OtpErlangPort otpPid = input.read_port();
+
+      assertThat(port.getDescriptor().getFullName())
+          .isEqualTo(otpPid.node());
+
+      assertThat(port.getId())
+          .isEqualTo(otpPid.id());
+
+      assertThat(port.getCreation())
+          .isEqualTo(otpPid.creation());
+    }
+
+    byte[] bytes2 = Bytes.allocate()
+        .put1B(NEW_PORT.getCode())
+        .put(new ErlangAtom("popa@localhost").toBytes())
+        .put4B(Integer.MAX_VALUE)
+        .put4B(Integer.MAX_VALUE)
+        .array();
+
+    try (val input = new OtpInputStream(bytes2)) {
+      ErlangPort port = ErlangTerm.newInstance(bytes2);
+      OtpErlangPort otpPid = input.read_port();
+
+      assertThat(port.getDescriptor().getFullName())
+          .isEqualTo(otpPid.node());
+
+      assertThat(port.getId())
+          .isEqualTo(otpPid.id());
+
+      assertThat(port.getCreation())
+          .isEqualTo(otpPid.creation());
+    }
+  }
 
   @SneakyThrows
   private byte[] bytes (int tag, String node, int id, int creation) {

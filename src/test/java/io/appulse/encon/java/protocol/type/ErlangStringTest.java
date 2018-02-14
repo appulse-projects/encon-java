@@ -1,13 +1,33 @@
+/*
+ * Copyright 2018 the original author or authors.
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
 
 package io.appulse.encon.java.protocol.type;
 
+import static io.appulse.encon.java.protocol.TermType.STRING;
+import static java.nio.charset.StandardCharsets.ISO_8859_1;
 import static org.assertj.core.api.Assertions.assertThat;
 
 import java.util.stream.IntStream;
 
 import org.junit.Test;
 import erlang.OtpErlangString;
+import erlang.OtpInputStream;
 import erlang.OtpOutputStream;
+import io.appulse.encon.java.protocol.term.ErlangTerm;
+import io.appulse.utils.Bytes;
 import lombok.SneakyThrows;
 import lombok.val;
 
@@ -28,6 +48,21 @@ public class ErlangStringTest {
     val string2 = repeat("я", 65536);
     assertThat(new ErlangString(string2).toBytes())
         .isEqualTo(bytes(string2));
+  }
+
+  @Test
+  public void decode () throws Exception {
+    val bytes = Bytes.allocate()
+        .put1B(STRING.getCode())
+        .put2B("popa".length())
+        .put("popa", ISO_8859_1)
+        .array();
+
+    try (val input = new OtpInputStream(bytes)) {
+      ErlangString string = ErlangTerm.newInstance(bytes);
+      assertThat(string.asText())
+          .isEqualTo(input.read_string());
+    }
   }
 
   private String repeat (String string, int times) {

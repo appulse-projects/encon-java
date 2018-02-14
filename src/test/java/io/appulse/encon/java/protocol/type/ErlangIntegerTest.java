@@ -7,14 +7,20 @@ import static io.appulse.encon.java.protocol.TermType.LARGE_BIG;
 import static io.appulse.encon.java.protocol.TermType.SMALL_BIG;
 import static io.appulse.encon.java.protocol.TermType.SMALL_INTEGER;
 
+import java.math.BigDecimal;
 import java.math.BigInteger;
+import java.util.Arrays;
 import java.util.stream.IntStream;
 
 import org.junit.Test;
 
 import erlang.OtpErlangLong;
+import erlang.OtpInputStream;
 import erlang.OtpOutputStream;
+import io.appulse.encon.java.protocol.term.ErlangTerm;
+import io.appulse.utils.Bytes;
 import lombok.SneakyThrows;
+import lombok.val;
 
 public class ErlangIntegerTest {
 
@@ -85,6 +91,55 @@ public class ErlangIntegerTest {
         .isEqualTo(bytes(value));
   }
 
+  @Test
+  public void decode () throws Exception {
+    val bytes1 = Bytes.allocate()
+        .put1B(SMALL_INTEGER.getCode())
+        .put1B(255)
+        .array();
+
+    try (val input = new OtpInputStream(bytes1)) {
+      ErlangInteger inte = ErlangTerm.newInstance(bytes1);
+      assertThat(inte.asInt())
+          .isEqualTo(input.read_int());
+    }
+
+    val bytes2 = Bytes.allocate()
+        .put1B(INTEGER.getCode())
+        .put4B(134217726)
+        .array();
+
+    try (val input = new OtpInputStream(bytes2)) {
+      ErlangInteger inte = ErlangTerm.newInstance(bytes2);
+      assertThat(inte.asInt())
+          .isEqualTo(input.read_int());
+    }
+
+    val bytes3 = bigBytes(BigInteger.valueOf(Long.MAX_VALUE));
+
+    try (val input = new OtpInputStream(bytes3)) {
+      ErlangInteger inte = ErlangTerm.newInstance(bytes3);
+      assertThat(inte.asLong())
+          .isEqualTo(input.read_long());
+    }
+
+    int count = 256;
+    byte[] bytes = new byte[count];
+    IntStream.range(0, count).forEach(it -> bytes[it] = 125);
+    BigInteger value = new BigInteger(bytes);
+    val bytes4 = bigBytes(value);
+
+    try (val input = new OtpInputStream(bytes4)) {
+      ErlangInteger inte = ErlangTerm.newInstance(bytes4);
+      OtpErlangLong ll = (OtpErlangLong) input.read_any();
+
+      assertThat(inte.asBigInteger())
+          .isEqualTo(ll.bigIntegerValue());
+
+      assertThat(value.equals(ll.bigIntegerValue())).isTrue();
+    }
+  }
+
   @SneakyThrows
   private byte[] bytes (char value) {
     try (OtpOutputStream output = new OtpOutputStream()) {
@@ -138,5 +193,43 @@ public class ErlangIntegerTest {
       output.trimToSize();
       return output.toByteArray();
     }
+  }
+
+  private byte[] bigBytes (BigInteger value) {
+    Bytes buffer = Bytes.allocate();
+
+    if (value.abs().toByteArray().length < 256) {
+        buffer.put1B(SMALL_BIG.getCode());
+    } else {
+        buffer.put1B(LARGE_BIG.getCode());
+    }
+
+    byte[] bytes = value.abs().toByteArray();
+    int index = 0;
+    for (; index < bytes.length && bytes[index] == 0; index++) {
+    // skip leading zeros
+    }
+
+    byte[] magnitude = Arrays.copyOfRange(bytes, index, bytes.length);
+    int length = magnitude.length;
+    // Reverse the array to make it little endian.
+    for (int i = 0, j = length; i < j--; i++) {
+    // Swap [i] with [j]
+    byte temp = magnitude[i];
+    magnitude[i] = magnitude[j];
+    magnitude[j] = temp;
+    }
+
+    if ((length & 0xFF) == length) {
+    buffer.put1B(length); // length
+    } else {
+    buffer.put4B(length); // length
+    }
+    val sign = value.signum() < 0
+                ? 1
+                : 0;
+    buffer.put1B(sign);
+    buffer.put(magnitude);
+    return buffer.array();
   }
 }

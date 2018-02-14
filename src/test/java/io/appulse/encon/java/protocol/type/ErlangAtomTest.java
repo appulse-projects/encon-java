@@ -30,7 +30,7 @@ import io.appulse.utils.Bytes;
 import org.assertj.core.api.SoftAssertions;
 import org.junit.Test;
 
-import erlang.OtpErlangAtom;
+import erlang.OtpInputStream;
 import erlang.OtpOutputStream;
 import lombok.SneakyThrows;
 import lombok.val;
@@ -116,6 +116,36 @@ public class ErlangAtomTest {
 
     assertThat(bigAtom.toBytes())
         .isEqualTo(bytes(bigValue));
+  }
+
+  @Test
+  public void decode () throws Exception {
+    val value1 = "hello";
+    val bytes1 = Bytes.allocate()
+        .put1B(SMALL_ATOM_UTF8.getCode())
+        .put1B(value1.getBytes(UTF_8).length)
+        .put(value1.getBytes(UTF_8))
+        .array();
+
+    try (val input = new OtpInputStream(bytes1)) {
+      ErlangAtom atom = ErlangTerm.newInstance(bytes1);
+      assertThat(atom.asText())
+          .isEqualTo(input.read_atom());
+    }
+
+
+    val value2 = "попа";
+    val bytes2 = Bytes.allocate()
+        .put1B(ATOM_UTF8.getCode())
+        .put2B(value2.getBytes(UTF_8).length)
+        .put(value2.getBytes(UTF_8))
+        .array();
+
+    try (val input = new OtpInputStream(bytes2)) {
+      ErlangAtom atom = ErlangTerm.newInstance(bytes2);
+      assertThat(atom.asText())
+          .isEqualTo(input.read_atom());
+    }
   }
 
   private String repeat (String string, int times) {
