@@ -110,7 +110,7 @@ public class ErlangPortTest {
   private byte[] bytes (int tag, String node, int id, int creation) {
     OtpErlangPort port = new OtpErlangPort(tag, node, id, creation);
     try (OtpOutputStream output = new OtpOutputStream()) {
-      output.write_port(port);
+      port.encode(output);
       output.trimToSize();
       return output.toByteArray();
     }

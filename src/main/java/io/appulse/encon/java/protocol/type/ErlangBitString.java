@@ -94,6 +94,11 @@ public class ErlangBitString extends ErlangTerm {
 
   @Override
   protected void write (@NonNull Bytes buffer) {
+    if (pad == 0) {
+      val position = buffer.position();
+      buffer.put(position - 1, new ErlangBinary(bits).toBytes());
+      return;
+    }
     buffer.put4B(bits.length);
     buffer.put1B(8 - pad);
     buffer.put(bits);

@@ -24,6 +24,10 @@ import io.appulse.utils.Bytes;
 
 import org.assertj.core.api.SoftAssertions;
 import org.junit.Test;
+
+import erlang.OtpErlangBinary;
+import erlang.OtpOutputStream;
+import lombok.SneakyThrows;
 import lombok.val;
 
 public class ErlangBinaryTest {
@@ -70,5 +74,22 @@ public class ErlangBinaryTest {
 
     assertThat(new ErlangBinary(value).toBytes())
         .isEqualTo(expected);
+  }
+
+  @Test
+  public void encode () {
+    val binary = new byte[] { 1, 2, 3, 4, 5 };
+    assertThat(new ErlangBinary(binary).toBytes())
+        .isEqualTo(bytes(binary));
+  }
+
+  @SneakyThrows
+  private byte[] bytes (byte[] value) {
+    try (OtpOutputStream output = new OtpOutputStream()) {
+      OtpErlangBinary binary = new OtpErlangBinary(value);
+      binary.encode(output);
+      output.trimToSize();
+      return output.toByteArray();
+    }
   }
 }

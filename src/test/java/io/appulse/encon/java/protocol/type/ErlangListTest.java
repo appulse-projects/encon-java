@@ -18,6 +18,8 @@ package io.appulse.encon.java.protocol.type;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
+import java.util.stream.Stream;
+
 import static io.appulse.encon.java.protocol.TermType.LIST;
 
 import io.appulse.encon.java.protocol.term.ErlangTerm;
@@ -25,6 +27,11 @@ import io.appulse.utils.Bytes;
 
 import org.assertj.core.api.SoftAssertions;
 import org.junit.Test;
+
+import erlang.OtpErlangAtom;
+import erlang.OtpErlangList;
+import erlang.OtpOutputStream;
+import lombok.SneakyThrows;
 import lombok.val;
 
 public class ErlangListTest {
@@ -73,5 +80,35 @@ public class ErlangListTest {
 
     assertThat(new ErlangList(value).toBytes())
         .isEqualTo(expected);
+  }
+
+  @Test
+  public void encode () {
+    String[] values = new String[] {
+        "one",
+        "two",
+        "three"
+    };
+
+    ErlangAtom[] atoms = Stream.of(values)
+        .map(ErlangAtom::new)
+        .toArray(ErlangAtom[]::new);
+
+    assertThat(new ErlangList(atoms).toBytes())
+        .isEqualTo(bytes(values));
+  }
+
+  @SneakyThrows
+  private byte[] bytes (String[] values) {
+    OtpErlangAtom[] atoms = Stream.of(values)
+        .map(OtpErlangAtom::new)
+        .toArray(OtpErlangAtom[]::new);
+
+    OtpErlangList list = new OtpErlangList(atoms);
+    try (OtpOutputStream output = new OtpOutputStream()) {
+      list.encode(output);
+      output.trimToSize();
+      return output.toByteArray();
+    }
   }
 }

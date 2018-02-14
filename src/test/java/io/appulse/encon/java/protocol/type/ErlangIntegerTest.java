@@ -12,6 +12,7 @@ import java.util.stream.IntStream;
 
 import org.junit.Test;
 
+import erlang.OtpErlangLong;
 import erlang.OtpOutputStream;
 import lombok.SneakyThrows;
 
@@ -132,7 +133,8 @@ public class ErlangIntegerTest {
   @SneakyThrows
   private byte[] bytes (BigInteger value) {
     try (OtpOutputStream output = new OtpOutputStream()) {
-      output.write_big_integer(value);
+      OtpErlangLong lon = new OtpErlangLong(value);
+      lon.encode(output);
       output.trimToSize();
       return output.toByteArray();
     }
