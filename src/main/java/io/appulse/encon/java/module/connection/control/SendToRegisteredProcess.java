@@ -43,7 +43,7 @@ public class SendToRegisteredProcess extends ControlMessage {
   ErlangPid from;
 
   @NonNull
-  ErlangAtom name;
+  ErlangAtom to;
 
   public SendToRegisteredProcess (@NonNull ErlangTuple tuple) {
     from = tuple.get(1)
@@ -51,7 +51,7 @@ public class SendToRegisteredProcess extends ControlMessage {
         .map(ErlangTerm::asPid)
         .orElseThrow(ControlMessageParsingException::new);
 
-    name = tuple.get(3)
+    to = tuple.get(3)
         .filter(ErlangTerm::isAtom)
         .map(ErlangTerm::asAtom)
         .orElseThrow(ControlMessageParsingException::new);
@@ -65,6 +65,6 @@ public class SendToRegisteredProcess extends ControlMessage {
   @Override
   public ErlangTerm[] elements () {
     // TODO: Atom or Nil?
-    return new ErlangTerm[] { from, new ErlangAtom(""), name };
+    return new ErlangTerm[] { from, new ErlangAtom(""), to };
   }
 }

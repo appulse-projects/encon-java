@@ -122,7 +122,7 @@ limitations under the License.
     <dependency>
       <groupId>io.appulse.epmd.java</groupId>
       <artifactId>client</artifactId>
-      <version>0.3.3</version>
+      <version>0.4.1</version>
     </dependency>
 
     <dependency>

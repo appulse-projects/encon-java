@@ -22,13 +22,15 @@ import static io.appulse.epmd.java.core.model.Protocol.TCP;
 import static io.appulse.epmd.java.core.model.Version.R6;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
+import static java.util.concurrent.TimeUnit.SECONDS;
 
 import java.util.concurrent.CompletableFuture;
-import java.util.concurrent.TimeUnit;
 
 import io.appulse.encon.java.module.mailbox.Mailbox;
 import io.appulse.encon.java.protocol.term.ErlangTerm;
 import lombok.val;
+import lombok.extern.slf4j.Slf4j;
+
 import org.assertj.core.api.SoftAssertions;
 import org.junit.After;
 import org.junit.Test;
@@ -38,6 +40,7 @@ import org.junit.Test;
  * @author Artem Labazin
  * @since 0.0.1
  */
+@Slf4j
 public class NodeTest {
 
   private static final int DEFAULT_EPMD_PORT = 4369;
@@ -122,38 +125,35 @@ public class NodeTest {
   @Test
   public void ping () throws Exception {
     node = Node.builder()
-        .name("node-1")
+        .name("node-1@localhost")
         .port(8971)
         .cookie("secret")
         .build()
         .register(DEFAULT_EPMD_PORT);
 
-    assertThat(node.ping("node-1"))
-        .isCompletedWithValue(true);
+    assertThat(node.ping("echo@localhost").get(2, SECONDS))
+        .isTrue();
 
-    assertThat(node.ping("node-2"))
-        .isCompletedWithValue(false);
+    assertThat(node.ping("node-1@localhost").get(2, SECONDS))
+        .isTrue();
 
-    CompletableFuture<Boolean> future = node.ping("echo@localhost");
+    assertThat(node.ping("node-2@localhost").get(2, SECONDS))
+        .isFalse();
 
-    TimeUnit.SECONDS.sleep(3);
 
-    assertThat(future)
-        .isCompletedWithValue(true);
+    try (val node2 = Node.builder()
+                         .name("node-2@localhost")
+                         .port(8972)
+                         .cookie("secret")
+                         .build()
+                         .register(DEFAULT_EPMD_PORT)) {
 
-    // val node2 = Node.builder()
-    //     .name("node-2")
-    //     .port(8972)
-    //     .build()
-    //     .register(epmd.getPort());
+      assertThat(node.ping("node-2@localhost").get(2, SECONDS))
+          .isTrue();
 
-    // assertThat(node1.ping("node-2"))
-    //     .isCompletedWithValue(true);
-    // assertThat(node2.ping("node-1"))
-    //     .isCompletedWithValue(true);
-
-    // node1.close();
-    // node2.close();
+      assertThat(node2.ping("node-1@localhost").get(2, SECONDS))
+          .isTrue();
+    }
   }
 
   @Test
@@ -166,71 +166,71 @@ public class NodeTest {
         .register(DEFAULT_EPMD_PORT);
 
     CompletableFuture<ErlangTerm> future = new CompletableFuture<>();
-    Mailbox mailbox =  node.createMailbox((self, message) -> {
-        future.complete(message.asTuple().get(1).get());
+    Mailbox mailbox = node.createMailbox((self, message) -> {
+      future.complete(message.asTuple().get(1).get());
     });
 
     mailbox.request()
         .makeTuple()
-            .add(mailbox.getPid())
-            .addTuple(items()
-                .add("hello, world")
-                .addAtom("popa")
-                .add(false)
-                .add(42)
-            )
+        .add(mailbox.getPid())
+        .addTuple(items()
+            .add("hello, world")
+            .addAtom("popa")
+            .add(false)
+            .add(42)
+        )
         .send("echo@localhost", "echo_server");
 
-    TimeUnit.SECONDS.sleep(3);
+    SECONDS.sleep(3);
 
     assertThat(future)
         .isCompleted()
         .isCompletedWithValueMatching(it -> it.isTuple(), "It is not a tuple")
         .isCompletedWithValueMatching(it -> {
-            val optional = it.get(0);
-            if (!optional.isPresent()) {
-                return false;
-            }
-            if (!optional.get().isTextual()) {
-                return false;
-            }
-            return optional.get()
-                .asText()
-                .equals("hello, world");
+          val optional = it.get(0);
+          if (!optional.isPresent()) {
+            return false;
+          }
+          if (!optional.get().isTextual()) {
+            return false;
+          }
+          return optional.get()
+              .asText()
+              .equals("hello, world");
         }, "Tuple(0)")
         .isCompletedWithValueMatching(it -> {
-            val optional = it.get(1);
-            if (!optional.isPresent()) {
-                return false;
-            }
-            if (!optional.get().isAtom()) {
-                return false;
-            }
-            return optional.get()
-                .asText()
-                .equals("popa");
+          val optional = it.get(1);
+          if (!optional.isPresent()) {
+            return false;
+          }
+          if (!optional.get().isAtom()) {
+            return false;
+          }
+          return optional.get()
+              .asText()
+              .equals("popa");
         }, "Tuple(1)")
         .isCompletedWithValueMatching(it -> {
-            val optional = it.get(2);
-            if (!optional.isPresent()) {
-                return false;
-            }
-            if (!optional.get().isBoolean()) {
-                return false;
-            }
-            return optional.get()
-                .asBoolean() == false;
+          val optional = it.get(2);
+          if (!optional.isPresent()) {
+            return false;
+          }
+          if (!optional.get().isBoolean()) {
+            return false;
+          }
+          return optional.get()
+              .asBoolean() == false;
         }, "Tuple(2)")
         .isCompletedWithValueMatching(it -> {
-            val optional = it.get(3);
-            if (!optional.isPresent()) {
-                return false;
-            }
-            if (!optional.get().isInt()) {
-                return false;
-            }
-            return optional.get()
-                .asInt() == 42;
+          val optional = it.get(3);
+          if (!optional.isPresent()) {
+            return false;
+          }
+          if (!optional.get().isInt()) {
+            return false;
+          }
+          return optional.get()
+              .asInt() == 42;
         }, "Tuple(3)");
   }
 }

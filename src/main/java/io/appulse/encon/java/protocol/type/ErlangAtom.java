@@ -45,6 +45,14 @@ public class ErlangAtom extends ErlangTerm {
 
   private static final int MAX_LENGTH = 255;
 
+  public static ErlangAtom atom (@NonNull String value) {
+    return new ErlangAtom(value);
+  }
+
+  public static ErlangAtom atom (boolean value) {
+    return new ErlangAtom(value);
+  }
+
   String value;
 
   public ErlangAtom (TermType type) {
@@ -66,7 +74,7 @@ public class ErlangAtom extends ErlangTerm {
   }
 
   @Override
-  public boolean isBoolean() {
+  public boolean isBoolean () {
     return "true".equalsIgnoreCase(value) || "false".equalsIgnoreCase(value);
   }
 
@@ -95,12 +103,12 @@ public class ErlangAtom extends ErlangTerm {
     val type = getType();
 
     val length = type == SMALL_ATOM || type == SMALL_ATOM_UTF8
-           ? buffer.getByte()
-           : buffer.getShort();
+                 ? buffer.getByte()
+                 : buffer.getShort();
 
     val charset = type == SMALL_ATOM_UTF8 || type == ATOM_UTF8
-            ? UTF_8
-            : ISO_8859_1;
+                  ? UTF_8
+                  : ISO_8859_1;
 
     val bytes = buffer.getBytes(length);
     this.value = trim(new String(bytes, charset));
@@ -124,9 +132,9 @@ public class ErlangAtom extends ErlangTerm {
 
   private String trim (String atom) {
     return atom.codePointCount(0, atom.length()) <= MAX_LENGTH
-         ? atom
-         // Throwing an exception would be better I think, but truncation
-         // seems to be the way it has been done in other parts of OTP...
-         : new String(atom.codePoints().toArray(), 0, MAX_LENGTH);
+           ? atom
+           // Throwing an exception would be better I think, but truncation
+           // seems to be the way it has been done in other parts of OTP...
+           : new String(atom.codePoints().toArray(), 0, MAX_LENGTH);
   }
 }

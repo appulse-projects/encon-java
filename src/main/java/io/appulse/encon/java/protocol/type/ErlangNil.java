@@ -16,8 +16,6 @@
 
 package io.appulse.encon.java.protocol.type;
 
-import static io.appulse.encon.java.protocol.TermType.NIL;
-
 import io.appulse.encon.java.protocol.TermType;
 import io.appulse.encon.java.protocol.term.ErlangTerm;
 import io.appulse.utils.Bytes;
@@ -32,8 +30,10 @@ import lombok.ToString;
 @ToString
 public class ErlangNil extends ErlangTerm {
 
+  public static final ErlangNil NIL = new ErlangNil();
+
   public ErlangNil () {
-    this(NIL);
+    this(io.appulse.encon.java.protocol.TermType.NIL);
   }
 
   public ErlangNil (TermType type) {

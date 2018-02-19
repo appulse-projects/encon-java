@@ -14,9 +14,9 @@
  * limitations under the License.
  */
 
-package io.appulse.encon.java.module.connection.regular;
+package io.appulse.encon.java.module.connection.handshake;
 
-import io.appulse.utils.Bytes;
+import io.appulse.encon.java.module.connection.handshake.message.Message;
 import io.netty.buffer.ByteBuf;
 import io.netty.channel.ChannelHandler.Sharable;
 import io.netty.channel.ChannelHandlerContext;
@@ -31,7 +31,7 @@ import lombok.val;
  */
 @Slf4j
 @Sharable
-public class ClientRegularEncoder extends MessageToByteEncoder<Container> {
+public class HandshakeEncoder extends MessageToByteEncoder<Message> {
 
   @Override
   public void exceptionCaught (ChannelHandlerContext context, Throwable cause) throws Exception {
@@ -43,29 +43,13 @@ public class ClientRegularEncoder extends MessageToByteEncoder<Container> {
   }
 
   @Override
-  protected void encode (ChannelHandlerContext context, Container container, ByteBuf out) throws Exception {
-    log.debug("Encoding message {} for {}", container, context.channel().remoteAddress());
-
+  protected void encode (ChannelHandlerContext context, Message message, ByteBuf out) throws Exception {
     try {
-      val bytes = Bytes.allocate()
-          .put4B(0)
-          .put1B(0x70) // 112
-          .put1B(0x83) // 131
-          // .put(EMPTY_DISTRIBUTION_HEADER)
-          .put(container.getControlMessage().toBytes())
-          .put1B(0x83) // 131
-          .put(container.getPayload().toBytes());
-
-      val length = bytes.limit() - Integer.BYTES;
-      log.debug("Outgoing message length is: {}", length);
-
-      val array = bytes.put4B(0, length).array();
-      log.debug("Output array:\n{}", array);
-
-      out.writeBytes(array);
-      log.debug("Message was sent");
+      val bytes = message.toBytes();
+      out.writeBytes(bytes);
+      log.debug("Encoded message {} for {}", message, context.channel().remoteAddress());
     } catch (Throwable ex) {
-      log.error("Error during encoding message {} for {}", container, context.channel().remoteAddress());
+      log.error("Error during encoding message {} for {}", message, context.channel().remoteAddress());
       throw ex;
     }
   }

@@ -30,6 +30,8 @@ import io.appulse.encon.java.module.NodeInternalApi;
 import io.appulse.encon.java.module.mailbox.request.RequestBuilder;
 import io.appulse.encon.java.protocol.term.ErlangTerm;
 import io.appulse.encon.java.protocol.type.ErlangPid;
+import java.util.concurrent.CompletableFuture;
+import java.util.concurrent.TimeUnit;
 
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -40,6 +42,7 @@ import lombok.experimental.FieldDefaults;
 import lombok.experimental.NonFinal;
 import lombok.extern.slf4j.Slf4j;
 import lombok.Setter;
+import lombok.SneakyThrows;
 import lombok.val;
 
 /**
@@ -79,26 +82,43 @@ public class Mailbox implements Closeable {
     return new RequestBuilder(this);
   }
 
-  public void request (Object obj) {
-    log.debug("Uh?");
+  public CompletableFuture<ErlangTerm> receiveAsync () {
+    throw new UnsupportedOperationException();
+  }
+
+  @SneakyThrows
+  public ErlangTerm receive () {
+    return receiveAsync().get();
+  }
+
+  @SneakyThrows
+  public ErlangTerm receive (long timeout, @NonNull TimeUnit unit) {
+    return receiveAsync().get(timeout, unit);
   }
 
   public void send (@NonNull ErlangPid pid, @NonNull ErlangTerm message) {
-    val remoteAddress = pid.getDescriptor().getAddress();
-    val localAddress = internal.node().getDescriptor().getAddress();
-    if (remoteAddress.equals(localAddress)) {
-      internal.mailboxes()
+    if (pid.getDescriptor().equals(internal.node().getDescriptor())) {
+      internal.processes()
           .getMailbox(pid)
           .orElseThrow(RuntimeException::new)
           .inbox(message);;
+      return;
     }
+
+    RemoteNode remote = internal.node()
+        .lookup(pid.getDescriptor())
+        .orElseThrow(RuntimeException::new);
+
+    internal.connections()
+        .connect(remote)
+        .send(pid, message);;
   }
 
   public void send (@NonNull String mailbox, @NonNull ErlangTerm message) {
-    internal.mailboxes()
+    internal.processes()
         .getMailbox(mailbox)
         .orElseThrow(RuntimeException::new)
-        .inbox(message);;
+        .inbox(message);
   }
 
   public void send (@NonNull String node, @NonNull String mailbox, @NonNull ErlangTerm message) {
@@ -115,20 +135,23 @@ public class Mailbox implements Closeable {
   }
 
   public void send (@NonNull RemoteNode remote, @NonNull String mailbox, @NonNull ErlangTerm message) {
+    log.debug("Sending message\nTo node: {}\nMailbox: {}\nPayload: {}",
+              remote, mailbox, message);
+
     if (internal.node().getDescriptor().equals(remote.getDescriptor())) {
-      log.debug("Sending message to local mailbox {}", mailbox);
       send(mailbox, message);
     } else {
-      log.debug("Sending message to remote {} mailbox {}", remote, mailbox);
       internal.connections()
           .connect(remote)
-          .sendReg(pid, mailbox, message);
+          .sendRegistered(pid, mailbox, message);
     }
     log.debug("Message was sent");
   }
 
-  public void inbox (ErlangTerm message) {
+  public void inbox (@NonNull ErlangTerm message) {
+    log.debug("Inbox {}", message);
     executor.execute(() -> inboxHandler.receive(this, message));
+    log.debug("END");
   }
 
   @Override

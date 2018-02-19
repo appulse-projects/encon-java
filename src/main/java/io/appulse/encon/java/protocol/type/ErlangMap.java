@@ -49,6 +49,18 @@ import lombok.val;
 @EqualsAndHashCode(callSuper = true)
 public class ErlangMap extends ErlangTerm {
 
+  public static ErlangMap map (@NonNull ErlangTerm... keysAndValues) {
+    if (keysAndValues.length % 2 != 0) {
+      throw new IllegalArgumentException();
+    }
+
+    LinkedHashMap<ErlangTerm, ErlangTerm> map = new LinkedHashMap<>(keysAndValues.length / 2);
+    for (int index = 0; index < keysAndValues.length - 1; index += 2) {
+      map.put(keysAndValues[index], keysAndValues[index + 1]);
+    }
+    return new ErlangMap(map);
+  }
+
   LinkedHashMap<ErlangTerm, ErlangTerm> map;
 
   public ErlangMap (TermType type) {
@@ -103,8 +115,8 @@ public class ErlangMap extends ErlangTerm {
   @Override
   protected void read (@NonNull Bytes buffer) {
     IntFunction<ErlangTerm[]> mapFunction = it -> new ErlangTerm[] {
-        ErlangTerm.newInstance(buffer),
-        ErlangTerm.newInstance(buffer)
+      ErlangTerm.newInstance(buffer),
+      ErlangTerm.newInstance(buffer)
     };
 
     BinaryOperator<ErlangTerm> mergeFunction = (left, right) -> {
@@ -121,8 +133,8 @@ public class ErlangMap extends ErlangTerm {
   protected void write (@NonNull Bytes buffer) {
     buffer.put4B(map.size());
     map.entrySet().forEach(it -> {
-        buffer.put(it.getKey().toBytes());
-        buffer.put(it.getValue().toBytes());
+      buffer.put(it.getKey().toBytes());
+      buffer.put(it.getValue().toBytes());
     });
   }
 }

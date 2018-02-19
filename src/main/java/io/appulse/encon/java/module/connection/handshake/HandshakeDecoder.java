@@ -14,15 +14,24 @@
  * limitations under the License.
  */
 
-package io.appulse.encon.java.module.connection.regular;
+package io.appulse.encon.java.module.connection.handshake;
 
-import io.appulse.encon.java.module.connection.control.ControlMessage;
-import io.appulse.encon.java.protocol.term.ErlangTerm;
+import static io.appulse.encon.java.module.connection.handshake.message.MessageType.CHALLENGE;
+import static io.appulse.encon.java.module.connection.handshake.message.MessageType.NAME;
+import static io.appulse.encon.java.module.connection.handshake.message.MessageType.UNDEFINED;
+import static lombok.AccessLevel.PRIVATE;
+
+import io.appulse.encon.java.module.connection.handshake.exception.HandshakeException;
+import io.appulse.encon.java.module.connection.handshake.message.Message;
+import io.appulse.encon.java.module.connection.handshake.message.MessageType;
 import io.appulse.utils.Bytes;
 import io.netty.buffer.ByteBuf;
 import io.netty.channel.ChannelHandlerContext;
 import io.netty.handler.codec.ReplayingDecoder;
 import java.util.List;
+import java.util.stream.Stream;
+import lombok.RequiredArgsConstructor;
+import lombok.experimental.FieldDefaults;
 import lombok.extern.slf4j.Slf4j;
 import lombok.val;
 
@@ -32,7 +41,11 @@ import lombok.val;
  * @since 0.0.1
  */
 @Slf4j
-public class ClientRegularDecoder extends ReplayingDecoder<Container> {
+@RequiredArgsConstructor
+@FieldDefaults(level = PRIVATE, makeFinal = true)
+public class HandshakeDecoder extends ReplayingDecoder<Message> {
+
+  boolean isClient;
 
   @Override
   public void exceptionCaught (ChannelHandlerContext context, Throwable cause) throws Exception {
@@ -45,34 +58,29 @@ public class ClientRegularDecoder extends ReplayingDecoder<Container> {
 
   @Override
   protected void decode (ChannelHandlerContext context, ByteBuf buffer, List<Object> out) throws Exception {
-    log.debug("Decoding...");
     val messageSize = buffer.readShort();
     log.debug("Decoding message size: {}", messageSize);
-    if (messageSize == 0) {
-      return;
-    }
 
     ByteBuf buf = buffer.readBytes(messageSize);
     val messageBytes = new byte[messageSize];
     buf.getBytes(0, messageBytes);
 
     val bytes = Bytes.wrap(messageBytes);
-    log.debug("Pass through: {}", bytes.getByte() == 112);
 
-    ErlangTerm header = readTerm(bytes);
-    log.debug("Received header:\n{}\n", header);
+    val message = parse(bytes);
 
-    ControlMessage controlMessage = ControlMessage.parse(header);
-    log.debug("Received control message:\n{}\n", controlMessage);
-
-    ErlangTerm body = readTerm(bytes);
-    log.debug("Received bode:\n{}\n", body);
-
-    out.add(new Container(controlMessage, body));
+    out.add(message);
+    log.debug("Decoded message {} from {}", message, context.channel().remoteAddress());
   }
 
-  private ErlangTerm readTerm (Bytes bytes) {
-    log.debug("Version byte: {}", bytes.getUnsignedByte());
-    return ErlangTerm.newInstance(bytes);
+  private Message parse (Bytes bytes) {
+    val tag = bytes.getByte(0);
+    return Stream.of(MessageType.values())
+        .filter(it -> it != UNDEFINED)
+        .filter(it -> (isClient && it != NAME) || (!isClient && it != CHALLENGE))
+        .filter(it -> it.getTag() == tag)
+        .findFirst()
+        .map(it -> Message.parse(bytes, it.getType()))
+        .orElseThrow(() -> new HandshakeException("Unknown income message with tag " + tag));
   }
 }

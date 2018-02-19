@@ -46,6 +46,10 @@ import lombok.val;
 @EqualsAndHashCode(callSuper = true)
 public class ErlangReference extends ErlangTerm {
 
+  public static ErlangReference reference (@NonNull String node, int id, int[] ids, int creation) {
+    return new ErlangReference(NEW_REFERENCE, node, id, ids, creation);
+  }
+
   NodeDescriptor descriptor;
 
   int[] ids;
@@ -64,8 +68,8 @@ public class ErlangReference extends ErlangTerm {
         .map(it -> {
           int[] result = new int[] { 0, 0, 0 };
           int length = it.length > 3
-                 ? 3
-                 : it.length;
+                       ? 3
+                       : it.length;
           System.arraycopy(it, 0, result, 0, length);
           return result;
         })

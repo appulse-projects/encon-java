@@ -41,6 +41,10 @@ import lombok.experimental.FieldDefaults;
 @EqualsAndHashCode(callSuper = true)
 public class ErlangExternalFunction extends ErlangTerm {
 
+  public ErlangExternalFunction extfun (@NonNull String module, @NonNull String name, int arity) {
+    return new ErlangExternalFunction(module, name, arity);
+  }
+
   String module;
 
   String name;

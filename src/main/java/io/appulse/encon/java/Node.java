@@ -39,7 +39,6 @@ import io.appulse.encon.java.module.generator.reference.ReferenceGeneratorModule
 import io.appulse.encon.java.module.lookup.LookupModule;
 import io.appulse.encon.java.module.lookup.LookupModuleApi;
 import io.appulse.encon.java.module.mailbox.MailboxModule;
-import io.appulse.encon.java.module.mailbox.MailboxModuleApi;
 import io.appulse.encon.java.module.ping.PingModule;
 import io.appulse.encon.java.module.ping.PingModuleApi;
 import io.appulse.epmd.java.client.EpmdClient;
@@ -53,6 +52,10 @@ import lombok.experimental.Delegate;
 import lombok.experimental.FieldDefaults;
 import lombok.extern.slf4j.Slf4j;
 import lombok.val;
+import io.appulse.encon.java.module.server.ServerModule;
+import io.appulse.encon.java.module.server.ServerModuleApi;
+import io.appulse.encon.java.protocol.term.ErlangTerm;
+import io.appulse.encon.java.module.mailbox.MailboxModuleApi;
 
 /**
  *
@@ -81,6 +84,7 @@ public final class Node implements PingModuleApi, Closeable {
   @Getter
   final Meta meta;
 
+  @Getter
   EpmdClient epmd;
 
   @Delegate(types = PingModuleApi.class)
@@ -99,13 +103,13 @@ public final class Node implements PingModuleApi, Closeable {
   ReferenceGeneratorModule referenceGeneratorModule;
 
   @Delegate(types = MailboxModuleApi.class)
-  MailboxModule mailboxModule;
+  MailboxModule processModule;
 
   @Delegate(types = ConnectionModuleApi.class)
   ConnectionModule connectionModule;
 
-//  @Delegate(types = ServerModuleApi.class)
-//  ServerModule serverModule;
+ @Delegate(types = ServerModuleApi.class)
+ ServerModule serverModule;
   @Builder
   private Node (@NonNull String name, String cookie, int port, Meta meta) {
     descriptor = NodeDescriptor.from(name);
@@ -137,18 +141,18 @@ public final class Node implements PingModuleApi, Closeable {
 
   @Override
   public void close () {
-    if (mailboxModule != null) {
-      mailboxModule.close();
-      mailboxModule = null;
+    if (processModule != null) {
+      processModule.close();
+      processModule = null;
     }
     if (connectionModule != null) {
       connectionModule.close();
       connectionModule = null;
     }
-//    if (serverModule != null) {
-//      serverModule.close();
-//      serverModule = null;
-//    }
+    if (serverModule != null) {
+      serverModule.close();
+      serverModule = null;
+    }
     if (epmd != null) {
       epmd.stop(descriptor.getShortName());
       epmd.close();
@@ -181,8 +185,8 @@ public final class Node implements PingModuleApi, Closeable {
       }
 
       @Override
-      public MailboxModule mailboxes () {
-        return mailboxModule;
+      public MailboxModule processes () {
+        return processModule;
       }
 
       @Override
@@ -208,10 +212,30 @@ public final class Node implements PingModuleApi, Closeable {
     pingModule = new PingModule(internal);
     lookupModule = new LookupModule(internal);
 
-    mailboxModule = new MailboxModule(internal);
+    processModule = new MailboxModule(internal);
     connectionModule = new ConnectionModule(internal);
-//    serverModule = new ServerModule(internal);
-//    serverModule.start(port);
+    serverModule = new ServerModule(internal);
+    serverModule.start(port);
+
+    createMailbox("net_kernel", (self, message) -> {
+      log.debug("Handler working");
+      if (!message.isTuple()) {
+        log.debug("Not a tuple");
+        return;
+      }
+      if (!message.get(0).map(ErlangTerm::asText).orElse("").equals("$gen_call")) {
+        log.debug("Uh?");
+        return;
+      }
+
+      ErlangTerm tuple = message.get(1).get();
+      self.request().makeTuple()
+          .add(tuple.get(1).get().asReference())
+          .addAtom("yes")
+          .send(tuple.get(0).get().asPid());
+
+      log.debug("Ping response was sent to {}", tuple);
+    });
 
     return this;
   }

@@ -81,10 +81,10 @@ public class PingModule implements PingModuleApi {
       log.debug("Incoming message: {}", message);
       future.complete(TRUE);
     });
-    CompletableFuture<Boolean> result = future.whenComplete((response, exception) -> {
-      log.debug("Removing mailbox: {}", mailbox);
-      internal.node().remove(mailbox);
-    });
+    // CompletableFuture<Boolean> result = future.whenComplete((response, exception) -> {
+    //   log.debug("Removing mailbox: {}", mailbox);
+    //   internal.node().remove(mailbox);
+    // });
 
     mailbox.request().makeTuple()
         .addAtom("$gen_call")
@@ -99,6 +99,6 @@ public class PingModule implements PingModuleApi {
         .send(remote, "net_kernel");
 
     log.debug("Returning from ping method");
-    return result;
+    return future;
   }
 }
