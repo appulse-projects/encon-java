@@ -34,7 +34,7 @@ public interface NodeInternalApi {
 
   EpmdClient epmd ();
 
-  MailboxModule mailboxes ();
+  MailboxModule processes ();
 
   ConnectionModule connections ();
 }

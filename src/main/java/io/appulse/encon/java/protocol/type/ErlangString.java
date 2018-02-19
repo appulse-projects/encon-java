@@ -41,6 +41,10 @@ import lombok.val;
 @EqualsAndHashCode(callSuper = true)
 public class ErlangString extends ErlangTerm {
 
+  public static ErlangString string (@NonNull String value) {
+    return new ErlangString(value);
+  }
+
   String value;
 
   public ErlangString (TermType type) {
@@ -89,9 +93,9 @@ public class ErlangString extends ErlangTerm {
           .toArray(ErlangInteger[]::new);
 
       buffer.put(positionBefore, ErlangList.builder()
-          .elements(elements)
-          .build()
-          .toBytes()
+                 .elements(elements)
+                 .build()
+                 .toBytes()
       );
       break;
     default:

@@ -39,6 +39,10 @@ import lombok.val;
 @EqualsAndHashCode(callSuper = true)
 public class ErlangBinary extends ErlangTerm {
 
+  public static ErlangBinary binary (@NonNull byte[] value) {
+    return new ErlangBinary(value);
+  }
+
   byte[] bytes;
 
   public ErlangBinary (TermType type) {

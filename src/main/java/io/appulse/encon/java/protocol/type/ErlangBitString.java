@@ -44,6 +44,10 @@ import lombok.val;
 @EqualsAndHashCode(callSuper = true)
 public class ErlangBitString extends ErlangTerm {
 
+  public static ErlangBitString bitstr (@NonNull byte[] bits, int pad) {
+    return new ErlangBitString(bits, pad);
+  }
+
   byte[] bits;
 
   int pad;

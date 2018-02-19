@@ -18,8 +18,9 @@ package io.appulse.encon.java.module.connection.handshake;
 
 import static lombok.AccessLevel.PRIVATE;
 
-import io.appulse.encon.java.Node;
 import io.appulse.encon.java.RemoteNode;
+import io.appulse.encon.java.module.NodeInternalApi;
+import io.appulse.encon.java.module.connection.Connection;
 import io.appulse.encon.java.module.connection.handshake.exception.HandshakeException;
 import io.appulse.encon.java.module.connection.handshake.message.ChallengeAcknowledgeMessage;
 import io.appulse.encon.java.module.connection.handshake.message.ChallengeMessage;
@@ -27,16 +28,19 @@ import io.appulse.encon.java.module.connection.handshake.message.ChallengeReplyM
 import io.appulse.encon.java.module.connection.handshake.message.Message;
 import io.appulse.encon.java.module.connection.handshake.message.NameMessage;
 import io.appulse.encon.java.module.connection.handshake.message.StatusMessage;
-import io.netty.channel.ChannelHandler;
+import io.appulse.encon.java.module.connection.regular.ClientEncoder;
+import io.appulse.encon.java.module.connection.regular.ClientDecoder;
+import io.appulse.encon.java.module.connection.regular.ClientRegularHandler;
 import io.netty.channel.ChannelHandlerContext;
 import io.netty.channel.ChannelInboundHandlerAdapter;
+import io.netty.channel.ChannelOutboundHandler;
 import java.util.Arrays;
-import java.util.Map;
+import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.ThreadLocalRandom;
+
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.NonNull;
-import lombok.Singular;
 import lombok.experimental.FieldDefaults;
 import lombok.experimental.NonFinal;
 import lombok.extern.slf4j.Slf4j;
@@ -53,15 +57,20 @@ import lombok.val;
 @FieldDefaults(level = PRIVATE, makeFinal = true)
 public class ClientHandshakeHandler extends ChannelInboundHandlerAdapter {
 
-  @NonNull
-  @Singular
-  Map<String, ChannelHandler> replaces;
+  private static final ChannelOutboundHandler CLIENT_ENCODER;
+
+  static {
+    CLIENT_ENCODER = new ClientEncoder();
+  }
 
   @NonNull
-  Node node;
+  NodeInternalApi internal;
 
   @NonNull
   RemoteNode remote;
+
+  @NonNull
+  CompletableFuture<Connection> future;
 
   @NonFinal
   int myChallenge;
@@ -69,60 +78,27 @@ public class ClientHandshakeHandler extends ChannelInboundHandlerAdapter {
   @Override
   public void channelActive (ChannelHandlerContext context) throws Exception {
     super.channelActive(context);
-    val message = NameMessage.builder()
-        .fullNodeName(node.getDescriptor().getFullName())
-        .distribution(HandshakeUtils.findHighestCommonVerion(node, remote))
-        .flags(node.getMeta().getFlags())
-        .build();
-
-    context.writeAndFlush(message);
+    context.writeAndFlush(NameMessage.builder()
+        .fullNodeName(internal.node().getDescriptor().getFullName())
+        .distribution(HandshakeUtils.findHighestCommonVerion(internal.node(), remote))
+        .flags(internal.node().getMeta().getFlags())
+        .build());
   }
 
   @Override
   public void channelRead (ChannelHandlerContext context, Object obj) throws Exception {
-    Message message = (Message) obj;
+    val message = (Message) obj;
     log.debug("Received message: {}", message);
 
     switch (message.getType()) {
     case STATUS:
-      val status = ((StatusMessage) message).getStatus();
-      switch (status) {
-      case OK:
-        break;
-      case OK_SIMULTANEOUS:
-      case NOK:
-      case NOT_ALLOWED:
-      case ALIVE:
-      default:
-        log.error("Invalid received status: {}", status);
-        throw new HandshakeException("Invalid received status: " + status);
-      }
+      handle((StatusMessage) message, context);
       break;
     case CHALLENGE:
-      val remoteChallenge = ((ChallengeMessage) message).getChallenge();
-      val digest = HandshakeUtils.generateDigest(remoteChallenge, node.getCookie());
-      myChallenge = ThreadLocalRandom.current().nextInt();
-      context.writeAndFlush(ChallengeReplyMessage.builder()
-          .challenge(myChallenge)
-          .digest(digest)
-          .build());
+      handle((ChallengeMessage) message, context);
       break;
     case CHALLENGE_ACKNOWLEDGE:
-      val peerDigest = ((ChallengeAcknowledgeMessage) message).getDigest();
-      val myDigest = HandshakeUtils.generateDigest(myChallenge, node.getCookie());
-      if (!Arrays.equals(peerDigest, myDigest)) {
-        log.error("Remote and own digest are not equal");
-        throw new HandshakeException("Remote and own digest are not equal");
-      }
-      log.debug("Sucessfull handshake from {} to {}",
-                node.getDescriptor().getFullName(),
-                remote.getDescriptor().getFullName());
-
-      log.debug("Replacing pipline to regular for {}", context.channel().remoteAddress());
-
-      replaces.entrySet().forEach(it -> {
-        context.pipeline().replace(it.getKey(), it.getKey(), it.getValue());
-      });
+      handle((ChallengeAcknowledgeMessage) message, context);
       break;
     default:
       log.error("Unexpected message type: {}", message.getType());
@@ -137,5 +113,52 @@ public class ClientHandshakeHandler extends ChannelInboundHandlerAdapter {
 
     log.error(message, cause);
     context.close();
+  }
+
+  private void handle (StatusMessage message, ChannelHandlerContext context) {
+    val status = message.getStatus();
+    switch (status) {
+    case OK:
+      break;
+    case OK_SIMULTANEOUS:
+    case NOK:
+    case NOT_ALLOWED:
+    case ALIVE:
+    default:
+      log.error("Invalid received status: {}", status);
+      throw new HandshakeException("Invalid received status: " + status);
+    }
+  }
+
+  private void handle (ChallengeMessage message, ChannelHandlerContext context) {
+    val remoteChallenge = message.getChallenge();
+    val digest = HandshakeUtils.generateDigest(remoteChallenge, internal.node().getCookie());
+    myChallenge = ThreadLocalRandom.current().nextInt();
+    context.writeAndFlush(ChallengeReplyMessage.builder()
+        .challenge(myChallenge)
+        .digest(digest)
+        .build());
+  }
+
+  private void handle (ChallengeAcknowledgeMessage message, ChannelHandlerContext context) {
+    val peerDigest = message.getDigest();
+    val myDigest = HandshakeUtils.generateDigest(myChallenge, internal.node().getCookie());
+    if (!Arrays.equals(peerDigest, myDigest)) {
+      log.error("Remote and own digest are not equal");
+      throw new HandshakeException("Remote and own digest are not equal");
+    }
+    log.debug("Sucessfull handshake from {} to {}",
+              internal.node().getDescriptor().getFullName(),
+              remote.getDescriptor().getFullName());
+
+    log.debug("Replacing pipline to regular for {}", context.channel().remoteAddress());
+
+    context.pipeline().replace("decoder", "decoder", new ClientDecoder());
+    context.pipeline().replace("encoder", "encoder", CLIENT_ENCODER);
+    val handler = new ClientRegularHandler(internal);
+    context.pipeline().replace("handler", "handler", handler);
+
+    val connection = new Connection(remote, handler);
+    future.complete(connection);
   }
 }

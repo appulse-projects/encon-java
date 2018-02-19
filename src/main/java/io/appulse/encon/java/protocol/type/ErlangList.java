@@ -51,6 +51,18 @@ import lombok.val;
 @EqualsAndHashCode(callSuper = true)
 public class ErlangList extends ErlangTerm {
 
+  public static ErlangList list (@NonNull ErlangTerm... elements) {
+    return new ErlangList(elements);
+  }
+
+  public static ErlangList list (@NonNull List<ErlangTerm> elements) {
+    return new ErlangList(elements);
+  }
+
+  public static ErlangList list (@NonNull ErlangTerm tail, @NonNull ErlangTerm... elements) {
+    return new ErlangList(tail, elements);
+  }
+
   ErlangTerm[] elements;
 
   @Getter
@@ -119,8 +131,8 @@ public class ErlangList extends ErlangTerm {
   @Override
   public Optional<ErlangTerm> get (int index) {
     return index >= 0 && index < size()
-         ? of(elements[index])
-         : empty();
+           ? of(elements[index])
+           : empty();
   }
 
   @Override

@@ -45,9 +45,9 @@ public class MailboxModule implements MailboxModuleApi, Closeable {
 
   NodeInternalApi internal;
 
-  Map<ErlangPid, WeakReference<Mailbox>> pids = new ConcurrentHashMap<>();
+  Map<ErlangPid, Mailbox> pids = new ConcurrentHashMap<>();
 
-  Map<String, WeakReference<Mailbox>> names = new ConcurrentHashMap<>();
+  Map<String, Mailbox> names = new ConcurrentHashMap<>();
 
   @Override
   public void close () {
@@ -63,7 +63,7 @@ public class MailboxModule implements MailboxModuleApi, Closeable {
         .inboxHandler(handler)
         .build();
 
-    pids.put(mailbox.getPid(), new WeakReference<>(mailbox));
+    pids.put(mailbox.getPid(), mailbox);
     return mailbox;
   }
 
@@ -79,7 +79,7 @@ public class MailboxModule implements MailboxModuleApi, Closeable {
     if (names.containsKey(name)) {
       return false;
     }
-    names.put(name, new WeakReference<>(mailbox));
+    names.put(name, mailbox);
     mailbox.setName(name);
     return true;
   }
@@ -87,24 +87,20 @@ public class MailboxModule implements MailboxModuleApi, Closeable {
   @Override
   public void deregisterMailbox (@NonNull String name) {
     ofNullable(names.remove(name))
-        .map(WeakReference::get)
         .ifPresent(it -> it.setName(null));
   }
 
   @Override
   public Optional<Mailbox> getMailbox (String name) {
-    return ofNullable(names.get(name))
-        .map(WeakReference::get);
+    return ofNullable(names.get(name));
   }
 
   public Optional<Mailbox> getMailbox (ErlangPid pid) {
-    return ofNullable(pids.get(pid))
-        .map(WeakReference::get);
+    return ofNullable(pids.get(pid));
   }
 
   public void remove (Mailbox mailbox) {
     ofNullable(pids.remove(mailbox.getPid()))
-        .map(WeakReference::get)
         .ifPresent(it -> it.close());
 
     ofNullable(mailbox.getName())

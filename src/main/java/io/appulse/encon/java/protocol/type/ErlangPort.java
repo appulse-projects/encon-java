@@ -43,6 +43,10 @@ import lombok.experimental.FieldDefaults;
 @EqualsAndHashCode(callSuper = true)
 public class ErlangPort extends ErlangTerm {
 
+  public static ErlangPort port (@NonNull String node, int id, int creation) {
+    return new ErlangPort(PORT, node, id, creation);
+  }
+
   NodeDescriptor descriptor;
 
   int id;

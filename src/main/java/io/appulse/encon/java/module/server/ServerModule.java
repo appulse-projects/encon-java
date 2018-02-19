@@ -16,20 +16,32 @@
 
 package io.appulse.encon.java.module.server;
 
+import static io.netty.channel.ChannelOption.SO_BACKLOG;
+import static io.netty.channel.ChannelOption.SO_KEEPALIVE;
+import static io.netty.channel.ChannelOption.TCP_NODELAY;
 import static lombok.AccessLevel.PRIVATE;
 
 import java.io.Closeable;
-import java.io.IOException;
-import java.net.ServerSocket;
-import java.util.concurrent.ExecutorService;
-import java.util.concurrent.Executors;
 
 import io.appulse.encon.java.module.NodeInternalApi;
+import io.appulse.encon.java.module.connection.handshake.ClientHandshakeHandler;
+import io.appulse.encon.java.module.connection.handshake.HandshakeDecoder;
+import io.appulse.encon.java.module.connection.handshake.HandshakeEncoder;
+import io.appulse.encon.java.module.connection.regular.ClientDecoder;
+import io.appulse.encon.java.module.connection.regular.ClientEncoder;
+import io.appulse.encon.java.module.connection.regular.ClientRegularHandler;
 
+import io.netty.bootstrap.ServerBootstrap;
+import io.netty.channel.ChannelInitializer;
+import io.netty.channel.ChannelOutboundHandler;
+import io.netty.channel.EventLoopGroup;
+import io.netty.channel.nio.NioEventLoopGroup;
+import io.netty.channel.socket.SocketChannel;
+import io.netty.channel.socket.nio.NioServerSocketChannel;
 import lombok.RequiredArgsConstructor;
 import lombok.SneakyThrows;
-import lombok.val;
 import lombok.experimental.FieldDefaults;
+import lombok.experimental.NonFinal;
 import lombok.extern.slf4j.Slf4j;
 
 /**
@@ -39,78 +51,78 @@ import lombok.extern.slf4j.Slf4j;
  */
 @Slf4j
 @RequiredArgsConstructor
-@FieldDefaults(level = PRIVATE)
+@FieldDefaults(level = PRIVATE, makeFinal = true)
 public class ServerModule implements ServerModuleApi, Closeable {
 
-  final NodeInternalApi internal;
+  private static final ChannelOutboundHandler HANDSHAKE_ENCODER;
 
-  ServerSocket serverSocket;
+  private static final ChannelOutboundHandler REGULAR_ENCODER;
 
-  ExecutorService executor;
+  static {
+    HANDSHAKE_ENCODER = new HandshakeEncoder();
 
-  ExecutorService main;
+    REGULAR_ENCODER = new ClientEncoder();
+  }
 
+  NodeInternalApi internal;
+
+  EventLoopGroup bossGroup = new NioEventLoopGroup(1);
+
+  EventLoopGroup workerGroup = new NioEventLoopGroup(2);
+
+  @NonFinal
+  ClientRegularHandler handler;
+
+  @NonFinal
   volatile boolean closed;
 
   @SneakyThrows
   public void start (int port) {
+    log.debug("Starting server on port {}", port);
+    handler = new ClientRegularHandler(internal);
+    // try {
+      new ServerBootstrap()
+          .group(bossGroup, workerGroup)
+          .channel(NioServerSocketChannel.class)
+          .childHandler(new ChannelInitializer<SocketChannel>() {
 
-    executor = Executors.newCachedThreadPool();
-    main = Executors.newSingleThreadExecutor();
-    main.execute(new Runner(port));
+            @Override
+            public void initChannel (SocketChannel channel) throws Exception {
+              channel.pipeline()
+                  .addLast("decoder", new HandshakeDecoder(false))
+                  .addLast("encoder", HANDSHAKE_ENCODER)
+                  .addLast("handler", HandshakeHandler.builder()
+                          .internal(internal)
+                          .build());
+            }
+          })
+          .option(SO_BACKLOG, 128)
+          .childOption(SO_KEEPALIVE, true)
+          .childOption(TCP_NODELAY, true)
+          .bind(port);
+          // .sync()
+          // // Wait until the server socket is closed.
+          // .channel().closeFuture().sync();
+    // } catch (InterruptedException ex) {
+    //   log.error("Server work exception", ex);
+    // } finally {
+    //   close();
+    // }
   }
 
   @Override
   @SneakyThrows
   public void close () {
     if (closed) {
+      log.debug("Server was already closed");
       return;
     }
     closed = true;
 
-    log.debug("Closing server...");
-    try {
-      serverSocket.close();
-    } catch (IOException ex) {
-    }
-    log.debug("Server socket was closed");
+    workerGroup.shutdownGracefully();
+    bossGroup.shutdownGracefully();
+    log.debug("Boss and workers groups are closed");
 
-    if (!executor.isShutdown()) {
-      executor.shutdown();
-    }
-    if (!main.isShutdown()) {
-      main.shutdown();
-    }
     log.info("Server was closed");
-  }
-
-  @RequiredArgsConstructor
-  @FieldDefaults(level = PRIVATE, makeFinal = true)
-  private class Runner implements Runnable {
-
-    int port;
-
-    @Override
-    @SneakyThrows
-    public void run () {
-      serverSocket = new ServerSocket(port);
-      log.debug("Server node started at port: {}", port);
-
-      try {
-        while (true) {
-          log.debug("Waiting new connection");
-          val socket = serverSocket.accept();
-          log.debug("New connection was accepted");
-          val handler = new ServerWorker(socket, internal);
-          executor.execute(handler);
-        }
-      } catch (Throwable ex) {
-        if (!closed) {
-          log.error("Error during server module work", ex);
-        }
-      } finally {
-        close();
-      }
-    }
   }
 }

@@ -50,6 +50,14 @@ import lombok.experimental.FieldDefaults;
 @EqualsAndHashCode(callSuper = true)
 public class ErlangTuple extends ErlangTerm {
 
+  public static ErlangTuple tuple (@NonNull ErlangTerm... elements) {
+    return new ErlangTuple(elements);
+  }
+
+  public static ErlangTuple tuple (@NonNull List<ErlangTerm> elements) {
+    return new ErlangTuple(elements);
+  }
+
   ErlangTerm[] elements;
 
   public ErlangTuple (TermType type) {
