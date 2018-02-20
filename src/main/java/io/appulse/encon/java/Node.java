@@ -108,8 +108,9 @@ public final class Node implements PingModuleApi, Closeable {
   @Delegate(types = ConnectionModuleApi.class)
   ConnectionModule connectionModule;
 
- @Delegate(types = ServerModuleApi.class)
- ServerModule serverModule;
+  @Delegate(types = ServerModuleApi.class)
+  ServerModule serverModule;
+
   @Builder
   private Node (@NonNull String name, String cookie, int port, Meta meta) {
     descriptor = NodeDescriptor.from(name);
@@ -185,7 +186,7 @@ public final class Node implements PingModuleApi, Closeable {
       }
 
       @Override
-      public MailboxModule processes () {
+      public MailboxModule mailboxes () {
         return processModule;
       }
 
@@ -218,24 +219,24 @@ public final class Node implements PingModuleApi, Closeable {
     serverModule.start(port);
 
     createMailbox("net_kernel", (self, message) -> {
-      log.debug("Handler working");
-      if (!message.isTuple()) {
-        log.debug("Not a tuple");
-        return;
-      }
-      if (!message.get(0).map(ErlangTerm::asText).orElse("").equals("$gen_call")) {
-        log.debug("Uh?");
-        return;
-      }
+                log.debug("Handler working");
+                if (!message.isTuple()) {
+                  log.debug("Not a tuple");
+                  return;
+                }
+                if (!message.get(0).map(ErlangTerm::asText).orElse("").equals("$gen_call")) {
+                  log.debug("Uh?");
+                  return;
+                }
 
-      ErlangTerm tuple = message.get(1).get();
-      self.request().makeTuple()
-          .add(tuple.get(1).get().asReference())
-          .addAtom("yes")
-          .send(tuple.get(0).get().asPid());
+                ErlangTerm tuple = message.get(1).get();
+                self.request().makeTuple()
+                    .add(tuple.get(1).get().asReference())
+                    .addAtom("yes")
+                    .send(tuple.get(0).get().asPid());
 
-      log.debug("Ping response was sent to {}", tuple);
-    });
+                log.debug("Ping response was sent to {}", tuple);
+              });
 
     return this;
   }

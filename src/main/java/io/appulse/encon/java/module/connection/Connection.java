@@ -28,7 +28,7 @@ import io.appulse.encon.java.protocol.term.ErlangTerm;
 import io.appulse.encon.java.protocol.type.ErlangAtom;
 import io.appulse.encon.java.protocol.type.ErlangPid;
 import java.io.Closeable;
-import java.util.concurrent.TimeUnit;
+import lombok.Getter;
 import lombok.NonNull;
 import lombok.RequiredArgsConstructor;
 import lombok.SneakyThrows;
@@ -45,6 +45,7 @@ import lombok.extern.slf4j.Slf4j;
 public class Connection implements Closeable {
 
   @NonNull
+  @Getter
   RemoteNode remote;
 
   @NonNull

@@ -14,31 +14,27 @@
  * limitations under the License.
  */
 
-package io.appulse.encon.java.module.server;
+package io.appulse.encon.java.module.connection.handshake;
 
 import io.appulse.encon.java.module.connection.handshake.message.Message;
 import io.appulse.encon.java.module.connection.handshake.message.NameMessage;
 import io.appulse.encon.java.module.connection.handshake.message.StatusMessage;
-import io.appulse.encon.java.module.connection.regular.ClientDecoder;
-import io.appulse.encon.java.module.connection.regular.ClientEncoder;
-import io.appulse.encon.java.module.connection.regular.ClientRegularHandler;
 
 import static io.appulse.encon.java.module.connection.handshake.message.StatusMessage.Status.OK;
 import static lombok.AccessLevel.PRIVATE;
 
+import io.appulse.encon.java.RemoteNode;
 import java.util.Arrays;
 import java.util.concurrent.ThreadLocalRandom;
 
 import io.appulse.encon.java.module.NodeInternalApi;
+import io.appulse.encon.java.module.connection.Pipeline;
 import io.appulse.encon.java.module.connection.handshake.HandshakeUtils;
 import io.appulse.encon.java.module.connection.handshake.exception.HandshakeException;
 import io.appulse.encon.java.module.connection.handshake.message.ChallengeAcknowledgeMessage;
 import io.appulse.encon.java.module.connection.handshake.message.ChallengeMessage;
 import io.appulse.encon.java.module.connection.handshake.message.ChallengeReplyMessage;
 import io.netty.channel.ChannelHandlerContext;
-import io.netty.channel.ChannelInboundHandlerAdapter;
-import io.netty.channel.ChannelOutboundHandler;
-import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.NonNull;
 import lombok.val;
@@ -47,22 +43,22 @@ import lombok.experimental.NonFinal;
 import lombok.extern.slf4j.Slf4j;
 
 @Slf4j
-@Builder
-@AllArgsConstructor
 @FieldDefaults(level = PRIVATE, makeFinal = true)
-public class HandshakeHandler extends ChannelInboundHandlerAdapter {
+public class HandshakeHandlerServer extends AbstractHandshakeHandler {
 
-  private static final ChannelOutboundHandler CLIENT_ENCODER;
-
-  static {
-    CLIENT_ENCODER = new ClientEncoder();
-  }
-
-  @NonNull
   NodeInternalApi internal;
 
   @NonFinal
+  RemoteNode remote;
+
+  @NonFinal
   int ourChallenge;
+
+  @Builder
+  public HandshakeHandlerServer (@NonNull Pipeline pipeline, @NonNull NodeInternalApi internal) {
+    super(pipeline);
+    this.internal = internal;
+  }
 
   @Override
   public void channelRead (ChannelHandlerContext context, Object obj) throws Exception {
@@ -83,18 +79,18 @@ public class HandshakeHandler extends ChannelInboundHandlerAdapter {
   }
 
   @Override
-  public void exceptionCaught (ChannelHandlerContext context, Throwable cause) throws Exception {
-    val message = String.format("Error during channel connection with %s",
-                                context.channel().remoteAddress().toString());
-
-    log.error(message, cause);
-    context.close();
+  public RemoteNode getRemoteNode () {
+    return remote;
   }
 
   private void handle (NameMessage message, ChannelHandlerContext context) {
+    remote = internal.node()
+        .lookup(message.getFullNodeName())
+        .orElseThrow(HandshakeException::new);
+
     context.write(StatusMessage.builder()
-          .status(OK)
-          .build());
+        .status(OK)
+        .build());
 
     ourChallenge = ThreadLocalRandom.current().nextInt();
 
@@ -119,9 +115,6 @@ public class HandshakeHandler extends ChannelInboundHandlerAdapter {
         .digest(ourDigest)
         .build());
 
-    context.pipeline().replace("decoder", "decoder", new ClientDecoder());
-    context.pipeline().replace("encoder", "encoder", CLIENT_ENCODER);
-    val handler = new ClientRegularHandler(internal);
-    context.pipeline().replace("handler", "handler", handler);
+    successHandshake(context);
   }
 }

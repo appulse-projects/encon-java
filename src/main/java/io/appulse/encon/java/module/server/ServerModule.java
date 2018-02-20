@@ -24,20 +24,16 @@ import static lombok.AccessLevel.PRIVATE;
 import java.io.Closeable;
 
 import io.appulse.encon.java.module.NodeInternalApi;
-import io.appulse.encon.java.module.connection.handshake.ClientHandshakeHandler;
-import io.appulse.encon.java.module.connection.handshake.HandshakeDecoder;
-import io.appulse.encon.java.module.connection.handshake.HandshakeEncoder;
-import io.appulse.encon.java.module.connection.regular.ClientDecoder;
-import io.appulse.encon.java.module.connection.regular.ClientEncoder;
-import io.appulse.encon.java.module.connection.regular.ClientRegularHandler;
+import io.appulse.encon.java.module.connection.Connection;
+import io.appulse.encon.java.module.connection.Pipeline;
 
 import io.netty.bootstrap.ServerBootstrap;
 import io.netty.channel.ChannelInitializer;
-import io.netty.channel.ChannelOutboundHandler;
 import io.netty.channel.EventLoopGroup;
 import io.netty.channel.nio.NioEventLoopGroup;
 import io.netty.channel.socket.SocketChannel;
 import io.netty.channel.socket.nio.NioServerSocketChannel;
+import java.util.concurrent.CompletableFuture;
 import lombok.RequiredArgsConstructor;
 import lombok.SneakyThrows;
 import lombok.experimental.FieldDefaults;
@@ -54,16 +50,6 @@ import lombok.extern.slf4j.Slf4j;
 @FieldDefaults(level = PRIVATE, makeFinal = true)
 public class ServerModule implements ServerModuleApi, Closeable {
 
-  private static final ChannelOutboundHandler HANDSHAKE_ENCODER;
-
-  private static final ChannelOutboundHandler REGULAR_ENCODER;
-
-  static {
-    HANDSHAKE_ENCODER = new HandshakeEncoder();
-
-    REGULAR_ENCODER = new ClientEncoder();
-  }
-
   NodeInternalApi internal;
 
   EventLoopGroup bossGroup = new NioEventLoopGroup(1);
@@ -71,43 +57,33 @@ public class ServerModule implements ServerModuleApi, Closeable {
   EventLoopGroup workerGroup = new NioEventLoopGroup(2);
 
   @NonFinal
-  ClientRegularHandler handler;
-
-  @NonFinal
   volatile boolean closed;
 
   @SneakyThrows
   public void start (int port) {
     log.debug("Starting server on port {}", port);
-    handler = new ClientRegularHandler(internal);
-    // try {
-      new ServerBootstrap()
-          .group(bossGroup, workerGroup)
-          .channel(NioServerSocketChannel.class)
-          .childHandler(new ChannelInitializer<SocketChannel>() {
+    new ServerBootstrap()
+        .group(bossGroup, workerGroup)
+        .channel(NioServerSocketChannel.class)
+        .childHandler(new ChannelInitializer<SocketChannel>() {
 
-            @Override
-            public void initChannel (SocketChannel channel) throws Exception {
-              channel.pipeline()
-                  .addLast("decoder", new HandshakeDecoder(false))
-                  .addLast("encoder", HANDSHAKE_ENCODER)
-                  .addLast("handler", HandshakeHandler.builder()
-                          .internal(internal)
-                          .build());
-            }
-          })
-          .option(SO_BACKLOG, 128)
-          .childOption(SO_KEEPALIVE, true)
-          .childOption(TCP_NODELAY, true)
-          .bind(port);
-          // .sync()
-          // // Wait until the server socket is closed.
-          // .channel().closeFuture().sync();
-    // } catch (InterruptedException ex) {
-    //   log.error("Server work exception", ex);
-    // } finally {
-    //   close();
-    // }
+          @Override
+          public void initChannel (SocketChannel channel) throws Exception {
+            CompletableFuture<Connection> future = new CompletableFuture<>();
+
+            Pipeline.builder()
+                .internal(internal)
+                .future(future)
+                .build()
+                .setupServerHandshake(channel.pipeline());
+
+            internal.connections().addConnection(future);
+          }
+        })
+        .option(SO_BACKLOG, 128)
+        .childOption(SO_KEEPALIVE, true)
+        .childOption(TCP_NODELAY, true)
+        .bind(port);
   }
 
   @Override

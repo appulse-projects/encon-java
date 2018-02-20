@@ -104,7 +104,7 @@ public class ClientRegularHandler extends ChannelInboundHandlerAdapter implement
 
   private void handle (@NonNull Send controlMessage, @NonNull ErlangTerm payload) {
     val destination = controlMessage.getTo();
-    val mailboxes = internal.processes();
+    val mailboxes = internal.mailboxes();
     Optional<Mailbox> optional;
     if (destination.isAtom()) {
       optional = mailboxes.getMailbox(destination.asText());
@@ -117,7 +117,7 @@ public class ClientRegularHandler extends ChannelInboundHandlerAdapter implement
   private void handle (@NonNull SendToRegisteredProcess controlMessage, @NonNull ErlangTerm payload) {
     ErlangAtom atom = controlMessage.getTo();
     String mailboxName = atom.asText();
-    internal.processes()
+    internal.mailboxes()
         .getMailbox(mailboxName)
         .ifPresent(it -> it.inbox(payload));
   }
