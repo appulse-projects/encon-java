@@ -98,7 +98,7 @@ public class Mailbox implements Closeable {
 
   public void send (@NonNull ErlangPid pid, @NonNull ErlangTerm message) {
     if (pid.getDescriptor().equals(internal.node().getDescriptor())) {
-      internal.processes()
+      internal.mailboxes()
           .getMailbox(pid)
           .orElseThrow(RuntimeException::new)
           .inbox(message);;
@@ -115,7 +115,7 @@ public class Mailbox implements Closeable {
   }
 
   public void send (@NonNull String mailbox, @NonNull ErlangTerm message) {
-    internal.processes()
+    internal.mailboxes()
         .getMailbox(mailbox)
         .orElseThrow(RuntimeException::new)
         .inbox(message);

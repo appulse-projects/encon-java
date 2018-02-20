@@ -33,8 +33,9 @@ import lombok.Value;
 @Value
 @Builder
 @EqualsAndHashCode(of = {
-    "descriptor",
-    "protocol"
+  "descriptor",
+  "protocol",
+  "port"
 })
 public class RemoteNode {
 

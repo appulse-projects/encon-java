@@ -28,12 +28,8 @@ import io.appulse.encon.java.RemoteNode;
 import io.netty.channel.EventLoopGroup;
 import io.netty.channel.nio.NioEventLoopGroup;
 import io.appulse.encon.java.module.NodeInternalApi;
-import io.appulse.encon.java.module.connection.handshake.ClientHandshakeHandler;
-import io.appulse.encon.java.module.connection.handshake.HandshakeDecoder;
-import io.appulse.encon.java.module.connection.handshake.HandshakeEncoder;
 import io.netty.bootstrap.Bootstrap;
 import io.netty.channel.ChannelInitializer;
-import io.netty.channel.ChannelOutboundHandler;
 import io.netty.channel.socket.SocketChannel;
 import io.netty.channel.socket.nio.NioSocketChannel;
 import java.util.concurrent.CompletableFuture;
@@ -42,21 +38,18 @@ import lombok.NonNull;
 import lombok.RequiredArgsConstructor;
 import lombok.SneakyThrows;
 import lombok.experimental.FieldDefaults;
+import lombok.extern.slf4j.Slf4j;
+import lombok.val;
 
 /**
  *
  * @author Artem Labazin
  * @since 0.0.1
  */
+@Slf4j
 @RequiredArgsConstructor
 @FieldDefaults(level = PRIVATE, makeFinal = true)
 public class ConnectionModule implements ConnectionModuleApi, Closeable {
-
-  private static final ChannelOutboundHandler HANDSHAKE_ENCODER;
-
-  static {
-    HANDSHAKE_ENCODER = new HandshakeEncoder();
-  }
 
   @NonNull
   NodeInternalApi internal;
@@ -75,10 +68,17 @@ public class ConnectionModule implements ConnectionModuleApi, Closeable {
     cache.clear();
   }
 
+  public void addConnection (@NonNull CompletableFuture<Connection> future) {
+    future.thenAccept(it -> {
+      log.debug("Connection to {} was added", it.getRemote());
+      cache.put(it.getRemote(), future);
+    });
+  }
+
   public CompletableFuture<Connection> connectAsync (@NonNull RemoteNode remote) {
     return cache.compute(remote, (key, value) -> value == null
-                                                 ? createConnection(key)
-                                                 : value
+                                                   ? createConnection(key)
+                                                   : value
     );
   }
 
@@ -101,6 +101,11 @@ public class ConnectionModule implements ConnectionModuleApi, Closeable {
 
   private CompletableFuture<Connection> createConnection (@NonNull RemoteNode remote) {
     CompletableFuture<Connection> future = new CompletableFuture<>();
+    val pipeline = Pipeline.builder()
+        .internal(internal)
+        .future(future)
+        .build();
+
     new Bootstrap()
         .group(workerGroup)
         .channel(NioSocketChannel.class)
@@ -109,17 +114,11 @@ public class ConnectionModule implements ConnectionModuleApi, Closeable {
 
           @Override
           public void initChannel (SocketChannel channel) throws Exception {
-            channel.pipeline()
-                .addLast("decoder", new HandshakeDecoder(true))
-                .addLast("encoder", HANDSHAKE_ENCODER)
-                .addLast("handler", ClientHandshakeHandler.builder()
-                         .internal(internal)
-                         .remote(remote)
-                         .future(future)
-                         .build());
+            pipeline.setupClientHandshake(channel.pipeline(), remote);
           }
         })
         .connect(remote.getDescriptor().getAddress(), remote.getPort());
+
     return future;
   }
 }
