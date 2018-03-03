@@ -66,7 +66,7 @@ public class Mailbox implements Closeable {
   NodeInternalApi internal;
 
   @NonNull
-  InboxHandler inboxHandler;
+  ReceiveHandler receiveHandler;
 
   @Getter
   @NonNull
@@ -150,7 +150,7 @@ public class Mailbox implements Closeable {
 
   public void inbox (@NonNull ErlangTerm message) {
     log.debug("Inbox {}", message);
-    executor.execute(() -> inboxHandler.receive(this, message));
+    executor.execute(() -> receiveHandler.receive(this, message));
     log.debug("END");
   }
 
@@ -159,10 +159,5 @@ public class Mailbox implements Closeable {
     log.debug("Closing mailbox '{}:{}'...", name, pid);
     executor.shutdown();
     name = null;
-  }
-
-  public interface InboxHandler {
-
-    void receive (Mailbox self, ErlangTerm message);
   }
 }
