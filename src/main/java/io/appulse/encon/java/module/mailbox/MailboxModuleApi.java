@@ -13,12 +13,10 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-
 package io.appulse.encon.java.module.mailbox;
 
 import java.util.Optional;
 
-import io.appulse.encon.java.module.mailbox.Mailbox.InboxHandler;
 import io.appulse.encon.java.protocol.type.ErlangPid;
 
 /**
@@ -28,17 +26,17 @@ import io.appulse.encon.java.protocol.type.ErlangPid;
  */
 public interface MailboxModuleApi {
 
-  Mailbox createMailbox (InboxHandler handler);
+  Mailbox createMailbox(ReceiveHandler handler);
 
-  Mailbox createMailbox (String name, InboxHandler handler);
+  Mailbox createMailbox(String name, ReceiveHandler handler);
 
-  boolean register (Mailbox mailbox, String name);
+  boolean register(Mailbox mailbox, String name);
 
-  void deregisterMailbox (String name);
+  void deregisterMailbox(String name);
 
-  Optional<Mailbox> getMailbox (String name);
+  Optional<Mailbox> getMailbox(String name);
 
-  Optional<Mailbox> getMailbox (ErlangPid pid);
+  Optional<Mailbox> getMailbox(ErlangPid pid);
 
-  void remove (Mailbox mailbox);
+  void remove(Mailbox mailbox);
 }

@@ -33,13 +33,11 @@ import lombok.NonNull;
 import lombok.RequiredArgsConstructor;
 import lombok.SneakyThrows;
 import lombok.experimental.FieldDefaults;
-import lombok.extern.slf4j.Slf4j;
 
 /**
  * @author Artem Labazin <xxlabaza@gmail.com>
  * @since 17.02.2018
  */
-@Slf4j
 @RequiredArgsConstructor
 @FieldDefaults(level = PRIVATE, makeFinal = true)
 public class Connection implements Closeable {

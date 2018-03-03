@@ -17,12 +17,12 @@
 package io.appulse.encon.java.module.connection;
 
 import static io.netty.channel.ChannelOption.SO_KEEPALIVE;
-import static java.util.concurrent.TimeUnit.SECONDS;
 import static lombok.AccessLevel.PRIVATE;
 
 import java.io.Closeable;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.TimeUnit;
 
 import io.appulse.encon.java.RemoteNode;
 import io.netty.channel.EventLoopGroup;
@@ -33,6 +33,7 @@ import io.netty.channel.ChannelInitializer;
 import io.netty.channel.socket.SocketChannel;
 import io.netty.channel.socket.nio.NioSocketChannel;
 import java.util.concurrent.CompletableFuture;
+import java.util.concurrent.CompletionStage;
 
 import lombok.NonNull;
 import lombok.RequiredArgsConstructor;
@@ -75,16 +76,26 @@ public class ConnectionModule implements ConnectionModuleApi, Closeable {
     });
   }
 
-  public CompletableFuture<Connection> connectAsync (@NonNull RemoteNode remote) {
-    return cache.compute(remote, (key, value) -> value == null
-                                                   ? createConnection(key)
-                                                   : value
-    );
+  public CompletionStage<Connection> connectAsync (@NonNull RemoteNode remote) {
+    return getOrCreateConnection(remote);
   }
 
   @SneakyThrows
   public Connection connect (@NonNull RemoteNode remote) {
-    return connectAsync(remote).get(5, SECONDS);
+    return getOrCreateConnection(remote).get();
+  }
+
+  @SneakyThrows
+  public Connection connect (@NonNull RemoteNode remote, long timeout, @NonNull TimeUnit unit) {
+    return getOrCreateConnection(remote).get(timeout, unit);
+  }
+
+  private CompletableFuture<Connection> getOrCreateConnection (RemoteNode remote) {
+    return cache.compute(remote, (key, value) -> {
+      return value == null
+             ? createConnection(key)
+             : value;
+    });
   }
 
   public boolean isAvailable (@NonNull RemoteNode remote) {

@@ -13,20 +13,17 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-
 package io.appulse.encon.java.module.mailbox;
 
 import static java.util.Optional.ofNullable;
 import static lombok.AccessLevel.PRIVATE;
 
 import java.io.Closeable;
-import java.lang.ref.WeakReference;
 import java.util.Map;
 import java.util.Optional;
 import java.util.concurrent.ConcurrentHashMap;
 
 import io.appulse.encon.java.module.NodeInternalApi;
-import io.appulse.encon.java.module.mailbox.Mailbox.InboxHandler;
 import io.appulse.encon.java.protocol.type.ErlangPid;
 
 import lombok.NonNull;
@@ -50,17 +47,17 @@ public class MailboxModule implements MailboxModuleApi, Closeable {
   Map<String, Mailbox> names = new ConcurrentHashMap<>();
 
   @Override
-  public void close () {
+  public void close() {
     pids.clear();
     names.clear();
   }
 
   @Override
-  public Mailbox createMailbox (@NonNull InboxHandler handler) {
+  public Mailbox createMailbox(@NonNull ReceiveHandler handler) {
     Mailbox mailbox = Mailbox.builder()
         .internal(internal)
         .pid(internal.node().generatePid())
-        .inboxHandler(handler)
+        .receiveHandler(handler)
         .build();
 
     pids.put(mailbox.getPid(), mailbox);
@@ -68,14 +65,14 @@ public class MailboxModule implements MailboxModuleApi, Closeable {
   }
 
   @Override
-  public Mailbox createMailbox (@NonNull String name, @NonNull InboxHandler handler) {
+  public Mailbox createMailbox(@NonNull String name, @NonNull ReceiveHandler handler) {
     val mailbox = createMailbox(handler);
     register(mailbox, name);
     return mailbox;
   }
 
   @Override
-  public boolean register (@NonNull Mailbox mailbox, @NonNull String name) {
+  public boolean register(@NonNull Mailbox mailbox, @NonNull String name) {
     if (names.containsKey(name)) {
       return false;
     }
@@ -85,21 +82,21 @@ public class MailboxModule implements MailboxModuleApi, Closeable {
   }
 
   @Override
-  public void deregisterMailbox (@NonNull String name) {
+  public void deregisterMailbox(@NonNull String name) {
     ofNullable(names.remove(name))
         .ifPresent(it -> it.setName(null));
   }
 
   @Override
-  public Optional<Mailbox> getMailbox (String name) {
+  public Optional<Mailbox> getMailbox(String name) {
     return ofNullable(names.get(name));
   }
 
-  public Optional<Mailbox> getMailbox (ErlangPid pid) {
+  public Optional<Mailbox> getMailbox(ErlangPid pid) {
     return ofNullable(pids.get(pid));
   }
 
-  public void remove (Mailbox mailbox) {
+  public void remove(Mailbox mailbox) {
     ofNullable(pids.remove(mailbox.getPid()))
         .ifPresent(it -> it.close());
 
