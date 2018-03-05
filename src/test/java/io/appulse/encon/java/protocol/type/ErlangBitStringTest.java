@@ -16,24 +16,29 @@
 
 package io.appulse.encon.java.protocol.type;
 
+import static io.appulse.encon.java.protocol.TermType.BIT_BINNARY;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
-import static io.appulse.encon.java.protocol.TermType.BIT_BINNARY;
 
 import io.appulse.encon.java.protocol.exception.ErlangTermValidationException;
 import io.appulse.encon.java.protocol.term.ErlangTerm;
+import io.appulse.encon.java.util.TestMethodNamePrinter;
 import io.appulse.utils.Bytes;
-
-import org.assertj.core.api.SoftAssertions;
-import org.junit.Test;
 
 import erlang.OtpErlangBitstr;
 import erlang.OtpInputStream;
 import erlang.OtpOutputStream;
 import lombok.SneakyThrows;
 import lombok.val;
+import org.assertj.core.api.SoftAssertions;
+import org.junit.Rule;
+import org.junit.Test;
+import org.junit.rules.TestRule;
 
 public class ErlangBitStringTest {
+
+  @Rule
+  public TestRule watcher = new TestMethodNamePrinter();
 
   @Test
   public void erlangTermValidationException () {

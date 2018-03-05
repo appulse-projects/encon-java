@@ -16,25 +16,27 @@
 
 package io.appulse.encon.java.module.connection;
 
+import static io.netty.channel.ChannelOption.CONNECT_TIMEOUT_MILLIS;
 import static io.netty.channel.ChannelOption.SO_KEEPALIVE;
+import static java.util.concurrent.TimeUnit.SECONDS;
 import static lombok.AccessLevel.PRIVATE;
 
 import java.io.Closeable;
 import java.util.Map;
+import java.util.concurrent.CompletableFuture;
+import java.util.concurrent.CompletionStage;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.TimeUnit;
 
 import io.appulse.encon.java.RemoteNode;
-import io.netty.channel.EventLoopGroup;
-import io.netty.channel.nio.NioEventLoopGroup;
 import io.appulse.encon.java.module.NodeInternalApi;
+
 import io.netty.bootstrap.Bootstrap;
 import io.netty.channel.ChannelInitializer;
+import io.netty.channel.EventLoopGroup;
+import io.netty.channel.nio.NioEventLoopGroup;
 import io.netty.channel.socket.SocketChannel;
 import io.netty.channel.socket.nio.NioSocketChannel;
-import java.util.concurrent.CompletableFuture;
-import java.util.concurrent.CompletionStage;
-
 import lombok.NonNull;
 import lombok.RequiredArgsConstructor;
 import lombok.SneakyThrows;
@@ -61,12 +63,22 @@ public class ConnectionModule implements ConnectionModuleApi, Closeable {
 
   @Override
   public void close () {
+    log.debug("Closing connection module of {}",
+              internal.node().getDescriptor().getFullName());
+
     cache.values().stream()
         .filter(CompletableFuture::isDone)
         .map(CompletableFuture::join)
         .forEach(Connection::close);
 
     cache.clear();
+    log.debug("Connection module's cache of {} was cleared",
+              internal.node().getDescriptor().getFullName());
+
+    workerGroup.shutdownGracefully();
+
+    log.debug("Connection module of {} was closed",
+              internal.node().getDescriptor().getFullName());
   }
 
   public void addConnection (@NonNull CompletableFuture<Connection> future) {
@@ -82,7 +94,7 @@ public class ConnectionModule implements ConnectionModuleApi, Closeable {
 
   @SneakyThrows
   public Connection connect (@NonNull RemoteNode remote) {
-    return getOrCreateConnection(remote).get();
+    return connect(remote, 10, SECONDS);
   }
 
   @SneakyThrows
@@ -101,7 +113,7 @@ public class ConnectionModule implements ConnectionModuleApi, Closeable {
   public boolean isAvailable (@NonNull RemoteNode remote) {
     try {
       return connect(remote) != null;
-    } catch (RuntimeException ex) {
+    } catch (Throwable ex) {
       return false;
     }
   }
@@ -121,6 +133,7 @@ public class ConnectionModule implements ConnectionModuleApi, Closeable {
         .group(workerGroup)
         .channel(NioSocketChannel.class)
         .option(SO_KEEPALIVE, true)
+        .option(CONNECT_TIMEOUT_MILLIS, 5000)
         .handler(new ChannelInitializer<SocketChannel>() {
 
           @Override

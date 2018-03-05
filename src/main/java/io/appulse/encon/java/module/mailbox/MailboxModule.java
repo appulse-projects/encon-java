@@ -15,7 +15,6 @@
  */
 package io.appulse.encon.java.module.mailbox;
 
-import static io.appulse.encon.java.module.mailbox.ReceiverType.CACHED;
 import static io.appulse.encon.java.module.mailbox.ReceiverType.SINGLE;
 import static java.util.Optional.ofNullable;
 import static lombok.AccessLevel.PRIVATE;
@@ -29,6 +28,7 @@ import java.util.concurrent.Executors;
 import io.appulse.encon.java.module.NodeInternalApi;
 import io.appulse.encon.java.protocol.type.ErlangPid;
 
+import lombok.NoArgsConstructor;
 import lombok.NonNull;
 import lombok.RequiredArgsConstructor;
 import lombok.SneakyThrows;
@@ -51,6 +51,8 @@ public class MailboxModule implements MailboxModuleApi, Closeable {
 
   @Override
   public void close() {
+    pids.values().forEach(Mailbox::close);
+
     pids.clear();
     names.clear();
   }
@@ -71,7 +73,7 @@ public class MailboxModule implements MailboxModuleApi, Closeable {
   }
 
   @Override
-  public void deregisterMailbox(@NonNull String name) {
+  public void deregister(@NonNull String name) {
     ofNullable(names.remove(name))
         .ifPresent(it -> it.setName(null));
   }
@@ -108,9 +110,11 @@ public class MailboxModule implements MailboxModuleApi, Closeable {
   }
 
   @FieldDefaults(level = PRIVATE)
+  @NoArgsConstructor(access = PRIVATE)
   public class NewMailboxBuilder {
 
-    final Mailbox.MailboxBuilder builder = Mailbox.builder();
+    final Mailbox.MailboxBuilder builder = Mailbox.builder()
+        .receiveHandler(new StubReceiveHandler());
 
     ReceiverType type = SINGLE;
 

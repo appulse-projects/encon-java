@@ -18,20 +18,26 @@ package io.appulse.encon.java.protocol.type;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
-import java.util.List;
 import java.util.ArrayList;
 import java.util.LinkedHashMap;
+import java.util.List;
 
-import org.junit.Test;
+import io.appulse.encon.java.protocol.term.ErlangTerm;
+import io.appulse.encon.java.util.TestMethodNamePrinter;
 
 import erlang.OtpErlangMap;
 import erlang.OtpErlangObject;
 import erlang.OtpErlangString;
 import erlang.OtpOutputStream;
-import io.appulse.encon.java.protocol.term.ErlangTerm;
 import lombok.SneakyThrows;
+import org.junit.Rule;
+import org.junit.Test;
+import org.junit.rules.TestRule;
 
 public class ErlangMapTest {
+
+  @Rule
+  public TestRule watcher = new TestMethodNamePrinter();
 
   @Test
   public void encode () {

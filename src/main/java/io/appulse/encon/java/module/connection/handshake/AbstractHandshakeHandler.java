@@ -53,6 +53,8 @@ public abstract class AbstractHandshakeHandler extends ChannelInboundHandlerAdap
                                 context.channel().remoteAddress().toString());
 
     log.error(message, cause);
+    context.fireExceptionCaught(cause);
     context.close();
+    pipeline.exception(cause);
   }
 }

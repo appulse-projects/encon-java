@@ -16,22 +16,28 @@
 
 package io.appulse.encon.java.protocol.type;
 
-import static org.assertj.core.api.Assertions.assertThat;
-import static io.appulse.encon.java.protocol.TermType.PORT;
 import static io.appulse.encon.java.protocol.TermType.NEW_PORT;
+import static io.appulse.encon.java.protocol.TermType.PORT;
+import static org.assertj.core.api.Assertions.assertThat;
 
 import io.appulse.encon.java.protocol.term.ErlangTerm;
+import io.appulse.encon.java.util.TestMethodNamePrinter;
 import io.appulse.utils.Bytes;
 
 import erlang.OtpErlangPort;
 import erlang.OtpInputStream;
 import erlang.OtpOutputStream;
-import org.assertj.core.api.SoftAssertions;
-import org.junit.Test;
-import lombok.val;
 import lombok.SneakyThrows;
+import lombok.val;
+import org.assertj.core.api.SoftAssertions;
+import org.junit.Rule;
+import org.junit.Test;
+import org.junit.rules.TestRule;
 
 public class ErlangPortTest {
+
+  @Rule
+  public TestRule watcher = new TestMethodNamePrinter();
 
   @Test
   public void newInstance () {

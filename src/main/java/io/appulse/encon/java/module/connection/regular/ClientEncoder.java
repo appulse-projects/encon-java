@@ -40,6 +40,7 @@ public class ClientEncoder extends MessageToByteEncoder<Container> {
                                 context.channel().remoteAddress().toString());
 
     log.error(message, cause);
+    context.fireExceptionCaught(cause);
     context.close();
   }
 

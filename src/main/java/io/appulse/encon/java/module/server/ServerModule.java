@@ -22,6 +22,7 @@ import static io.netty.channel.ChannelOption.TCP_NODELAY;
 import static lombok.AccessLevel.PRIVATE;
 
 import java.io.Closeable;
+import java.util.concurrent.CompletableFuture;
 
 import io.appulse.encon.java.module.NodeInternalApi;
 import io.appulse.encon.java.module.connection.Connection;
@@ -33,8 +34,6 @@ import io.netty.channel.EventLoopGroup;
 import io.netty.channel.nio.NioEventLoopGroup;
 import io.netty.channel.socket.SocketChannel;
 import io.netty.channel.socket.nio.NioServerSocketChannel;
-import java.util.concurrent.CompletableFuture;
-
 import lombok.NonNull;
 import lombok.SneakyThrows;
 import lombok.experimental.FieldDefaults;
@@ -103,11 +102,14 @@ public class ServerModule implements ServerModuleApi, Closeable {
       return;
     }
     closed = true;
+    log.debug("Closing server module of {}",
+              internal.node().getDescriptor().getFullName());
 
     workerGroup.shutdownGracefully();
     bossGroup.shutdownGracefully();
     log.debug("Boss and workers groups are closed");
 
-    log.info("Server was closed");
+    log.debug("Server of {} was closed",
+              internal.node().getDescriptor().getFullName());
   }
 }

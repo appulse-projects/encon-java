@@ -21,9 +21,8 @@ import static io.appulse.encon.java.protocol.TermType.NEW_FLOAT;
 import static java.nio.charset.StandardCharsets.ISO_8859_1;
 import static org.assertj.core.api.Assertions.assertThat;
 
-import org.junit.Test;
-
 import io.appulse.encon.java.protocol.term.ErlangTerm;
+import io.appulse.encon.java.util.TestMethodNamePrinter;
 import io.appulse.utils.Bytes;
 
 import erlang.OtpErlangDouble;
@@ -32,8 +31,14 @@ import erlang.OtpInputStream;
 import erlang.OtpOutputStream;
 import lombok.SneakyThrows;
 import lombok.val;
+import org.junit.Rule;
+import org.junit.Test;
+import org.junit.rules.TestRule;
 
 public class ErlangFloatTest {
+
+  @Rule
+  public TestRule watcher = new TestMethodNamePrinter();
 
   @Test
   public void encode () {

@@ -16,26 +16,30 @@
 
 package io.appulse.encon.java.protocol.type;
 
+import static io.appulse.encon.java.protocol.TermType.ATOM_UTF8;
+import static io.appulse.encon.java.protocol.TermType.SMALL_ATOM_UTF8;
+import static java.nio.charset.StandardCharsets.UTF_8;
 import static org.assertj.core.api.Assertions.assertThat;
 
 import java.util.stream.IntStream;
 
-import static io.appulse.encon.java.protocol.TermType.ATOM_UTF8;
-import static io.appulse.encon.java.protocol.TermType.SMALL_ATOM_UTF8;
-import static java.nio.charset.StandardCharsets.UTF_8;
-
 import io.appulse.encon.java.protocol.term.ErlangTerm;
+import io.appulse.encon.java.util.TestMethodNamePrinter;
 import io.appulse.utils.Bytes;
-
-import org.assertj.core.api.SoftAssertions;
-import org.junit.Test;
 
 import erlang.OtpInputStream;
 import erlang.OtpOutputStream;
 import lombok.SneakyThrows;
 import lombok.val;
+import org.assertj.core.api.SoftAssertions;
+import org.junit.Rule;
+import org.junit.Test;
+import org.junit.rules.TestRule;
 
 public class ErlangAtomTest {
+
+  @Rule
+  public TestRule watcher = new TestMethodNamePrinter();
 
   @Test
   public void instantiate () {

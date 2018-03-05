@@ -23,7 +23,11 @@ import static org.assertj.core.api.Assertions.assertThat;
 
 import java.util.stream.Stream;
 
+import io.appulse.encon.java.util.TestMethodNamePrinter;
+
+import org.junit.Rule;
 import org.junit.Test;
+import org.junit.rules.TestRule;
 
 /**
  *
@@ -31,6 +35,9 @@ import org.junit.Test;
  * @since 0.0.1
  */
 public class DistributionFlagTest {
+
+  @Rule
+  public TestRule watcher = new TestMethodNamePrinter();
 
   @Test
   public void parse () {

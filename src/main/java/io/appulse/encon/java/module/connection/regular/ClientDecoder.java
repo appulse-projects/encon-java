@@ -42,6 +42,7 @@ public class ClientDecoder extends ReplayingDecoder<Container> {
                                 context.channel().remoteAddress().toString());
 
     log.error(message, cause);
+    context.fireExceptionCaught(cause);
     context.close();
   }
 

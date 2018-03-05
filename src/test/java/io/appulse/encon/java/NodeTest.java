@@ -30,22 +30,24 @@ import io.appulse.encon.java.config.NodeConfig;
 import io.appulse.encon.java.config.ServerConfig;
 import io.appulse.encon.java.module.mailbox.Mailbox;
 import io.appulse.encon.java.protocol.term.ErlangTerm;
+import io.appulse.encon.java.util.TestMethodNamePrinter;
 
-import lombok.extern.slf4j.Slf4j;
 import lombok.val;
 import org.assertj.core.api.SoftAssertions;
 import org.junit.After;
+import org.junit.Rule;
 import org.junit.Test;
+import org.junit.rules.TestRule;
 
 /**
  *
  * @author Artem Labazin
  * @since 0.0.1
  */
-@Slf4j
 public class NodeTest {
 
-  private static final int DEFAULT_EPMD_PORT = 4369;
+  @Rule
+  public TestRule watcher = new TestMethodNamePrinter();
 
   Node node;
 
@@ -93,9 +95,6 @@ public class NodeTest {
       softly.assertThat(nodeInfo.getExtra())
           .isNull();
     });
-
-    node.close();
-    node = null;
   }
 
   @Test
@@ -146,6 +145,41 @@ public class NodeTest {
 
     assertThat(node.mailbox("three"))
         .isNotPresent();
+  }
+
+  @Test
+  public void sendFromOneToAnotherNode () throws Exception {
+    node = Erts.node("node-1@localhost", NodeConfig.builder()
+                     .cookie("secret")
+                     .build()
+    );
+
+    CompletableFuture<String> future1 = new CompletableFuture<>();
+    Mailbox mailbox = node.mailbox()
+        .name("popa")
+        .handler((self, message) -> future1.complete(message.asText()))
+        .build();
+
+    try (val node2 = Erts.node("node-2@localhost", NodeConfig.builder()
+                               .cookie("secret")
+                               .build())) {
+
+      String text = "Hello world";
+      mailbox.receiveAsync()
+          .thenAccept(it -> {
+            assertThat(it.asText())
+                .isEqualTo(text);
+          });
+
+      node2.mailbox()
+          .build()
+          .request()
+          .put(text)
+          .send("node-1@localhost", "popa");
+
+      assertThat(future1.get(2, SECONDS))
+          .isEqualTo(text);
+    }
   }
 
   @Test

@@ -39,6 +39,7 @@ public class HandshakeEncoder extends MessageToByteEncoder<Message> {
                                 context.channel().remoteAddress().toString());
 
     log.error(message, cause);
+    context.fireExceptionCaught(cause);
     context.close();
   }
 
