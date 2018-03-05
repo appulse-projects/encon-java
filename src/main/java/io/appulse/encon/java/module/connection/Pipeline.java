@@ -18,6 +18,8 @@ package io.appulse.encon.java.module.connection;
 
 import static lombok.AccessLevel.PRIVATE;
 
+import java.util.concurrent.CompletableFuture;
+
 import io.appulse.encon.java.RemoteNode;
 import io.appulse.encon.java.module.NodeInternalApi;
 import io.appulse.encon.java.module.connection.handshake.AbstractHandshakeHandler;
@@ -28,9 +30,10 @@ import io.appulse.encon.java.module.connection.handshake.HandshakeHandlerServer;
 import io.appulse.encon.java.module.connection.regular.ClientDecoder;
 import io.appulse.encon.java.module.connection.regular.ClientEncoder;
 import io.appulse.encon.java.module.connection.regular.ClientRegularHandler;
+
 import io.netty.channel.ChannelOutboundHandler;
 import io.netty.channel.ChannelPipeline;
-import java.util.concurrent.CompletableFuture;
+import io.netty.handler.timeout.ReadTimeoutHandler;
 import lombok.Builder;
 import lombok.NonNull;
 import lombok.RequiredArgsConstructor;
@@ -65,6 +68,7 @@ public class Pipeline {
 
   public void setupClientHandshake (@NonNull ChannelPipeline pipeline, @NonNull RemoteNode remote) {
     pipeline
+        .addLast("readTimeoutHandler", new ReadTimeoutHandler(5))
         .addLast("decoder", new HandshakeDecoder(true))
         .addLast("encoder", HANDSHAKE_ENCODER)
         .addLast("handler", new HandshakeHandlerClient(this, internal, remote));
@@ -74,6 +78,7 @@ public class Pipeline {
 
   public void setupServerHandshake (@NonNull ChannelPipeline pipeline) {
     pipeline
+        .addLast("readTimeoutHandler", new ReadTimeoutHandler(5))
         .addLast("decoder", new HandshakeDecoder(false))
         .addLast("encoder", HANDSHAKE_ENCODER)
         .addLast("handler", new HandshakeHandlerServer(this, internal));
@@ -83,15 +88,20 @@ public class Pipeline {
 
   public void setupPipeline (@NonNull ChannelPipeline pipeline) {
     val handshakeHandler = (AbstractHandshakeHandler) pipeline.get("handler");
-    val handler = new ClientRegularHandler(internal);
+    val remote = handshakeHandler.getRemoteNode();
+    val handler = new ClientRegularHandler(internal, remote, future);
 
     pipeline.replace("decoder", "decoder", new ClientDecoder());
     pipeline.replace("encoder", "encoder", CLIENT_ENCODER);
     pipeline.replace("handler", "handler", handler);
 
-    val connection = new Connection(handshakeHandler.getRemoteNode(), handler);
+    val connection = new Connection(remote, handler);
     future.complete(connection);
 
-    log.debug("Connection for {} was added to pool", handshakeHandler.getRemoteNode());
+    log.debug("Connection for {} was added to pool", remote);
+  }
+
+  public void exception (Throwable ex) {
+    future.completeExceptionally(ex);
   }
 }

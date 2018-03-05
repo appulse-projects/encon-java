@@ -7,7 +7,6 @@ import static io.appulse.encon.java.protocol.TermType.LARGE_BIG;
 import static io.appulse.encon.java.protocol.TermType.SMALL_BIG;
 import static io.appulse.encon.java.protocol.TermType.SMALL_INTEGER;
 
-import java.math.BigDecimal;
 import java.math.BigInteger;
 import java.util.Arrays;
 import java.util.stream.IntStream;
@@ -17,12 +16,20 @@ import org.junit.Test;
 import erlang.OtpErlangLong;
 import erlang.OtpInputStream;
 import erlang.OtpOutputStream;
+
 import io.appulse.encon.java.protocol.term.ErlangTerm;
+import io.appulse.encon.java.util.TestMethodNamePrinter;
 import io.appulse.utils.Bytes;
+
 import lombok.SneakyThrows;
 import lombok.val;
+import org.junit.Rule;
+import org.junit.rules.TestRule;
 
 public class ErlangIntegerTest {
+
+  @Rule
+  public TestRule watcher = new TestMethodNamePrinter();
 
   @Test
   public void instantiate () {

@@ -18,6 +18,8 @@ package io.appulse.encon.java.module.connection;
 
 import static lombok.AccessLevel.PRIVATE;
 
+import java.io.Closeable;
+
 import io.appulse.encon.java.RemoteNode;
 import io.appulse.encon.java.module.connection.control.ControlMessage;
 import io.appulse.encon.java.module.connection.control.Send;
@@ -27,17 +29,19 @@ import io.appulse.encon.java.module.connection.regular.Container;
 import io.appulse.encon.java.protocol.term.ErlangTerm;
 import io.appulse.encon.java.protocol.type.ErlangAtom;
 import io.appulse.encon.java.protocol.type.ErlangPid;
-import java.io.Closeable;
+
 import lombok.Getter;
 import lombok.NonNull;
 import lombok.RequiredArgsConstructor;
 import lombok.SneakyThrows;
 import lombok.experimental.FieldDefaults;
+import lombok.extern.slf4j.Slf4j;
 
 /**
  * @author Artem Labazin <xxlabaza@gmail.com>
  * @since 17.02.2018
  */
+@Slf4j
 @RequiredArgsConstructor
 @FieldDefaults(level = PRIVATE, makeFinal = true)
 public class Connection implements Closeable {
@@ -63,7 +67,9 @@ public class Connection implements Closeable {
 
   @Override
   public void close () {
+    log.debug("Closing connection to {}", remote);
     handler.close();
+    log.debug("Connection to {} was closed", remote);
   }
 
   @SneakyThrows

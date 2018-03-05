@@ -23,10 +23,13 @@ import static org.mockito.Mockito.when;
 import io.appulse.encon.java.Node;
 import io.appulse.encon.java.NodeDescriptor;
 import io.appulse.encon.java.module.NodeInternalApi;
-import org.assertj.core.api.SoftAssertions;
-import org.junit.Test;
-
 import io.appulse.encon.java.protocol.type.ErlangPid;
+import io.appulse.encon.java.util.TestMethodNamePrinter;
+
+import org.assertj.core.api.SoftAssertions;
+import org.junit.Rule;
+import org.junit.Test;
+import org.junit.rules.TestRule;
 
 /**
  *
@@ -34,6 +37,9 @@ import io.appulse.encon.java.protocol.type.ErlangPid;
  * @since 0.0.1
  */
 public class PidGeneratorModuleTest {
+
+  @Rule
+  public TestRule watcher = new TestMethodNamePrinter();
 
   @Test
   public void generate () {

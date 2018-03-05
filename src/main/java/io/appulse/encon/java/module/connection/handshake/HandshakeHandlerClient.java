@@ -18,6 +18,9 @@ package io.appulse.encon.java.module.connection.handshake;
 
 import static lombok.AccessLevel.PRIVATE;
 
+import java.util.Arrays;
+import java.util.concurrent.ThreadLocalRandom;
+
 import io.appulse.encon.java.RemoteNode;
 import io.appulse.encon.java.module.NodeInternalApi;
 import io.appulse.encon.java.module.connection.Pipeline;
@@ -28,11 +31,9 @@ import io.appulse.encon.java.module.connection.handshake.message.ChallengeReplyM
 import io.appulse.encon.java.module.connection.handshake.message.Message;
 import io.appulse.encon.java.module.connection.handshake.message.NameMessage;
 import io.appulse.encon.java.module.connection.handshake.message.StatusMessage;
-import io.netty.channel.ChannelHandlerContext;
-import java.util.Arrays;
-import java.util.concurrent.ThreadLocalRandom;
-import lombok.Builder;
 
+import io.netty.channel.ChannelHandlerContext;
+import lombok.Builder;
 import lombok.NonNull;
 import lombok.experimental.FieldDefaults;
 import lombok.experimental.NonFinal;
@@ -63,6 +64,16 @@ public class HandshakeHandlerClient extends AbstractHandshakeHandler {
     super(pipeline);
     this.internal = internal;
     this.remote = remote;
+  }
+
+  @Override
+  public void exceptionCaught (ChannelHandlerContext context, Throwable cause) throws Exception {
+    val message = String.format("Error during channel connection with %s",
+                                context.channel().remoteAddress().toString());
+
+    log.error(message, cause);
+    context.fireExceptionCaught(cause);
+    context.close();
   }
 
   @Override

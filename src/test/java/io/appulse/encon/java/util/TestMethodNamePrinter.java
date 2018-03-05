@@ -28,6 +28,8 @@ public class TestMethodNamePrinter extends TestWatcher {
 
   @Override
   protected void starting (Description description) {
-    System.out.println("\nRUNNING TEST: " + description.getMethodName() + '\n');
+    System.out.println(String.format("\nRUNNING TEST: %s.%s\n",
+                                     description.getClassName(),
+                                     description.getMethodName()));
   }
 }

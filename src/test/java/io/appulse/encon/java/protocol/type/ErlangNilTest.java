@@ -16,19 +16,24 @@
 
 package io.appulse.encon.java.protocol.type;
 
-import static org.assertj.core.api.Assertions.assertThat;
 import static io.appulse.encon.java.protocol.TermType.NIL;
+import static org.assertj.core.api.Assertions.assertThat;
 
 import io.appulse.encon.java.protocol.term.ErlangTerm;
+import io.appulse.encon.java.util.TestMethodNamePrinter;
 import io.appulse.utils.Bytes;
-
-import org.junit.Test;
 
 import erlang.OtpOutputStream;
 import lombok.SneakyThrows;
 import lombok.val;
+import org.junit.Rule;
+import org.junit.Test;
+import org.junit.rules.TestRule;
 
 public class ErlangNilTest {
+
+  @Rule
+  public TestRule watcher = new TestMethodNamePrinter();
 
   @Test
   public void newInstance () {

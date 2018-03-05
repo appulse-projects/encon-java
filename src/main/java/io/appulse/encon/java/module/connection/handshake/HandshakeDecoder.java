@@ -53,6 +53,7 @@ public class HandshakeDecoder extends ReplayingDecoder<Message> {
                                 context.channel().remoteAddress().toString());
 
     log.error(message, cause);
+    context.fireExceptionCaught(cause);
     context.close();
   }
 

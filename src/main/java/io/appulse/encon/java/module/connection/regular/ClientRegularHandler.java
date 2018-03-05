@@ -20,8 +20,11 @@ import static lombok.AccessLevel.PRIVATE;
 
 import java.io.Closeable;
 import java.util.Optional;
+import java.util.concurrent.CompletableFuture;
 
+import io.appulse.encon.java.RemoteNode;
 import io.appulse.encon.java.module.NodeInternalApi;
+import io.appulse.encon.java.module.connection.Connection;
 import io.appulse.encon.java.module.connection.control.Send;
 import io.appulse.encon.java.module.connection.control.SendToRegisteredProcess;
 import io.appulse.encon.java.module.mailbox.Mailbox;
@@ -51,8 +54,26 @@ public class ClientRegularHandler extends ChannelInboundHandlerAdapter implement
   @NonNull
   NodeInternalApi internal;
 
+  @NonNull
+  RemoteNode remote;
+
+  @NonNull
+  CompletableFuture<Connection> future;
+
   @NonFinal
   Channel channel;
+
+  @Override
+  public void exceptionCaught (ChannelHandlerContext context, Throwable cause) throws Exception {
+    val message = String.format("Error during channel connection with %s",
+                                context.channel().remoteAddress().toString());
+
+    log.error(message, cause);
+    context.fireExceptionCaught(cause);
+    context.close();
+    close();
+    future.completeExceptionally(cause);
+  }
 
   @Override
   public void handlerAdded (ChannelHandlerContext context) throws Exception {
@@ -90,17 +111,11 @@ public class ClientRegularHandler extends ChannelInboundHandlerAdapter implement
   }
 
   @Override
-  public void exceptionCaught (ChannelHandlerContext context, Throwable cause) throws Exception {
-    val message = String.format("Error during channel connection with %s",
-                                context.channel().remoteAddress().toString());
-
-    log.error(message, cause);
-    context.close();
-  }
-
-  @Override
   public void close () {
+    log.debug("Closing client handler");
     channel.close();
+    internal.connections().remove(remote);
+    log.debug("Client handler was closed");
   }
 
   private void handle (@NonNull Send controlMessage, @NonNull ErlangTerm payload) {

@@ -22,16 +22,23 @@ import static org.assertj.core.api.Assertions.assertThat;
 
 import java.util.stream.IntStream;
 
-import org.junit.Test;
+import io.appulse.encon.java.protocol.term.ErlangTerm;
+import io.appulse.encon.java.util.TestMethodNamePrinter;
+import io.appulse.utils.Bytes;
+
 import erlang.OtpErlangString;
 import erlang.OtpInputStream;
 import erlang.OtpOutputStream;
-import io.appulse.encon.java.protocol.term.ErlangTerm;
-import io.appulse.utils.Bytes;
 import lombok.SneakyThrows;
 import lombok.val;
+import org.junit.Rule;
+import org.junit.Test;
+import org.junit.rules.TestRule;
 
 public class ErlangStringTest {
+
+  @Rule
+  public TestRule watcher = new TestMethodNamePrinter();
 
   @Test
   public void encode () {

@@ -47,19 +47,25 @@ import java.util.Set;
 import io.appulse.encon.java.DistributionFlag;
 import io.appulse.encon.java.module.mailbox.ReceiveHandler;
 import io.appulse.encon.java.module.mailbox.ReceiverType;
+import io.appulse.encon.java.util.TestMethodNamePrinter;
 import io.appulse.epmd.java.client.EpmdClient;
 import io.appulse.epmd.java.core.model.NodeType;
 import io.appulse.epmd.java.core.model.Protocol;
 import io.appulse.epmd.java.core.model.Version;
 
 import org.assertj.core.api.SoftAssertions;
+import org.junit.Rule;
 import org.junit.Test;
+import org.junit.rules.TestRule;
 
 /**
  *
  * @author alabazin
  */
 public class ConfigTest {
+
+  @Rule
+  public TestRule watcher = new TestMethodNamePrinter();
 
   @Test
   public void defaultDefaults () {

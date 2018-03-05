@@ -35,7 +35,7 @@ public interface MailboxModuleApi {
 
   boolean register (Mailbox mailbox, String name);
 
-  void deregisterMailbox (String name);
+  void deregister (String name);
 
   void remove (Mailbox mailbox);
 
