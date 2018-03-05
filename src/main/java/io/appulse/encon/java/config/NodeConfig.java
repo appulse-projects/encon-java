@@ -16,17 +16,15 @@
 
 package io.appulse.encon.java.config;
 
-import static java.util.Collections.emptyMap;
+import static java.util.Collections.emptyList;
 import static java.util.Optional.ofNullable;
-import static java.util.stream.Collectors.toMap;
+import static java.util.stream.Collectors.toList;
 import static java.util.stream.Collectors.toSet;
 import static lombok.AccessLevel.PRIVATE;
 
 import java.util.List;
 import java.util.Map;
-import java.util.Map.Entry;
 import java.util.Set;
-import java.util.function.Function;
 
 import io.appulse.encon.java.DistributionFlag;
 import io.appulse.epmd.java.core.model.NodeType;
@@ -101,7 +99,7 @@ public class NodeConfig {
         .map(it -> (List<Map<String, Object>>) it)
         .map(it -> it.stream()
             .map(sub -> MailboxConfig.newInstance(sub))
-            .collect(toMap(MailboxConfig::getName, Function.identity()))
+            .collect(toList())
         )
         .ifPresent(builder::mailboxes);
 
@@ -132,7 +130,7 @@ public class NodeConfig {
   Set<DistributionFlag> distributionFlags;
 
   @Singular
-  Map<String, MailboxConfig> mailboxes;
+  List<MailboxConfig> mailboxes;
 
   ServerConfig server;
 
@@ -163,12 +161,11 @@ public class NodeConfig {
         .orElse(defaults.getDistributionFlags());
 
     mailboxes = ofNullable(mailboxes)
-        .map(it -> it.entrySet()
-            .stream()
-            .peek(entry -> entry.getValue().initDefaults(defaults.getMailbox()))
-            .collect(toMap(Entry::getKey, Entry::getValue))
+        .map(it -> it.stream()
+            .map(mailbox -> mailbox.initDefaults(defaults.getMailbox()))
+            .collect(toList())
         )
-        .orElse(emptyMap());
+        .orElse(emptyList());
 
     server = ofNullable(server)
         .orElse(ServerConfig.builder().build())

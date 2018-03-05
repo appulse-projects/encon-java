@@ -147,7 +147,18 @@ public final class Node implements PingModuleApi, Closeable {
     node.setServerModule(new ServerModule(internal));
     node.serverModule.start();
 
-    node.createMailbox("net_kernel", new NetKernelReceiveHandler());
+    node.mailbox()
+        .name("net_kernel")
+        .handler(new NetKernelReceiveHandler())
+        .build();
+
+    config.getMailboxes().forEach(it -> {
+        node.mailbox()
+            .name(it.getName())
+            .handler(it.getHandler())
+            .type(it.getReceiverType())
+            .build();
+    });
 
     log.debug("Node '{}' was created", descriptor.getFullName());
     return node;

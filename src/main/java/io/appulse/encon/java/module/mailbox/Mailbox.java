@@ -20,8 +20,10 @@ import static lombok.AccessLevel.PACKAGE;
 import static lombok.AccessLevel.PRIVATE;
 
 import java.io.Closeable;
+import java.util.concurrent.CompletableFuture;
+import java.util.concurrent.CompletionStage;
 import java.util.concurrent.ExecutorService;
-import java.util.concurrent.Executors;
+import java.util.concurrent.TimeUnit;
 
 import io.appulse.encon.java.Node;
 import io.appulse.encon.java.NodeDescriptor;
@@ -30,19 +32,18 @@ import io.appulse.encon.java.module.NodeInternalApi;
 import io.appulse.encon.java.module.mailbox.request.RequestBuilder;
 import io.appulse.encon.java.protocol.term.ErlangTerm;
 import io.appulse.encon.java.protocol.type.ErlangPid;
-import java.util.concurrent.CompletableFuture;
-import java.util.concurrent.TimeUnit;
 
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.EqualsAndHashCode;
 import lombok.Getter;
 import lombok.NonNull;
+import lombok.Setter;
+import lombok.SneakyThrows;
+import lombok.Synchronized;
 import lombok.experimental.FieldDefaults;
 import lombok.experimental.NonFinal;
 import lombok.extern.slf4j.Slf4j;
-import lombok.Setter;
-import lombok.SneakyThrows;
 import lombok.val;
 
 /**
@@ -72,7 +73,11 @@ public class Mailbox implements Closeable {
   @NonNull
   ErlangPid pid;
 
-  ExecutorService executor = Executors.newSingleThreadExecutor();
+  @NonNull
+  ExecutorService executor;
+
+  @NonFinal
+  CompletableFuture<ErlangTerm> currentFuture;
 
   public Node getNode () {
     return internal.node();
@@ -82,24 +87,24 @@ public class Mailbox implements Closeable {
     return new RequestBuilder(this);
   }
 
-  public CompletableFuture<ErlangTerm> receiveAsync () {
-    throw new UnsupportedOperationException();
+  public CompletionStage<ErlangTerm> receiveAsync () {
+    return currentFuture();
   }
 
   @SneakyThrows
   public ErlangTerm receive () {
-    return receiveAsync().get();
+    return currentFuture().get();
   }
 
   @SneakyThrows
   public ErlangTerm receive (long timeout, @NonNull TimeUnit unit) {
-    return receiveAsync().get(timeout, unit);
+    return currentFuture().get(timeout, unit);
   }
 
   public void send (@NonNull ErlangPid pid, @NonNull ErlangTerm message) {
     if (pid.getDescriptor().equals(internal.node().getDescriptor())) {
       internal.mailboxes()
-          .getMailbox(pid)
+          .mailbox(pid)
           .orElseThrow(RuntimeException::new)
           .inbox(message);;
       return;
@@ -116,7 +121,7 @@ public class Mailbox implements Closeable {
 
   public void send (@NonNull String mailbox, @NonNull ErlangTerm message) {
     internal.mailboxes()
-        .getMailbox(mailbox)
+        .mailbox(mailbox)
         .orElseThrow(RuntimeException::new)
         .inbox(message);
   }
@@ -150,7 +155,7 @@ public class Mailbox implements Closeable {
 
   public void inbox (@NonNull ErlangTerm message) {
     log.debug("Inbox {}", message);
-    executor.execute(() -> receiveHandler.receive(this, message));
+    executor.execute(() -> inboxMessage(message));
     log.debug("END");
   }
 
@@ -159,5 +164,22 @@ public class Mailbox implements Closeable {
     log.debug("Closing mailbox '{}:{}'...", name, pid);
     executor.shutdown();
     name = null;
+  }
+
+  @Synchronized
+  private CompletableFuture<ErlangTerm> currentFuture () {
+    if (currentFuture == null) {
+      currentFuture = new CompletableFuture<>();
+    }
+    return currentFuture;
+  }
+
+  @Synchronized
+  private void inboxMessage (@NonNull ErlangTerm message) {
+    if (currentFuture != null) {
+      currentFuture.complete(message);
+      currentFuture = null;
+    }
+    receiveHandler.receive(this, message);
   }
 }

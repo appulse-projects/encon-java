@@ -13,7 +13,7 @@ defaults:
   client-threads: 7
   mailbox:
     type: SINGLE
-    handler: io.appulse.encon.java.module.mailbox.DefaultReceiveHandler
+    handler: io.appulse.encon.java.module.mailbox.StubReceiveHandler
   server:
     boss-threads: 2
     worker-threads: 4
@@ -40,9 +40,8 @@ nodes:
     mailboxes:
       - name: net_kernel
         type: CACHED
-      - name: popa
-        type: SINGLE
-        handler: io.appulse.encon.java.module.mailbox.DefaultReceiveHandler
+      - type: SINGLE
+        handler: io.appulse.encon.java.module.mailbox.StubReceiveHandler
       - name: another
     server:
       port: 8971
@@ -55,4 +54,4 @@ nodes:
     mailboxes:
       - name: net_kernel
         type: CACHED
-        handler: io.appulse.encon.java.module.mailbox.DefaultReceiveHandler
+        handler: io.appulse.encon.java.module.mailbox.StubReceiveHandler

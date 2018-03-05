@@ -197,7 +197,7 @@ public class Defaults {
   @Builder.Default
   MailboxConfig mailbox = MailboxConfig.builder()
       .receiverType(SINGLE)
-      .handler(io.appulse.encon.java.module.mailbox.DefaultReceiveHandler.class)
+      .handler(io.appulse.encon.java.module.mailbox.StubReceiveHandler.class)
       .build();
 
   @Builder.Default
