@@ -21,9 +21,10 @@ import static io.appulse.epmd.java.core.model.NodeType.R6_ERLANG;
 import static io.appulse.epmd.java.core.model.Protocol.TCP;
 import static io.appulse.epmd.java.core.model.Version.R6;
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static java.util.concurrent.TimeUnit.SECONDS;
 
+import io.appulse.encon.java.config.NodeConfig;
+import io.appulse.encon.java.config.ServerConfig;
 import java.util.concurrent.CompletableFuture;
 
 import io.appulse.encon.java.module.mailbox.Mailbox;
@@ -57,14 +58,7 @@ public class NodeTest {
 
   @Test
   public void register () {
-    node = Node.builder()
-        .name("popa")
-        .port(8971)
-        .build()
-        .register(DEFAULT_EPMD_PORT);
-
-    assertThat(node.isRegistered())
-        .isTrue();
+    node = Erts.node("popa");
 
     assertThat(node.generatePid())
         .isNotNull();
@@ -81,7 +75,7 @@ public class NodeTest {
     val nodeInfo = optional.get();
     SoftAssertions.assertSoftly(softly -> {
       softly.assertThat(nodeInfo.getPort())
-          .isEqualTo(8971);
+          .isNotEqualTo(0);
 
       softly.assertThat(nodeInfo.getType())
           .isEqualTo(R6_ERLANG);
@@ -100,36 +94,15 @@ public class NodeTest {
     });
 
     node.close();
-
-    assertThat(node.isRegistered()).isFalse();
     node = null;
   }
 
   @Test
-  public void generatorsFailsWithoutRegistration () {
-    node = Node.builder()
-        .name("popa")
-        .port(8971)
-        .build();
-
-    assertThatThrownBy(() -> node.generatePid())
-        .isInstanceOf(NullPointerException.class);
-
-    assertThatThrownBy(() -> node.generateReference())
-        .isInstanceOf(NullPointerException.class);
-
-    assertThatThrownBy(() -> node.generatePort())
-        .isInstanceOf(NullPointerException.class);
-  }
-
-  @Test
   public void ping () throws Exception {
-    node = Node.builder()
-        .name("node-1@localhost")
-        .port(8971)
-        .cookie("secret")
-        .build()
-        .register(DEFAULT_EPMD_PORT);
+    node = Erts.node("node-1@localhost", NodeConfig.builder()
+                     .cookie("secret")
+                     .build()
+    );
 
     assertThat(node.ping("echo@localhost").get(2, SECONDS))
         .isTrue();
@@ -140,13 +113,9 @@ public class NodeTest {
     assertThat(node.ping("node-2@localhost").get(2, SECONDS))
         .isFalse();
 
-
-    try (val node2 = Node.builder()
-                         .name("node-2@localhost")
-                         .port(8972)
-                         .cookie("secret")
-                         .build()
-                         .register(DEFAULT_EPMD_PORT)) {
+    try (val node2 = Erts.node("node-2@localhost", NodeConfig.builder()
+                               .cookie("secret")
+                               .build())) {
 
       assertThat(node.ping("node-2@localhost").get(2, SECONDS))
           .isTrue();
@@ -158,12 +127,11 @@ public class NodeTest {
 
   @Test
   public void send () throws Exception {
-    node = Node.builder()
-        .name("popa")
-        .port(8500)
-        .cookie("secret")
-        .build()
-        .register(DEFAULT_EPMD_PORT);
+    node = Erts.node("popa", NodeConfig.builder()
+                     .server(ServerConfig.builder().port(8500).build())
+                     .cookie("secret")
+                     .build()
+    );
 
     CompletableFuture<ErlangTerm> future = new CompletableFuture<>();
     Mailbox mailbox = node.createMailbox((self, message) -> {

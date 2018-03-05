@@ -16,17 +16,12 @@
 
 package io.appulse.encon.java;
 
-import static java.util.Locale.ENGLISH;
-import static java.util.Optional.ofNullable;
 import static lombok.AccessLevel.PRIVATE;
 
 import java.io.Closeable;
-import java.io.IOException;
-import java.nio.file.Files;
-import java.nio.file.Paths;
-import java.util.Objects;
 
-import io.appulse.encon.java.exception.NodeAlreadyRegisteredException;
+import io.appulse.encon.java.config.NodeConfig;
+import io.appulse.encon.java.config.ServerConfig;
 import io.appulse.encon.java.module.NodeInternalApi;
 import io.appulse.encon.java.module.connection.ConnectionModule;
 import io.appulse.encon.java.module.connection.ConnectionModuleApi;
@@ -39,23 +34,24 @@ import io.appulse.encon.java.module.generator.reference.ReferenceGeneratorModule
 import io.appulse.encon.java.module.lookup.LookupModule;
 import io.appulse.encon.java.module.lookup.LookupModuleApi;
 import io.appulse.encon.java.module.mailbox.MailboxModule;
+import io.appulse.encon.java.module.mailbox.MailboxModuleApi;
+import io.appulse.encon.java.module.mailbox.NetKernelReceiveHandler;
 import io.appulse.encon.java.module.ping.PingModule;
 import io.appulse.encon.java.module.ping.PingModuleApi;
+import io.appulse.encon.java.module.server.ServerModule;
+import io.appulse.encon.java.module.server.ServerModuleApi;
 import io.appulse.epmd.java.client.EpmdClient;
 import io.appulse.epmd.java.core.model.request.Registration;
 
-import lombok.Builder;
 import lombok.Getter;
+import lombok.NoArgsConstructor;
 import lombok.NonNull;
+import lombok.Setter;
 import lombok.ToString;
 import lombok.experimental.Delegate;
 import lombok.experimental.FieldDefaults;
 import lombok.extern.slf4j.Slf4j;
 import lombok.val;
-import io.appulse.encon.java.module.server.ServerModule;
-import io.appulse.encon.java.module.server.ServerModuleApi;
-import io.appulse.encon.java.protocol.term.ErlangTerm;
-import io.appulse.encon.java.module.mailbox.MailboxModuleApi;
 
 /**
  *
@@ -63,6 +59,7 @@ import io.appulse.encon.java.module.mailbox.MailboxModuleApi;
  * @since 0.0.1
  */
 @Slf4j
+@Setter(PRIVATE)
 @ToString(of = {
   "descriptor",
   "cookie",
@@ -70,19 +67,103 @@ import io.appulse.encon.java.module.mailbox.MailboxModuleApi;
   "meta"
 })
 @FieldDefaults(level = PRIVATE)
+@NoArgsConstructor(access = PRIVATE)
 public final class Node implements PingModuleApi, Closeable {
 
-  @Getter
-  final NodeDescriptor descriptor;
+  static Node newInstance (@NonNull String name, @NonNull NodeConfig config) {
+    val node = new Node();
+
+    val descriptor = NodeDescriptor.from(name);
+    node.setDescriptor(descriptor);
+    log.debug("Creating new Node '{}' with config:\n{}", descriptor.getFullName(), config);
+
+    node.setCookie(config.getCookie());
+    node.setPort(config.getServer().getPort());
+
+    val meta = Meta.builder()
+        .type(config.getType())
+        .protocol(config.getProtocol())
+        .low(config.getLow())
+        .high(config.getHigh())
+        .flags(config.getDistributionFlags())
+        .build();
+    node.setMeta(meta);
+
+    val epmd = new EpmdClient(config.getEpmdPort());
+    val creation = epmd.register(Registration.builder()
+        .name(descriptor.getShortName())
+        .port(config.getServer().getPort())
+        .type(meta.getType())
+        .protocol(meta.getProtocol())
+        .high(meta.getHigh())
+        .low(meta.getLow())
+        .build()
+    );
+    node.setEpmd(epmd);
+    log.debug("Node '{}' was registered", descriptor.getFullName());
+
+    val internal = new NodeInternalApi() {
+
+      @Override
+      public Node node () {
+        return node;
+      }
+
+      @Override
+      public MailboxModule mailboxes () {
+        return node.mailboxModule;
+      }
+
+      @Override
+      public EpmdClient epmd () {
+        return epmd;
+      }
+
+      @Override
+      public int creation () {
+        return creation;
+      }
+
+      @Override
+      public ConnectionModule connections () {
+        return node.connectionModule;
+      }
+
+      @Override
+      public ServerConfig serverConfig () {
+        return config.getServer();
+      }
+    };
+
+    node.setPidGeneratorModule(new PidGeneratorModule(internal));
+    node.setPortGeneratorModule(new PortGeneratorModule(internal));
+    node.setReferenceGeneratorModule(new ReferenceGeneratorModule(internal));
+
+    node.setPingModule(new PingModule(internal));
+    node.setLookupModule(new LookupModule(internal));
+
+    node.setMailboxModule(new MailboxModule(internal));
+    node.setConnectionModule(new ConnectionModule(internal));
+    node.setServerModule(new ServerModule(internal));
+    node.serverModule.start();
+
+    node.createMailbox("net_kernel", new NetKernelReceiveHandler());
+
+    log.debug("Node '{}' was created", descriptor.getFullName());
+    return node;
+  }
 
   @Getter
-  final String cookie;
+  NodeDescriptor descriptor;
 
   @Getter
-  final int port;
+  String cookie;
 
   @Getter
-  final Meta meta;
+  int port;
+
+  @Getter
+  Meta meta;
 
   @Getter
   EpmdClient epmd;
@@ -103,7 +184,7 @@ public final class Node implements PingModuleApi, Closeable {
   ReferenceGeneratorModule referenceGeneratorModule;
 
   @Delegate(types = MailboxModuleApi.class)
-  MailboxModule processModule;
+  MailboxModule mailboxModule;
 
   @Delegate(types = ConnectionModuleApi.class)
   ConnectionModule connectionModule;
@@ -111,40 +192,19 @@ public final class Node implements PingModuleApi, Closeable {
   @Delegate(types = ServerModuleApi.class)
   ServerModule serverModule;
 
-  @Builder
-  private Node (@NonNull String name, String cookie, int port, Meta meta) {
-    descriptor = NodeDescriptor.from(name);
-
-    this.cookie = ofNullable(cookie).orElse(Default.COOKIE);
-    this.port = port;
-    this.meta = ofNullable(meta).orElse(Meta.DEFAULT);
-  }
-
-  public boolean isRegistered () {
-    return epmd != null;
-  }
-
-  public Node register () {
-    if (isRegistered()) {
-      throw new NodeAlreadyRegisteredException();
-    }
-    epmd = new EpmdClient();
-    return selfRegistration();
-  }
-
-  public Node register (int epmdPort) {
-    if (isRegistered()) {
-      throw new NodeAlreadyRegisteredException();
-    }
-    epmd = new EpmdClient(epmdPort);
-    return selfRegistration();
-  }
-
   @Override
   public void close () {
-    if (processModule != null) {
-      processModule.close();
-      processModule = null;
+    log.debug("Closing node '{}'", descriptor.getFullName());
+
+    pingModule = null;
+    lookupModule = null;
+    pidGeneratorModule = null;
+    portGeneratorModule = null;
+    referenceGeneratorModule = null;
+
+    if (mailboxModule != null) {
+      mailboxModule.close();
+      mailboxModule = null;
     }
     if (connectionModule != null) {
       connectionModule.close();
@@ -158,122 +218,8 @@ public final class Node implements PingModuleApi, Closeable {
       epmd.stop(descriptor.getShortName());
       epmd.close();
       epmd = null;
+      log.debug("Node '{}' was deregistered from EPMD", descriptor.getFullName());
     }
-
-    pidGeneratorModule = null;
-    portGeneratorModule = null;
-    referenceGeneratorModule = null;
-
     log.debug("Node '{}' was closed", descriptor.getFullName());
-  }
-
-  private Node selfRegistration () {
-    val creation = epmd.register(Registration.builder()
-        .name(descriptor.getShortName())
-        .port(port)
-        .type(meta.getType())
-        .protocol(meta.getProtocol())
-        .high(meta.getHigh())
-        .low(meta.getLow())
-        .build()
-    );
-
-    NodeInternalApi internal = new NodeInternalApi() {
-
-      @Override
-      public Node node () {
-        return Node.this;
-      }
-
-      @Override
-      public MailboxModule mailboxes () {
-        return processModule;
-      }
-
-      @Override
-      public EpmdClient epmd () {
-        return epmd;
-      }
-
-      @Override
-      public int creation () {
-        return creation;
-      }
-
-      @Override
-      public ConnectionModule connections () {
-        return connectionModule;
-      }
-    };
-
-    pidGeneratorModule = new PidGeneratorModule(internal);
-    portGeneratorModule = new PortGeneratorModule(internal);
-    referenceGeneratorModule = new ReferenceGeneratorModule(internal);
-
-    pingModule = new PingModule(internal);
-    lookupModule = new LookupModule(internal);
-
-    processModule = new MailboxModule(internal);
-    connectionModule = new ConnectionModule(internal);
-    serverModule = new ServerModule(internal);
-    serverModule.start(port);
-
-    createMailbox("net_kernel", (self, message) -> {
-                log.debug("Handler working");
-                if (!message.isTuple()) {
-                  log.debug("Not a tuple");
-                  return;
-                }
-                if (!message.get(0).map(ErlangTerm::asText).orElse("").equals("$gen_call")) {
-                  log.debug("Uh?");
-                  return;
-                }
-
-                ErlangTerm tuple = message.get(1).get();
-                self.request().makeTuple()
-                    .add(tuple.get(1).get().asReference())
-                    .addAtom("yes")
-                    .send(tuple.get(0).get().asPid());
-
-                log.debug("Ping response was sent to {}", tuple);
-              });
-
-    return this;
-  }
-
-  private static class Default {
-
-    private static final String COOKIE = getDefaultCookie();
-
-    private static String getDefaultCookie () {
-      val cookieFile = Paths.get(getHomeDir(), ".erlang.cookie");
-      if (!Files.exists(cookieFile)) {
-        return "";
-      }
-
-      try {
-        return Files.lines(cookieFile)
-            .filter(Objects::nonNull)
-            .map(String::trim)
-            .filter(it -> !it.isEmpty())
-            .findFirst()
-            .orElse("");
-      } catch (IOException ex) {
-        return "";
-      }
-    }
-
-    private static String getHomeDir () {
-      val home = System.getProperty("user.home");
-      if (!System.getProperty("os.name").toLowerCase(ENGLISH).contains("windows")) {
-        return home;
-      }
-
-      val drive = System.getenv("HOMEDRIVE");
-      val path = System.getenv("HOMEPATH");
-      return drive != null && path != null
-             ? drive + path
-             : home;
-    }
   }
 }
