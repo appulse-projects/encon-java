@@ -17,6 +17,7 @@
 package io.appulse.encon.java.module;
 
 import io.appulse.encon.java.Node;
+import io.appulse.encon.java.config.ServerConfig;
 import io.appulse.encon.java.module.connection.ConnectionModule;
 import io.appulse.encon.java.module.mailbox.MailboxModule;
 import io.appulse.epmd.java.client.EpmdClient;
@@ -37,4 +38,6 @@ public interface NodeInternalApi {
   MailboxModule mailboxes ();
 
   ConnectionModule connections ();
+
+  ServerConfig serverConfig ();
 }

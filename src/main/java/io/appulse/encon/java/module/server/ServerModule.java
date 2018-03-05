@@ -36,7 +36,6 @@ import io.netty.channel.socket.nio.NioServerSocketChannel;
 import java.util.concurrent.CompletableFuture;
 
 import lombok.NonNull;
-import lombok.RequiredArgsConstructor;
 import lombok.SneakyThrows;
 import lombok.experimental.FieldDefaults;
 import lombok.experimental.NonFinal;
@@ -48,22 +47,29 @@ import lombok.extern.slf4j.Slf4j;
  * @since 0.0.1
  */
 @Slf4j
-@RequiredArgsConstructor
 @FieldDefaults(level = PRIVATE, makeFinal = true)
 public class ServerModule implements ServerModuleApi, Closeable {
 
-  @NonNull
+  int port;
+
   NodeInternalApi internal;
 
-  EventLoopGroup bossGroup = new NioEventLoopGroup(1);
+  EventLoopGroup bossGroup;
 
-  EventLoopGroup workerGroup = new NioEventLoopGroup(2);
+  EventLoopGroup workerGroup;
 
   @NonFinal
   volatile boolean closed;
 
+  public ServerModule (@NonNull NodeInternalApi internal) {
+    this.internal = internal;
+    port = internal.serverConfig().getPort();
+    bossGroup = new NioEventLoopGroup(internal.serverConfig().getBossThreads());
+    workerGroup = new NioEventLoopGroup(internal.serverConfig().getWorkerThreads());
+  }
+
   @SneakyThrows
-  public void start (int port) {
+  public void start () {
     log.debug("Starting server on port {}", port);
     new ServerBootstrap()
         .group(bossGroup, workerGroup)

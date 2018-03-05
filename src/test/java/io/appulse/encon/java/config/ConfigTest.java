@@ -93,8 +93,7 @@ public class ConfigTest {
           .isEqualTo(2);
 
       softly.assertThat(defaults.getDistributionFlags())
-          .isEqualTo(Defaults.FLAGS);
-
+          .isNotEmpty();
 
       softly.assertThat(defaults.getMailbox())
           .isNotNull();
@@ -104,7 +103,6 @@ public class ConfigTest {
 
       softly.assertThat(defaults.getMailbox().getHandler())
           .isEqualTo(io.appulse.encon.java.module.mailbox.DefaultReceiveHandler.class);
-
 
       softly.assertThat(defaults.getServer())
           .isNotNull();
@@ -129,13 +127,12 @@ public class ConfigTest {
     Version high = R5C;
     int clientThreads = 8;
     Set<DistributionFlag> distributionFlags = new HashSet<>(asList(
-      UTF8_ATOMS
+        UTF8_ATOMS
     ));
     ReceiverType receiverType = CACHED;
     Class<ReceiveHandler> handler = null;
     int bossThreads = 7;
     int workerThreads = 14;
-
 
     Config config = Config.builder()
         .defaults(Defaults.builder()
@@ -185,7 +182,6 @@ public class ConfigTest {
       softly.assertThat(defaults.getDistributionFlags())
           .isEqualTo(distributionFlags);
 
-
       softly.assertThat(defaults.getMailbox())
           .isNotNull();
 
@@ -194,7 +190,6 @@ public class ConfigTest {
 
       softly.assertThat(defaults.getMailbox().getHandler())
           .isEqualTo(handler);
-
 
       softly.assertThat(defaults.getServer())
           .isNotNull();
@@ -239,12 +234,10 @@ public class ConfigTest {
           .isEqualTo(2);
 
       softly.assertThat(nodeConfig.getDistributionFlags())
-          .isEqualTo(Defaults.FLAGS);
-
+          .isNotEmpty();
 
       softly.assertThat(nodeConfig.getMailboxes())
           .isEmpty();
-
 
       softly.assertThat(nodeConfig.getServer())
           .isNotNull();
@@ -296,7 +289,6 @@ public class ConfigTest {
       softly.assertThat(defaults.getDistributionFlags())
           .contains(MAP_TAG, BIG_CREATION);
 
-
       softly.assertThat(defaults.getMailbox())
           .isNotNull();
 
@@ -305,7 +297,6 @@ public class ConfigTest {
 
       softly.assertThat(defaults.getMailbox().getHandler())
           .isEqualTo(io.appulse.encon.java.module.mailbox.DefaultReceiveHandler.class);
-
 
       softly.assertThat(defaults.getServer())
           .isNotNull();
@@ -319,7 +310,6 @@ public class ConfigTest {
       softly.assertThat(defaults.getServer().getWorkerThreads())
           .isEqualTo(4);
     });
-
 
     Map<String, NodeConfig> nodes = config.getNodes();
     assertThat(nodes).isNotNull();
@@ -361,7 +351,6 @@ public class ConfigTest {
           BIG_CREATION
       );
 
-
       softly.assertThat(node1.getMailboxes())
           .isNotEmpty();
 
@@ -386,7 +375,6 @@ public class ConfigTest {
       softly.assertThat(mailbox3.getHandler())
           .isEqualTo(io.appulse.encon.java.module.mailbox.DefaultReceiveHandler.class);
 
-
       softly.assertThat(node1.getServer())
           .isNotNull();
 
@@ -399,8 +387,6 @@ public class ConfigTest {
       softly.assertThat(node1.getServer().getWorkerThreads())
           .isEqualTo(2);
     });
-
-
 
     NodeConfig node2 = nodes.get("node-2");
     assertThat(node2).isNotNull();
@@ -432,7 +418,6 @@ public class ConfigTest {
           BIG_CREATION
       );
 
-
       softly.assertThat(node2.getMailboxes())
           .isNotEmpty();
 
@@ -442,7 +427,6 @@ public class ConfigTest {
           .isEqualTo(CACHED);
       softly.assertThat(mailbox1.getHandler())
           .isEqualTo(io.appulse.encon.java.module.mailbox.DefaultReceiveHandler.class);
-
 
       softly.assertThat(node2.getServer())
           .isNotNull();
