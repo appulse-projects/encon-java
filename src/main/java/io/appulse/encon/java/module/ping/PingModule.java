@@ -17,8 +17,8 @@
 package io.appulse.encon.java.module.ping;
 
 import static io.appulse.encon.java.module.mailbox.request.ArrayItems.items;
-import static java.lang.Boolean.TRUE;
 import static java.lang.Boolean.FALSE;
+import static java.lang.Boolean.TRUE;
 import static lombok.AccessLevel.PRIVATE;
 
 import java.util.Optional;
@@ -31,9 +31,9 @@ import io.appulse.encon.java.module.mailbox.Mailbox;
 
 import lombok.NonNull;
 import lombok.RequiredArgsConstructor;
-import lombok.val;
 import lombok.experimental.FieldDefaults;
 import lombok.extern.slf4j.Slf4j;
+import lombok.val;
 
 /**
  *
@@ -77,14 +77,10 @@ public class PingModule implements PingModuleApi {
     log.debug("Remote node {} is available", remote);
 
     CompletableFuture<Boolean> future = new CompletableFuture<>();
-    Mailbox mailbox = internal.node().createMailbox((self, message) -> {
-      log.debug("Incoming message: {}", message);
-      future.complete(TRUE);
-    });
-    // CompletableFuture<Boolean> result = future.whenComplete((response, exception) -> {
-    //   log.debug("Removing mailbox: {}", mailbox);
-    //   internal.node().remove(mailbox);
-    // });
+    Mailbox mailbox = internal.node()
+        .mailbox()
+        .handler(new PingReceiveHandler(future))
+        .build();
 
     mailbox.request().makeTuple()
         .addAtom("$gen_call")

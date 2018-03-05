@@ -15,6 +15,8 @@
  */
 package io.appulse.encon.java.module.mailbox;
 
+import static io.appulse.encon.java.module.mailbox.ReceiverType.CACHED;
+import static io.appulse.encon.java.module.mailbox.ReceiverType.SINGLE;
 import static java.util.Optional.ofNullable;
 import static lombok.AccessLevel.PRIVATE;
 
@@ -22,14 +24,15 @@ import java.io.Closeable;
 import java.util.Map;
 import java.util.Optional;
 import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.Executors;
 
 import io.appulse.encon.java.module.NodeInternalApi;
 import io.appulse.encon.java.protocol.type.ErlangPid;
 
 import lombok.NonNull;
 import lombok.RequiredArgsConstructor;
+import lombok.SneakyThrows;
 import lombok.experimental.FieldDefaults;
-import lombok.val;
 
 /**
  *
@@ -53,22 +56,8 @@ public class MailboxModule implements MailboxModuleApi, Closeable {
   }
 
   @Override
-  public Mailbox createMailbox(@NonNull ReceiveHandler handler) {
-    Mailbox mailbox = Mailbox.builder()
-        .internal(internal)
-        .pid(internal.node().generatePid())
-        .receiveHandler(handler)
-        .build();
-
-    pids.put(mailbox.getPid(), mailbox);
-    return mailbox;
-  }
-
-  @Override
-  public Mailbox createMailbox(@NonNull String name, @NonNull ReceiveHandler handler) {
-    val mailbox = createMailbox(handler);
-    register(mailbox, name);
-    return mailbox;
+  public NewMailboxBuilder mailbox () {
+    return new NewMailboxBuilder();
   }
 
   @Override
@@ -88,19 +77,85 @@ public class MailboxModule implements MailboxModuleApi, Closeable {
   }
 
   @Override
-  public Optional<Mailbox> getMailbox(String name) {
+  public Optional<Mailbox> mailbox(@NonNull String name) {
     return ofNullable(names.get(name));
   }
 
-  public Optional<Mailbox> getMailbox(ErlangPid pid) {
+  @Override
+  public Optional<Mailbox> mailbox(@NonNull ErlangPid pid) {
     return ofNullable(pids.get(pid));
   }
 
-  public void remove(Mailbox mailbox) {
+  @Override
+  public void remove(@NonNull Mailbox mailbox) {
     ofNullable(pids.remove(mailbox.getPid()))
         .ifPresent(it -> it.close());
 
     ofNullable(mailbox.getName())
         .ifPresent(names::remove);
+  }
+
+  @Override
+  public void remove(@NonNull String name) {
+    mailbox(name)
+        .ifPresent(this::remove);
+  }
+
+  @Override
+  public void remove(@NonNull ErlangPid pid) {
+    mailbox(pid)
+        .ifPresent(this::remove);
+  }
+
+  @FieldDefaults(level = PRIVATE)
+  public class NewMailboxBuilder {
+
+    final Mailbox.MailboxBuilder builder = Mailbox.builder();
+
+    ReceiverType type = SINGLE;
+
+    public NewMailboxBuilder name (String name) {
+      builder.name(name);
+      return this;
+    }
+
+    public NewMailboxBuilder handler (@NonNull ReceiveHandler handler) {
+      builder.receiveHandler(handler);
+      return this;
+    }
+
+    @SneakyThrows
+    public NewMailboxBuilder handler (@NonNull Class<? extends ReceiveHandler> handlerClass) {
+      return handler(handlerClass.newInstance());
+    }
+
+    public NewMailboxBuilder type (@NonNull ReceiverType type) {
+      this.type = type;
+      return this;
+    }
+
+    public Mailbox build () {
+      switch (type) {
+      case SINGLE:
+        builder.executor(Executors.newSingleThreadExecutor());
+        break;
+      case CACHED:
+        builder.executor(Executors.newCachedThreadPool());
+        break;
+      default:
+        throw new UnsupportedOperationException("Unsupported type " + type);
+      }
+
+      Mailbox mailbox = builder
+          .internal(internal)
+          .pid(internal.node().generatePid())
+          .build();
+
+      pids.put(mailbox.getPid(), mailbox);
+      ofNullable(mailbox.getName())
+          .ifPresent(it -> register(mailbox, it));
+
+      return mailbox;
+    }
   }
 }

@@ -17,6 +17,7 @@ package io.appulse.encon.java.module.mailbox;
 
 import java.util.Optional;
 
+import io.appulse.encon.java.module.mailbox.MailboxModule.NewMailboxBuilder;
 import io.appulse.encon.java.protocol.type.ErlangPid;
 
 /**
@@ -26,17 +27,19 @@ import io.appulse.encon.java.protocol.type.ErlangPid;
  */
 public interface MailboxModuleApi {
 
-  Mailbox createMailbox(ReceiveHandler handler);
+  NewMailboxBuilder mailbox ();
 
-  Mailbox createMailbox(String name, ReceiveHandler handler);
+  Optional<Mailbox> mailbox (String name);
 
-  boolean register(Mailbox mailbox, String name);
+  Optional<Mailbox> mailbox (ErlangPid pid);
 
-  void deregisterMailbox(String name);
+  boolean register (Mailbox mailbox, String name);
 
-  Optional<Mailbox> getMailbox(String name);
+  void deregisterMailbox (String name);
 
-  Optional<Mailbox> getMailbox(ErlangPid pid);
+  void remove (Mailbox mailbox);
 
-  void remove(Mailbox mailbox);
+  void remove (String name);
+
+  void remove (ErlangPid pid);
 }

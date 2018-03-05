@@ -18,18 +18,19 @@ package io.appulse.encon.java.module.connection.regular;
 
 import static lombok.AccessLevel.PRIVATE;
 
+import java.io.Closeable;
 import java.util.Optional;
 
 import io.appulse.encon.java.module.NodeInternalApi;
+import io.appulse.encon.java.module.connection.control.Send;
+import io.appulse.encon.java.module.connection.control.SendToRegisteredProcess;
 import io.appulse.encon.java.module.mailbox.Mailbox;
 import io.appulse.encon.java.protocol.term.ErlangTerm;
 import io.appulse.encon.java.protocol.type.ErlangAtom;
-import io.appulse.encon.java.module.connection.control.Send;
-import io.appulse.encon.java.module.connection.control.SendToRegisteredProcess;
+
 import io.netty.channel.Channel;
 import io.netty.channel.ChannelHandlerContext;
 import io.netty.channel.ChannelInboundHandlerAdapter;
-import java.io.Closeable;
 import lombok.NonNull;
 import lombok.RequiredArgsConstructor;
 import lombok.experimental.FieldDefaults;
@@ -107,9 +108,9 @@ public class ClientRegularHandler extends ChannelInboundHandlerAdapter implement
     val mailboxes = internal.mailboxes();
     Optional<Mailbox> optional;
     if (destination.isAtom()) {
-      optional = mailboxes.getMailbox(destination.asText());
+      optional = mailboxes.mailbox(destination.asText());
     } else {
-      optional = mailboxes.getMailbox(destination.asPid());
+      optional = mailboxes.mailbox(destination.asPid());
     }
     optional.ifPresent(it -> it.inbox(payload));
   }
@@ -118,7 +119,7 @@ public class ClientRegularHandler extends ChannelInboundHandlerAdapter implement
     ErlangAtom atom = controlMessage.getTo();
     String mailboxName = atom.asText();
     internal.mailboxes()
-        .getMailbox(mailboxName)
+        .mailbox(mailboxName)
         .ifPresent(it -> it.inbox(payload));
   }
 }

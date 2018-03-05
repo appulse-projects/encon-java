@@ -20,18 +20,19 @@ import static io.appulse.encon.java.module.mailbox.request.ArrayItems.items;
 import static io.appulse.epmd.java.core.model.NodeType.R6_ERLANG;
 import static io.appulse.epmd.java.core.model.Protocol.TCP;
 import static io.appulse.epmd.java.core.model.Version.R6;
-import static org.assertj.core.api.Assertions.assertThat;
 import static java.util.concurrent.TimeUnit.SECONDS;
+import static org.assertj.core.api.Assertions.assertThat;
 
-import io.appulse.encon.java.config.NodeConfig;
-import io.appulse.encon.java.config.ServerConfig;
 import java.util.concurrent.CompletableFuture;
 
+import io.appulse.encon.java.config.MailboxConfig;
+import io.appulse.encon.java.config.NodeConfig;
+import io.appulse.encon.java.config.ServerConfig;
 import io.appulse.encon.java.module.mailbox.Mailbox;
 import io.appulse.encon.java.protocol.term.ErlangTerm;
-import lombok.val;
-import lombok.extern.slf4j.Slf4j;
 
+import lombok.extern.slf4j.Slf4j;
+import lombok.val;
 import org.assertj.core.api.SoftAssertions;
 import org.junit.After;
 import org.junit.Test;
@@ -126,6 +127,28 @@ public class NodeTest {
   }
 
   @Test
+  public void instantiating () throws Exception {
+    node = Erts.node("popa", NodeConfig.builder()
+        .mailbox(MailboxConfig.builder()
+            .name("one")
+            .build())
+        .mailbox(MailboxConfig.builder()
+            .name("two")
+            .build())
+        .build()
+    );
+
+    assertThat(node.mailbox("one"))
+        .isPresent();
+
+    assertThat(node.mailbox("two"))
+        .isPresent();
+
+    assertThat(node.mailbox("three"))
+        .isNotPresent();
+  }
+
+  @Test
   public void send () throws Exception {
     node = Erts.node("popa", NodeConfig.builder()
                      .server(ServerConfig.builder().port(8500).build())
@@ -134,9 +157,11 @@ public class NodeTest {
     );
 
     CompletableFuture<ErlangTerm> future = new CompletableFuture<>();
-    Mailbox mailbox = node.createMailbox((self, message) -> {
-      future.complete(message.asTuple().get(1).get());
-    });
+    Mailbox mailbox = node.mailbox()
+        .handler((self, message) -> {
+            future.complete(message.asTuple().get(1).get());
+        })
+        .build();
 
     mailbox.request()
         .makeTuple()
