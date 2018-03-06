@@ -39,6 +39,7 @@ import lombok.SneakyThrows;
 import lombok.experimental.FieldDefaults;
 import lombok.experimental.NonFinal;
 import lombok.extern.slf4j.Slf4j;
+import lombok.val;
 
 /**
  *
@@ -62,13 +63,17 @@ public class ServerModule implements ServerModuleApi, Closeable {
 
   public ServerModule (@NonNull NodeInternalApi internal) {
     this.internal = internal;
-    port = internal.serverConfig().getPort();
-    bossGroup = new NioEventLoopGroup(internal.serverConfig().getBossThreads());
-    workerGroup = new NioEventLoopGroup(internal.serverConfig().getWorkerThreads());
+
+    val serverConfig = internal.config().getServer();
+    port = serverConfig.getPort();
+    bossGroup = new NioEventLoopGroup(serverConfig.getBossThreads());
+    workerGroup = new NioEventLoopGroup(serverConfig.getWorkerThreads());
+
+    start();
   }
 
   @SneakyThrows
-  public void start () {
+  private void start () {
     log.debug("Starting server on port {}", port);
     new ServerBootstrap()
         .group(bossGroup, workerGroup)

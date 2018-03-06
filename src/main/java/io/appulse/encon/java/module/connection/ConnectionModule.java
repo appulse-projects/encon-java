@@ -38,7 +38,6 @@ import io.netty.channel.nio.NioEventLoopGroup;
 import io.netty.channel.socket.SocketChannel;
 import io.netty.channel.socket.nio.NioSocketChannel;
 import lombok.NonNull;
-import lombok.RequiredArgsConstructor;
 import lombok.SneakyThrows;
 import lombok.experimental.FieldDefaults;
 import lombok.extern.slf4j.Slf4j;
@@ -50,16 +49,22 @@ import lombok.val;
  * @since 0.0.1
  */
 @Slf4j
-@RequiredArgsConstructor
 @FieldDefaults(level = PRIVATE, makeFinal = true)
 public class ConnectionModule implements ConnectionModuleApi, Closeable {
 
   @NonNull
   NodeInternalApi internal;
 
-  Map<RemoteNode, CompletableFuture<Connection>> cache = new ConcurrentHashMap<>();
+  Map<RemoteNode, CompletableFuture<Connection>> cache;
 
-  EventLoopGroup workerGroup = new NioEventLoopGroup(4);
+  EventLoopGroup workerGroup;
+
+  public ConnectionModule (@NonNull NodeInternalApi internal) {
+    this.internal = internal;
+    cache = new ConcurrentHashMap<>();
+
+    workerGroup = new NioEventLoopGroup(internal.config().getClientThreads());
+  }
 
   @Override
   public void close () {
