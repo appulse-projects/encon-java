@@ -24,12 +24,14 @@ import static java.util.concurrent.TimeUnit.SECONDS;
 import static org.assertj.core.api.Assertions.assertThat;
 
 import java.util.concurrent.CompletableFuture;
+import java.util.concurrent.CompletionStage;
 
 import io.appulse.encon.java.config.MailboxConfig;
 import io.appulse.encon.java.config.NodeConfig;
 import io.appulse.encon.java.config.ServerConfig;
 import io.appulse.encon.java.module.mailbox.Mailbox;
 import io.appulse.encon.java.protocol.term.ErlangTerm;
+import io.appulse.encon.java.protocol.type.ErlangString;
 import io.appulse.encon.java.util.TestMethodNamePrinter;
 
 import lombok.val;
@@ -149,36 +151,45 @@ public class NodeTest {
 
   @Test
   public void sendFromOneToAnotherNode () throws Exception {
-    node = Erts.node("node-1@localhost", NodeConfig.builder()
-                     .cookie("secret")
-                     .build()
-    );
+    node = Erts.node("node-1@localhost");
 
     CompletableFuture<String> future1 = new CompletableFuture<>();
-    Mailbox mailbox = node.mailbox()
-        .name("popa")
+    Mailbox mailbox1 = node.mailbox()
+        .name("popa1")
         .handler((self, message) -> future1.complete(message.asText()))
         .build();
 
-    try (val node2 = Erts.node("node-2@localhost", NodeConfig.builder()
-                               .cookie("secret")
-                               .build())) {
+    try (val node2 = Erts.node("node-2@localhost")) {
 
-      String text = "Hello world";
-      mailbox.receiveAsync()
-          .thenAccept(it -> {
-            assertThat(it.asText())
-                .isEqualTo(text);
-          });
+      String text1 = "Hello world 1";
+      String text2 = "Hello world 2";
+      CompletionStage<ErlangTerm> stage1 = mailbox1.receiveAsync();
 
-      node2.mailbox()
-          .build()
-          .request()
-          .put(text)
-          .send("node-1@localhost", "popa");
+      CompletableFuture<String> future2 = new CompletableFuture<>();
+      Mailbox mailbox2 = node2.mailbox()
+          .name("popa2")
+          .handler((self, message) -> future2.complete(message.asText()))
+          .build();
+
+      mailbox2.request()
+          .put(text1)
+          .send("node-1@localhost", "popa1");
 
       assertThat(future1.get(2, SECONDS))
-          .isEqualTo(text);
+          .isEqualTo(text1);
+
+      assertThat(stage1)
+          .isCompleted()
+          .isCompletedWithValue(new ErlangString(text1));
+
+      CompletionStage<ErlangTerm> stage2 = mailbox2.receiveAsync();
+
+      mailbox1.request()
+          .put(text2)
+          .send("node-2@localhost", "popa2");
+
+      assertThat(stage2.toCompletableFuture().get(2, SECONDS))
+          .isEqualTo(new ErlangString(text2));
     }
   }
 
