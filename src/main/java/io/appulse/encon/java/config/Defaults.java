@@ -50,8 +50,10 @@ import io.appulse.epmd.java.core.model.NodeType;
 import io.appulse.epmd.java.core.model.Protocol;
 import io.appulse.epmd.java.core.model.Version;
 
+import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
+import lombok.NoArgsConstructor;
 import lombok.NonNull;
 import lombok.experimental.FieldDefaults;
 import lombok.val;
@@ -62,7 +64,9 @@ import lombok.val;
  */
 @Data
 @Builder
-@FieldDefaults(level = PRIVATE, makeFinal = true)
+@NoArgsConstructor
+@AllArgsConstructor
+@FieldDefaults(level = PRIVATE)
 public class Defaults {
 
   public static final Defaults INSTANCE = Defaults.builder().build();

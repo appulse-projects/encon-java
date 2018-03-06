@@ -109,6 +109,11 @@ public class MailboxModule implements MailboxModuleApi, Closeable {
         .ifPresent(this::remove);
   }
 
+  @Override
+  public Map<ErlangPid, Mailbox> mailboxes () {
+    return pids;
+  }
+
   @FieldDefaults(level = PRIVATE)
   @NoArgsConstructor(access = PRIVATE)
   public class NewMailboxBuilder {

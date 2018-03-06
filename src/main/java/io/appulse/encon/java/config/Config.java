@@ -26,12 +26,11 @@ import java.util.Map.Entry;
 import java.util.Objects;
 
 import lombok.Builder;
-import lombok.EqualsAndHashCode;
-import lombok.Getter;
+import lombok.Data;
+import lombok.NoArgsConstructor;
 import lombok.NonNull;
 import lombok.Singular;
 import lombok.SneakyThrows;
-import lombok.ToString;
 import lombok.val;
 import org.yaml.snakeyaml.Yaml;
 
@@ -39,9 +38,8 @@ import org.yaml.snakeyaml.Yaml;
  *
  * @author alabazin
  */
-@Getter
-@ToString
-@EqualsAndHashCode
+@Data
+@NoArgsConstructor
 public class Config {
 
   public static Config load (@NonNull String fileName) {

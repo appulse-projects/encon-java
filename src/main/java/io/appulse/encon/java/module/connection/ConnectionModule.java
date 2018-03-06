@@ -101,15 +101,18 @@ public class ConnectionModule implements ConnectionModuleApi, Closeable {
     });
   }
 
+  @Override
   public CompletionStage<Connection> connectAsync (@NonNull RemoteNode remote) {
     return getOrCreateConnection(remote);
   }
 
+  @Override
   @SneakyThrows
   public Connection connect (@NonNull RemoteNode remote) {
     return connect(remote, 10, SECONDS);
   }
 
+  @Override
   @SneakyThrows
   public Connection connect (@NonNull RemoteNode remote, long timeout, @NonNull TimeUnit unit) {
     return getOrCreateConnection(remote).get(timeout, unit);
@@ -123,6 +126,7 @@ public class ConnectionModule implements ConnectionModuleApi, Closeable {
     });
   }
 
+  @Override
   public boolean isAvailable (@NonNull RemoteNode remote) {
     try {
       return connect(remote) != null;
