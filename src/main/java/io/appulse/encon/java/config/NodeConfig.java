@@ -31,8 +31,10 @@ import io.appulse.epmd.java.core.model.NodeType;
 import io.appulse.epmd.java.core.model.Protocol;
 import io.appulse.epmd.java.core.model.Version;
 
+import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
+import lombok.NoArgsConstructor;
 import lombok.NonNull;
 import lombok.Singular;
 import lombok.experimental.FieldDefaults;
@@ -44,8 +46,12 @@ import lombok.val;
  */
 @Data
 @Builder
+@NoArgsConstructor
+@AllArgsConstructor
 @FieldDefaults(level = PRIVATE)
 public class NodeConfig {
+
+  public static NodeConfig DEFAULT = NodeConfig.builder().build();
 
   static NodeConfig newInstance (@NonNull Map<String, Object> map) {
     NodeConfigBuilder builder = NodeConfig.builder();

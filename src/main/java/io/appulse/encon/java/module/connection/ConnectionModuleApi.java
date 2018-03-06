@@ -16,6 +16,11 @@
 
 package io.appulse.encon.java.module.connection;
 
+import java.util.concurrent.CompletionStage;
+import java.util.concurrent.TimeUnit;
+
+import io.appulse.encon.java.RemoteNode;
+
 /**
  *
  * @author Artem Labazin
@@ -23,4 +28,11 @@ package io.appulse.encon.java.module.connection;
  */
 public interface ConnectionModuleApi {
 
+  CompletionStage<Connection> connectAsync (RemoteNode remote);
+
+  Connection connect (RemoteNode remote);
+
+  Connection connect (RemoteNode remote, long timeout, TimeUnit unit);
+
+  boolean isAvailable (RemoteNode remote);
 }

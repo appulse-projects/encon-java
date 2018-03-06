@@ -63,7 +63,7 @@ public class NodeTest {
 
   @Test
   public void register () {
-    node = Erts.node("popa");
+    node = Erts.singleNode("popa");
 
     assertThat(node.generatePid())
         .isNotNull();
@@ -101,7 +101,7 @@ public class NodeTest {
 
   @Test
   public void ping () throws Exception {
-    node = Erts.node("node-1@localhost", NodeConfig.builder()
+    node = Erts.singleNode("node-1@localhost", NodeConfig.builder()
                      .cookie("secret")
                      .build()
     );
@@ -115,7 +115,7 @@ public class NodeTest {
     assertThat(node.ping("node-2@localhost").get(2, SECONDS))
         .isFalse();
 
-    try (val node2 = Erts.node("node-2@localhost", NodeConfig.builder()
+    try (val node2 = Erts.singleNode("node-2@localhost", NodeConfig.builder()
                                .cookie("secret")
                                .build())) {
 
@@ -129,7 +129,7 @@ public class NodeTest {
 
   @Test
   public void instantiating () throws Exception {
-    node = Erts.node("popa", NodeConfig.builder()
+    node = Erts.singleNode("popa", NodeConfig.builder()
         .mailbox(MailboxConfig.builder()
             .name("one")
             .build())
@@ -151,7 +151,7 @@ public class NodeTest {
 
   @Test
   public void sendFromOneToAnotherNode () throws Exception {
-    node = Erts.node("node-1@localhost");
+    node = Erts.singleNode("node-1@localhost");
 
     CompletableFuture<String> future1 = new CompletableFuture<>();
     Mailbox mailbox1 = node.mailbox()
@@ -159,7 +159,7 @@ public class NodeTest {
         .handler((self, message) -> future1.complete(message.asText()))
         .build();
 
-    try (val node2 = Erts.node("node-2@localhost")) {
+    try (val node2 = Erts.singleNode("node-2@localhost")) {
 
       String text1 = "Hello world 1";
       String text2 = "Hello world 2";
@@ -195,7 +195,7 @@ public class NodeTest {
 
   @Test
   public void send () throws Exception {
-    node = Erts.node("popa", NodeConfig.builder()
+    node = Erts.singleNode("popa", NodeConfig.builder()
                      .server(ServerConfig.builder().port(8500).build())
                      .cookie("secret")
                      .build()

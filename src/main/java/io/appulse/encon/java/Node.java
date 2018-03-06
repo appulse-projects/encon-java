@@ -38,7 +38,6 @@ import io.appulse.encon.java.module.mailbox.NetKernelReceiveHandler;
 import io.appulse.encon.java.module.ping.PingModule;
 import io.appulse.encon.java.module.ping.PingModuleApi;
 import io.appulse.encon.java.module.server.ServerModule;
-import io.appulse.encon.java.module.server.ServerModuleApi;
 import io.appulse.epmd.java.client.EpmdClient;
 import io.appulse.epmd.java.core.model.request.Registration;
 
@@ -198,7 +197,6 @@ public final class Node implements PingModuleApi, Closeable {
   @Delegate(types = ConnectionModuleApi.class)
   ConnectionModule connectionModule;
 
-  @Delegate(types = ServerModuleApi.class)
   ServerModule serverModule;
 
   @Override

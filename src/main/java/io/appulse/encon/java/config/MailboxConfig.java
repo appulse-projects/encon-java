@@ -24,8 +24,10 @@ import java.util.Map;
 import io.appulse.encon.java.module.mailbox.ReceiveHandler;
 import io.appulse.encon.java.module.mailbox.ReceiverType;
 
+import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
+import lombok.NoArgsConstructor;
 import lombok.NonNull;
 import lombok.experimental.FieldDefaults;
 
@@ -35,6 +37,8 @@ import lombok.experimental.FieldDefaults;
  */
 @Data
 @Builder
+@NoArgsConstructor
+@AllArgsConstructor
 @FieldDefaults(level = PRIVATE)
 public class MailboxConfig {
 

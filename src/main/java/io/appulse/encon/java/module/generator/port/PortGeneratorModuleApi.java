@@ -24,5 +24,6 @@ import io.appulse.encon.java.protocol.type.ErlangPort;
  * @since 0.0.1
  */
 public interface PortGeneratorModuleApi {
+  
   ErlangPort generatePort ();
 }

@@ -15,6 +15,7 @@
  */
 package io.appulse.encon.java.module.mailbox;
 
+import java.util.Map;
 import java.util.Optional;
 
 import io.appulse.encon.java.module.mailbox.MailboxModule.NewMailboxBuilder;
@@ -42,4 +43,6 @@ public interface MailboxModuleApi {
   void remove (String name);
 
   void remove (ErlangPid pid);
+
+  Map<ErlangPid, Mailbox> mailboxes ();
 }
