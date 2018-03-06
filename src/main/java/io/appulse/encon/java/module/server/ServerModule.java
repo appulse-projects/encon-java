@@ -34,6 +34,7 @@ import io.netty.channel.EventLoopGroup;
 import io.netty.channel.nio.NioEventLoopGroup;
 import io.netty.channel.socket.SocketChannel;
 import io.netty.channel.socket.nio.NioServerSocketChannel;
+import io.netty.util.concurrent.DefaultThreadFactory;
 import lombok.NonNull;
 import lombok.SneakyThrows;
 import lombok.experimental.FieldDefaults;
@@ -66,8 +67,17 @@ public class ServerModule implements ServerModuleApi, Closeable {
 
     val serverConfig = internal.config().getServer();
     port = serverConfig.getPort();
-    bossGroup = new NioEventLoopGroup(serverConfig.getBossThreads());
-    workerGroup = new NioEventLoopGroup(serverConfig.getWorkerThreads());
+
+    internal.node().getDescriptor().getShortName();
+
+    bossGroup = new NioEventLoopGroup(
+        serverConfig.getBossThreads(),
+        new DefaultThreadFactory(getThreadName("boss"))
+    );
+    workerGroup = new NioEventLoopGroup(
+        serverConfig.getWorkerThreads(),
+        new DefaultThreadFactory(getThreadName("worker"))
+    );
 
     start();
   }
@@ -116,5 +126,14 @@ public class ServerModule implements ServerModuleApi, Closeable {
 
     log.debug("Server of {} was closed",
               internal.node().getDescriptor().getFullName());
+  }
+
+  private String getThreadName (@NonNull String suffix) {
+    return new StringBuilder()
+        .append("server-")
+        .append(internal.node().getDescriptor().getShortName())
+        .append('-')
+        .append(suffix)
+        .toString();
   }
 }

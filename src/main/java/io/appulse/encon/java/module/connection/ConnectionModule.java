@@ -37,6 +37,7 @@ import io.netty.channel.EventLoopGroup;
 import io.netty.channel.nio.NioEventLoopGroup;
 import io.netty.channel.socket.SocketChannel;
 import io.netty.channel.socket.nio.NioSocketChannel;
+import io.netty.util.concurrent.DefaultThreadFactory;
 import lombok.NonNull;
 import lombok.SneakyThrows;
 import lombok.experimental.FieldDefaults;
@@ -63,7 +64,14 @@ public class ConnectionModule implements ConnectionModuleApi, Closeable {
     this.internal = internal;
     cache = new ConcurrentHashMap<>();
 
-    workerGroup = new NioEventLoopGroup(internal.config().getClientThreads());
+    workerGroup = new NioEventLoopGroup(
+        internal.config().getClientThreads(),
+        new DefaultThreadFactory(new StringBuilder()
+            .append("client-")
+            .append(internal.node().getDescriptor().getShortName())
+            .toString()
+        )
+    );
   }
 
   @Override
