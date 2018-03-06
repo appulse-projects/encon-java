@@ -21,7 +21,6 @@ import static lombok.AccessLevel.PRIVATE;
 import java.io.Closeable;
 
 import io.appulse.encon.java.config.NodeConfig;
-import io.appulse.encon.java.config.ServerConfig;
 import io.appulse.encon.java.module.NodeInternalApi;
 import io.appulse.encon.java.module.connection.ConnectionModule;
 import io.appulse.encon.java.module.connection.ConnectionModuleApi;
@@ -130,8 +129,8 @@ public final class Node implements PingModuleApi, Closeable {
       }
 
       @Override
-      public ServerConfig serverConfig () {
-        return config.getServer();
+      public NodeConfig config () {
+        return config;
       }
     };
 
@@ -145,7 +144,6 @@ public final class Node implements PingModuleApi, Closeable {
     node.setMailboxModule(new MailboxModule(internal));
     node.setConnectionModule(new ConnectionModule(internal));
     node.setServerModule(new ServerModule(internal));
-    node.serverModule.start();
 
     node.mailbox()
         .name("net_kernel")
