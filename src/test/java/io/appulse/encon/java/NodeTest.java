@@ -102,10 +102,16 @@ public class NodeTest {
   @Test
   public void ping () throws Exception {
     node = Erts.singleNode("node-1@localhost", NodeConfig.builder()
-                     .cookie("secret")
-                     .build()
+                           .cookie("secret")
+                           .build()
     );
 
+    assertThat(node.ping("echo@localhost").get(2, SECONDS))
+        .isTrue();
+    assertThat(node.ping("echo@localhost").get(2, SECONDS))
+        .isTrue();
+    assertThat(node.ping("echo@localhost").get(2, SECONDS))
+        .isTrue();
     assertThat(node.ping("echo@localhost").get(2, SECONDS))
         .isTrue();
 
@@ -116,8 +122,8 @@ public class NodeTest {
         .isFalse();
 
     try (val node2 = Erts.singleNode("node-2@localhost", NodeConfig.builder()
-                               .cookie("secret")
-                               .build())) {
+                                     .cookie("secret")
+                                     .build())) {
 
       assertThat(node.ping("node-2@localhost").get(2, SECONDS))
           .isTrue();
@@ -130,13 +136,13 @@ public class NodeTest {
   @Test
   public void instantiating () throws Exception {
     node = Erts.singleNode("popa", NodeConfig.builder()
-        .mailbox(MailboxConfig.builder()
-            .name("one")
-            .build())
-        .mailbox(MailboxConfig.builder()
-            .name("two")
-            .build())
-        .build()
+                           .mailbox(MailboxConfig.builder()
+                               .name("one")
+                               .build())
+                           .mailbox(MailboxConfig.builder()
+                               .name("two")
+                               .build())
+                           .build()
     );
 
     assertThat(node.mailbox("one"))
@@ -196,15 +202,15 @@ public class NodeTest {
   @Test
   public void send () throws Exception {
     node = Erts.singleNode("popa", NodeConfig.builder()
-                     .server(ServerConfig.builder().port(8500).build())
-                     .cookie("secret")
-                     .build()
+                           .server(ServerConfig.builder().port(8500).build())
+                           .cookie("secret")
+                           .build()
     );
 
     CompletableFuture<ErlangTerm> future = new CompletableFuture<>();
     Mailbox mailbox = node.mailbox()
         .handler((self, message) -> {
-            future.complete(message.asTuple().get(1).get());
+          future.complete(message.asTuple().get(1).get());
         })
         .build();
 
