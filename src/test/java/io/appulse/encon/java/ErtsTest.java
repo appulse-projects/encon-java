@@ -53,10 +53,10 @@ public class ErtsTest {
         .node("kojima1", new NodeConfig())
         .node("kojima2", new NodeConfig())
         .node("ocelot", NodeConfig.builder()
-            .mailbox(MailboxConfig.builder()
-                .name("revolver")
-                .build())
-            .build())
+              .mailbox(MailboxConfig.builder()
+                  .name("revolver")
+                  .build())
+              .build())
         .build();
 
     val erts = Erts.start(config);

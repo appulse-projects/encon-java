@@ -24,7 +24,6 @@ import static lombok.AccessLevel.PRIVATE;
 import java.io.Closeable;
 import java.util.Map;
 import java.util.concurrent.CompletableFuture;
-import java.util.concurrent.CompletionStage;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.TimeUnit;
 
@@ -102,8 +101,8 @@ public class ConnectionModule implements ConnectionModuleApi, Closeable {
   }
 
   @Override
-  public CompletionStage<Connection> connectAsync (@NonNull RemoteNode remote) {
-    return getOrCreateConnection(remote);
+  public CompletableFuture<Connection> connectAsync (@NonNull RemoteNode remote) {
+    return cache.computeIfAbsent(remote, this::createConnection);
   }
 
   @Override
@@ -115,15 +114,7 @@ public class ConnectionModule implements ConnectionModuleApi, Closeable {
   @Override
   @SneakyThrows
   public Connection connect (@NonNull RemoteNode remote, long timeout, @NonNull TimeUnit unit) {
-    return getOrCreateConnection(remote).get(timeout, unit);
-  }
-
-  private CompletableFuture<Connection> getOrCreateConnection (RemoteNode remote) {
-    return cache.compute(remote, (key, value) -> {
-      return value == null
-             ? createConnection(key)
-             : value;
-    });
+    return connectAsync(remote).get(timeout, unit);
   }
 
   @Override
@@ -160,6 +151,13 @@ public class ConnectionModule implements ConnectionModuleApi, Closeable {
         })
         .connect(remote.getDescriptor().getAddress(), remote.getPort());
 
-    return future;
+    return future.whenComplete((connection, throwable) -> {
+      if (throwable != null) {
+        remove(remote);
+      } else {
+        val result = CompletableFuture.completedFuture(connection);
+        cache.put(remote, result);
+      }
+    });
   }
 }

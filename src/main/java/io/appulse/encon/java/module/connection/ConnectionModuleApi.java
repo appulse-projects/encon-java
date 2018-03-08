@@ -16,10 +16,10 @@
 
 package io.appulse.encon.java.module.connection;
 
-import java.util.concurrent.CompletionStage;
 import java.util.concurrent.TimeUnit;
 
 import io.appulse.encon.java.RemoteNode;
+import java.util.concurrent.CompletableFuture;
 
 /**
  *
@@ -28,7 +28,7 @@ import io.appulse.encon.java.RemoteNode;
  */
 public interface ConnectionModuleApi {
 
-  CompletionStage<Connection> connectAsync (RemoteNode remote);
+  CompletableFuture<Connection> connectAsync (RemoteNode remote);
 
   Connection connect (RemoteNode remote);
 
