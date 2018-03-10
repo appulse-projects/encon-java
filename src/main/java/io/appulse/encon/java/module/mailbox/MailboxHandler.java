@@ -15,13 +15,16 @@
  */
 package io.appulse.encon.java.module.mailbox;
 
+import java.util.Optional;
+
+import io.appulse.encon.java.module.connection.control.ControlMessage;
 import io.appulse.encon.java.protocol.term.ErlangTerm;
 
 /**
  *
  * @author alabazin
  */
-public interface ReceiveHandler {
-  
-  void receive (Mailbox self, ErlangTerm message);
+public interface MailboxHandler {
+
+  void receive (Mailbox self, ControlMessage header, Optional<ErlangTerm> body);
 }

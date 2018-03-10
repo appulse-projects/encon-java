@@ -15,30 +15,38 @@
  */
 package io.appulse.encon.java.module.mailbox;
 
+import java.util.Optional;
+
+import io.appulse.encon.java.module.connection.control.ControlMessage;
 import io.appulse.encon.java.protocol.term.ErlangTerm;
 
+import lombok.NonNull;
 import lombok.extern.slf4j.Slf4j;
+import lombok.val;
 
 /**
  *
  * @author alabazin
  */
 @Slf4j
-public class NetKernelReceiveHandler implements ReceiveHandler {
+public class NetKernelMailboxHandler implements MailboxHandler {
 
   @Override
-  public void receive(Mailbox self, ErlangTerm message) {
+  public void receive (@NonNull Mailbox self, @NonNull ControlMessage header, Optional<ErlangTerm> body) {
     log.debug("Handler working");
-    if (!message.isTuple()) {
+
+    val payload = body.orElseThrow(RuntimeException::new);
+
+    if (!payload.isTuple()) {
       log.debug("Not a tuple");
       return;
     }
-    if (!message.get(0).map(ErlangTerm::asText).orElse("").equals("$gen_call")) {
+    if (!payload.get(0).map(ErlangTerm::asText).orElse("").equals("$gen_call")) {
       log.debug("Uh?");
       return;
     }
 
-    ErlangTerm tuple = message.get(1).get();
+    ErlangTerm tuple = payload.get(1).get();
     self.request().makeTuple()
         .add(tuple.get(1).get().asReference())
         .addAtom("yes")

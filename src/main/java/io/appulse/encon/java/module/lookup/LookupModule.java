@@ -23,13 +23,14 @@ import java.util.Optional;
 import io.appulse.encon.java.NodeDescriptor;
 import io.appulse.encon.java.RemoteNode;
 import io.appulse.encon.java.module.NodeInternalApi;
+import io.appulse.encon.java.protocol.type.ErlangPid;
 import io.appulse.epmd.java.core.model.response.NodeInfo;
 
 import lombok.NonNull;
 import lombok.RequiredArgsConstructor;
-import lombok.val;
 import lombok.experimental.FieldDefaults;
 import lombok.extern.slf4j.Slf4j;
+import lombok.val;
 
 /**
  *
@@ -46,6 +47,12 @@ public class LookupModule implements LookupModuleApi {
   @Override
   public Optional<RemoteNode> lookup (@NonNull String node) {
     val descriptor = NodeDescriptor.from(node);
+    return lookup(descriptor);
+  }
+
+  @Override
+  public Optional<RemoteNode> lookup (@NonNull ErlangPid pid) {
+    val descriptor = pid.getDescriptor();
     return lookup(descriptor);
   }
 

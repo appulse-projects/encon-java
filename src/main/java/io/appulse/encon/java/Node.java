@@ -34,7 +34,7 @@ import io.appulse.encon.java.module.lookup.LookupModule;
 import io.appulse.encon.java.module.lookup.LookupModuleApi;
 import io.appulse.encon.java.module.mailbox.MailboxModule;
 import io.appulse.encon.java.module.mailbox.MailboxModuleApi;
-import io.appulse.encon.java.module.mailbox.NetKernelReceiveHandler;
+import io.appulse.encon.java.module.mailbox.NetKernelMailboxHandler;
 import io.appulse.encon.java.module.ping.PingModule;
 import io.appulse.encon.java.module.ping.PingModuleApi;
 import io.appulse.encon.java.module.server.ServerModule;
@@ -146,7 +146,7 @@ public final class Node implements PingModuleApi, Closeable {
 
     node.mailbox()
         .name("net_kernel")
-        .handler(new NetKernelReceiveHandler())
+        .handler(new NetKernelMailboxHandler())
         .build();
 
     config.getMailboxes().forEach(it -> {

@@ -17,15 +17,20 @@
 package io.appulse.encon.java.module.connection;
 
 import static lombok.AccessLevel.PRIVATE;
+import static java.util.Optional.ofNullable;
 
 import java.io.Closeable;
 
 import io.appulse.encon.java.RemoteNode;
 import io.appulse.encon.java.module.connection.control.ControlMessage;
+import io.appulse.encon.java.module.connection.control.Exit;
+import io.appulse.encon.java.module.connection.control.Exit2;
+import io.appulse.encon.java.module.connection.control.Link;
 import io.appulse.encon.java.module.connection.control.Send;
 import io.appulse.encon.java.module.connection.control.SendToRegisteredProcess;
+import io.appulse.encon.java.module.connection.control.Unlink;
 import io.appulse.encon.java.module.connection.regular.ClientRegularHandler;
-import io.appulse.encon.java.module.connection.regular.Container;
+import io.appulse.encon.java.module.connection.regular.Message;
 import io.appulse.encon.java.protocol.term.ErlangTerm;
 import io.appulse.encon.java.protocol.type.ErlangAtom;
 import io.appulse.encon.java.protocol.type.ErlangPid;
@@ -33,7 +38,6 @@ import io.appulse.encon.java.protocol.type.ErlangPid;
 import lombok.Getter;
 import lombok.NonNull;
 import lombok.RequiredArgsConstructor;
-import lombok.SneakyThrows;
 import lombok.experimental.FieldDefaults;
 import lombok.extern.slf4j.Slf4j;
 
@@ -53,16 +57,40 @@ public class Connection implements Closeable {
   @NonNull
   ClientRegularHandler handler;
 
-  public void sendRegistered (@NonNull ErlangPid from, @NonNull String mailbox, @NonNull ErlangTerm message) {
-    sendReg(from, new ErlangAtom(mailbox), message);
+  public void sendToRegisteredProcess (@NonNull ErlangPid from, @NonNull String mailbox, @NonNull ErlangTerm message) {
+    sendToRegisteredProcess(from, new ErlangAtom(mailbox), message);
   }
 
-  public void sendReg (@NonNull ErlangPid from, @NonNull ErlangAtom mailbox, @NonNull ErlangTerm message) {
+  public void sendToRegisteredProcess (@NonNull ErlangPid from, @NonNull ErlangAtom mailbox, @NonNull ErlangTerm message) {
     send(new SendToRegisteredProcess(from, mailbox), message);
   }
 
   public void send (@NonNull ErlangPid to, @NonNull ErlangTerm message) {
     send(new Send(to), message);
+  }
+
+  public void link (@NonNull ErlangPid from, @NonNull ErlangPid to) {
+    send(new Link(from, to));
+  }
+
+  public void unlink (@NonNull ErlangPid from, @NonNull ErlangPid to) {
+    send(new Unlink(from, to));
+  }
+
+  public void exit (@NonNull ErlangPid from, @NonNull ErlangPid to, @NonNull String reason) {
+    exit(from, to, new ErlangAtom(reason));
+  }
+
+  public void exit (@NonNull ErlangPid from, @NonNull ErlangPid to, @NonNull ErlangTerm reason) {
+    send(new Exit(from, to, reason));
+  }
+
+  public void exit2 (@NonNull ErlangPid from, @NonNull ErlangPid to, @NonNull String reason) {
+    exit2(from, to, new ErlangAtom(reason));
+  }
+
+  public void exit2 (@NonNull ErlangPid from, @NonNull ErlangPid to, @NonNull ErlangTerm reason) {
+    send(new Exit2(from, to, reason));
   }
 
   @Override
@@ -72,17 +100,11 @@ public class Connection implements Closeable {
     log.debug("Connection to {} was closed", remote);
   }
 
-  @SneakyThrows
-  private void send (ControlMessage control, ErlangTerm payload) {
-    // while (!handler.wasAdded()) {
-    //   log.debug("Waiting {} connection to send message", remote);
-    //   TimeUnit.SECONDS.sleep(1);
-    // }
+  private void send (@NonNull ControlMessage control) {
+    send(control, null);
+  }
 
-    // if (handler.wasAdded()) {
-    handler.send(new Container(control, payload));
-    // } else {
-    // log.warn("Handler was not added");
-    // }
+  private void send (@NonNull ControlMessage control, ErlangTerm payload) {
+    handler.send(new Message(control, ofNullable(payload)));
   }
 }

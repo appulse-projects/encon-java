@@ -29,6 +29,7 @@ import java.util.concurrent.CompletionStage;
 import io.appulse.encon.java.config.MailboxConfig;
 import io.appulse.encon.java.config.NodeConfig;
 import io.appulse.encon.java.config.ServerConfig;
+import io.appulse.encon.java.module.connection.regular.Message;
 import io.appulse.encon.java.module.mailbox.Mailbox;
 import io.appulse.encon.java.protocol.term.ErlangTerm;
 import io.appulse.encon.java.protocol.type.ErlangString;
@@ -162,19 +163,19 @@ public class NodeTest {
     CompletableFuture<String> future1 = new CompletableFuture<>();
     Mailbox mailbox1 = node.mailbox()
         .name("popa1")
-        .handler((self, message) -> future1.complete(message.asText()))
+        .handler((self, header, body) -> future1.complete(body.get().asText()))
         .build();
 
     try (val node2 = Erts.singleNode("node-2@localhost")) {
 
       String text1 = "Hello world 1";
       String text2 = "Hello world 2";
-      CompletionStage<ErlangTerm> stage1 = mailbox1.receiveAsync();
+      CompletionStage<Message> stage1 = mailbox1.receiveAsync();
 
       CompletableFuture<String> future2 = new CompletableFuture<>();
       Mailbox mailbox2 = node2.mailbox()
           .name("popa2")
-          .handler((self, message) -> future2.complete(message.asText()))
+          .handler((self, header, body) -> future2.complete(body.get().asText()))
           .build();
 
       mailbox2.request()
@@ -186,16 +187,16 @@ public class NodeTest {
 
       assertThat(stage1)
           .isCompleted()
-          .isCompletedWithValue(new ErlangString(text1));
+          .isCompletedWithValueMatching(it -> it.getBody().get().equals(new ErlangString(text1)));
 
-      CompletionStage<ErlangTerm> stage2 = mailbox2.receiveAsync();
+      CompletionStage<Message> stage2 = mailbox2.receiveAsync();
 
       mailbox1.request()
           .put(text2)
           .send("node-2@localhost", "popa2");
 
       assertThat(stage2.toCompletableFuture().get(2, SECONDS))
-          .isEqualTo(new ErlangString(text2));
+          .isNotNull();
     }
   }
 
@@ -209,8 +210,8 @@ public class NodeTest {
 
     CompletableFuture<ErlangTerm> future = new CompletableFuture<>();
     Mailbox mailbox = node.mailbox()
-        .handler((self, message) -> {
-          future.complete(message.asTuple().get(1).get());
+        .handler((self, header, body) -> {
+          future.complete(body.get().asTuple().get(1).get());
         })
         .build();
 

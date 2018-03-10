@@ -16,7 +16,11 @@
 
 package io.appulse.encon.java.module.connection.regular;
 
+import static java.util.Optional.empty;
+import static java.util.Optional.ofNullable;
+
 import java.util.List;
+import java.util.Optional;
 
 import io.appulse.encon.java.module.connection.control.ControlMessage;
 import io.appulse.encon.java.protocol.term.ErlangTerm;
@@ -34,7 +38,7 @@ import lombok.val;
  * @since 0.0.1
  */
 @Slf4j
-public class ClientDecoder extends ReplayingDecoder<Container> {
+public class ClientDecoder extends ReplayingDecoder<Message> {
 
   @Override
   public void exceptionCaught (ChannelHandlerContext context, Throwable cause) throws Exception {
@@ -68,10 +72,14 @@ public class ClientDecoder extends ReplayingDecoder<Container> {
     ControlMessage controlMessage = ControlMessage.parse(header);
     log.debug("Received control message:\n{}\n", controlMessage);
 
-    ErlangTerm body = readTerm(bytes);
-    log.debug("Received bode:\n{}\n", body);
+    Optional<ErlangTerm> optionalBody = empty();
+    if (bytes.remaining() > 0) {
+      ErlangTerm body = readTerm(bytes);
+      log.debug("Received body:\n{}\n", body);
+      optionalBody = ofNullable(body);
+    }
 
-    out.add(new Container(controlMessage, body));
+    out.add(new Message(controlMessage, optionalBody));
   }
 
   private ErlangTerm readTerm (Bytes bytes) {

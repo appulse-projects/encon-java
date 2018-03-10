@@ -32,7 +32,7 @@ import lombok.val;
  */
 @Slf4j
 @Sharable
-public class ClientEncoder extends MessageToByteEncoder<Container> {
+public class ClientEncoder extends MessageToByteEncoder<Message> {
 
   @Override
   public void exceptionCaught (ChannelHandlerContext context, Throwable cause) throws Exception {
@@ -45,7 +45,7 @@ public class ClientEncoder extends MessageToByteEncoder<Container> {
   }
 
   @Override
-  protected void encode (ChannelHandlerContext context, Container container, ByteBuf out) throws Exception {
+  protected void encode (ChannelHandlerContext context, Message container, ByteBuf out) throws Exception {
     log.debug("Encoding message {} for {}", container, context.channel().remoteAddress());
 
     try {
@@ -54,9 +54,13 @@ public class ClientEncoder extends MessageToByteEncoder<Container> {
           .put1B(0x70) // 112
           .put1B(0x83) // 131
           // .put(EMPTY_DISTRIBUTION_HEADER)
-          .put(container.getControlMessage().toBytes())
+          .put(container.getHeader().toBytes());
+
+      container.getBody().ifPresent(it -> {
+        bytes
           .put1B(0x83) // 131
-          .put(container.getPayload().toBytes());
+          .put(it.toBytes());
+      });
 
       val length = bytes.limit() - Integer.BYTES;
       log.debug("Outgoing message length is: {}", length);
