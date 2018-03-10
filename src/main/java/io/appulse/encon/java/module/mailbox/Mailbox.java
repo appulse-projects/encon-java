@@ -16,12 +16,16 @@
 
 package io.appulse.encon.java.module.mailbox;
 
+import static java.util.Optional.empty;
+import static java.util.Optional.of;
 import static lombok.AccessLevel.PACKAGE;
 import static lombok.AccessLevel.PRIVATE;
 
 import java.io.Closeable;
+import java.util.Set;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.CompletionStage;
+import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.TimeUnit;
 
@@ -29,6 +33,11 @@ import io.appulse.encon.java.Node;
 import io.appulse.encon.java.NodeDescriptor;
 import io.appulse.encon.java.RemoteNode;
 import io.appulse.encon.java.module.NodeInternalApi;
+import io.appulse.encon.java.module.connection.Connection;
+import io.appulse.encon.java.module.connection.control.Link;
+import io.appulse.encon.java.module.connection.control.Send;
+import io.appulse.encon.java.module.connection.control.Unlink;
+import io.appulse.encon.java.module.connection.regular.Message;
 import io.appulse.encon.java.module.mailbox.request.RequestBuilder;
 import io.appulse.encon.java.protocol.term.ErlangTerm;
 import io.appulse.encon.java.protocol.type.ErlangPid;
@@ -67,7 +76,7 @@ public class Mailbox implements Closeable {
   NodeInternalApi internal;
 
   @NonNull
-  ReceiveHandler receiveHandler;
+  MailboxHandler handler;
 
   @Getter
   @NonNull
@@ -76,8 +85,11 @@ public class Mailbox implements Closeable {
   @NonNull
   ExecutorService executor;
 
+  @Getter(PACKAGE)
+  Set<ErlangPid> links = ConcurrentHashMap.newKeySet(10);
+
   @NonFinal
-  CompletableFuture<ErlangTerm> currentFuture;
+  CompletableFuture<Message> currentFuture;
 
   public Node getNode () {
     return internal.node();
@@ -87,43 +99,30 @@ public class Mailbox implements Closeable {
     return new RequestBuilder(this);
   }
 
-  public CompletionStage<ErlangTerm> receiveAsync () {
+  public CompletionStage<Message> receiveAsync () {
     return currentFuture();
   }
 
   @SneakyThrows
-  public ErlangTerm receive () {
+  public Message receive () {
     return currentFuture().get();
   }
 
   @SneakyThrows
-  public ErlangTerm receive (long timeout, @NonNull TimeUnit unit) {
+  public Message receive (long timeout, @NonNull TimeUnit unit) {
     return currentFuture().get(timeout, unit);
   }
 
-  public void send (@NonNull ErlangPid pid, @NonNull ErlangTerm message) {
-    if (pid.getDescriptor().equals(internal.node().getDescriptor())) {
-      internal.mailboxes()
-          .mailbox(pid)
-          .orElseThrow(RuntimeException::new)
-          .inbox(message);;
-      return;
+  public void send (@NonNull ErlangPid to, @NonNull ErlangTerm message) {
+    if (isLocal(to)) {
+      getMailbox(to).send(message);;
+    } else {
+      getConnection(to).send(to, message);
     }
-
-    RemoteNode remote = internal.node()
-        .lookup(pid.getDescriptor())
-        .orElseThrow(RuntimeException::new);
-
-    internal.connections()
-        .connect(remote)
-        .send(pid, message);;
   }
 
   public void send (@NonNull String mailbox, @NonNull ErlangTerm message) {
-    internal.mailboxes()
-        .mailbox(mailbox)
-        .orElseThrow(RuntimeException::new)
-        .inbox(message);
+    getMailbox(mailbox).send(message);
   }
 
   public void send (@NonNull String node, @NonNull String mailbox, @NonNull ErlangTerm message) {
@@ -143,31 +142,56 @@ public class Mailbox implements Closeable {
     log.debug("Sending message\nTo node: {}\nMailbox: {}\nPayload: {}",
               remote, mailbox, message);
 
-    if (internal.node().getDescriptor().equals(remote.getDescriptor())) {
+    if (isLocal(remote)) {
       send(mailbox, message);
     } else {
       internal.connections()
           .connect(remote)
-          .sendRegistered(pid, mailbox, message);
+          .sendToRegisteredProcess(pid, mailbox, message);
     }
     log.debug("Message was sent");
   }
 
-  public void inbox (@NonNull ErlangTerm message) {
-    log.debug("Inbox {}", message);
-    executor.execute(() -> inboxMessage(message));
-    log.debug("END");
+  private void send (@NonNull ErlangTerm body) {
+    deliver(new Message(new Send(pid), of(body)));
+  }
+
+  public void link (@NonNull ErlangPid to) {
+    if (isLocal(to)) {
+      getMailbox(to).deliver(new Message(new Link(pid, to), empty()));
+    } else {
+      getConnection(to).link(pid, to);
+    }
+    links.add(to);
+  }
+
+  public void unlink (@NonNull ErlangPid to) {
+    links.remove(to);
+
+    if (isLocal(to)) {
+      getMailbox(to).deliver(new Message(new Unlink(pid, to), empty()));
+    } else {
+      getConnection(to).unlink(pid, to);
+    }
+  }
+
+  public void deliver (@NonNull Message message) {
+    log.debug("Deliver: {}", message);
+    executor.execute(() -> handle(message));
   }
 
   @Override
   public void close () {
     log.debug("Closing mailbox '{}:{}'...", name, pid);
     executor.shutdown();
+    links.forEach(it -> {
+      getConnection(it).exit(pid, it, "normal");
+    });
     name = null;
   }
 
   @Synchronized
-  private CompletableFuture<ErlangTerm> currentFuture () {
+  private CompletableFuture<Message> currentFuture () {
     if (currentFuture == null) {
       currentFuture = new CompletableFuture<>();
     }
@@ -175,11 +199,38 @@ public class Mailbox implements Closeable {
   }
 
   @Synchronized
-  private void inboxMessage (@NonNull ErlangTerm message) {
+  private void handle (@NonNull Message message) {
     if (currentFuture != null) {
       currentFuture.complete(message);
       currentFuture = null;
     }
-    receiveHandler.receive(this, message);
+    handler.receive(this, message.getHeader(), message.getBody());
+  }
+
+  private Mailbox getMailbox (@NonNull String name) {
+    return internal.mailboxes()
+          .mailbox(name)
+          .orElseThrow(RuntimeException::new);
+  }
+
+  private Mailbox getMailbox (@NonNull ErlangPid pid) {
+    return internal.mailboxes()
+          .mailbox(pid)
+          .orElseThrow(RuntimeException::new);
+  }
+
+  private Connection getConnection (@NonNull ErlangPid pid) {
+    return internal.node()
+        .lookup(pid)
+        .map(it -> internal.connections().connect(it))
+        .orElseThrow(RuntimeException::new);
+  }
+
+  private boolean isLocal (@NonNull ErlangPid pid) {
+    return internal.node().getDescriptor().equals(pid.getDescriptor());
+  }
+
+  private boolean isLocal (@NonNull RemoteNode remote) {
+    return internal.node().getDescriptor().equals(remote.getDescriptor());
   }
 }

@@ -18,8 +18,11 @@ package io.appulse.encon.java.module.lookup;
 
 import java.util.Optional;
 
-import io.appulse.encon.java.RemoteNode;
 import io.appulse.encon.java.NodeDescriptor;
+import io.appulse.encon.java.RemoteNode;
+import io.appulse.encon.java.protocol.type.ErlangPid;
+
+import lombok.NonNull;
 
 /**
  *
@@ -29,6 +32,8 @@ import io.appulse.encon.java.NodeDescriptor;
 public interface LookupModuleApi {
 
   Optional<RemoteNode> lookup (String node);
+
+  Optional<RemoteNode> lookup (@NonNull ErlangPid pid);
 
   Optional<RemoteNode> lookup (NodeDescriptor descriptor);
 }

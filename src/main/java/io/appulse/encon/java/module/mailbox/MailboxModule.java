@@ -119,7 +119,7 @@ public class MailboxModule implements MailboxModuleApi, Closeable {
   public class NewMailboxBuilder {
 
     final Mailbox.MailboxBuilder builder = Mailbox.builder()
-        .receiveHandler(new StubReceiveHandler());
+        .handler(new DefaultMailboxHandler());
 
     ReceiverType type = SINGLE;
 
@@ -128,13 +128,13 @@ public class MailboxModule implements MailboxModuleApi, Closeable {
       return this;
     }
 
-    public NewMailboxBuilder handler (@NonNull ReceiveHandler handler) {
-      builder.receiveHandler(handler);
+    public NewMailboxBuilder handler (@NonNull MailboxHandler handler) {
+      builder.handler(handler);
       return this;
     }
 
     @SneakyThrows
-    public NewMailboxBuilder handler (@NonNull Class<? extends ReceiveHandler> handlerClass) {
+    public NewMailboxBuilder handler (@NonNull Class<? extends MailboxHandler> handlerClass) {
       return handler(handlerClass.newInstance());
     }
 

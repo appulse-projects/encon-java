@@ -13,22 +13,25 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+package io.appulse.encon.java.module.mailbox;
 
-package io.appulse.encon.java.module.connection.regular;
+import java.util.Optional;
 
 import io.appulse.encon.java.module.connection.control.ControlMessage;
 import io.appulse.encon.java.protocol.term.ErlangTerm;
-import lombok.Value;
+
+import lombok.extern.slf4j.Slf4j;
 
 /**
  *
- * @author Artem Labazin
- * @since 0.0.1
+ * @author alabazin
  */
-@Value
-public class Container {
+@Slf4j
+public class DefaultMailboxHandler extends AbstractMailboxHandler {
 
-  ControlMessage controlMessage;
-
-  ErlangTerm payload;
+  @Override
+  protected void handle (Mailbox self, ControlMessage header, Optional<ErlangTerm> body) {
+    log.debug("Mailbox '{}({})' received message\n  header: {}\n  body: {}",
+              self.getName(), self.getPid(), header, body);
+  }
 }

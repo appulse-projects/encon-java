@@ -19,10 +19,12 @@ package io.appulse.encon.java.module.ping;
 import static java.lang.Boolean.TRUE;
 import static lombok.AccessLevel.PRIVATE;
 
+import java.util.Optional;
 import java.util.concurrent.CompletableFuture;
 
+import io.appulse.encon.java.module.connection.control.ControlMessage;
 import io.appulse.encon.java.module.mailbox.Mailbox;
-import io.appulse.encon.java.module.mailbox.ReceiveHandler;
+import io.appulse.encon.java.module.mailbox.MailboxHandler;
 import io.appulse.encon.java.protocol.term.ErlangTerm;
 
 import lombok.NonNull;
@@ -37,13 +39,13 @@ import lombok.extern.slf4j.Slf4j;
 @Slf4j
 @RequiredArgsConstructor
 @FieldDefaults(level = PRIVATE, makeFinal = true)
-class PingReceiveHandler implements ReceiveHandler {
+class PingReceiveHandler implements MailboxHandler {
 
   CompletableFuture<Boolean> future;
 
   @Override
-  public void receive (@NonNull Mailbox self, @NonNull ErlangTerm message) {
-    log.debug("Incoming message: {}", message);
+  public void receive(@NonNull Mailbox self, @NonNull ControlMessage header, Optional<ErlangTerm> body) {
+    log.debug("Incoming message: {}", body);
     future.complete(TRUE);
     self.getNode().remove(self);
   }

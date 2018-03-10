@@ -21,7 +21,7 @@ import static lombok.AccessLevel.PRIVATE;
 
 import java.util.Map;
 
-import io.appulse.encon.java.module.mailbox.ReceiveHandler;
+import io.appulse.encon.java.module.mailbox.MailboxHandler;
 import io.appulse.encon.java.module.mailbox.ReceiverType;
 
 import lombok.AllArgsConstructor;
@@ -63,7 +63,7 @@ public class MailboxConfig {
             throw new RuntimeException(ex);
           }
         })
-        .map(it -> it.asSubclass(ReceiveHandler.class))
+        .map(it -> it.asSubclass(MailboxHandler.class))
         .ifPresent(builder::handler);
 
     return builder.build();
@@ -73,7 +73,7 @@ public class MailboxConfig {
 
   ReceiverType receiverType;
 
-  Class<? extends ReceiveHandler> handler;
+  Class<? extends MailboxHandler> handler;
 
   MailboxConfig initDefaults (@NonNull MailboxConfig defaults) {
     receiverType = ofNullable(receiverType)

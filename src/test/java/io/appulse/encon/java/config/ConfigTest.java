@@ -45,7 +45,7 @@ import java.util.Map;
 import java.util.Set;
 
 import io.appulse.encon.java.DistributionFlag;
-import io.appulse.encon.java.module.mailbox.ReceiveHandler;
+import io.appulse.encon.java.module.mailbox.MailboxHandler;
 import io.appulse.encon.java.module.mailbox.ReceiverType;
 import io.appulse.encon.java.util.TestMethodNamePrinter;
 import io.appulse.epmd.java.client.EpmdClient;
@@ -108,7 +108,7 @@ public class ConfigTest {
           .isEqualTo(SINGLE);
 
       softly.assertThat(defaults.getMailbox().getHandler())
-          .isEqualTo(io.appulse.encon.java.module.mailbox.StubReceiveHandler.class);
+          .isEqualTo(io.appulse.encon.java.module.mailbox.DefaultMailboxHandler.class);
 
       softly.assertThat(defaults.getServer())
           .isNotNull();
@@ -136,7 +136,7 @@ public class ConfigTest {
         UTF8_ATOMS
     ));
     ReceiverType receiverType = CACHED;
-    Class<ReceiveHandler> handler = null;
+    Class<MailboxHandler> handler = null;
     int bossThreads = 7;
     int workerThreads = 14;
 
@@ -302,7 +302,7 @@ public class ConfigTest {
           .isEqualTo(SINGLE);
 
       softly.assertThat(defaults.getMailbox().getHandler())
-          .isEqualTo(io.appulse.encon.java.module.mailbox.StubReceiveHandler.class);
+          .isEqualTo(io.appulse.encon.java.module.mailbox.DefaultMailboxHandler.class);
 
       softly.assertThat(defaults.getServer())
           .isNotNull();
@@ -369,7 +369,7 @@ public class ConfigTest {
       softly.assertThat(mailbox1.getReceiverType())
           .isEqualTo(CACHED);
       softly.assertThat(mailbox1.getHandler())
-          .isEqualTo(io.appulse.encon.java.module.mailbox.StubReceiveHandler.class);
+          .isEqualTo(io.appulse.encon.java.module.mailbox.DefaultMailboxHandler.class);
 
       MailboxConfig mailbox2 = node1.getMailboxes()
           .stream()
@@ -380,7 +380,7 @@ public class ConfigTest {
       softly.assertThat(mailbox2.getReceiverType())
           .isEqualTo(SINGLE);
       softly.assertThat(mailbox2.getHandler())
-          .isEqualTo(io.appulse.encon.java.module.mailbox.StubReceiveHandler.class);
+          .isEqualTo(io.appulse.encon.java.module.mailbox.DefaultMailboxHandler.class);
 
       MailboxConfig mailbox3 = node1.getMailboxes()
           .stream()
@@ -391,7 +391,7 @@ public class ConfigTest {
       softly.assertThat(mailbox3.getReceiverType())
           .isEqualTo(SINGLE);
       softly.assertThat(mailbox3.getHandler())
-          .isEqualTo(io.appulse.encon.java.module.mailbox.StubReceiveHandler.class);
+          .isEqualTo(io.appulse.encon.java.module.mailbox.DefaultMailboxHandler.class);
 
       softly.assertThat(node1.getServer())
           .isNotNull();
@@ -448,7 +448,7 @@ public class ConfigTest {
       softly.assertThat(mailbox1.getReceiverType())
           .isEqualTo(CACHED);
       softly.assertThat(mailbox1.getHandler())
-          .isEqualTo(io.appulse.encon.java.module.mailbox.StubReceiveHandler.class);
+          .isEqualTo(io.appulse.encon.java.module.mailbox.DefaultMailboxHandler.class);
 
       softly.assertThat(node2.getServer())
           .isNotNull();
