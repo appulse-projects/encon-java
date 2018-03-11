@@ -15,7 +15,7 @@
  */
 package io.appulse.encon.java.module.mailbox;
 
-import static io.appulse.encon.java.module.mailbox.ReceiverType.SINGLE;
+import static io.appulse.encon.java.module.mailbox.MailboxType.SINGLE;
 import static java.util.Optional.ofNullable;
 import static lombok.AccessLevel.PRIVATE;
 
@@ -121,7 +121,7 @@ public class MailboxModule implements MailboxModuleApi, Closeable {
     final Mailbox.MailboxBuilder builder = Mailbox.builder()
         .handler(new DefaultMailboxHandler());
 
-    ReceiverType type = SINGLE;
+    MailboxType type = SINGLE;
 
     public NewMailboxBuilder name (String name) {
       builder.name(name);
@@ -138,7 +138,7 @@ public class MailboxModule implements MailboxModuleApi, Closeable {
       return handler(handlerClass.newInstance());
     }
 
-    public NewMailboxBuilder type (@NonNull ReceiverType type) {
+    public NewMailboxBuilder type (@NonNull MailboxType type) {
       this.type = type;
       return this;
     }

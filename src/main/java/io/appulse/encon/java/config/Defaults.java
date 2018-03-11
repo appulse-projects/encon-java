@@ -25,7 +25,7 @@ import static io.appulse.encon.java.DistributionFlag.MAP_TAG;
 import static io.appulse.encon.java.DistributionFlag.NEW_FLOATS;
 import static io.appulse.encon.java.DistributionFlag.NEW_FUN_TAGS;
 import static io.appulse.encon.java.DistributionFlag.UTF8_ATOMS;
-import static io.appulse.encon.java.module.mailbox.ReceiverType.SINGLE;
+import static io.appulse.encon.java.module.mailbox.MailboxType.SINGLE;
 import static io.appulse.epmd.java.core.model.NodeType.R6_ERLANG;
 import static io.appulse.epmd.java.core.model.Protocol.TCP;
 import static io.appulse.epmd.java.core.model.Version.R6;

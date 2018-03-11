@@ -19,7 +19,7 @@ package io.appulse.encon.java.module.mailbox;
  *
  * @author alabazin
  */
-public enum ReceiverType {
+public enum MailboxType {
 
   SINGLE,
   CACHED;

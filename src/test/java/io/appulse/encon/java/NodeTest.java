@@ -16,6 +16,7 @@
 
 package io.appulse.encon.java;
 
+import static io.appulse.encon.java.module.connection.control.ControlMessageTag.EXIT;
 import static io.appulse.encon.java.module.mailbox.request.ArrayItems.items;
 import static io.appulse.epmd.java.core.model.NodeType.R6_ERLANG;
 import static io.appulse.epmd.java.core.model.Protocol.TCP;
@@ -29,9 +30,11 @@ import java.util.concurrent.CompletionStage;
 import io.appulse.encon.java.config.MailboxConfig;
 import io.appulse.encon.java.config.NodeConfig;
 import io.appulse.encon.java.config.ServerConfig;
+import io.appulse.encon.java.module.connection.control.Exit;
 import io.appulse.encon.java.module.connection.regular.Message;
 import io.appulse.encon.java.module.mailbox.Mailbox;
 import io.appulse.encon.java.protocol.term.ErlangTerm;
+import io.appulse.encon.java.protocol.type.ErlangAtom;
 import io.appulse.encon.java.protocol.type.ErlangString;
 import io.appulse.encon.java.util.TestMethodNamePrinter;
 
@@ -277,5 +280,41 @@ public class NodeTest {
           return optional.get()
               .asInt() == 42;
         }, "Tuple(3)");
+  }
+
+  @Test
+  public void link () throws Exception {
+    node = Erts.singleNode("node-1@localhost");
+    Mailbox mailbox1 = node.mailbox().build();
+    Mailbox mailbox2 = node.mailbox().build();
+
+    mailbox1.link(mailbox2.getPid());
+    SECONDS.sleep(1);
+    mailbox2.unlink(mailbox1.getPid());
+    SECONDS.sleep(1);
+
+    CompletableFuture<Message> future = mailbox2.receiveAsync();
+    mailbox1.exit("popa");
+
+    SECONDS.sleep(1);
+    assertThat(future.isDone())
+        .isFalse();
+  }
+
+  @Test
+  public void exit () throws Exception {
+    node = Erts.singleNode("node-1@localhost");
+    Mailbox mailbox1 = node.mailbox().build();
+    Mailbox mailbox2 = node.mailbox().build();
+
+    mailbox2.link(mailbox1.getPid());
+    SECONDS.sleep(1);
+
+    CompletableFuture<Message> future = mailbox1.receiveAsync();
+    mailbox2.exit("popa");
+
+    assertThat(future.get(2, SECONDS))
+        .matches(it -> it.getHeader().getTag().equals(EXIT))
+        .matches(it -> ((Exit) it.getHeader()).getReason().equals(new ErlangAtom("popa")));
   }
 }
