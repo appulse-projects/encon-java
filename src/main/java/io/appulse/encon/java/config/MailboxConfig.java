@@ -22,7 +22,7 @@ import static lombok.AccessLevel.PRIVATE;
 import java.util.Map;
 
 import io.appulse.encon.java.module.mailbox.MailboxHandler;
-import io.appulse.encon.java.module.mailbox.ReceiverType;
+import io.appulse.encon.java.module.mailbox.MailboxType;
 
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -51,7 +51,7 @@ public class MailboxConfig {
 
     ofNullable(map.get("type"))
         .map(Object::toString)
-        .map(ReceiverType::valueOf)
+        .map(MailboxType::valueOf)
         .ifPresent(builder::receiverType);
 
     ofNullable(map.get("handler"))
@@ -71,7 +71,7 @@ public class MailboxConfig {
 
   String name;
 
-  ReceiverType receiverType;
+  MailboxType receiverType;
 
   Class<? extends MailboxHandler> handler;
 

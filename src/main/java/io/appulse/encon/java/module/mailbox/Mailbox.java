@@ -24,7 +24,6 @@ import static lombok.AccessLevel.PRIVATE;
 import java.io.Closeable;
 import java.util.Set;
 import java.util.concurrent.CompletableFuture;
-import java.util.concurrent.CompletionStage;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.TimeUnit;
@@ -34,12 +33,14 @@ import io.appulse.encon.java.NodeDescriptor;
 import io.appulse.encon.java.RemoteNode;
 import io.appulse.encon.java.module.NodeInternalApi;
 import io.appulse.encon.java.module.connection.Connection;
+import io.appulse.encon.java.module.connection.control.Exit;
 import io.appulse.encon.java.module.connection.control.Link;
 import io.appulse.encon.java.module.connection.control.Send;
 import io.appulse.encon.java.module.connection.control.Unlink;
 import io.appulse.encon.java.module.connection.regular.Message;
 import io.appulse.encon.java.module.mailbox.request.RequestBuilder;
 import io.appulse.encon.java.protocol.term.ErlangTerm;
+import io.appulse.encon.java.protocol.type.ErlangAtom;
 import io.appulse.encon.java.protocol.type.ErlangPid;
 
 import lombok.AllArgsConstructor;
@@ -91,6 +92,9 @@ public class Mailbox implements Closeable {
   @NonFinal
   CompletableFuture<Message> currentFuture;
 
+  @NonFinal
+  volatile boolean closed;
+
   public Node getNode () {
     return internal.node();
   }
@@ -99,7 +103,7 @@ public class Mailbox implements Closeable {
     return new RequestBuilder(this);
   }
 
-  public CompletionStage<Message> receiveAsync () {
+  public CompletableFuture<Message> receiveAsync () {
     return currentFuture();
   }
 
@@ -152,10 +156,6 @@ public class Mailbox implements Closeable {
     log.debug("Message was sent");
   }
 
-  private void send (@NonNull ErlangTerm body) {
-    deliver(new Message(new Send(pid), of(body)));
-  }
-
   public void link (@NonNull ErlangPid to) {
     if (isLocal(to)) {
       getMailbox(to).deliver(new Message(new Link(pid, to), empty()));
@@ -175,6 +175,26 @@ public class Mailbox implements Closeable {
     }
   }
 
+  public void exit (@NonNull String reason) {
+    closed = true;
+
+    log.debug("Exiting mailbox '{}:{}'. Reason: '{}'",
+              name, pid, reason);
+
+    executor.shutdown();
+
+    links.forEach(it -> {
+      if (isLocal(it)) {
+        getMailbox(it).deliver(new Message(new Exit(pid, it, new ErlangAtom(reason)), empty()));
+      } else {
+        getConnection(it).exit(pid, it, reason);
+      }
+    });
+
+    internal.mailboxes()
+        .remove(this);
+  }
+
   public void deliver (@NonNull Message message) {
     log.debug("Deliver: {}", message);
     executor.execute(() -> handle(message));
@@ -182,12 +202,14 @@ public class Mailbox implements Closeable {
 
   @Override
   public void close () {
-    log.debug("Closing mailbox '{}:{}'...", name, pid);
-    executor.shutdown();
-    links.forEach(it -> {
-      getConnection(it).exit(pid, it, "normal");
-    });
-    name = null;
+    if (closed) {
+      return;
+    }
+    exit("normal");
+  }
+
+  private void send (@NonNull ErlangTerm body) {
+    deliver(new Message(new Send(pid), of(body)));
   }
 
   @Synchronized
@@ -209,14 +231,14 @@ public class Mailbox implements Closeable {
 
   private Mailbox getMailbox (@NonNull String name) {
     return internal.mailboxes()
-          .mailbox(name)
-          .orElseThrow(RuntimeException::new);
+        .mailbox(name)
+        .orElseThrow(RuntimeException::new);
   }
 
   private Mailbox getMailbox (@NonNull ErlangPid pid) {
     return internal.mailboxes()
-          .mailbox(pid)
-          .orElseThrow(RuntimeException::new);
+        .mailbox(pid)
+        .orElseThrow(RuntimeException::new);
   }
 
   private Connection getConnection (@NonNull ErlangPid pid) {

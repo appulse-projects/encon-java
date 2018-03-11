@@ -24,8 +24,8 @@ import static io.appulse.encon.java.DistributionFlag.MAP_TAG;
 import static io.appulse.encon.java.DistributionFlag.NEW_FLOATS;
 import static io.appulse.encon.java.DistributionFlag.NEW_FUN_TAGS;
 import static io.appulse.encon.java.DistributionFlag.UTF8_ATOMS;
-import static io.appulse.encon.java.module.mailbox.ReceiverType.CACHED;
-import static io.appulse.encon.java.module.mailbox.ReceiverType.SINGLE;
+import static io.appulse.encon.java.module.mailbox.MailboxType.CACHED;
+import static io.appulse.encon.java.module.mailbox.MailboxType.SINGLE;
 import static io.appulse.epmd.java.core.model.NodeType.R3_ERLANG;
 import static io.appulse.epmd.java.core.model.NodeType.R3_HIDDEN;
 import static io.appulse.epmd.java.core.model.NodeType.R6_ERLANG;
@@ -46,7 +46,7 @@ import java.util.Set;
 
 import io.appulse.encon.java.DistributionFlag;
 import io.appulse.encon.java.module.mailbox.MailboxHandler;
-import io.appulse.encon.java.module.mailbox.ReceiverType;
+import io.appulse.encon.java.module.mailbox.MailboxType;
 import io.appulse.encon.java.util.TestMethodNamePrinter;
 import io.appulse.epmd.java.client.EpmdClient;
 import io.appulse.epmd.java.core.model.NodeType;
@@ -135,7 +135,7 @@ public class ConfigTest {
     Set<DistributionFlag> distributionFlags = new HashSet<>(asList(
         UTF8_ATOMS
     ));
-    ReceiverType receiverType = CACHED;
+    MailboxType receiverType = CACHED;
     Class<MailboxHandler> handler = null;
     int bossThreads = 7;
     int workerThreads = 14;
