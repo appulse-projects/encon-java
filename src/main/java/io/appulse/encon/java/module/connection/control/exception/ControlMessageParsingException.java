@@ -16,6 +16,12 @@
 
 package io.appulse.encon.java.module.connection.control.exception;
 
+import io.appulse.encon.java.protocol.TermType;
+import io.appulse.encon.java.protocol.term.ErlangTerm;
+import io.appulse.encon.java.protocol.type.ErlangTuple;
+
+import lombok.val;
+
 /**
  *
  * @author Artem Labazin
@@ -24,6 +30,18 @@ package io.appulse.encon.java.module.connection.control.exception;
 public class ControlMessageParsingException extends RuntimeException {
 
   private static final long serialVersionUID = 6926960910687262514L;
+
+  public static ControlMessageFieldParsingException fieldException (ErlangTuple tuple, int index, Class<?> expectingType) {
+    val string = tuple.get(0)
+        .map(ErlangTerm::getType)
+        .map(TermType::toString)
+        .orElse("[null]");
+
+    val message = String.format("Expected tuple[%d] is %s, but was %s",
+                                index, expectingType.getSimpleName(), string);
+
+    return new ControlMessageFieldParsingException(message, index, expectingType);
+  }
 
   public ControlMessageParsingException () {
     super();

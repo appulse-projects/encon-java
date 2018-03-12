@@ -102,9 +102,13 @@ public class ClientRegularHandler extends ChannelInboundHandlerAdapter implement
     log.debug("Received message: {}", message);
     val header = message.getHeader();
 
-    findMailbox(header)
-        .orElseThrow(RuntimeException::new)
-        .deliver(message);
+    val optional = findMailbox(header);
+    if (optional.isPresent()) {
+      optional.get()
+          .deliver(message);
+    } else {
+      log.warn("There is no mailbox for message: {}", message);
+    }
   }
 
   @Override
@@ -130,6 +134,7 @@ public class ClientRegularHandler extends ChannelInboundHandlerAdapter implement
     case EXIT2:
       return handle((Exit2) header);
     default:
+
       return empty();
     }
   }
