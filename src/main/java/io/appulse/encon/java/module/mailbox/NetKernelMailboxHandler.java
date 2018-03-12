@@ -33,9 +33,7 @@ public class NetKernelMailboxHandler implements MailboxHandler {
 
   @Override
   public void receive (@NonNull Mailbox self, @NonNull ControlMessage header, Optional<ErlangTerm> body) {
-    log.debug("Handler working");
-
-    val payload = body.orElseThrow(RuntimeException::new);
+    val payload = body.orElseThrow(() -> new IllegalArgumentException("Invalid net_kernel call, without body"));
 
     if (!payload.isTuple()) {
       log.debug("Not a tuple");

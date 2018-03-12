@@ -39,7 +39,11 @@ import io.appulse.encon.java.module.connection.control.Exit;
 import io.appulse.encon.java.module.connection.control.Link;
 import io.appulse.encon.java.module.connection.control.Send;
 import io.appulse.encon.java.module.connection.control.Unlink;
+import io.appulse.encon.java.module.connection.exception.CouldntConnectException;
 import io.appulse.encon.java.module.connection.regular.Message;
+import io.appulse.encon.java.module.lookup.exception.NoSuchRemoteNodeException;
+import io.appulse.encon.java.module.mailbox.exception.MailboxWithSuchNameDoesntExistException;
+import io.appulse.encon.java.module.mailbox.exception.MailboxWithSuchPidDoesntExistException;
 import io.appulse.encon.java.module.mailbox.exception.ReceivedExitException;
 import io.appulse.encon.java.module.mailbox.request.RequestBuilder;
 import io.appulse.encon.java.protocol.term.ErlangTerm;
@@ -140,7 +144,7 @@ public class Mailbox implements Closeable {
   public void send (@NonNull NodeDescriptor descriptor, @NonNull String mailbox, @NonNull ErlangTerm message) {
     RemoteNode remote = internal.node()
         .lookup(descriptor)
-        .orElseThrow(RuntimeException::new);
+        .orElseThrow(() -> new NoSuchRemoteNodeException(descriptor));
 
     send(remote, mailbox, message);
   }
@@ -242,20 +246,20 @@ public class Mailbox implements Closeable {
   private Mailbox getMailbox (@NonNull String name) {
     return internal.mailboxes()
         .mailbox(name)
-        .orElseThrow(RuntimeException::new);
+        .orElseThrow(() -> new MailboxWithSuchNameDoesntExistException(name));
   }
 
   private Mailbox getMailbox (@NonNull ErlangPid pid) {
     return internal.mailboxes()
         .mailbox(pid)
-        .orElseThrow(RuntimeException::new);
+        .orElseThrow(() -> new MailboxWithSuchPidDoesntExistException(pid));
   }
 
   private Connection getConnection (@NonNull ErlangPid pid) {
     return internal.node()
         .lookup(pid)
         .map(it -> internal.connections().connect(it))
-        .orElseThrow(RuntimeException::new);
+        .orElseThrow(CouldntConnectException::new);
   }
 
   private boolean isLocal (@NonNull ErlangPid pid) {

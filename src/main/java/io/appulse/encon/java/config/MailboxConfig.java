@@ -21,6 +21,7 @@ import static lombok.AccessLevel.PRIVATE;
 
 import java.util.Map;
 
+import io.appulse.encon.java.config.exception.NoSuchMailboxHandlerException;
 import io.appulse.encon.java.module.mailbox.MailboxHandler;
 import io.appulse.encon.java.module.mailbox.MailboxType;
 
@@ -60,7 +61,7 @@ public class MailboxConfig {
           try {
             return Class.forName(it);
           } catch (ClassNotFoundException ex) {
-            throw new RuntimeException(ex);
+            throw new NoSuchMailboxHandlerException(ex, it);
           }
         })
         .map(it -> it.asSubclass(MailboxHandler.class))

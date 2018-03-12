@@ -19,11 +19,13 @@ package io.appulse.encon.java.module.connection.control;
 import java.lang.reflect.Constructor;
 import java.util.stream.Stream;
 
+import io.appulse.encon.java.module.connection.control.exception.ControlMessageParsingException;
 import io.appulse.encon.java.protocol.term.ErlangTerm;
 import io.appulse.encon.java.protocol.type.ErlangInteger;
 import io.appulse.encon.java.protocol.type.ErlangNil;
 import io.appulse.encon.java.protocol.type.ErlangTuple;
 import io.appulse.encon.java.protocol.type.ErlangTuple.ErlangTupleBuilder;
+
 import lombok.NonNull;
 import lombok.SneakyThrows;
 import lombok.val;
@@ -41,19 +43,19 @@ public abstract class ControlMessage {
   @SuppressWarnings("unchecked")
   public static <T extends ControlMessage> T parse (@NonNull ErlangTerm term) {
     if (!term.isTuple()) {
-      throw new RuntimeException();
+      throw new ControlMessageParsingException("Expected type is TUPLE, but was " + term.getType());
     }
     val tuple = term.asTuple();
 
     val code = tuple.get(0)
         .filter(ErlangTerm::isNumber)
         .map(ErlangTerm::asInt)
-        .orElseThrow(RuntimeException::new);
+        .orElseThrow(() ->  ControlMessageParsingException.fieldException(tuple, 0, Integer.class));
 
     val tag = Stream.of(ControlMessageTag.values())
         .filter(it -> it.getCode() == code)
         .findFirst()
-        .orElseThrow(() -> new RuntimeException());
+        .orElseThrow(() -> new ControlMessageParsingException("Unknown tag code: " + code));
 
     Class<T> type = (Class<T>) tag.getType();
     Constructor<T> constructor = type.getConstructor(ErlangTuple.class);
