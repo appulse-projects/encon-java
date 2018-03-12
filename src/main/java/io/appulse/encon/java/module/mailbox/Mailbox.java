@@ -16,6 +16,8 @@
 
 package io.appulse.encon.java.module.mailbox;
 
+import static io.appulse.encon.java.module.connection.control.ControlMessageTag.EXIT;
+import static io.appulse.encon.java.module.connection.control.ControlMessageTag.EXIT2;
 import static java.util.Optional.empty;
 import static java.util.Optional.of;
 import static lombok.AccessLevel.PACKAGE;
@@ -38,6 +40,7 @@ import io.appulse.encon.java.module.connection.control.Link;
 import io.appulse.encon.java.module.connection.control.Send;
 import io.appulse.encon.java.module.connection.control.Unlink;
 import io.appulse.encon.java.module.connection.regular.Message;
+import io.appulse.encon.java.module.mailbox.exception.ReceivedExitException;
 import io.appulse.encon.java.module.mailbox.request.RequestBuilder;
 import io.appulse.encon.java.protocol.term.ErlangTerm;
 import io.appulse.encon.java.protocol.type.ErlangAtom;
@@ -104,17 +107,17 @@ public class Mailbox implements Closeable {
   }
 
   public CompletableFuture<Message> receiveAsync () {
-    return currentFuture();
+    return getCurrentFuture();
   }
 
   @SneakyThrows
   public Message receive () {
-    return currentFuture().get();
+    return receiveAsync().get();
   }
 
   @SneakyThrows
   public Message receive (long timeout, @NonNull TimeUnit unit) {
-    return currentFuture().get(timeout, unit);
+    return receiveAsync().get(timeout, unit);
   }
 
   public void send (@NonNull ErlangPid to, @NonNull ErlangTerm message) {
@@ -213,7 +216,7 @@ public class Mailbox implements Closeable {
   }
 
   @Synchronized
-  private CompletableFuture<Message> currentFuture () {
+  private CompletableFuture<Message> getCurrentFuture () {
     if (currentFuture == null) {
       currentFuture = new CompletableFuture<>();
     }
@@ -223,7 +226,14 @@ public class Mailbox implements Closeable {
   @Synchronized
   private void handle (@NonNull Message message) {
     if (currentFuture != null) {
-      currentFuture.complete(message);
+      if (message.getHeader().getTag() == EXIT || message.getHeader().getTag() == EXIT2) {
+        val exit = (Exit) message.getHeader();
+        val fromPid = exit.getFrom();
+        val reason = exit.getReason();
+        currentFuture.completeExceptionally(new ReceivedExitException(fromPid, reason));
+      } else {
+        currentFuture.complete(message);
+      }
       currentFuture = null;
     }
     handler.receive(this, message.getHeader(), message.getBody());

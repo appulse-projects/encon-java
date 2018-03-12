@@ -16,7 +16,6 @@
 
 package io.appulse.encon.java;
 
-import static io.appulse.encon.java.module.connection.control.ControlMessageTag.EXIT;
 import static io.appulse.encon.java.module.mailbox.request.ArrayItems.items;
 import static io.appulse.epmd.java.core.model.NodeType.R6_ERLANG;
 import static io.appulse.epmd.java.core.model.Protocol.TCP;
@@ -26,13 +25,14 @@ import static org.assertj.core.api.Assertions.assertThat;
 
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.CompletionStage;
+import java.util.concurrent.ExecutionException;
 
 import io.appulse.encon.java.config.MailboxConfig;
 import io.appulse.encon.java.config.NodeConfig;
 import io.appulse.encon.java.config.ServerConfig;
-import io.appulse.encon.java.module.connection.control.Exit;
 import io.appulse.encon.java.module.connection.regular.Message;
 import io.appulse.encon.java.module.mailbox.Mailbox;
+import io.appulse.encon.java.module.mailbox.exception.ReceivedExitException;
 import io.appulse.encon.java.protocol.term.ErlangTerm;
 import io.appulse.encon.java.protocol.type.ErlangAtom;
 import io.appulse.encon.java.protocol.type.ErlangString;
@@ -313,8 +313,19 @@ public class NodeTest {
     CompletableFuture<Message> future = mailbox1.receiveAsync();
     mailbox2.exit("popa");
 
-    assertThat(future.get(2, SECONDS))
-        .matches(it -> it.getHeader().getTag().equals(EXIT))
-        .matches(it -> ((Exit) it.getHeader()).getReason().equals(new ErlangAtom("popa")));
+    try {
+      future.get();
+    } catch (ExecutionException ex) {
+      Throwable cause = ex.getCause();
+      assertThat(cause).isInstanceOf(ReceivedExitException.class);
+
+      val exitException = (ReceivedExitException) cause;
+
+      assertThat(exitException.getFrom())
+          .isEqualTo(mailbox2.getPid());
+
+      assertThat(exitException.getReason())
+          .isEqualTo(new ErlangAtom("popa"));
+    }
   }
 }
