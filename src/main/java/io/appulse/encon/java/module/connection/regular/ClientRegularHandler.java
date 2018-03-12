@@ -129,8 +129,9 @@ public class ClientRegularHandler extends ChannelInboundHandlerAdapter implement
       return handle((Exit) header);
     case EXIT2:
       return handle((Exit2) header);
+    default:
+      return empty();
     }
-    return empty();
   }
 
   private Optional<Mailbox> handle (@NonNull Send header) {
