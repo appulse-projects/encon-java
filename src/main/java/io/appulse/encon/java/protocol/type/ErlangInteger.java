@@ -48,6 +48,8 @@ import lombok.val;
 @EqualsAndHashCode(callSuper = true)
 public class ErlangInteger extends ErlangTerm {
 
+  private static final long serialVersionUID = -1757584303003802030L;
+
   private static final int MAX_INTEGER;
 
   private static final int MIN_INTEGER;
@@ -228,8 +230,6 @@ public class ErlangInteger extends ErlangTerm {
 
   @Override
   protected void read (@NonNull Bytes buffer) {
-    int arity = -1;
-    int sign = -1;
     switch (getType()) {
     case SMALL_INTEGER:
       value = BigInteger.valueOf(buffer.getUnsignedByte());
@@ -238,12 +238,12 @@ public class ErlangInteger extends ErlangTerm {
       value = BigInteger.valueOf(buffer.getInt());
       break;
     case SMALL_BIG:
-      arity = buffer.getByte();
     case LARGE_BIG:
-      if (arity == -1) {
-        arity = buffer.getInt();
-      }
-      sign = buffer.getByte();
+      int arity = getType() == SMALL_BIG
+                  ? buffer.getByte()
+                  : buffer.getInt();
+
+      int sign = buffer.getByte();
       byte[] bytes = buffer.getBytes(arity);
       // Reverse the array to make it big endian.
       for (int i = 0, j = bytes.length - 1; i < j; i++, j--) {
@@ -258,7 +258,7 @@ public class ErlangInteger extends ErlangTerm {
       }
       break;
     default:
-      throw new IllegalArgumentException("");
+      throw new IllegalArgumentException("Unknown type: " + getType());
     }
   }
 

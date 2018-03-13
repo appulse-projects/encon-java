@@ -51,6 +51,8 @@ import lombok.val;
 @EqualsAndHashCode(callSuper = true)
 public class ErlangList extends ErlangTerm {
 
+  private static final long serialVersionUID = 6923705109793240922L;
+
   public static ErlangList list (@NonNull ErlangTerm... elements) {
     return new ErlangList(elements);
   }

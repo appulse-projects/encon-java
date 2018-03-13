@@ -55,6 +55,4 @@ public class RemoteNode {
   Version low;
 
   int port;
-
-  byte[] extra;
 }

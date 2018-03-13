@@ -54,10 +54,8 @@ public final class Config {
     return load(file);
   }
 
-  @SneakyThrows
   public static Config load (@NonNull File file) {
-    val yaml = new Yaml();
-    val map = (Map<String, Map<String, Object>>) yaml.load(new FileInputStream(file));
+    val map = parseYaml(file);
 
     ConfigBuilder builder = Config.builder();
 
@@ -78,6 +76,14 @@ public final class Config {
         .ifPresent(builder::nodes);
 
     return builder.build();
+  }
+
+  @SneakyThrows
+  private static Map<String, Map<String, Object>> parseYaml (@NonNull File file) {
+    val yaml = new Yaml();
+    try (val inputStream = new FileInputStream(file)) {
+      return (Map<String, Map<String, Object>>) yaml.load(inputStream);
+    }
   }
 
   Defaults defaults;

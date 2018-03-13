@@ -39,6 +39,8 @@ import lombok.val;
 @EqualsAndHashCode(callSuper = true)
 public class ErlangBinary extends ErlangTerm {
 
+  private static final long serialVersionUID = 2120051138040192507L;
+
   public static ErlangBinary binary (@NonNull byte[] value) {
     return new ErlangBinary(value);
   }
