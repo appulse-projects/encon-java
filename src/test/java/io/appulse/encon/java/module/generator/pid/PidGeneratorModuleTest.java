@@ -20,21 +20,21 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
+import io.appulse.encon.java.module.NodeInternalApi;
 import io.appulse.encon.java.Node;
 import io.appulse.encon.java.NodeDescriptor;
-import io.appulse.encon.java.module.NodeInternalApi;
 import io.appulse.encon.java.protocol.type.ErlangPid;
 import io.appulse.encon.java.util.TestMethodNamePrinter;
 
 import org.assertj.core.api.SoftAssertions;
 import org.junit.Rule;
-import org.junit.Test;
 import org.junit.rules.TestRule;
+import org.junit.Test;
 
 /**
  *
  * @author Artem Labazin
- * @since 0.0.1
+ * @since 1.0.0
  */
 public class PidGeneratorModuleTest {
 

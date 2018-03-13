@@ -28,7 +28,7 @@ import lombok.NonNull;
 /**
  *
  * @author Artem Labazin
- * @since 0.0.1
+ * @since 1.0.0
  */
 @EqualsAndHashCode(callSuper = true)
 public class Exit2 extends Exit {

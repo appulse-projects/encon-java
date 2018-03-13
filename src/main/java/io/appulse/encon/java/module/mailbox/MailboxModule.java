@@ -13,6 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+
 package io.appulse.encon.java.module.mailbox;
 
 import static io.appulse.encon.java.module.mailbox.MailboxType.SINGLE;
@@ -37,11 +38,11 @@ import lombok.experimental.FieldDefaults;
 /**
  *
  * @author Artem Labazin
- * @since 0.0.1
+ * @since 1.0.0
  */
 @RequiredArgsConstructor
 @FieldDefaults(level = PRIVATE, makeFinal = true)
-public class MailboxModule implements MailboxModuleApi, Closeable {
+public final class MailboxModule implements MailboxModuleApi, Closeable {
 
   NodeInternalApi internal;
 
@@ -50,7 +51,7 @@ public class MailboxModule implements MailboxModuleApi, Closeable {
   Map<String, Mailbox> names = new ConcurrentHashMap<>();
 
   @Override
-  public void close() {
+  public void close () {
     pids.values().forEach(Mailbox::close);
 
     pids.clear();
@@ -63,7 +64,7 @@ public class MailboxModule implements MailboxModuleApi, Closeable {
   }
 
   @Override
-  public boolean register(@NonNull Mailbox mailbox, @NonNull String name) {
+  public boolean register (@NonNull Mailbox mailbox, @NonNull String name) {
     if (names.containsKey(name)) {
       return false;
     }
@@ -73,23 +74,23 @@ public class MailboxModule implements MailboxModuleApi, Closeable {
   }
 
   @Override
-  public void deregister(@NonNull String name) {
+  public void deregister (@NonNull String name) {
     ofNullable(names.remove(name))
         .ifPresent(it -> it.setName(null));
   }
 
   @Override
-  public Optional<Mailbox> mailbox(@NonNull String name) {
+  public Optional<Mailbox> mailbox (@NonNull String name) {
     return ofNullable(names.get(name));
   }
 
   @Override
-  public Optional<Mailbox> mailbox(@NonNull ErlangPid pid) {
+  public Optional<Mailbox> mailbox (@NonNull ErlangPid pid) {
     return ofNullable(pids.get(pid));
   }
 
   @Override
-  public void remove(@NonNull Mailbox mailbox) {
+  public void remove (@NonNull Mailbox mailbox) {
     ofNullable(pids.remove(mailbox.getPid()))
         .ifPresent(it -> it.close());
 
@@ -98,13 +99,13 @@ public class MailboxModule implements MailboxModuleApi, Closeable {
   }
 
   @Override
-  public void remove(@NonNull String name) {
+  public void remove (@NonNull String name) {
     mailbox(name)
         .ifPresent(this::remove);
   }
 
   @Override
-  public void remove(@NonNull ErlangPid pid) {
+  public void remove (@NonNull ErlangPid pid) {
     mailbox(pid)
         .ifPresent(this::remove);
   }
@@ -116,7 +117,7 @@ public class MailboxModule implements MailboxModuleApi, Closeable {
 
   @FieldDefaults(level = PRIVATE)
   @NoArgsConstructor(access = PRIVATE)
-  public class NewMailboxBuilder {
+  public final class NewMailboxBuilder {
 
     final Mailbox.MailboxBuilder builder = Mailbox.builder()
         .handler(new DefaultMailboxHandler());
@@ -138,8 +139,8 @@ public class MailboxModule implements MailboxModuleApi, Closeable {
       return handler(handlerClass.newInstance());
     }
 
-    public NewMailboxBuilder type (@NonNull MailboxType type) {
-      this.type = type;
+    public NewMailboxBuilder type (@NonNull MailboxType mailboxType) {
+      this.type = mailboxType;
       return this;
     }
 

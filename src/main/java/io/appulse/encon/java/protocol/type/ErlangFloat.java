@@ -26,6 +26,7 @@ import java.math.BigInteger;
 import io.appulse.encon.java.protocol.TermType;
 import io.appulse.encon.java.protocol.term.ErlangTerm;
 import io.appulse.utils.Bytes;
+
 import lombok.EqualsAndHashCode;
 import lombok.NonNull;
 import lombok.ToString;
@@ -35,7 +36,7 @@ import lombok.val;
 /**
  *
  * @author Artem Labazin
- * @since 0.0.1
+ * @since 1.0.0
  */
 @ToString
 @FieldDefaults(level = PRIVATE)

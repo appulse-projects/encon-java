@@ -46,11 +46,11 @@ import lombok.val;
 /**
  *
  * @author Artem Labazin
- * @since 0.0.1
+ * @since 1.0.0
  */
 @Slf4j
 @FieldDefaults(level = PRIVATE, makeFinal = true)
-public class ConnectionModule implements ConnectionModuleApi, Closeable {
+public final class ConnectionModule implements ConnectionModuleApi, Closeable {
 
   @NonNull
   NodeInternalApi internal;

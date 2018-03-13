@@ -34,7 +34,8 @@ import lombok.extern.slf4j.Slf4j;
 
 /**
  *
- * @author alabazin
+ * @author Artem Labazin
+ * @since 1.0.0
  */
 @Slf4j
 @RequiredArgsConstructor
@@ -44,7 +45,7 @@ class PingReceiveHandler implements MailboxHandler {
   CompletableFuture<Boolean> future;
 
   @Override
-  public void receive(@NonNull Mailbox self, @NonNull ControlMessage header, Optional<ErlangTerm> body) {
+  public void receive (@NonNull Mailbox self, @NonNull ControlMessage header, Optional<ErlangTerm> body) {
     log.debug("Incoming message: {}", body);
     future.complete(TRUE);
     self.getNode().remove(self);

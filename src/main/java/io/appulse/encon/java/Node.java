@@ -54,20 +54,21 @@ import lombok.val;
 /**
  *
  * @author Artem Labazin
- * @since 0.0.1
+ * @since 1.0.0
  */
 @Slf4j
 @Setter(PRIVATE)
 @ToString(of = {
-  "descriptor",
-  "cookie",
-  "port",
-  "meta"
+    "descriptor",
+    "cookie",
+    "port",
+    "meta"
 })
 @FieldDefaults(level = PRIVATE)
 @NoArgsConstructor(access = PRIVATE)
 public final class Node implements PingModuleApi, Closeable {
 
+  @SuppressWarnings({"checkstyle:MethodLength", "checkstyle:AnonInnerLength"})
   static Node newInstance (@NonNull String name, @NonNull NodeConfig config) {
     val node = new Node();
 
@@ -150,11 +151,11 @@ public final class Node implements PingModuleApi, Closeable {
         .build();
 
     config.getMailboxes().forEach(it -> {
-        node.mailbox()
-            .name(it.getName())
-            .handler(it.getHandler())
-            .type(it.getReceiverType())
-            .build();
+      node.mailbox()
+          .name(it.getName())
+          .handler(it.getHandler())
+          .type(it.getReceiverType())
+          .build();
     });
 
     log.debug("Node '{}' was created", descriptor.getFullName());

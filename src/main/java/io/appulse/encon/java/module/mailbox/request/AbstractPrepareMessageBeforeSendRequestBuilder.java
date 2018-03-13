@@ -16,9 +16,9 @@
 
 package io.appulse.encon.java.module.mailbox.request;
 
-import io.appulse.encon.java.module.mailbox.Mailbox;
 import io.appulse.encon.java.NodeDescriptor;
 import io.appulse.encon.java.RemoteNode;
+import io.appulse.encon.java.module.mailbox.Mailbox;
 import io.appulse.encon.java.protocol.type.ErlangPid;
 
 import lombok.NonNull;
@@ -26,7 +26,7 @@ import lombok.NonNull;
 /**
  *
  * @author Artem Labazin
- * @since 0.0.1
+ * @since 1.0.0
  */
 abstract class AbstractPrepareMessageBeforeSendRequestBuilder extends RequestInvoker {
 
@@ -64,5 +64,5 @@ abstract class AbstractPrepareMessageBeforeSendRequestBuilder extends RequestInv
     super.send(remote, mailbox);
   }
 
-  abstract protected void prepareMessage ();
+  protected abstract void prepareMessage ();
 }

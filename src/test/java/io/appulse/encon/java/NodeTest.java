@@ -31,8 +31,8 @@ import io.appulse.encon.java.config.MailboxConfig;
 import io.appulse.encon.java.config.NodeConfig;
 import io.appulse.encon.java.config.ServerConfig;
 import io.appulse.encon.java.module.connection.regular.Message;
-import io.appulse.encon.java.module.mailbox.Mailbox;
 import io.appulse.encon.java.module.mailbox.exception.ReceivedExitException;
+import io.appulse.encon.java.module.mailbox.Mailbox;
 import io.appulse.encon.java.protocol.term.ErlangTerm;
 import io.appulse.encon.java.protocol.type.ErlangAtom;
 import io.appulse.encon.java.protocol.type.ErlangString;
@@ -42,13 +42,13 @@ import lombok.val;
 import org.assertj.core.api.SoftAssertions;
 import org.junit.After;
 import org.junit.Rule;
-import org.junit.Test;
 import org.junit.rules.TestRule;
+import org.junit.Test;
 
 /**
  *
  * @author Artem Labazin
- * @since 0.0.1
+ * @since 1.0.0
  */
 public class NodeTest {
 

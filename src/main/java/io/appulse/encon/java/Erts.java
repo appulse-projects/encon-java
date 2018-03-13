@@ -35,8 +35,9 @@ import lombok.extern.slf4j.Slf4j;
 import lombok.val;
 
 /**
- * @author Artem Labazin <xxlabaza@gmail.com>
- * @since 04.03.2018
+ *
+ * @author Artem Labazin
+ * @since 1.0.0
  */
 @Slf4j
 @RequiredArgsConstructor(access = PRIVATE)
@@ -64,7 +65,7 @@ public final class Erts {
   }
 
   public static Node singleNode (@NonNull String name, @NonNull NodeConfig nodeConfig) {
-    nodeConfig.initDefaults(Defaults.INSTANCE);
+    nodeConfig.withDefaultsFrom(Defaults.INSTANCE);
     return Node.newInstance(name, nodeConfig);
   }
 
@@ -78,7 +79,7 @@ public final class Erts {
   }
 
   public Node newNode (@NonNull String name, @NonNull NodeConfig nodeConfig) {
-    nodeConfig.initDefaults(defaults);
+    nodeConfig.withDefaultsFrom(defaults);
     val node = Node.newInstance(name, nodeConfig);
     nodes.put(node.getDescriptor(), node);
     return node;

@@ -21,7 +21,7 @@ import lombok.Getter;
 /**
  *
  * @author Artem Labazin
- * @since 0.0.1
+ * @since 1.0.0
  */
 @Getter
 public enum ControlMessageTag {

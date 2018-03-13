@@ -29,11 +29,11 @@ import lombok.experimental.FieldDefaults;
 /**
  *
  * @author Artem Labazin
- * @since 0.0.1
+ * @since 1.0.0
  */
 @RequiredArgsConstructor
 @FieldDefaults(level = PRIVATE, makeFinal = true)
-public class PidGeneratorModule implements PidGeneratorModuleApi {
+public final class PidGeneratorModule implements PidGeneratorModuleApi {
 
   NodeInternalApi internal;
 

@@ -31,7 +31,7 @@ import lombok.val;
 /**
  *
  * @author Artem Labazin
- * @since 0.0.1
+ * @since 1.0.0
  */
 @Getter
 @FieldDefaults(level = PRIVATE, makeFinal = true)
@@ -63,6 +63,13 @@ public abstract class Message {
     this.type = type;
   }
 
+  /**
+   * Returns byte array representation of this message instance.
+   * <p>
+   * Length and tag of the message setup automaticaly.
+   *
+   * @return byte array
+   */
   public byte[] toBytes () {
     val buffer = Bytes.allocate()
         .put2B(0) // reserve space for final request length
@@ -74,7 +81,17 @@ public abstract class Message {
         .array();
   }
 
+  /**
+   * Writes instance state to byte buffer.
+   *
+   * @param buffer byte buffer
+   */
   abstract void write (Bytes buffer);
 
+  /**
+   * Reads message's fields values from byte buffer.
+   *
+   * @param buffer byte buffer
+   */
   abstract void read (Bytes buffer);
 }
