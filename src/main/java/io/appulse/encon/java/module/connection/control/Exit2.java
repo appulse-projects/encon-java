@@ -23,7 +23,6 @@ import io.appulse.encon.java.protocol.type.ErlangPid;
 import io.appulse.encon.java.protocol.type.ErlangTuple;
 
 import lombok.EqualsAndHashCode;
-import lombok.NonNull;
 
 /**
  *
@@ -33,11 +32,11 @@ import lombok.NonNull;
 @EqualsAndHashCode(callSuper = true)
 public class Exit2 extends Exit {
 
-  public Exit2 (@NonNull ErlangPid from, @NonNull ErlangPid to, @NonNull ErlangTerm reason) {
+  public Exit2 (ErlangPid from, ErlangPid to, ErlangTerm reason) {
     super(from, to, reason);
   }
 
-  public Exit2 (@NonNull ErlangTuple tuple) {
+  public Exit2 (ErlangTuple tuple) {
     super(tuple);
   }
 

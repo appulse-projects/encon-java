@@ -49,6 +49,8 @@ import lombok.val;
 @EqualsAndHashCode(callSuper = true)
 public class ErlangMap extends ErlangTerm {
 
+  private static final long serialVersionUID = -4889715199209923662L;
+
   public static ErlangMap map (@NonNull ErlangTerm... keysAndValues) {
     if (keysAndValues.length % 2 != 0) {
       throw new IllegalArgumentException();

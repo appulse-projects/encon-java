@@ -16,6 +16,8 @@
 
 package io.appulse.encon.java.module.connection.handshake;
 
+import static java.nio.charset.StandardCharsets.ISO_8859_1;
+
 import java.security.MessageDigest;
 
 import io.appulse.encon.java.Node;
@@ -57,8 +59,8 @@ public final class HandshakeUtils {
     }
 
     val messageDigest = MessageDigest.getInstance("MD5");
-    messageDigest.update(cookie.getBytes());
-    messageDigest.update(("" + ch).getBytes());
+    messageDigest.update(cookie.getBytes(ISO_8859_1));
+    messageDigest.update(("" + ch).getBytes(ISO_8859_1));
 
     return messageDigest.digest();
   }

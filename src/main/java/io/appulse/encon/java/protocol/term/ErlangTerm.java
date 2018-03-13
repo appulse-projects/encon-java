@@ -22,6 +22,7 @@ import static lombok.AccessLevel.PROTECTED;
 
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
+import java.io.Serializable;
 import java.lang.reflect.Constructor;
 import java.nio.ByteBuffer;
 import java.util.zip.Deflater;
@@ -53,7 +54,8 @@ public abstract class ErlangTerm implements IntegerTerm,
                                             BooleanTerm,
                                             StringTerm,
                                             ContainerTerm,
-                                            SpecificTerm {
+                                            SpecificTerm,
+                                            Serializable {
 
   public static <T extends ErlangTerm> T newInstance (@NonNull ByteBuffer byteBuffer) {
     val buffer = Bytes.wrap(byteBuffer);

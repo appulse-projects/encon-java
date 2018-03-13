@@ -45,6 +45,8 @@ import lombok.experimental.FieldDefaults;
 @EqualsAndHashCode(callSuper = true)
 public class ErlangFunction extends ErlangTerm {
 
+  private static final long serialVersionUID = 6531209051661233549L;
+
   ErlangPid pid;
 
   String module;

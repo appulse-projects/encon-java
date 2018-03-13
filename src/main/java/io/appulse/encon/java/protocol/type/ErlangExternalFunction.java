@@ -41,6 +41,8 @@ import lombok.experimental.FieldDefaults;
 @EqualsAndHashCode(callSuper = true)
 public class ErlangExternalFunction extends ErlangTerm {
 
+  private static final long serialVersionUID = -8415499460097963982L;
+
   String module;
 
   String name;

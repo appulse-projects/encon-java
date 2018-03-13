@@ -43,6 +43,8 @@ import lombok.val;
 @EqualsAndHashCode(callSuper = true)
 public class ErlangFloat extends ErlangTerm {
 
+  private static final long serialVersionUID = -4146479045850295285L;
+
   public static ErlangFloat decimal (float value) {
     return new ErlangFloat(value);
   }

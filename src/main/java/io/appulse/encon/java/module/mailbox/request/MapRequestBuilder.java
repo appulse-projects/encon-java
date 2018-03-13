@@ -38,7 +38,7 @@ public class MapRequestBuilder extends AbstractPrepareMessageBeforeSendRequestBu
 
   LinkedHashMap<ErlangTerm, ErlangTerm> map;
 
-  MapRequestBuilder (@NonNull Mailbox mailbox) {
+  MapRequestBuilder (Mailbox mailbox) {
     super(mailbox);
     map = new LinkedHashMap<>();
   }

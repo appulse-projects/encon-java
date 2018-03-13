@@ -34,7 +34,6 @@ import io.appulse.encon.java.module.connection.handshake.message.NameMessage;
 import io.appulse.encon.java.module.connection.handshake.message.StatusMessage;
 
 import io.netty.channel.ChannelHandlerContext;
-import lombok.Builder;
 import lombok.NonNull;
 import lombok.experimental.FieldDefaults;
 import lombok.experimental.NonFinal;
@@ -58,8 +57,7 @@ public class HandshakeHandlerServer extends AbstractHandshakeHandler {
   @NonFinal
   int ourChallenge;
 
-  @Builder
-  public HandshakeHandlerServer (@NonNull Pipeline pipeline, @NonNull NodeInternalApi internal) {
+  public HandshakeHandlerServer (Pipeline pipeline, @NonNull NodeInternalApi internal) {
     super(pipeline);
     this.internal = internal;
   }

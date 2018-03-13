@@ -18,6 +18,7 @@ package io.appulse.encon.java;
 
 import static lombok.AccessLevel.PRIVATE;
 
+import java.io.Serializable;
 import java.net.InetAddress;
 import java.net.UnknownHostException;
 
@@ -35,9 +36,11 @@ import lombok.val;
 @Value
 @EqualsAndHashCode(exclude = "address")
 @AllArgsConstructor(access = PRIVATE)
-public class NodeDescriptor {
+public class NodeDescriptor implements Serializable {
 
   private static final InetAddress LOCALHOST;
+
+  private static final long serialVersionUID = 7324588959922091097L;
 
   static {
     try {

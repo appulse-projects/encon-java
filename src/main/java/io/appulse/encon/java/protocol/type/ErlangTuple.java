@@ -50,6 +50,8 @@ import lombok.experimental.FieldDefaults;
 @EqualsAndHashCode(callSuper = true)
 public class ErlangTuple extends ErlangTerm {
 
+  private static final long serialVersionUID = -8441946894531062971L;
+
   public static ErlangTuple tuple (@NonNull ErlangTerm... elements) {
     return new ErlangTuple(elements);
   }

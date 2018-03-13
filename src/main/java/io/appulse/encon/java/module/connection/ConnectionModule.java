@@ -106,7 +106,6 @@ public final class ConnectionModule implements ConnectionModuleApi, Closeable {
   }
 
   @Override
-  @SneakyThrows
   public Connection connect (@NonNull RemoteNode remote) {
     return connect(remote, 10, SECONDS);
   }
@@ -121,7 +120,7 @@ public final class ConnectionModule implements ConnectionModuleApi, Closeable {
   public boolean isAvailable (@NonNull RemoteNode remote) {
     try {
       return connect(remote) != null;
-    } catch (Throwable ex) {
+    } catch (Exception ex) {
       return false;
     }
   }
