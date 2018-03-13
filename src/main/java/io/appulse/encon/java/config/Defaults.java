@@ -59,8 +59,9 @@ import lombok.experimental.FieldDefaults;
 import lombok.val;
 
 /**
- * @author Artem Labazin <xxlabaza@gmail.com>
- * @since 22.02.2018
+ *
+ * @author Artem Labazin
+ * @since 1.0.0
  */
 @Data
 @Builder

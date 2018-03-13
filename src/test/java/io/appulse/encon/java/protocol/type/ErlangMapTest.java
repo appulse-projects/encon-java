@@ -34,6 +34,11 @@ import org.junit.Rule;
 import org.junit.Test;
 import org.junit.rules.TestRule;
 
+/**
+ *
+ * @author Artem Labazin
+ * @since 1.0.0
+ */
 public class ErlangMapTest {
 
   @Rule

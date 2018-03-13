@@ -25,7 +25,7 @@ import io.appulse.epmd.java.client.EpmdClient;
 /**
  *
  * @author Artem Labazin
- * @since 0.0.1
+ * @since 1.0.0
  */
 public interface NodeInternalApi {
 

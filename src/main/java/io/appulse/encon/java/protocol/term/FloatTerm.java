@@ -21,7 +21,7 @@ import java.math.BigDecimal;
 /**
  *
  * @author Artem Labazin
- * @since 0.0.1
+ * @since 1.0.0
  */
 public interface FloatTerm extends NumberTerm {
 

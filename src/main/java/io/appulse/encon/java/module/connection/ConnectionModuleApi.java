@@ -16,15 +16,15 @@
 
 package io.appulse.encon.java.module.connection;
 
+import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.TimeUnit;
 
 import io.appulse.encon.java.RemoteNode;
-import java.util.concurrent.CompletableFuture;
 
 /**
  *
  * @author Artem Labazin
- * @since 0.0.1
+ * @since 1.0.0
  */
 public interface ConnectionModuleApi {
 

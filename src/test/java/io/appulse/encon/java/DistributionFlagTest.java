@@ -26,13 +26,13 @@ import java.util.stream.Stream;
 import io.appulse.encon.java.util.TestMethodNamePrinter;
 
 import org.junit.Rule;
-import org.junit.Test;
 import org.junit.rules.TestRule;
+import org.junit.Test;
 
 /**
  *
  * @author Artem Labazin
- * @since 0.0.1
+ * @since 1.0.0
  */
 public class DistributionFlagTest {
 

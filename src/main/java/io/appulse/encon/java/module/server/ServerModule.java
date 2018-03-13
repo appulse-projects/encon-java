@@ -45,11 +45,11 @@ import lombok.val;
 /**
  *
  * @author Artem Labazin
- * @since 0.0.1
+ * @since 1.0.0
  */
 @Slf4j
 @FieldDefaults(level = PRIVATE, makeFinal = true)
-public class ServerModule implements ServerModuleApi, Closeable {
+public final class ServerModule implements ServerModuleApi, Closeable {
 
   int port;
 

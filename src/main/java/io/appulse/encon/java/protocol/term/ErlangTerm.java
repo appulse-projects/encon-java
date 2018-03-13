@@ -16,8 +16,8 @@
 
 package io.appulse.encon.java.protocol.term;
 
-import static lombok.AccessLevel.PRIVATE;
 import static java.util.zip.Deflater.BEST_COMPRESSION;
+import static lombok.AccessLevel.PRIVATE;
 import static lombok.AccessLevel.PROTECTED;
 
 import java.io.ByteArrayInputStream;
@@ -31,6 +31,7 @@ import java.util.zip.InflaterInputStream;
 
 import io.appulse.encon.java.protocol.TermType;
 import io.appulse.utils.Bytes;
+
 import lombok.EqualsAndHashCode;
 import lombok.Getter;
 import lombok.NonNull;
@@ -42,7 +43,7 @@ import lombok.val;
 /**
  *
  * @author Artem Labazin
- * @since 0.0.1
+ * @since 1.0.0
  */
 @Getter
 @EqualsAndHashCode

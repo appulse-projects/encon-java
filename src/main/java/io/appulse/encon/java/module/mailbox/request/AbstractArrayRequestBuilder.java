@@ -19,21 +19,21 @@ package io.appulse.encon.java.module.mailbox.request;
 import static lombok.AccessLevel.PRIVATE;
 import static lombok.AccessLevel.PROTECTED;
 
-import io.appulse.encon.java.module.mailbox.Mailbox;
 import java.math.BigInteger;
 import java.util.LinkedList;
 import java.util.List;
 
+import io.appulse.encon.java.module.mailbox.Mailbox;
 import io.appulse.encon.java.protocol.term.ErlangTerm;
 import io.appulse.encon.java.protocol.type.ErlangAtom;
 import io.appulse.encon.java.protocol.type.ErlangBinary;
-import io.appulse.encon.java.protocol.type.ErlangString;
 import io.appulse.encon.java.protocol.type.ErlangFloat;
 import io.appulse.encon.java.protocol.type.ErlangInteger;
 import io.appulse.encon.java.protocol.type.ErlangNil;
 import io.appulse.encon.java.protocol.type.ErlangPid;
 import io.appulse.encon.java.protocol.type.ErlangPort;
 import io.appulse.encon.java.protocol.type.ErlangReference;
+import io.appulse.encon.java.protocol.type.ErlangString;
 
 import lombok.Getter;
 import lombok.NonNull;
@@ -42,7 +42,7 @@ import lombok.experimental.FieldDefaults;
 /**
  *
  * @author Artem Labazin
- * @since 0.0.1
+ * @since 1.0.0
  */
 @FieldDefaults(level = PRIVATE, makeFinal = true)
 public abstract class AbstractArrayRequestBuilder extends AbstractPrepareMessageBeforeSendRequestBuilder {

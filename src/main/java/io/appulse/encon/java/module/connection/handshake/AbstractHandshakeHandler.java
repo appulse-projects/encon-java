@@ -1,11 +1,11 @@
 /*
- * Copyright 2018 Appulse.
+ * Copyright 2018 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
  *
- *      http://www.apache.org/licenses/LICENSE-2.0
+ *     http://www.apache.org/licenses/LICENSE-2.0
  *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
@@ -20,6 +20,7 @@ import static lombok.AccessLevel.PRIVATE;
 
 import io.appulse.encon.java.RemoteNode;
 import io.appulse.encon.java.module.connection.Pipeline;
+
 import io.netty.channel.ChannelHandlerContext;
 import io.netty.channel.ChannelInboundHandlerAdapter;
 import lombok.NonNull;
@@ -29,8 +30,9 @@ import lombok.extern.slf4j.Slf4j;
 import lombok.val;
 
 /**
- * @author Artem Labazin <xxlabaza@gmail.com>
- * @since 20.02.2018
+ *
+ * @author Artem Labazin
+ * @since 1.0.0
  */
 @Slf4j
 @RequiredArgsConstructor
@@ -42,11 +44,6 @@ public abstract class AbstractHandshakeHandler extends ChannelInboundHandlerAdap
 
   public abstract RemoteNode getRemoteNode ();
 
-  public void successHandshake (@NonNull ChannelHandlerContext context) {
-    log.debug("Replacing pipline to regular for {}", context.channel().remoteAddress());
-    pipeline.setupPipeline(context.pipeline());
-  }
-
   @Override
   public void exceptionCaught (ChannelHandlerContext context, Throwable cause) throws Exception {
     val message = String.format("Error during channel connection with %s",
@@ -56,5 +53,15 @@ public abstract class AbstractHandshakeHandler extends ChannelInboundHandlerAdap
     context.fireExceptionCaught(cause);
     context.close();
     pipeline.exception(cause);
+  }
+
+  /**
+   * Replaces handshake pipeline with regular pipeline after successfull handshake process.
+   *
+   * @param context connection context
+   */
+  protected void successHandshake (@NonNull ChannelHandlerContext context) {
+    log.debug("Replacing pipline to regular for {}", context.channel().remoteAddress());
+    pipeline.setupPipeline(context.pipeline());
   }
 }

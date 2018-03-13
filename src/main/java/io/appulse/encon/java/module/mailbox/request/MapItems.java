@@ -30,7 +30,7 @@ import lombok.experimental.FieldDefaults;
 /**
  *
  * @author Artem Labazin
- * @since 0.0.1
+ * @since 1.0.0
  */
 @NoArgsConstructor(access = PRIVATE)
 @FieldDefaults(level = PRIVATE, makeFinal = true)

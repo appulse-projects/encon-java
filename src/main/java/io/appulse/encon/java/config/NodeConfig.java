@@ -41,8 +41,9 @@ import lombok.experimental.FieldDefaults;
 import lombok.val;
 
 /**
- * @author Artem Labazin <xxlabaza@gmail.com>
- * @since 22.02.2018
+ *
+ * @author Artem Labazin
+ * @since 1.0.0
  */
 @Data
 @Builder
@@ -51,7 +52,7 @@ import lombok.val;
 @FieldDefaults(level = PRIVATE)
 public class NodeConfig {
 
-  public static NodeConfig DEFAULT = NodeConfig.builder().build();
+  public static final NodeConfig DEFAULT = NodeConfig.builder().build();
 
   static NodeConfig newInstance (@NonNull Map<String, Object> map) {
     NodeConfigBuilder builder = NodeConfig.builder();
@@ -140,7 +141,14 @@ public class NodeConfig {
 
   ServerConfig server;
 
-  public void initDefaults (@NonNull Defaults defaults) {
+  /**
+   * Method for setting up default values.
+   *
+   * @param defaults Defaults with default values for node
+   *
+   * @return reference to this object (for chain calls)
+   */
+  public NodeConfig withDefaultsFrom (@NonNull Defaults defaults) {
     epmdPort = ofNullable(epmdPort)
         .orElse(defaults.getEpmdPort());
 
@@ -168,13 +176,15 @@ public class NodeConfig {
 
     mailboxes = ofNullable(mailboxes)
         .map(it -> it.stream()
-            .map(mailbox -> mailbox.initDefaults(defaults.getMailbox()))
+            .map(mailbox -> mailbox.withDefaultsFrom(defaults.getMailbox()))
             .collect(toList())
         )
         .orElse(emptyList());
 
     server = ofNullable(server)
         .orElse(ServerConfig.builder().build())
-        .initDefaults(defaults.getServer());
+        .withDefaultsFrom(defaults.getServer());
+
+    return this;
   }
 }

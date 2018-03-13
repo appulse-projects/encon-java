@@ -66,14 +66,14 @@ import lombok.val;
 /**
  *
  * @author Artem Labazin
- * @since 0.0.1
+ * @since 1.0.0
  */
 @Slf4j
 @Builder
 @EqualsAndHashCode
 @AllArgsConstructor
 @FieldDefaults(level = PRIVATE, makeFinal = true)
-public class Mailbox implements Closeable {
+public final class Mailbox implements Closeable {
 
   @Getter
   @NonFinal
@@ -126,7 +126,7 @@ public class Mailbox implements Closeable {
 
   public void send (@NonNull ErlangPid to, @NonNull ErlangTerm message) {
     if (isLocal(to)) {
-      getMailbox(to).send(message);;
+      getMailbox(to).send(message);
     } else {
       getConnection(to).send(to, message);
     }
@@ -243,27 +243,27 @@ public class Mailbox implements Closeable {
     handler.receive(this, message.getHeader(), message.getBody());
   }
 
-  private Mailbox getMailbox (@NonNull String name) {
+  private Mailbox getMailbox (@NonNull String remoteName) {
     return internal.mailboxes()
-        .mailbox(name)
-        .orElseThrow(() -> new MailboxWithSuchNameDoesntExistException(name));
+        .mailbox(remoteName)
+        .orElseThrow(() -> new MailboxWithSuchNameDoesntExistException(remoteName));
   }
 
-  private Mailbox getMailbox (@NonNull ErlangPid pid) {
+  private Mailbox getMailbox (@NonNull ErlangPid remotePid) {
     return internal.mailboxes()
-        .mailbox(pid)
-        .orElseThrow(() -> new MailboxWithSuchPidDoesntExistException(pid));
+        .mailbox(remotePid)
+        .orElseThrow(() -> new MailboxWithSuchPidDoesntExistException(remotePid));
   }
 
-  private Connection getConnection (@NonNull ErlangPid pid) {
+  private Connection getConnection (@NonNull ErlangPid remotePid) {
     return internal.node()
-        .lookup(pid)
+        .lookup(remotePid)
         .map(it -> internal.connections().connect(it))
         .orElseThrow(CouldntConnectException::new);
   }
 
-  private boolean isLocal (@NonNull ErlangPid pid) {
-    return internal.node().getDescriptor().equals(pid.getDescriptor());
+  private boolean isLocal (@NonNull ErlangPid remotePid) {
+    return internal.node().getDescriptor().equals(remotePid.getDescriptor());
   }
 
   private boolean isLocal (@NonNull RemoteNode remote) {

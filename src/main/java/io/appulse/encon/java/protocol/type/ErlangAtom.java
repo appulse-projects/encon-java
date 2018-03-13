@@ -36,12 +36,14 @@ import lombok.val;
 /**
  *
  * @author Artem Labazin
- * @since 0.0.1
+ * @since 1.0.0
  */
 @ToString
 @FieldDefaults(level = PRIVATE)
 @EqualsAndHashCode(callSuper = true)
 public class ErlangAtom extends ErlangTerm {
+
+  public static final ErlangAtom EMPTY = new ErlangAtom("");
 
   private static final int MAX_LENGTH = 255;
 

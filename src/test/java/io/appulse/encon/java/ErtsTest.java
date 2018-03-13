@@ -27,12 +27,13 @@ import io.appulse.encon.java.util.TestMethodNamePrinter;
 
 import lombok.val;
 import org.junit.Rule;
-import org.junit.Test;
 import org.junit.rules.TestRule;
+import org.junit.Test;
 
 /**
  *
- * @author alabazin
+ * @author Artem Labazin
+ * @since 1.0.0
  */
 public class ErtsTest {
 

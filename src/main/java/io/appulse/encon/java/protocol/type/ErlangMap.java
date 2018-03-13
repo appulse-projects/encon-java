@@ -42,7 +42,7 @@ import lombok.val;
 /**
  *
  * @author Artem Labazin
- * @since 0.0.1
+ * @since 1.0.0
  */
 @ToString
 @FieldDefaults(level = PRIVATE)
@@ -115,8 +115,8 @@ public class ErlangMap extends ErlangTerm {
   @Override
   protected void read (@NonNull Bytes buffer) {
     IntFunction<ErlangTerm[]> mapFunction = it -> new ErlangTerm[] {
-      ErlangTerm.newInstance(buffer),
-      ErlangTerm.newInstance(buffer)
+        ErlangTerm.newInstance(buffer),
+        ErlangTerm.newInstance(buffer)
     };
 
     BinaryOperator<ErlangTerm> mergeFunction = (left, right) -> {

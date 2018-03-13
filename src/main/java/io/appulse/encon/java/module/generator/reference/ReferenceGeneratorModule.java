@@ -30,11 +30,11 @@ import lombok.val;
 /**
  *
  * @author Artem Labazin
- * @since 0.0.1
+ * @since 1.0.0
  */
 @RequiredArgsConstructor
 @FieldDefaults(level = PRIVATE, makeFinal = true)
-public class ReferenceGeneratorModule implements ReferenceGeneratorModuleApi {
+public final class ReferenceGeneratorModule implements ReferenceGeneratorModuleApi {
 
   NodeInternalApi internal;
 

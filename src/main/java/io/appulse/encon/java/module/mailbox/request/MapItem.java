@@ -24,13 +24,13 @@ import java.math.BigInteger;
 import io.appulse.encon.java.protocol.term.ErlangTerm;
 import io.appulse.encon.java.protocol.type.ErlangAtom;
 import io.appulse.encon.java.protocol.type.ErlangBinary;
-import io.appulse.encon.java.protocol.type.ErlangString;
 import io.appulse.encon.java.protocol.type.ErlangFloat;
 import io.appulse.encon.java.protocol.type.ErlangInteger;
 import io.appulse.encon.java.protocol.type.ErlangNil;
 import io.appulse.encon.java.protocol.type.ErlangPid;
 import io.appulse.encon.java.protocol.type.ErlangPort;
 import io.appulse.encon.java.protocol.type.ErlangReference;
+import io.appulse.encon.java.protocol.type.ErlangString;
 
 import lombok.Getter;
 import lombok.NonNull;
@@ -40,7 +40,7 @@ import lombok.Value;
 /**
  *
  * @author Artem Labazin
- * @since 0.0.1
+ * @since 1.0.0
  */
 @Value
 @Getter(PACKAGE)

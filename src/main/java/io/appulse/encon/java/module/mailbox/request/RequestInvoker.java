@@ -35,35 +35,35 @@ import lombok.experimental.FieldDefaults;
 /**
  *
  * @author Artem Labazin
- * @since 0.0.1
+ * @since 1.0.0
  */
 @FieldDefaults(level = PRIVATE)
 @RequiredArgsConstructor(access = PROTECTED)
 @AllArgsConstructor(access = PACKAGE)
 public class RequestInvoker {
 
-  final Mailbox mailbox;
+  final Mailbox self;
 
   @Setter(PROTECTED)
   ErlangTerm message;
 
   public void send (@NonNull ErlangPid pid) {
-    mailbox.send(pid, message);
+    self.send(pid, message);
   }
 
   public void send (@NonNull String mailbox) {
-    this.mailbox.send(mailbox, message);
+    this.self.send(mailbox, message);
   }
 
   public void send (@NonNull String node, @NonNull String mailbox) {
-    this.mailbox.send(node, mailbox, message);
+    this.self.send(node, mailbox, message);
   }
 
   public void send (@NonNull NodeDescriptor descriptor, @NonNull String mailbox) {
-    this.mailbox.send(descriptor, mailbox, message);
+    this.self.send(descriptor, mailbox, message);
   }
 
   public void send (@NonNull RemoteNode remote, @NonNull String mailbox) {
-    this.mailbox.send(remote, mailbox, message);
+    this.self.send(remote, mailbox, message);
   }
 }

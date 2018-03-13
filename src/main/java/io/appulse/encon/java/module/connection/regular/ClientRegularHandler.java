@@ -48,7 +48,7 @@ import lombok.val;
 /**
  *
  * @author Artem Labazin
- * @since 0.0.1
+ * @since 1.0.0
  */
 @Slf4j
 @RequiredArgsConstructor

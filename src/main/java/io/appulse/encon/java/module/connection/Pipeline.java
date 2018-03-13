@@ -1,11 +1,11 @@
 /*
- * Copyright 2018 Appulse.
+ * Copyright 2018 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
  *
- *      http://www.apache.org/licenses/LICENSE-2.0
+ *     http://www.apache.org/licenses/LICENSE-2.0
  *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
@@ -42,14 +42,15 @@ import lombok.extern.slf4j.Slf4j;
 import lombok.val;
 
 /**
- * @author Artem Labazin <xxlabaza@gmail.com>
- * @since 20.02.2018
+ *
+ * @author Artem Labazin
+ * @since 1.0.0
  */
 @Slf4j
 @Builder
 @RequiredArgsConstructor
 @FieldDefaults(level = PRIVATE, makeFinal = true)
-public class Pipeline {
+public final class Pipeline {
 
   private static final ChannelOutboundHandler HANDSHAKE_ENCODER;
 

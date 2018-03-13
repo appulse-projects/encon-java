@@ -1,11 +1,11 @@
 /*
- * Copyright 2018 Appulse.
+ * Copyright 2018 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
  *
- *      http://www.apache.org/licenses/LICENSE-2.0
+ *     http://www.apache.org/licenses/LICENSE-2.0
  *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
@@ -16,32 +16,36 @@
 
 package io.appulse.encon.java.module.connection.handshake;
 
-import io.appulse.encon.java.module.connection.handshake.message.Message;
-import io.appulse.encon.java.module.connection.handshake.message.NameMessage;
-import io.appulse.encon.java.module.connection.handshake.message.StatusMessage;
-
 import static io.appulse.encon.java.module.connection.handshake.message.StatusMessage.Status.OK;
 import static lombok.AccessLevel.PRIVATE;
 
-import io.appulse.encon.java.RemoteNode;
 import java.util.Arrays;
 import java.util.concurrent.ThreadLocalRandom;
 
+import io.appulse.encon.java.RemoteNode;
 import io.appulse.encon.java.module.NodeInternalApi;
 import io.appulse.encon.java.module.connection.Pipeline;
-import io.appulse.encon.java.module.connection.handshake.HandshakeUtils;
 import io.appulse.encon.java.module.connection.handshake.exception.HandshakeException;
 import io.appulse.encon.java.module.connection.handshake.message.ChallengeAcknowledgeMessage;
 import io.appulse.encon.java.module.connection.handshake.message.ChallengeMessage;
 import io.appulse.encon.java.module.connection.handshake.message.ChallengeReplyMessage;
+import io.appulse.encon.java.module.connection.handshake.message.Message;
+import io.appulse.encon.java.module.connection.handshake.message.NameMessage;
+import io.appulse.encon.java.module.connection.handshake.message.StatusMessage;
+
 import io.netty.channel.ChannelHandlerContext;
 import lombok.Builder;
 import lombok.NonNull;
-import lombok.val;
 import lombok.experimental.FieldDefaults;
 import lombok.experimental.NonFinal;
 import lombok.extern.slf4j.Slf4j;
+import lombok.val;
 
+/**
+ *
+ * @author Artem Labazin
+ * @since 1.0.0
+ */
 @Slf4j
 @FieldDefaults(level = PRIVATE, makeFinal = true)
 public class HandshakeHandlerServer extends AbstractHandshakeHandler {

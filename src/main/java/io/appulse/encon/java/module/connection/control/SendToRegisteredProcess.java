@@ -17,6 +17,7 @@
 package io.appulse.encon.java.module.connection.control;
 
 import static io.appulse.encon.java.module.connection.control.ControlMessageTag.REG_SEND;
+import static io.appulse.encon.java.protocol.type.ErlangAtom.EMPTY;
 
 import io.appulse.encon.java.module.connection.control.exception.ControlMessageParsingException;
 import io.appulse.encon.java.protocol.term.ErlangTerm;
@@ -32,7 +33,7 @@ import lombok.Value;
 /**
  *
  * @author Artem Labazin
- * @since 0.0.1
+ * @since 1.0.0
  */
 @Value
 @AllArgsConstructor
@@ -64,7 +65,6 @@ public class SendToRegisteredProcess extends ControlMessage {
 
   @Override
   public ErlangTerm[] elements () {
-    // TODO: Atom or Nil?
-    return new ErlangTerm[] { from, new ErlangAtom(""), to };
+    return new ErlangTerm[] { from, EMPTY, to };
   }
 }

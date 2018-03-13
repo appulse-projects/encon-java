@@ -32,7 +32,7 @@ import lombok.Value;
 /**
  *
  * @author Artem Labazin
- * @since 0.0.1
+ * @since 1.0.0
  */
 @Value
 @AllArgsConstructor

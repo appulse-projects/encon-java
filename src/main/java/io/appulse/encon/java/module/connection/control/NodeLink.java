@@ -27,7 +27,7 @@ import lombok.NoArgsConstructor;
 /**
  *
  * @author Artem Labazin
- * @since 0.0.1
+ * @since 1.0.0
  */
 @NoArgsConstructor
 @EqualsAndHashCode(callSuper = true)

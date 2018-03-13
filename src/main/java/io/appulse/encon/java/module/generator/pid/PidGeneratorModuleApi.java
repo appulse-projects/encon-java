@@ -21,7 +21,7 @@ import io.appulse.encon.java.protocol.type.ErlangPid;
 /**
  *
  * @author Artem Labazin
- * @since 0.0.1
+ * @since 1.0.0
  */
 public interface PidGeneratorModuleApi {
 
