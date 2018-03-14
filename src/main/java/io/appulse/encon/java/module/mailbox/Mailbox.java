@@ -18,8 +18,6 @@ package io.appulse.encon.java.module.mailbox;
 
 import static io.appulse.encon.java.module.connection.control.ControlMessageTag.EXIT;
 import static io.appulse.encon.java.module.connection.control.ControlMessageTag.EXIT2;
-import static java.util.Optional.empty;
-import static java.util.Optional.of;
 import static lombok.AccessLevel.PACKAGE;
 import static lombok.AccessLevel.PRIVATE;
 
@@ -36,17 +34,14 @@ import io.appulse.encon.java.RemoteNode;
 import io.appulse.encon.java.module.NodeInternalApi;
 import io.appulse.encon.java.module.connection.Connection;
 import io.appulse.encon.java.module.connection.control.Exit;
-import io.appulse.encon.java.module.connection.control.Link;
-import io.appulse.encon.java.module.connection.control.Send;
-import io.appulse.encon.java.module.connection.control.Unlink;
 import io.appulse.encon.java.module.connection.exception.CouldntConnectException;
 import io.appulse.encon.java.module.connection.regular.Message;
 import io.appulse.encon.java.module.lookup.exception.NoSuchRemoteNodeException;
 import io.appulse.encon.java.module.mailbox.exception.MailboxWithSuchNameDoesntExistException;
 import io.appulse.encon.java.module.mailbox.exception.MailboxWithSuchPidDoesntExistException;
 import io.appulse.encon.java.module.mailbox.exception.ReceivedExitException;
+import io.appulse.encon.java.protocol.Erlang;
 import io.appulse.encon.java.protocol.term.ErlangTerm;
-import io.appulse.encon.java.protocol.type.ErlangAtom;
 import io.appulse.encon.java.protocol.type.ErlangPid;
 
 import lombok.AllArgsConstructor;
@@ -123,50 +118,53 @@ public final class Mailbox implements Closeable {
     return receiveAsync().get(timeout, unit);
   }
 
-  public void send (@NonNull ErlangPid to, @NonNull ErlangTerm message) {
+  public void send (@NonNull ErlangPid to, @NonNull ErlangTerm body) {
+    val message = Message.send(to, body);
     if (isLocal(to)) {
-      getMailbox(to).send(message);
+      getMailbox(to).deliver(message);
     } else {
-      getConnection(to).send(to, message);
+      getConnection(to).send(message);
     }
   }
 
-  public void send (@NonNull String mailbox, @NonNull ErlangTerm message) {
-    getMailbox(mailbox).send(message);
+  public void send (@NonNull String mailbox, @NonNull ErlangTerm body) {
+    val message = Message.send(mailbox, body);
+    getMailbox(mailbox).deliver(message);
   }
 
-  public void send (@NonNull String node, @NonNull String mailbox, @NonNull ErlangTerm message) {
+  public void send (@NonNull String node, @NonNull String mailbox, @NonNull ErlangTerm body) {
     val descriptor = NodeDescriptor.from(node);
-    send(descriptor, mailbox, message);
+    send(descriptor, mailbox, body);
   }
 
-  public void send (@NonNull NodeDescriptor descriptor, @NonNull String mailbox, @NonNull ErlangTerm message) {
+  public void send (@NonNull NodeDescriptor descriptor, @NonNull String mailbox, @NonNull ErlangTerm body) {
     RemoteNode remote = internal.node()
         .lookup(descriptor)
         .orElseThrow(() -> new NoSuchRemoteNodeException(descriptor));
 
-    send(remote, mailbox, message);
+    send(remote, mailbox, body);
   }
 
-  public void send (@NonNull RemoteNode remote, @NonNull String mailbox, @NonNull ErlangTerm message) {
+  public void send (@NonNull RemoteNode remote, @NonNull String mailbox, @NonNull ErlangTerm body) {
     log.debug("Sending message\nTo node: {}\nMailbox: {}\nPayload: {}",
-              remote, mailbox, message);
+              remote, mailbox, body);
 
     if (isLocal(remote)) {
-      send(mailbox, message);
+      send(mailbox, body);
     } else {
       internal.connections()
           .connect(remote)
-          .sendToRegisteredProcess(pid, mailbox, message);
+          .send(Message.sendToRegisteredProcess(pid, mailbox, body));
     }
     log.debug("Message was sent");
   }
 
   public void link (@NonNull ErlangPid to) {
+    val message = Message.link(pid, to);
     if (isLocal(to)) {
-      getMailbox(to).deliver(new Message(new Link(pid, to), empty()));
+      getMailbox(to).deliver(message);
     } else {
-      getConnection(to).link(pid, to);
+      getConnection(to).send(message);
     }
     links.add(to);
   }
@@ -174,14 +172,15 @@ public final class Mailbox implements Closeable {
   public void unlink (@NonNull ErlangPid to) {
     links.remove(to);
 
+    val message = Message.unlink(pid, to);
     if (isLocal(to)) {
-      getMailbox(to).deliver(new Message(new Unlink(pid, to), empty()));
+      getMailbox(to).deliver(message);
     } else {
-      getConnection(to).unlink(pid, to);
+      getConnection(to).send(message);
     }
   }
 
-  public void exit (@NonNull String reason) {
+  public void exit (@NonNull ErlangTerm reason) {
     closed = true;
 
     log.debug("Exiting mailbox '{}:{}'. Reason: '{}'",
@@ -190,15 +189,20 @@ public final class Mailbox implements Closeable {
     executor.shutdown();
 
     links.forEach(it -> {
+      val message = Message.exit(pid, it, reason);
       if (isLocal(it)) {
-        getMailbox(it).deliver(new Message(new Exit(pid, it, new ErlangAtom(reason)), empty()));
+        getMailbox(it).deliver(message);
       } else {
-        getConnection(it).exit(pid, it, reason);
+        getConnection(it).send(message);
       }
     });
 
     internal.mailboxes()
         .remove(this);
+  }
+
+  public void exit (@NonNull String reason) {
+    exit(Erlang.atom(reason));
   }
 
   public void deliver (@NonNull Message message) {
@@ -212,10 +216,6 @@ public final class Mailbox implements Closeable {
       return;
     }
     exit("normal");
-  }
-
-  private void send (@NonNull ErlangTerm body) {
-    deliver(new Message(new Send(pid), of(body)));
   }
 
   @Synchronized

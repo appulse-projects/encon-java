@@ -45,79 +45,79 @@ public final class Erlang {
 
   public static final ErlangAtom EMPTY_ATOM = new ErlangAtom("");
 
-  public static ErlangTerm atom (boolean value) {
+  public static ErlangAtom atom (boolean value) {
     return new ErlangAtom(value);
   }
 
-  public static ErlangTerm atom (@NonNull String value) {
+  public static ErlangAtom atom (@NonNull String value) {
     return new ErlangAtom(value);
   }
 
-  public static ErlangTerm number (char value) {
+  public static ErlangInteger number (char value) {
     return new ErlangInteger(value);
   }
 
-  public static ErlangTerm number (byte value) {
+  public static ErlangInteger number (byte value) {
     return new ErlangInteger(value);
   }
 
-  public static ErlangTerm number (short value) {
+  public static ErlangInteger number (short value) {
     return new ErlangInteger(value);
   }
 
-  public static ErlangTerm number (int value) {
+  public static ErlangInteger number (int value) {
     return new ErlangInteger(value);
   }
 
-  public static ErlangTerm number (long value) {
+  public static ErlangInteger number (long value) {
     return new ErlangInteger(value);
   }
 
-  public static ErlangTerm number (@NonNull BigInteger value) {
+  public static ErlangInteger number (@NonNull BigInteger value) {
     return new ErlangInteger(value);
   }
 
-  public static ErlangTerm number (float value) {
+  public static ErlangFloat number (float value) {
     return new ErlangFloat(value);
   }
 
-  public static ErlangTerm number (double value) {
+  public static ErlangFloat number (double value) {
     return new ErlangFloat(value);
   }
 
-  public static ErlangTerm binary (@NonNull byte[] value) {
+  public static ErlangBinary binary (@NonNull byte[] value) {
     return new ErlangBinary(value);
   }
 
-  public static ErlangTerm bitstr (@NonNull byte[] bits, int pad) {
+  public static ErlangBitString bitstr (@NonNull byte[] bits, int pad) {
     return new ErlangBitString(bits, pad);
   }
 
-  public static ErlangTerm string (@NonNull String value) {
+  public static ErlangString string (@NonNull String value) {
     return new ErlangString(value); // List/BitString?
   }
 
-  public static ErlangTerm tuple (@NonNull ErlangTerm... elements) {
+  public static ErlangTuple tuple (@NonNull ErlangTerm... elements) {
     return new ErlangTuple(elements);
   }
 
-  public static ErlangTerm tuple (@NonNull List<ErlangTerm> elements) {
+  public static ErlangTuple tuple (@NonNull List<ErlangTerm> elements) {
     return new ErlangTuple(elements);
   }
 
-  public static ErlangTerm list (@NonNull ErlangTerm... elements) {
+  public static ErlangList list (@NonNull ErlangTerm... elements) {
     return new ErlangList(elements);
   }
 
-  public static ErlangTerm list (@NonNull List<ErlangTerm> elements) {
+  public static ErlangList list (@NonNull List<ErlangTerm> elements) {
     return new ErlangList(elements);
   }
 
-  public static ErlangTerm list (@NonNull ErlangTerm tail, @NonNull List<ErlangTerm> elements) {
+  public static ErlangList list (@NonNull ErlangTerm tail, @NonNull List<ErlangTerm> elements) {
     return new ErlangList(tail, elements);
   }
 
-  public static ErlangTerm map (@NonNull ErlangTerm... keysAndValues) {
+  public static ErlangMap map (@NonNull ErlangTerm... keysAndValues) {
     if (keysAndValues.length % 2 != 0) {
       throw new IllegalArgumentException("Keys and Values array must be even");
     }

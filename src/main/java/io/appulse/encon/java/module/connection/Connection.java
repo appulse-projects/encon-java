@@ -16,24 +16,13 @@
 
 package io.appulse.encon.java.module.connection;
 
-import static java.util.Optional.ofNullable;
 import static lombok.AccessLevel.PRIVATE;
 
 import java.io.Closeable;
 
 import io.appulse.encon.java.RemoteNode;
-import io.appulse.encon.java.module.connection.control.ControlMessage;
-import io.appulse.encon.java.module.connection.control.Exit;
-import io.appulse.encon.java.module.connection.control.Exit2;
-import io.appulse.encon.java.module.connection.control.Link;
-import io.appulse.encon.java.module.connection.control.Send;
-import io.appulse.encon.java.module.connection.control.SendToRegisteredProcess;
-import io.appulse.encon.java.module.connection.control.Unlink;
 import io.appulse.encon.java.module.connection.regular.ClientRegularHandler;
 import io.appulse.encon.java.module.connection.regular.Message;
-import io.appulse.encon.java.protocol.term.ErlangTerm;
-import io.appulse.encon.java.protocol.type.ErlangAtom;
-import io.appulse.encon.java.protocol.type.ErlangPid;
 
 import lombok.Getter;
 import lombok.NonNull;
@@ -58,40 +47,8 @@ public final class Connection implements Closeable {
   @NonNull
   ClientRegularHandler handler;
 
-  public void sendToRegisteredProcess (@NonNull ErlangPid from, @NonNull String mailbox, @NonNull ErlangTerm message) {
-    sendToRegisteredProcess(from, new ErlangAtom(mailbox), message);
-  }
-
-  public void sendToRegisteredProcess (@NonNull ErlangPid from, @NonNull ErlangAtom mailbox, @NonNull ErlangTerm message) {
-    send(new SendToRegisteredProcess(from, mailbox), message);
-  }
-
-  public void send (@NonNull ErlangPid to, @NonNull ErlangTerm message) {
-    send(new Send(to), message);
-  }
-
-  public void link (@NonNull ErlangPid from, @NonNull ErlangPid to) {
-    send(new Link(from, to));
-  }
-
-  public void unlink (@NonNull ErlangPid from, @NonNull ErlangPid to) {
-    send(new Unlink(from, to));
-  }
-
-  public void exit (@NonNull ErlangPid from, @NonNull ErlangPid to, @NonNull String reason) {
-    exit(from, to, new ErlangAtom(reason));
-  }
-
-  public void exit (@NonNull ErlangPid from, @NonNull ErlangPid to, @NonNull ErlangTerm reason) {
-    send(new Exit(from, to, reason));
-  }
-
-  public void exit2 (@NonNull ErlangPid from, @NonNull ErlangPid to, @NonNull String reason) {
-    exit2(from, to, new ErlangAtom(reason));
-  }
-
-  public void exit2 (@NonNull ErlangPid from, @NonNull ErlangPid to, @NonNull ErlangTerm reason) {
-    send(new Exit2(from, to, reason));
+  public void send (@NonNull Message message) {
+    handler.send(message);
   }
 
   @Override
@@ -99,13 +56,5 @@ public final class Connection implements Closeable {
     log.debug("Closing connection to {}", remote);
     handler.close();
     log.debug("Connection to {} was closed", remote);
-  }
-
-  private void send (@NonNull ControlMessage control) {
-    send(control, null);
-  }
-
-  private void send (@NonNull ControlMessage control, ErlangTerm payload) {
-    handler.send(new Message(control, ofNullable(payload)));
   }
 }
