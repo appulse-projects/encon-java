@@ -54,6 +54,7 @@ public class NodeConfig {
 
   public static final NodeConfig DEFAULT = NodeConfig.builder().build();
 
+  @SuppressWarnings("unchecked")
   static NodeConfig newInstance (@NonNull Map<String, Object> map) {
     NodeConfigBuilder builder = NodeConfig.builder();
 

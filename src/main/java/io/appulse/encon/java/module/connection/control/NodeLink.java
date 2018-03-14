@@ -23,18 +23,20 @@ import io.appulse.encon.java.protocol.type.ErlangTuple;
 
 import lombok.EqualsAndHashCode;
 import lombok.NoArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 
 /**
  *
  * @author Artem Labazin
  * @since 1.0.0
  */
+@Slf4j
 @NoArgsConstructor
 @EqualsAndHashCode(callSuper = true)
 public class NodeLink extends ControlMessage {
 
   public NodeLink (ErlangTuple tuple) {
-    // empty body
+    log.debug("tuple: {}", tuple);
   }
 
   @Override

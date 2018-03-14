@@ -20,7 +20,6 @@ import static io.appulse.encon.java.module.connection.handshake.message.MessageT
 import static java.nio.charset.StandardCharsets.ISO_8859_1;
 import static lombok.AccessLevel.PRIVATE;
 
-import java.nio.ByteBuffer;
 import java.util.Set;
 
 import io.appulse.encon.java.DistributionFlag;
@@ -60,7 +59,7 @@ public class ChallengeMessage extends Message {
 
   @Builder
   private ChallengeMessage (Version distribution, @Singular Set<DistributionFlag> flags,
-                            int challenge, String fullName, ByteBuffer byteBuffer
+                            int challenge, String fullName
   ) {
     this();
     this.distribution = distribution;

@@ -70,7 +70,7 @@ public class ClientEncoder extends MessageToByteEncoder<Message> {
 
       out.writeBytes(array);
       log.debug("Message was sent");
-    } catch (Throwable ex) {
+    } catch (Exception ex) {
       log.error("Error during encoding message {} for {}", container, context.channel().remoteAddress());
       throw ex;
     }

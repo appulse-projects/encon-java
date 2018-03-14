@@ -57,6 +57,8 @@ public abstract class ErlangTerm implements IntegerTerm,
                                             SpecificTerm,
                                             Serializable {
 
+  private static final long serialVersionUID = 5430854281567501819L;
+
   public static <T extends ErlangTerm> T newInstance (@NonNull ByteBuffer byteBuffer) {
     val buffer = Bytes.wrap(byteBuffer);
     return newInstance(buffer);
@@ -68,7 +70,7 @@ public abstract class ErlangTerm implements IntegerTerm,
   }
 
   @SneakyThrows
-  @SuppressWarnings("unchecked")
+  // @SuppressWarnings("unchecked")
   public static <T extends ErlangTerm> T newInstance (@NonNull Bytes buffer) {
     val type = TermType.of(buffer.getByte());
     Class<T> klass = (Class<T>) type.getType();

@@ -16,6 +16,8 @@
 
 package io.appulse.encon.java.protocol.type;
 
+import static io.appulse.encon.java.protocol.TermType.NIL;
+
 import io.appulse.encon.java.protocol.TermType;
 import io.appulse.encon.java.protocol.term.ErlangTerm;
 import io.appulse.utils.Bytes;
@@ -33,7 +35,7 @@ public class ErlangNil extends ErlangTerm {
   private static final long serialVersionUID = 3124893467508024194L;
 
   public ErlangNil () {
-    this(io.appulse.encon.java.protocol.TermType.NIL);
+    this(NIL);
   }
 
   public ErlangNil (TermType type) {
