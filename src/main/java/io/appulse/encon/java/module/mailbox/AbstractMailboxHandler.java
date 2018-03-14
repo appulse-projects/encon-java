@@ -20,11 +20,14 @@ import java.util.Optional;
 
 import io.appulse.encon.java.module.connection.control.ControlMessage;
 import io.appulse.encon.java.module.connection.control.Exit;
+import io.appulse.encon.java.module.connection.control.ExitTraceToken;
 import io.appulse.encon.java.module.connection.control.Link;
 import io.appulse.encon.java.module.connection.control.Unlink;
 import io.appulse.encon.java.protocol.term.ErlangTerm;
+import io.appulse.encon.java.protocol.type.ErlangPid;
 
 import lombok.NonNull;
+import lombok.extern.slf4j.Slf4j;
 import lombok.val;
 
 /**
@@ -32,21 +35,36 @@ import lombok.val;
  * @author Artem Labazin
  * @since 1.0.0
  */
+@Slf4j
 public abstract class AbstractMailboxHandler implements MailboxHandler {
 
   @Override
-  public void receive (@NonNull Mailbox self, @NonNull ControlMessage header, Optional<ErlangTerm> body) {
-    switch (header.getTag()) {
-    case LINK:
-      handle(self, (Link) header);
-      return;
-    case UNLINK:
-      handle(self, (Unlink) header);
-      return;
-    case EXIT:
-      handle(self, (Exit) header);
-    default:
-      handle(self, header, body);
+  public void receive (@NonNull Mailbox self, @NonNull ControlMessage header, @NonNull Optional<ErlangTerm> body) {
+    log.debug("Mailbox {} received:\n  header: {}\n  body:   {}",
+              self, header, body);
+
+    try {
+      switch (header.getTag()) {
+      case LINK:
+        handle(self, (Link) header);
+        break;
+      case UNLINK:
+        handle(self, (Unlink) header);
+        break;
+      case EXIT:
+      case EXIT2:
+        handle(self, (Exit) header);
+        break;
+      case EXIT_TT:
+      case EXIT2_TT:
+        handle(self, (ExitTraceToken) header);
+        break;
+      default:
+        handle(self, header, body);
+      }
+    } catch (Exception ex) {
+      log.error("Exception during processing received message", ex);
+      self.exit(ex.getMessage());
     }
   }
 
@@ -59,7 +77,7 @@ public abstract class AbstractMailboxHandler implements MailboxHandler {
    *
    * @param header received Link control message
    */
-  protected void handle (@NonNull Mailbox self, @NonNull Link header) {
+  protected void handle (Mailbox self, Link header) {
     val pidFrom = header.getFrom();
     self.getLinks().add(pidFrom);
   }
@@ -71,7 +89,7 @@ public abstract class AbstractMailboxHandler implements MailboxHandler {
    *
    * @param header received Unlink control message
    */
-  protected void handle (@NonNull Mailbox self, @NonNull Unlink header) {
+  protected void handle (Mailbox self, Unlink header) {
     val pidFrom = header.getFrom();
     self.getLinks().remove(pidFrom);
   }
@@ -83,8 +101,35 @@ public abstract class AbstractMailboxHandler implements MailboxHandler {
    *
    * @param header received Exit control message
    */
-  protected void handle (@NonNull Mailbox self, @NonNull Exit header) {
-    val pidFrom = header.getFrom();
-    self.getLinks().remove(pidFrom);
+  protected void handle (Mailbox self, Exit header) {
+    exit(self, header.getFrom(), header.getReason());
+  }
+
+  /**
+   * Handles exit trace token requests.
+   *
+   * @param self reference to this mailbox
+   *
+   * @param header received ExitTraceToken control message
+   */
+  protected void handle (Mailbox self, ExitTraceToken header) {
+    exit(self, header.getFrom(), header.getReason());
+  }
+
+  private void exit (Mailbox self, ErlangPid from, ErlangTerm reason) {
+    self.getLinks().remove(from);
+
+    if (reason.isAtom()) {
+      val test = reason.asText();
+      if ("normal".equals(test)) {
+        // ignore 'normal' exit
+        return;
+      } else if ("kill".equals(test)) {
+        self.close();
+        return;
+      }
+    }
+
+    self.exit(reason);
   }
 }

@@ -16,15 +16,15 @@
 
 package io.appulse.encon.java;
 
+import static io.appulse.encon.java.protocol.Erlang.atom;
+import static io.appulse.encon.java.protocol.Erlang.number;
+import static io.appulse.encon.java.protocol.Erlang.string;
+import static io.appulse.encon.java.protocol.Erlang.tuple;
 import static io.appulse.epmd.java.core.model.NodeType.R6_ERLANG;
 import static io.appulse.epmd.java.core.model.Protocol.TCP;
 import static io.appulse.epmd.java.core.model.Version.R6;
 import static java.util.concurrent.TimeUnit.SECONDS;
 import static org.assertj.core.api.Assertions.assertThat;
-import static io.appulse.encon.java.protocol.Erlang.atom;
-import static io.appulse.encon.java.protocol.Erlang.number;
-import static io.appulse.encon.java.protocol.Erlang.tuple;
-import static io.appulse.encon.java.protocol.Erlang.string;
 
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.CompletionStage;
@@ -222,7 +222,7 @@ public class NodeTest {
         .body(tuple(
             mailbox.getPid(),
             tuple(
-                string("hello world"),
+                string("hello, world"),
                 atom("popa"),
                 atom(false),
                 number(42)
