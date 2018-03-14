@@ -18,6 +18,7 @@ package io.appulse.encon.java.module.connection.handshake.message;
 
 import static io.appulse.encon.java.module.connection.handshake.message.MessageType.STATUS;
 import static java.nio.charset.StandardCharsets.ISO_8859_1;
+import static java.util.Locale.ENGLISH;
 import static lombok.AccessLevel.PRIVATE;
 
 import java.util.stream.Stream;
@@ -104,7 +105,7 @@ public class StatusMessage extends Message {
     }
 
     public byte[] getBytes () {
-      return name().toLowerCase().getBytes(ISO_8859_1);
+      return name().toLowerCase(ENGLISH).getBytes(ISO_8859_1);
     }
   }
 }
