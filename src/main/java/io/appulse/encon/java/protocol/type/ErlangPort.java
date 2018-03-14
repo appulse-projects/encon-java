@@ -45,10 +45,6 @@ public class ErlangPort extends ErlangTerm {
 
   private static final long serialVersionUID = 6837541013041204637L;
 
-  public static ErlangPort port (@NonNull String node, int id, int creation) {
-    return new ErlangPort(PORT, node, id, creation);
-  }
-
   NodeDescriptor descriptor;
 
   int id;

@@ -51,18 +51,6 @@ public class ErlangMap extends ErlangTerm {
 
   private static final long serialVersionUID = -4889715199209923662L;
 
-  public static ErlangMap map (@NonNull ErlangTerm... keysAndValues) {
-    if (keysAndValues.length % 2 != 0) {
-      throw new IllegalArgumentException();
-    }
-
-    LinkedHashMap<ErlangTerm, ErlangTerm> map = new LinkedHashMap<>(keysAndValues.length / 2);
-    for (int index = 0; index < keysAndValues.length - 1; index += 2) {
-      map.put(keysAndValues[index], keysAndValues[index + 1]);
-    }
-    return new ErlangMap(map);
-  }
-
   LinkedHashMap<ErlangTerm, ErlangTerm> map;
 
   public ErlangMap (TermType type) {

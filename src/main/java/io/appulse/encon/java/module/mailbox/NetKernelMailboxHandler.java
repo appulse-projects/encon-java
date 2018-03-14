@@ -16,6 +16,9 @@
 
 package io.appulse.encon.java.module.mailbox;
 
+import static io.appulse.encon.java.protocol.Erlang.atom;
+import static io.appulse.encon.java.protocol.Erlang.tuple;
+
 import java.util.Optional;
 
 import io.appulse.encon.java.module.connection.control.ControlMessage;
@@ -47,9 +50,11 @@ public class NetKernelMailboxHandler implements MailboxHandler {
     }
 
     ErlangTerm tuple = payload.get(1).get();
-    self.request().makeTuple()
-        .add(tuple.get(1).get().asReference())
-        .addAtom("yes")
+    self.request()
+        .body(tuple(
+            tuple.get(1).get().asReference(),
+            atom("yes")
+        ))
         .send(tuple.get(0).get().asPid());
 
     log.debug("Ping response was sent to {}", tuple);

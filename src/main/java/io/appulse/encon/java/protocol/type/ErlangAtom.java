@@ -43,19 +43,9 @@ import lombok.val;
 @EqualsAndHashCode(callSuper = true)
 public class ErlangAtom extends ErlangTerm {
 
-  public static final ErlangAtom EMPTY = new ErlangAtom("");
-
   private static final int MAX_LENGTH = 255;
 
   private static final long serialVersionUID = -2748345367418129439L;
-
-  public static ErlangAtom atom (@NonNull String value) {
-    return new ErlangAtom(value);
-  }
-
-  public static ErlangAtom atom (boolean value) {
-    return new ErlangAtom(value);
-  }
 
   String value;
 

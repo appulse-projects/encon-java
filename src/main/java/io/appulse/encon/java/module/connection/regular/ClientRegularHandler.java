@@ -53,7 +53,7 @@ import lombok.val;
 @Slf4j
 @RequiredArgsConstructor
 @FieldDefaults(level = PRIVATE, makeFinal = true)
-public class ClientRegularHandler extends ChannelInboundHandlerAdapter implements Closeable {
+public final class ClientRegularHandler extends ChannelInboundHandlerAdapter implements Closeable {
 
   @NonNull
   NodeInternalApi internal;

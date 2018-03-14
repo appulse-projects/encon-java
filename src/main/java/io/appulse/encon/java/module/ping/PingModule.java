@@ -16,7 +16,8 @@
 
 package io.appulse.encon.java.module.ping;
 
-import static io.appulse.encon.java.module.mailbox.request.ArrayItems.items;
+import static io.appulse.encon.java.protocol.Erlang.atom;
+import static io.appulse.encon.java.protocol.Erlang.tuple;
 import static java.lang.Boolean.FALSE;
 import static java.lang.Boolean.TRUE;
 import static lombok.AccessLevel.PRIVATE;
@@ -82,17 +83,31 @@ public final class PingModule implements PingModuleApi {
         .handler(new PingReceiveHandler(future))
         .build();
 
-    mailbox.request().makeTuple()
-        .addAtom("$gen_call")
-        .addTuple(items()
-            .add(mailbox.getPid())
-            .add(internal.node().generateReference())
-        )
-        .addTuple(items()
-            .addAtom("is_auth")
-            .addAtom(internal.node().getDescriptor().getFullName())
-        )
+    mailbox.request()
+        .body(tuple(
+            atom("$gen_call"),
+            tuple(
+                mailbox.getPid(),
+                internal.node().generateReference()
+            ),
+            tuple(
+                atom("is_auth"),
+                atom(internal.node().getDescriptor().getFullName())
+            )
+        ))
         .send(remote, "net_kernel");
+
+    // mailbox.request().makeTuple()
+    //     .addAtom("$gen_call")
+    //     .addTuple(items()
+    //         .add(mailbox.getPid())
+    //         .add(internal.node().generateReference())
+    //     )
+    //     .addTuple(items()
+    //         .addAtom("is_auth")
+    //         .addAtom(internal.node().getDescriptor().getFullName())
+    //     )
+    //     .send(remote, "net_kernel");
 
     log.debug("Returning from ping method");
     return future;

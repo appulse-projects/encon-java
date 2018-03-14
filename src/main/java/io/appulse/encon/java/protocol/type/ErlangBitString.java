@@ -46,10 +46,6 @@ public class ErlangBitString extends ErlangTerm {
 
   private static final long serialVersionUID = 7484207266013629164L;
 
-  public static ErlangBitString bitstr (@NonNull byte[] bits, int pad) {
-    return new ErlangBitString(bits, pad);
-  }
-
   byte[] bits;
 
   int pad;

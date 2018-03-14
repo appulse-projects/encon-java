@@ -16,12 +16,15 @@
 
 package io.appulse.encon.java;
 
-import static io.appulse.encon.java.module.mailbox.request.ArrayItems.items;
 import static io.appulse.epmd.java.core.model.NodeType.R6_ERLANG;
 import static io.appulse.epmd.java.core.model.Protocol.TCP;
 import static io.appulse.epmd.java.core.model.Version.R6;
 import static java.util.concurrent.TimeUnit.SECONDS;
 import static org.assertj.core.api.Assertions.assertThat;
+import static io.appulse.encon.java.protocol.Erlang.atom;
+import static io.appulse.encon.java.protocol.Erlang.number;
+import static io.appulse.encon.java.protocol.Erlang.tuple;
+import static io.appulse.encon.java.protocol.Erlang.string;
 
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.CompletionStage;
@@ -179,7 +182,7 @@ public class NodeTest {
           .build();
 
       mailbox2.request()
-          .put(text1)
+          .body(string(text1))
           .send("node-1@localhost", "popa1");
 
       assertThat(future1.get(2, SECONDS))
@@ -192,7 +195,7 @@ public class NodeTest {
       CompletionStage<Message> stage2 = mailbox2.receiveAsync();
 
       mailbox1.request()
-          .put(text2)
+          .body(string(text2))
           .send("node-2@localhost", "popa2");
 
       assertThat(stage2.toCompletableFuture().get(2, SECONDS))
@@ -216,14 +219,15 @@ public class NodeTest {
         .build();
 
     mailbox.request()
-        .makeTuple()
-        .add(mailbox.getPid())
-        .addTuple(items()
-            .add("hello, world")
-            .addAtom("popa")
-            .add(false)
-            .add(42)
-        )
+        .body(tuple(
+            mailbox.getPid(),
+            tuple(
+                string("hello world"),
+                atom("popa"),
+                atom(false),
+                number(42)
+            )
+        ))
         .send("echo@localhost", "echo_server");
 
     SECONDS.sleep(3);

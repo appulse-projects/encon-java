@@ -14,55 +14,56 @@
  * limitations under the License.
  */
 
-package io.appulse.encon.java.module.mailbox.request;
+package io.appulse.encon.java.module.mailbox;
+
+import static lombok.AccessLevel.PACKAGE;
+import static lombok.AccessLevel.PRIVATE;
 
 import io.appulse.encon.java.NodeDescriptor;
 import io.appulse.encon.java.RemoteNode;
-import io.appulse.encon.java.module.mailbox.Mailbox;
+import io.appulse.encon.java.protocol.term.ErlangTerm;
 import io.appulse.encon.java.protocol.type.ErlangPid;
 
 import lombok.NonNull;
+import lombok.RequiredArgsConstructor;
+import lombok.experimental.FieldDefaults;
 
 /**
  *
  * @author Artem Labazin
  * @since 1.0.0
  */
-abstract class AbstractPrepareMessageBeforeSendRequestBuilder extends RequestInvoker {
+@FieldDefaults(level = PRIVATE)
+@RequiredArgsConstructor(access = PACKAGE)
+public final class RequestBuilder {
 
-  protected AbstractPrepareMessageBeforeSendRequestBuilder (@NonNull Mailbox mailbox) {
-    super(mailbox);
+  @NonNull
+  final Mailbox self;
+
+  ErlangTerm body;
+
+  public RequestBuilder body (@NonNull ErlangTerm value) {
+    this.body = value;
+    return this;
   }
 
-  @Override
-  public void send (@NonNull ErlangPid pid) {
-    prepareMessage();
-    super.send(pid);
+  public void send (@NonNull ErlangPid to) {
+    self.send(to, body);
   }
 
-  @Override
   public void send (@NonNull String mailbox) {
-    prepareMessage();
-    super.send(mailbox);
+    self.send(mailbox, body);
   }
 
-  @Override
   public void send (@NonNull String node, @NonNull String mailbox) {
-    prepareMessage();
-    super.send(node, mailbox);
+    self.send(node, mailbox, body);
   }
 
-  @Override
   public void send (@NonNull NodeDescriptor descriptor, @NonNull String mailbox) {
-    prepareMessage();
-    super.send(descriptor, mailbox);
+    self.send(descriptor, mailbox, body);
   }
 
-  @Override
   public void send (@NonNull RemoteNode remote, @NonNull String mailbox) {
-    prepareMessage();
-    super.send(remote, mailbox);
+    self.send(remote, mailbox, body);
   }
-
-  protected abstract void prepareMessage ();
 }

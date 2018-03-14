@@ -45,7 +45,6 @@ import io.appulse.encon.java.module.lookup.exception.NoSuchRemoteNodeException;
 import io.appulse.encon.java.module.mailbox.exception.MailboxWithSuchNameDoesntExistException;
 import io.appulse.encon.java.module.mailbox.exception.MailboxWithSuchPidDoesntExistException;
 import io.appulse.encon.java.module.mailbox.exception.ReceivedExitException;
-import io.appulse.encon.java.module.mailbox.request.RequestBuilder;
 import io.appulse.encon.java.protocol.term.ErlangTerm;
 import io.appulse.encon.java.protocol.type.ErlangAtom;
 import io.appulse.encon.java.protocol.type.ErlangPid;
