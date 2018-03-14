@@ -54,6 +54,7 @@ public final class Config {
     return load(file);
   }
 
+  @SuppressWarnings("unchecked")
   public static Config load (@NonNull File file) {
     val map = parseYaml(file);
 
@@ -79,6 +80,7 @@ public final class Config {
   }
 
   @SneakyThrows
+  @SuppressWarnings("unchecked")
   private static Map<String, Map<String, Object>> parseYaml (@NonNull File file) {
     val yaml = new Yaml();
     try (val inputStream = new FileInputStream(file)) {

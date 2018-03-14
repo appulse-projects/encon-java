@@ -100,7 +100,7 @@ public final class ClientRegularHandler extends ChannelInboundHandlerAdapter imp
   public void channelRead (ChannelHandlerContext context, Object obj) throws Exception {
     val message = (Message) obj;
     log.debug("Received message: {}", message);
-    val header = message.getHeader();
+    ControlMessage header = message.getHeader();
 
     val optional = findMailbox(header);
     if (optional.isPresent()) {

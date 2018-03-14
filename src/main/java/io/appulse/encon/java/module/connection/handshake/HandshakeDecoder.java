@@ -68,7 +68,7 @@ public class HandshakeDecoder extends ReplayingDecoder<Message> {
     val messageBytes = new byte[messageSize];
     buf.getBytes(0, messageBytes);
 
-    val bytes = Bytes.wrap(messageBytes);
+    Bytes bytes = Bytes.wrap(messageBytes);
 
     val message = parse(bytes);
 

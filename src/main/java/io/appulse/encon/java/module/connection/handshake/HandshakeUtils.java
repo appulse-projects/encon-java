@@ -60,7 +60,7 @@ public final class HandshakeUtils {
 
     val messageDigest = MessageDigest.getInstance("MD5");
     messageDigest.update(cookie.getBytes(ISO_8859_1));
-    messageDigest.update(("" + ch).getBytes(ISO_8859_1));
+    messageDigest.update(Long.toString(ch).getBytes(ISO_8859_1));
 
     return messageDigest.digest();
   }

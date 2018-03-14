@@ -16,7 +16,10 @@
 
 package io.appulse.encon.java.module.connection.control;
 
+import static java.util.stream.Collectors.toCollection;
+
 import java.lang.reflect.Constructor;
+import java.util.LinkedList;
 import java.util.stream.Stream;
 
 import io.appulse.encon.java.module.connection.control.exception.ControlMessageParsingException;
@@ -24,7 +27,6 @@ import io.appulse.encon.java.protocol.term.ErlangTerm;
 import io.appulse.encon.java.protocol.type.ErlangInteger;
 import io.appulse.encon.java.protocol.type.ErlangNil;
 import io.appulse.encon.java.protocol.type.ErlangTuple;
-import io.appulse.encon.java.protocol.type.ErlangTuple.ErlangTupleBuilder;
 
 import lombok.NonNull;
 import lombok.SneakyThrows;
@@ -63,10 +65,11 @@ public abstract class ControlMessage {
   }
 
   public final ErlangTuple toTuple () {
-    ErlangTupleBuilder builder = ErlangTuple.builder();
-    builder.add(ErlangInteger.from(getTag().getCode()));
-    Stream.of(elements()).forEach(builder::add);
-    return builder.build();
+    val elements = Stream.of(elements())
+        .collect(toCollection(LinkedList::new));
+
+    elements.addFirst(ErlangInteger.from(getTag().getCode()));
+    return new ErlangTuple(elements);
   }
 
   public final byte[] toBytes () {

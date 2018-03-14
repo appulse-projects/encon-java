@@ -50,7 +50,7 @@ public class HandshakeEncoder extends MessageToByteEncoder<Message> {
       val bytes = message.toBytes();
       out.writeBytes(bytes);
       log.debug("Encoded message {} for {}", message, context.channel().remoteAddress());
-    } catch (Throwable ex) {
+    } catch (Exception ex) {
       log.error("Error during encoding message {} for {}", message, context.channel().remoteAddress());
       throw ex;
     }

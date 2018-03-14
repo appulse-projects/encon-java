@@ -56,9 +56,19 @@ public final class Pipeline {
 
   private static final ChannelOutboundHandler CLIENT_ENCODER;
 
+  private static final String TIMEOUT_HANDLER_NAME;
+  private static final String DECODER_NAME;
+  private static final String ENCODER_NAME;
+  private static final String HANDLER_NAME;
+
   static {
     HANDSHAKE_ENCODER = new HandshakeEncoder();
     CLIENT_ENCODER = new ClientEncoder();
+
+    TIMEOUT_HANDLER_NAME = "readTimeoutHandler";
+    DECODER_NAME = "decoder";
+    ENCODER_NAME = "encoder";
+    HANDLER_NAME = "handler";
   }
 
   @NonNull
@@ -69,20 +79,20 @@ public final class Pipeline {
 
   public void setupClientHandshake (@NonNull ChannelPipeline pipeline, @NonNull RemoteNode remote) {
     pipeline
-        .addLast("readTimeoutHandler", new ReadTimeoutHandler(5))
-        .addLast("decoder", new HandshakeDecoder(true))
-        .addLast("encoder", HANDSHAKE_ENCODER)
-        .addLast("handler", new HandshakeHandlerClient(this, internal, remote));
+        .addLast(TIMEOUT_HANDLER_NAME, new ReadTimeoutHandler(5))
+        .addLast(DECODER_NAME, new HandshakeDecoder(true))
+        .addLast(ENCODER_NAME, HANDSHAKE_ENCODER)
+        .addLast(HANDLER_NAME, new HandshakeHandlerClient(this, internal, remote));
 
     log.debug("Client handshake pipline was setted up for {}", remote);
   }
 
   public void setupServerHandshake (@NonNull ChannelPipeline pipeline) {
     pipeline
-        .addLast("readTimeoutHandler", new ReadTimeoutHandler(5))
-        .addLast("decoder", new HandshakeDecoder(false))
-        .addLast("encoder", HANDSHAKE_ENCODER)
-        .addLast("handler", new HandshakeHandlerServer(this, internal));
+        .addLast(TIMEOUT_HANDLER_NAME, new ReadTimeoutHandler(5))
+        .addLast(DECODER_NAME, new HandshakeDecoder(false))
+        .addLast(ENCODER_NAME, HANDSHAKE_ENCODER)
+        .addLast(HANDLER_NAME, new HandshakeHandlerServer(this, internal));
 
     log.debug("Server handshake pipline was setted up for {}", pipeline.channel().remoteAddress());
   }
@@ -92,9 +102,10 @@ public final class Pipeline {
     val remote = handshakeHandler.getRemoteNode();
     val handler = new ClientRegularHandler(internal, remote, future);
 
-    pipeline.replace("decoder", "decoder", new ClientDecoder());
-    pipeline.replace("encoder", "encoder", CLIENT_ENCODER);
-    pipeline.replace("handler", "handler", handler);
+    pipeline.remove(TIMEOUT_HANDLER_NAME);
+    pipeline.replace(DECODER_NAME, DECODER_NAME, new ClientDecoder());
+    pipeline.replace(ENCODER_NAME, ENCODER_NAME, CLIENT_ENCODER);
+    pipeline.replace(HANDLER_NAME, HANDLER_NAME, handler);
 
     val connection = new Connection(remote, handler);
     future.complete(connection);

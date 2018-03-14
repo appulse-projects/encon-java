@@ -271,7 +271,7 @@ limitations under the License.
           </execution>
         </executions>
       </plugin> -->
-      <!-- <plugin>
+      <plugin>
         <groupId>org.apache.maven.plugins</groupId>
         <artifactId>maven-pmd-plugin</artifactId>
         <version>3.8</version>
@@ -292,7 +292,7 @@ limitations under the License.
             </goals>
           </execution>
         </executions>
-      </plugin> -->
+      </plugin>
 
       <plugin>
         <groupId>org.apache.maven.plugins</groupId>

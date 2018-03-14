@@ -117,7 +117,7 @@ public class HandshakeHandlerClient extends AbstractHandshakeHandler {
     case NOT_ALLOWED:
     case ALIVE:
     default:
-      log.error("Invalid received status: {}", status);
+      log.error("Invalid received status {} in context {}", status, context);
       throw new HandshakeException("Invalid received status: " + status);
     }
   }

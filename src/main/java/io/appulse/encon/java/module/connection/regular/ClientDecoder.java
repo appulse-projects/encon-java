@@ -63,7 +63,7 @@ public class ClientDecoder extends ReplayingDecoder<Message> {
     val messageBytes = new byte[messageSize];
     buf.getBytes(0, messageBytes);
 
-    val bytes = Bytes.wrap(messageBytes);
+    Bytes bytes = Bytes.wrap(messageBytes);
     log.debug("Pass through: {}", bytes.getByte() == 112);
 
     ErlangTerm header = readTerm(bytes);

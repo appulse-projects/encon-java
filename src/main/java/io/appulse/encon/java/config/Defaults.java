@@ -103,6 +103,7 @@ public class Defaults {
            : home;
   }
 
+  @SuppressWarnings("unchecked")
   static Defaults newInstance (@NonNull Map<String, Object> map) {
     DefaultsBuilder builder = Defaults.builder();
 
