@@ -95,7 +95,7 @@ public final class Config {
   @Builder
   private Config (Defaults defaults, @Singular Map<String, NodeConfig> nodes) {
     this.defaults = ofNullable(defaults)
-        .orElse(Defaults.builder().build());
+        .orElse(Defaults.INSTANCE);
 
     this.nodes = nodes.entrySet()
         .stream()
