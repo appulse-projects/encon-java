@@ -41,10 +41,6 @@ public class ErlangBinary extends ErlangTerm {
 
   private static final long serialVersionUID = 2120051138040192507L;
 
-  public static ErlangBinary binary (@NonNull byte[] value) {
-    return new ErlangBinary(value);
-  }
-
   byte[] bytes;
 
   public ErlangBinary (TermType type) {

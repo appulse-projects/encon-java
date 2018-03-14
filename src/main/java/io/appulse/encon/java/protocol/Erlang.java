@@ -1,0 +1,134 @@
+/*
+ * Copyright 2018 the original author or authors.
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+
+package io.appulse.encon.java.protocol;
+
+import java.math.BigInteger;
+import java.util.LinkedHashMap;
+import java.util.List;
+
+import io.appulse.encon.java.protocol.term.ErlangTerm;
+import io.appulse.encon.java.protocol.type.ErlangAtom;
+import io.appulse.encon.java.protocol.type.ErlangBinary;
+import io.appulse.encon.java.protocol.type.ErlangBitString;
+import io.appulse.encon.java.protocol.type.ErlangFloat;
+import io.appulse.encon.java.protocol.type.ErlangInteger;
+import io.appulse.encon.java.protocol.type.ErlangList;
+import io.appulse.encon.java.protocol.type.ErlangMap;
+import io.appulse.encon.java.protocol.type.ErlangNil;
+import io.appulse.encon.java.protocol.type.ErlangString;
+import io.appulse.encon.java.protocol.type.ErlangTuple;
+
+import lombok.NonNull;
+
+/**
+ *
+ * @author Artem Labazin
+ * @since 1.0.0
+ */
+public final class Erlang {
+
+  public static final ErlangNil NIL = new ErlangNil();
+
+  public static final ErlangAtom EMPTY_ATOM = new ErlangAtom("");
+
+  public static ErlangTerm atom (boolean value) {
+    return new ErlangAtom(value);
+  }
+
+  public static ErlangTerm atom (@NonNull String value) {
+    return new ErlangAtom(value);
+  }
+
+  public static ErlangTerm number (char value) {
+    return new ErlangInteger(value);
+  }
+
+  public static ErlangTerm number (byte value) {
+    return new ErlangInteger(value);
+  }
+
+  public static ErlangTerm number (short value) {
+    return new ErlangInteger(value);
+  }
+
+  public static ErlangTerm number (int value) {
+    return new ErlangInteger(value);
+  }
+
+  public static ErlangTerm number (long value) {
+    return new ErlangInteger(value);
+  }
+
+  public static ErlangTerm number (@NonNull BigInteger value) {
+    return new ErlangInteger(value);
+  }
+
+  public static ErlangTerm number (float value) {
+    return new ErlangFloat(value);
+  }
+
+  public static ErlangTerm number (double value) {
+    return new ErlangFloat(value);
+  }
+
+  public static ErlangTerm binary (@NonNull byte[] value) {
+    return new ErlangBinary(value);
+  }
+
+  public static ErlangTerm bitstr (@NonNull byte[] bits, int pad) {
+    return new ErlangBitString(bits, pad);
+  }
+
+  public static ErlangTerm string (@NonNull String value) {
+    return new ErlangString(value); // List/BitString?
+  }
+
+  public static ErlangTerm tuple (@NonNull ErlangTerm... elements) {
+    return new ErlangTuple(elements);
+  }
+
+  public static ErlangTerm tuple (@NonNull List<ErlangTerm> elements) {
+    return new ErlangTuple(elements);
+  }
+
+  public static ErlangTerm list (@NonNull ErlangTerm... elements) {
+    return new ErlangList(elements);
+  }
+
+  public static ErlangTerm list (@NonNull List<ErlangTerm> elements) {
+    return new ErlangList(elements);
+  }
+
+  public static ErlangTerm list (@NonNull ErlangTerm tail, @NonNull List<ErlangTerm> elements) {
+    return new ErlangList(tail, elements);
+  }
+
+  public static ErlangTerm map (@NonNull ErlangTerm... keysAndValues) {
+    if (keysAndValues.length % 2 != 0) {
+      throw new IllegalArgumentException("Keys and Values array must be even");
+    }
+
+    LinkedHashMap<ErlangTerm, ErlangTerm> map = new LinkedHashMap<>(keysAndValues.length / 2);
+    for (int index = 0; index < keysAndValues.length - 1; index += 2) {
+      map.put(keysAndValues[index], keysAndValues[index + 1]);
+    }
+    return new ErlangMap(map);
+  }
+
+  private Erlang () {
+  }
+}

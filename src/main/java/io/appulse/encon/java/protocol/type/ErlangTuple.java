@@ -52,14 +52,6 @@ public class ErlangTuple extends ErlangTerm {
 
   private static final long serialVersionUID = -8441946894531062971L;
 
-  public static ErlangTuple tuple (@NonNull ErlangTerm... elements) {
-    return new ErlangTuple(elements);
-  }
-
-  public static ErlangTuple tuple (@NonNull List<ErlangTerm> elements) {
-    return new ErlangTuple(elements);
-  }
-
   ErlangTerm[] elements;
 
   public ErlangTuple (TermType type) {
@@ -71,7 +63,7 @@ public class ErlangTuple extends ErlangTerm {
   }
 
   @Builder
-  private ErlangTuple (@Singular List<ErlangTerm> adds) {
+  public ErlangTuple (@Singular List<ErlangTerm> adds) {
     this(adds.size() < 256
          ? SMALL_TUPLE
          : LARGE_TUPLE);

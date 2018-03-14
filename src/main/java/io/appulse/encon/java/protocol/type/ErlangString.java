@@ -21,6 +21,7 @@ import static io.appulse.encon.java.protocol.TermType.STRING;
 import static java.nio.charset.StandardCharsets.ISO_8859_1;
 import static lombok.AccessLevel.PRIVATE;
 
+import io.appulse.encon.java.protocol.Erlang;
 import io.appulse.encon.java.protocol.TermType;
 import io.appulse.encon.java.protocol.term.ErlangTerm;
 import io.appulse.utils.Bytes;
@@ -94,11 +95,7 @@ public class ErlangString extends ErlangTerm {
           .map(ErlangInteger::from)
           .toArray(ErlangInteger[]::new);
 
-      buffer.put(positionBefore, ErlangList.builder()
-                 .elements(elements)
-                 .build()
-                 .toBytes()
-      );
+      buffer.put(positionBefore, Erlang.list(elements).toBytes());
       break;
     default:
       buffer.put(positionBefore, new ErlangNil().toBytes());

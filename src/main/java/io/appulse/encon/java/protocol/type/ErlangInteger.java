@@ -79,30 +79,6 @@ public class ErlangInteger extends ErlangTerm {
            : CACHE[number - MIN_CACHE];
   }
 
-  public static ErlangInteger integer (char value) {
-    return new ErlangInteger(value);
-  }
-
-  public static ErlangInteger integer (byte value) {
-    return new ErlangInteger(value);
-  }
-
-  public static ErlangInteger integer (short value) {
-    return new ErlangInteger(value);
-  }
-
-  public static ErlangInteger integer (int value) {
-    return new ErlangInteger(value);
-  }
-
-  public static ErlangInteger integer (long value) {
-    return new ErlangInteger(value);
-  }
-
-  public static ErlangInteger integer (@NonNull BigInteger value) {
-    return new ErlangInteger(value);
-  }
-
   BigInteger value;
 
   public ErlangInteger (TermType type) {

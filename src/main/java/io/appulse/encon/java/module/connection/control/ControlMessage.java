@@ -62,14 +62,14 @@ public abstract class ControlMessage {
     return constructor.newInstance(tuple);
   }
 
-  public ErlangTuple toTuple () {
+  public final ErlangTuple toTuple () {
     ErlangTupleBuilder builder = ErlangTuple.builder();
     builder.add(ErlangInteger.from(getTag().getCode()));
     Stream.of(elements()).forEach(builder::add);
     return builder.build();
   }
 
-  public byte[] toBytes () {
+  public final byte[] toBytes () {
     return toTuple().toBytes();
   }
 

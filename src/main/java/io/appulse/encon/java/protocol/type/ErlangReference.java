@@ -48,10 +48,6 @@ public class ErlangReference extends ErlangTerm {
 
   private static final long serialVersionUID = -868493639369161400L;
 
-  public static ErlangReference reference (@NonNull String node, int id, int[] ids, int creation) {
-    return new ErlangReference(NEW_REFERENCE, node, id, ids, creation);
-  }
-
   NodeDescriptor descriptor;
 
   int[] ids;

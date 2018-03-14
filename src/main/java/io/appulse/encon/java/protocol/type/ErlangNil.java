@@ -30,8 +30,6 @@ import lombok.ToString;
 @ToString
 public class ErlangNil extends ErlangTerm {
 
-  public static final ErlangNil NIL = new ErlangNil();
-
   private static final long serialVersionUID = 3124893467508024194L;
 
   public ErlangNil () {

@@ -37,6 +37,7 @@ import lombok.Builder;
 import lombok.EqualsAndHashCode;
 import lombok.Getter;
 import lombok.NonNull;
+import lombok.Singular;
 import lombok.ToString;
 import lombok.experimental.FieldDefaults;
 import lombok.val;
@@ -52,18 +53,6 @@ import lombok.val;
 public class ErlangList extends ErlangTerm {
 
   private static final long serialVersionUID = 6923705109793240922L;
-
-  public static ErlangList list (@NonNull ErlangTerm... elements) {
-    return new ErlangList(elements);
-  }
-
-  public static ErlangList list (@NonNull List<ErlangTerm> elements) {
-    return new ErlangList(elements);
-  }
-
-  public static ErlangList list (@NonNull ErlangTerm tail, @NonNull ErlangTerm... elements) {
-    return new ErlangList(tail, elements);
-  }
 
   ErlangTerm[] elements;
 
@@ -85,9 +74,10 @@ public class ErlangList extends ErlangTerm {
   }
 
   @Builder
-  private ErlangList (ErlangTerm tail, ErlangTerm... elements) {
+  public ErlangList (ErlangTerm tail, @Singular List<ErlangTerm> elements) {
     this(LIST);
     this.elements = ofNullable(elements)
+        .map(it -> it.toArray(new ErlangTerm[it.size()]))
         .orElse(new ErlangTerm[0]);
 
     this.tail = tail;

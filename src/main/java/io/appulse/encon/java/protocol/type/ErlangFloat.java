@@ -45,14 +45,6 @@ public class ErlangFloat extends ErlangTerm {
 
   private static final long serialVersionUID = -4146479045850295285L;
 
-  public static ErlangFloat decimal (float value) {
-    return new ErlangFloat(value);
-  }
-
-  public static ErlangFloat decimal (double value) {
-    return new ErlangFloat(value);
-  }
-
   double value;
 
   public ErlangFloat (TermType type) {

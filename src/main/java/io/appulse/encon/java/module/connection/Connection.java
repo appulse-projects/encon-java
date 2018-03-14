@@ -49,7 +49,7 @@ import lombok.extern.slf4j.Slf4j;
 @Slf4j
 @RequiredArgsConstructor
 @FieldDefaults(level = PRIVATE, makeFinal = true)
-public class Connection implements Closeable {
+public final class Connection implements Closeable {
 
   @NonNull
   @Getter

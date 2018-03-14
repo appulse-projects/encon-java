@@ -17,7 +17,7 @@
 package io.appulse.encon.java.module.connection.control;
 
 import static io.appulse.encon.java.module.connection.control.ControlMessageTag.REG_SEND;
-import static io.appulse.encon.java.protocol.type.ErlangAtom.EMPTY;
+import static io.appulse.encon.java.protocol.Erlang.EMPTY_ATOM;
 
 import io.appulse.encon.java.module.connection.control.exception.ControlMessageParsingException;
 import io.appulse.encon.java.protocol.term.ErlangTerm;
@@ -65,6 +65,6 @@ public class SendToRegisteredProcess extends ControlMessage {
 
   @Override
   public ErlangTerm[] elements () {
-    return new ErlangTerm[] { from, EMPTY, to };
+    return new ErlangTerm[] { from, EMPTY_ATOM, to };
   }
 }

@@ -52,16 +52,37 @@ public abstract class AbstractMailboxHandler implements MailboxHandler {
 
   protected abstract void handle (Mailbox self, ControlMessage header, Optional<ErlangTerm> body);
 
+  /**
+   * Handles link requests.
+   *
+   * @param self reference to this mailbox
+   *
+   * @param header received Link control message
+   */
   protected void handle (@NonNull Mailbox self, @NonNull Link header) {
     val pidFrom = header.getFrom();
     self.getLinks().add(pidFrom);
   }
 
+  /**
+   * Handles unlink requests.
+   *
+   * @param self reference to this mailbox
+   *
+   * @param header received Unlink control message
+   */
   protected void handle (@NonNull Mailbox self, @NonNull Unlink header) {
     val pidFrom = header.getFrom();
     self.getLinks().remove(pidFrom);
   }
 
+  /**
+   * Handles exit requests.
+   *
+   * @param self reference to this mailbox
+   *
+   * @param header received Exit control message
+   */
   protected void handle (@NonNull Mailbox self, @NonNull Exit header) {
     val pidFrom = header.getFrom();
     self.getLinks().remove(pidFrom);
