@@ -23,4 +23,7 @@ limitations under the License.
   <Match>
     <Bug pattern="RCN_REDUNDANT_NULLCHECK_OF_NONNULL_VALUE"/>
   </Match>
+  <Match>
+    <Bug pattern="BC_UNCONFIRMED_CAST"/>
+  </Match>
 </FindBugsFilter>

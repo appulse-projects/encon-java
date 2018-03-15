@@ -47,6 +47,8 @@ public class SendToRegisteredProcess extends ControlMessage {
   ErlangAtom to;
 
   public SendToRegisteredProcess (@NonNull ErlangTuple tuple) {
+    super();
+
     from = tuple.get(1)
         .filter(ErlangTerm::isPid)
         .map(ErlangTerm::asPid)

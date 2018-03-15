@@ -68,7 +68,7 @@ public class ErlangTuple extends ErlangTerm {
          ? SMALL_TUPLE
          : LARGE_TUPLE);
 
-    this.elements = adds.toArray(new ErlangTerm[adds.size()]);
+    this.elements = adds.toArray(new ErlangTerm[0]);
   }
 
   @Override
@@ -95,7 +95,7 @@ public class ErlangTuple extends ErlangTerm {
 
   @Override
   protected void read (@NonNull Bytes buffer) {
-    int arity = 0;
+    int arity;
     switch (getType()) {
     case SMALL_TUPLE:
       arity = buffer.getByte();
@@ -104,7 +104,7 @@ public class ErlangTuple extends ErlangTerm {
       arity = buffer.getInt();
       break;
     default:
-      throw new RuntimeException();
+      throw new IllegalArgumentException("Unknown type: " + getType());
     }
 
     elements = IntStream.range(0, arity)
@@ -123,7 +123,7 @@ public class ErlangTuple extends ErlangTerm {
       buffer.put4B(elements.length);
       break;
     default:
-      throw new RuntimeException();
+      throw new IllegalArgumentException("Unknown type: " + getType());
     }
 
     Stream.of(elements)

@@ -98,7 +98,7 @@ public class HandshakeHandlerClient extends AbstractHandshakeHandler {
       break;
     default:
       log.error("Unexpected message type: {}", message.getType());
-      throw new RuntimeException("Unexpected message type: " + message.getType());
+      throw new IllegalArgumentException("Unexpected message type: " + message.getType());
     }
   }
 

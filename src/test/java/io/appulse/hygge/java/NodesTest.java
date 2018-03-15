@@ -27,15 +27,15 @@ import io.appulse.encon.java.util.TestMethodNamePrinter;
 
 import lombok.val;
 import org.junit.Rule;
-import org.junit.rules.TestRule;
 import org.junit.Test;
+import org.junit.rules.TestRule;
 
 /**
  *
  * @author Artem Labazin
  * @since 1.0.0
  */
-public class ErtsTest {
+public class NodesTest {
 
   @Rule
   public TestRule watcher = new TestMethodNamePrinter();
@@ -60,15 +60,15 @@ public class ErtsTest {
               .build())
         .build();
 
-    val erts = Erts.start(config);
-
-    assertThat(erts.node("kojima1"))
-        .isPresent();
-    assertThat(erts.node("kojima2"))
-        .isPresent();
-    assertThat(erts.node("ocelot"))
-        .isPresent();
-    assertThat(erts.node("kojima3"))
-        .isNotPresent();
+    try (val nodes = Nodes.start(config)) {
+      assertThat(nodes.node("kojima1"))
+          .isPresent();
+      assertThat(nodes.node("kojima2"))
+          .isPresent();
+      assertThat(nodes.node("ocelot"))
+          .isPresent();
+      assertThat(nodes.node("kojima3"))
+          .isNotPresent();
+    }
   }
 }

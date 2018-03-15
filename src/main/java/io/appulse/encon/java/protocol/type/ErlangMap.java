@@ -47,6 +47,7 @@ import lombok.val;
 @ToString
 @FieldDefaults(level = PRIVATE)
 @EqualsAndHashCode(callSuper = true)
+@SuppressWarnings("PMD.LooseCoupling") // we realy need to use LinkedHashMap
 public class ErlangMap extends ErlangTerm {
 
   private static final long serialVersionUID = -4889715199209923662L;

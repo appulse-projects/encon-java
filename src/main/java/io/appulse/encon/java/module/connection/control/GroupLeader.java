@@ -45,6 +45,8 @@ public class GroupLeader extends ControlMessage {
   ErlangPid to;
 
   public GroupLeader (@NonNull ErlangTuple tuple) {
+    super();
+
     from = tuple.get(1)
         .filter(ErlangTerm::isPid)
         .map(ErlangTerm::asPid)

@@ -18,6 +18,7 @@ package io.appulse.encon.java.protocol.type;
 
 import static io.appulse.encon.java.protocol.TermType.FUNCTION;
 import static io.appulse.encon.java.protocol.TermType.NEW_FUNCTION;
+import static java.util.Optional.ofNullable;
 import static lombok.AccessLevel.PRIVATE;
 
 import java.util.stream.IntStream;
@@ -69,7 +70,7 @@ public class ErlangFunction extends ErlangTerm {
 
   @Builder
   private ErlangFunction (ErlangPid pid, String module, int index, int unique, ErlangTerm[] variables,
-              int arity, byte[] md5, int oldIndex) {
+                          int arity, byte[] md5, int oldIndex) {
     super(md5 == null
         ? FUNCTION
         : NEW_FUNCTION);
@@ -78,10 +79,14 @@ public class ErlangFunction extends ErlangTerm {
     this.module = module;
     this.index = index;
     this.unique = unique;
-    this.variables = variables;
     this.arity = arity;
-    this.md5 = md5;
     this.oldIndex = oldIndex;
+    this.variables = ofNullable(variables)
+        .map(it -> it.clone())
+        .orElse(null);
+    this.md5 = ofNullable(md5)
+        .map(it -> it.clone())
+        .orElse(null);
   }
 
   @Override
@@ -161,7 +166,7 @@ public class ErlangFunction extends ErlangTerm {
       buffer.put4B(position, buffer.position() - position);
       break;
     default:
-      throw new RuntimeException();
+      throw new IllegalArgumentException("Unknown type: " + getType());
     }
   }
 }

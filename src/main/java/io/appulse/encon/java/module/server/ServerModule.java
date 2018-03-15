@@ -23,6 +23,7 @@ import static lombok.AccessLevel.PRIVATE;
 
 import java.io.Closeable;
 import java.util.concurrent.CompletableFuture;
+import java.util.concurrent.atomic.AtomicBoolean;
 
 import io.appulse.encon.java.module.NodeInternalApi;
 import io.appulse.encon.java.module.connection.Connection;
@@ -38,7 +39,6 @@ import io.netty.util.concurrent.DefaultThreadFactory;
 import lombok.NonNull;
 import lombok.SneakyThrows;
 import lombok.experimental.FieldDefaults;
-import lombok.experimental.NonFinal;
 import lombok.extern.slf4j.Slf4j;
 import lombok.val;
 
@@ -59,16 +59,13 @@ public final class ServerModule implements ServerModuleApi, Closeable {
 
   EventLoopGroup workerGroup;
 
-  @NonFinal
-  volatile boolean closed;
+  AtomicBoolean closed = new AtomicBoolean(false);
 
   public ServerModule (@NonNull NodeInternalApi internal) {
     this.internal = internal;
 
     val serverConfig = internal.config().getServer();
     port = serverConfig.getPort();
-
-    internal.node().getDescriptor().getShortName();
 
     bossGroup = new NioEventLoopGroup(
         serverConfig.getBossThreads(),
@@ -112,11 +109,12 @@ public final class ServerModule implements ServerModuleApi, Closeable {
   @Override
   @SneakyThrows
   public void close () {
-    if (closed) {
+    if (closed.get()) {
       log.debug("Server was already closed");
       return;
     }
-    closed = true;
+
+    closed.set(true);
     log.debug("Closing server module of {}",
               internal.node().getDescriptor().getFullName());
 

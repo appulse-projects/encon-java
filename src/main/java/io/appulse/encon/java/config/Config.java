@@ -20,7 +20,7 @@ import static java.util.Optional.ofNullable;
 import static java.util.stream.Collectors.toMap;
 
 import java.io.File;
-import java.io.FileInputStream;
+import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.Map;
 import java.util.Map.Entry;
@@ -83,7 +83,7 @@ public final class Config {
   @SuppressWarnings("unchecked")
   private static Map<String, Map<String, Object>> parseYaml (@NonNull File file) {
     val yaml = new Yaml();
-    try (val inputStream = new FileInputStream(file)) {
+    try (val inputStream = Files.newInputStream(file.toPath())) {
       return (Map<String, Map<String, Object>>) yaml.load(inputStream);
     }
   }

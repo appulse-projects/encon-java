@@ -49,6 +49,8 @@ public class SendToRegisteredProcessTraceToken extends ControlMessage {
   ErlangTerm traceToken;
 
   public SendToRegisteredProcessTraceToken (@NonNull ErlangTuple tuple) {
+    super();
+
     from = tuple.get(1)
         .filter(ErlangTerm::isPid)
         .map(ErlangTerm::asPid)

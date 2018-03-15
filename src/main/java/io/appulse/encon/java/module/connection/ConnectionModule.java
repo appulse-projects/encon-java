@@ -37,6 +37,7 @@ import io.netty.channel.nio.NioEventLoopGroup;
 import io.netty.channel.socket.SocketChannel;
 import io.netty.channel.socket.nio.NioSocketChannel;
 import io.netty.util.concurrent.DefaultThreadFactory;
+import lombok.Builder;
 import lombok.NonNull;
 import lombok.SneakyThrows;
 import lombok.experimental.FieldDefaults;
@@ -131,32 +132,51 @@ public final class ConnectionModule implements ConnectionModuleApi, Closeable {
 
   private CompletableFuture<Connection> createConnection (@NonNull RemoteNode remote) {
     CompletableFuture<Connection> future = new CompletableFuture<>();
-    val pipeline = Pipeline.builder()
-        .internal(internal)
-        .future(future)
-        .build();
 
     new Bootstrap()
         .group(workerGroup)
         .channel(NioSocketChannel.class)
         .option(SO_KEEPALIVE, true)
         .option(CONNECT_TIMEOUT_MILLIS, 5000)
-        .handler(new ChannelInitializer<SocketChannel>() {
-
-          @Override
-          public void initChannel (SocketChannel channel) throws Exception {
-            pipeline.setupClientHandshake(channel.pipeline(), remote);
-          }
-        })
+        .handler(Initializer.builder()
+            .future(future)
+            .remote(remote)
+            .internal(internal)
+            .build()
+        )
         .connect(remote.getDescriptor().getAddress(), remote.getPort());
 
     return future.whenComplete((connection, throwable) -> {
-      if (throwable != null) {
-        remove(remote);
-      } else {
+      if (throwable == null) {
         val result = CompletableFuture.completedFuture(connection);
         cache.put(remote, result);
+      } else {
+        remove(remote);
       }
     });
+  }
+
+  private static class Initializer extends ChannelInitializer<SocketChannel> {
+
+    Pipeline pipeline;
+
+    RemoteNode remote;
+
+    @Builder
+    Initializer (@NonNull CompletableFuture<Connection> future, @NonNull RemoteNode remote, @NonNull NodeInternalApi internal) {
+      super();
+
+      pipeline = Pipeline.builder()
+          .internal(internal)
+          .future(future)
+          .build();
+
+      this.remote = remote;
+    }
+
+    @Override
+    public void initChannel (SocketChannel channel) throws Exception {
+      pipeline.setupClientHandshake(channel.pipeline(), remote);
+    }
   }
 }

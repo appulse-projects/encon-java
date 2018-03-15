@@ -362,7 +362,6 @@ limitations under the License.
     </module>
     <module name="FinalClass"/>
     <module name="HideUtilityClassConstructor"/>
-    <module name="MutableException"/>
     <module name="OneTopLevelClass"/>
 
     <!-- Miscellaneous other checks.                   -->

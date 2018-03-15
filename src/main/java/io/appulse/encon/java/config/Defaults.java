@@ -98,9 +98,9 @@ public class Defaults {
 
     val drive = System.getenv("HOMEDRIVE");
     val path = System.getenv("HOMEPATH");
-    return drive != null && path != null
-           ? drive + path
-           : home;
+    return drive == null || path == null
+           ? home
+           : drive + path;
   }
 
   @SuppressWarnings("unchecked")

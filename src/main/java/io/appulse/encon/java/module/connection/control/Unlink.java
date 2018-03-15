@@ -45,6 +45,8 @@ public class Unlink extends ControlMessage {
   ErlangPid to;
 
   public Unlink (@NonNull ErlangTuple tuple) {
+    super();
+
     from = tuple.get(1)
         .filter(ErlangTerm::isPid)
         .map(ErlangTerm::asPid)

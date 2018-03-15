@@ -19,6 +19,7 @@ package io.appulse.encon.java;
 import static java.util.Optional.ofNullable;
 import static lombok.AccessLevel.PRIVATE;
 
+import java.io.Closeable;
 import java.util.Collection;
 import java.util.Map;
 import java.util.Optional;
@@ -42,17 +43,17 @@ import lombok.val;
 @Slf4j
 @RequiredArgsConstructor(access = PRIVATE)
 @FieldDefaults(level = PRIVATE, makeFinal = true)
-public final class Erts {
+public final class Nodes implements Closeable {
 
-  public static Erts start () {
+  public static Nodes start () {
     val config = Config.builder().build();
     return start(config);
   }
 
-  public static Erts start (@NonNull Config config) {
+  public static Nodes start (@NonNull Config config) {
     log.debug("Creating ERTS instance with config {}", config);
 
-    val erts = new Erts(config.getDefaults(), new ConcurrentHashMap<>());
+    val erts = new Nodes(config.getDefaults(), new ConcurrentHashMap<>());
     config.getNodes()
         .entrySet()
         .forEach(it -> erts.newNode(it.getKey(), it.getValue()));
@@ -87,7 +88,7 @@ public final class Erts {
 
   public Optional<Node> node (@NonNull String node) {
     val descriptor = NodeDescriptor.from(node);
-    return Erts.this.node(descriptor);
+    return node(descriptor);
   }
 
   public Optional<Node> node (@NonNull NodeDescriptor descriptor) {
@@ -105,5 +106,11 @@ public final class Erts {
 
   public Node remove (@NonNull NodeDescriptor descriptor) {
     return nodes.remove(descriptor);
+  }
+
+  @Override
+  public void close () {
+    nodes.values().forEach(Node::close);
+    nodes.clear();
   }
 }

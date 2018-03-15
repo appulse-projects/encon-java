@@ -29,7 +29,6 @@ import lombok.Value;
  */
 @Value
 @EqualsAndHashCode(callSuper = false)
-@SuppressWarnings("checkstyle:MutableException") // checkstyle bug, all variables are already final
 public class ReceivedExitException extends RuntimeException {
 
   private static final long serialVersionUID = 7678315293152032729L;

@@ -43,7 +43,9 @@ import lombok.val;
 @EqualsAndHashCode(callSuper = true)
 public class ErlangAtom extends ErlangTerm {
 
-  private static final int MAX_LENGTH = 255;
+  private static final int MAX_ATOM_CODE_POINTS_LENGTH = 255;
+
+  private static final int MAX_SMALL_ATOM_BYTES_LENGTH = 255;
 
   private static final long serialVersionUID = -2748345367418129439L;
 
@@ -54,10 +56,10 @@ public class ErlangAtom extends ErlangTerm {
   }
 
   public ErlangAtom (String value) {
-    super(SMALL_ATOM_UTF8);
+    this(SMALL_ATOM_UTF8);
 
     this.value = trim(value);
-    if (this.value.getBytes(UTF_8).length >= 256) {
+    if (this.value.getBytes(UTF_8).length > MAX_SMALL_ATOM_BYTES_LENGTH) {
       setType(ATOM_UTF8);
     }
   }
@@ -93,6 +95,7 @@ public class ErlangAtom extends ErlangTerm {
   }
 
   @Override
+  @SuppressWarnings("deprecation")
   protected void read (@NonNull Bytes buffer) {
     val type = getType();
 
@@ -125,10 +128,10 @@ public class ErlangAtom extends ErlangTerm {
   }
 
   private String trim (String atom) {
-    return atom.codePointCount(0, atom.length()) <= MAX_LENGTH
+    return atom.codePointCount(0, atom.length()) <= MAX_ATOM_CODE_POINTS_LENGTH
            ? atom
            // Throwing an exception would be better I think, but truncation
            // seems to be the way it has been done in other parts of OTP...
-           : new String(atom.codePoints().toArray(), 0, MAX_LENGTH);
+           : new String(atom.codePoints().toArray(), 0, MAX_ATOM_CODE_POINTS_LENGTH);
   }
 }

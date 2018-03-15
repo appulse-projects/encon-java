@@ -49,6 +49,8 @@ public class DemonitorProcess extends ControlMessage {
   ErlangReference reference;
 
   public DemonitorProcess (@NonNull ErlangTuple tuple) {
+    super();
+
     from = tuple.get(1)
         .filter(ErlangTerm::isPid)
         .map(ErlangTerm::asPid)

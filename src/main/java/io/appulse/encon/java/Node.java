@@ -201,6 +201,7 @@ public final class Node implements PingModuleApi, Closeable {
   ServerModule serverModule;
 
   @Override
+  @SuppressWarnings("PMD.NullAssignment")
   public void close () {
     log.debug("Closing node '{}'", descriptor.getFullName());
 
