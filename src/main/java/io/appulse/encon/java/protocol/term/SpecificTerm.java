@@ -33,6 +33,7 @@ import io.appulse.encon.java.protocol.type.ErlangReference;
  */
 public interface SpecificTerm extends ValueTerm {
 
+  @SuppressWarnings("deprecation")
   default boolean isSpecificTerm () {
     switch (getType()) {
     case REFERENCE:
@@ -83,6 +84,7 @@ public interface SpecificTerm extends ValueTerm {
     return null;
   }
 
+  @SuppressWarnings("deprecation")
   default boolean isAtom () {
     switch (getType()) {
     case ATOM:

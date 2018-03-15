@@ -41,6 +41,8 @@ public class Send extends ControlMessage {
   ErlangTerm to; // atom or pid
 
   public Send (@NonNull ErlangTuple tuple) {
+    super();
+
     to = tuple.get(2)
         .filter(it -> it.isAtom() || it.isPid())
         .orElseThrow(ControlMessageParsingException::new);

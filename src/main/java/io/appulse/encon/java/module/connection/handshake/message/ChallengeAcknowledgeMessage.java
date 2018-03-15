@@ -47,7 +47,7 @@ public class ChallengeAcknowledgeMessage extends Message {
   @Builder
   private ChallengeAcknowledgeMessage (byte[] digest) {
     this();
-    this.digest = digest;
+    this.digest = digest.clone();
   }
 
   @Override

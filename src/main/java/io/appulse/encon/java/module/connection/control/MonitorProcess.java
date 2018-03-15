@@ -49,6 +49,8 @@ public class MonitorProcess extends ControlMessage {
   ErlangReference reference;
 
   public MonitorProcess (@NonNull ErlangTuple tuple) {
+    super();
+
     from = tuple.get(1)
         .filter(ErlangTerm::isPid)
         .map(ErlangTerm::asPid)

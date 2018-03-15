@@ -52,6 +52,8 @@ public class MonitorProcessExit extends ControlMessage {
   ErlangTerm reason;
 
   public MonitorProcessExit (@NonNull ErlangTuple tuple) {
+    super();
+
     from = tuple.get(1)
         .filter(ErlangTerm::isPid)
         .map(ErlangTerm::asPid)

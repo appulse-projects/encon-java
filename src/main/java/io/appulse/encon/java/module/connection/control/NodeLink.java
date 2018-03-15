@@ -36,6 +36,8 @@ import lombok.extern.slf4j.Slf4j;
 public class NodeLink extends ControlMessage {
 
   public NodeLink (ErlangTuple tuple) {
+    super();
+
     log.debug("tuple: {}", tuple);
   }
 

@@ -48,6 +48,8 @@ public class ErlangReference extends ErlangTerm {
 
   private static final long serialVersionUID = -868493639369161400L;
 
+  private static final int MAX_REFERENCE_ARITY = 3;
+
   NodeDescriptor descriptor;
 
   int[] ids;
@@ -61,8 +63,10 @@ public class ErlangReference extends ErlangTerm {
   @Builder
   public ErlangReference (TermType type, @NonNull String node, int id, int[] ids, int creation) {
     this(ofNullable(type).orElse(NEW_REFERENCE));
+
     descriptor = NodeDescriptor.from(node);
     this.ids = ofNullable(ids)
+        .map(it -> it.clone())
         .map(it -> {
           int[] result = new int[] { 0, 0, 0 };
           int length = it.length > 3
@@ -83,7 +87,7 @@ public class ErlangReference extends ErlangTerm {
       this.creation = creation;
       break;
     default:
-      throw new RuntimeException();
+      throw new IllegalArgumentException("Unknown type: " + getType());
     }
   }
 
@@ -119,12 +123,12 @@ public class ErlangReference extends ErlangTerm {
     case NEWER_REFERENCE:
       break;
     default:
-      throw new IllegalArgumentException("");
+      throw new IllegalArgumentException("Unknown type: " + getType());
     }
 
     val arity = buffer.getShort();
-    if (arity > 3) {
-      throw new RuntimeException();
+    if (arity > MAX_REFERENCE_ARITY) {
+      throw new IllegalArgumentException("Maximum arity value is " + MAX_REFERENCE_ARITY + ", but was " + arity);
     }
 
     ErlangAtom atom = ErlangTerm.newInstance(buffer);
@@ -157,7 +161,7 @@ public class ErlangReference extends ErlangTerm {
     case NEWER_REFERENCE:
       break;
     default:
-      throw new IllegalArgumentException("");
+      throw new IllegalArgumentException("Unknown type: " + getType());
     }
 
     buffer.put2B(ids.length);
@@ -169,11 +173,9 @@ public class ErlangReference extends ErlangTerm {
       buffer.put4B(ids[0] & 0x3FFFF);
       break;
     case NEWER_REFERENCE:
+    default:
       buffer.put4B(creation);
       buffer.put4B(ids[0]);
-      break;
-    default:
-      throw new RuntimeException();
     }
 
     IntStream.of(ids)

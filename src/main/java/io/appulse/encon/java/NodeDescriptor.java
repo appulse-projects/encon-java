@@ -46,7 +46,7 @@ public class NodeDescriptor implements Serializable {
     try {
       LOCALHOST = InetAddress.getLocalHost();
     } catch (UnknownHostException ex) {
-      throw new RuntimeException(ex);
+      throw new IllegalArgumentException("Couldn't determine localhost address", ex);
     }
   }
 

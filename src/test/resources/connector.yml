@@ -47,7 +47,7 @@ nodes:
       port: 8971
       boss-threads: 1
       worker-threads: 2
-      
+
   node-2:
     cookie: popa
     client-threads: 1

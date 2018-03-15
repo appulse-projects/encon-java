@@ -26,7 +26,6 @@ import lombok.Value;
  */
 @Value
 @EqualsAndHashCode(callSuper = false)
-@SuppressWarnings("checkstyle:MutableException") // checkstyle bug, all variables are already final
 public class ControlMessageFieldParsingException extends ControlMessageParsingException {
 
   private static final long serialVersionUID = 7639697351744349460L;

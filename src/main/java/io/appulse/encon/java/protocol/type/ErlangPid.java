@@ -95,7 +95,7 @@ public class ErlangPid extends ErlangTerm {
       creation = buffer.getInt();
       break;
     default:
-      throw new RuntimeException();
+      throw new IllegalArgumentException("Unknown type: " + getType());
     }
     validate();
   }
@@ -114,7 +114,7 @@ public class ErlangPid extends ErlangTerm {
       buffer.put4B(creation);
       break;
     default:
-      throw new RuntimeException();
+      throw new IllegalArgumentException("Unknown type: " + getType());
     }
   }
 

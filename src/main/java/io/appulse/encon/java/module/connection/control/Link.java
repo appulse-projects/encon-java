@@ -45,6 +45,8 @@ public class Link extends ControlMessage {
   ErlangPid to;
 
   public Link (@NonNull ErlangTuple tuple) {
+    super();
+
     from = tuple.get(1)
         .filter(ErlangTerm::isPid)
         .map(ErlangTerm::asPid)

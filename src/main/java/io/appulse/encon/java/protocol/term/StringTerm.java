@@ -29,6 +29,7 @@ public interface StringTerm extends ValueTerm {
    *
    * @return could the term be represented as text or not
    */
+  @SuppressWarnings("deprecation")
   default boolean isTextual () {
     switch (getType()) {
     case ATOM:

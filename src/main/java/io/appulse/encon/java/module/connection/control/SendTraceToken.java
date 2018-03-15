@@ -45,6 +45,8 @@ public class SendTraceToken extends ControlMessage {
   ErlangTerm traceToken;
 
   public SendTraceToken (@NonNull ErlangTuple tuple) {
+    super();
+
     to = tuple.get(2)
         .filter(ErlangTerm::isPid)
         .map(ErlangTerm::asPid)

@@ -59,6 +59,8 @@ public abstract class ErlangTerm implements IntegerTerm,
 
   private static final long serialVersionUID = 5430854281567501819L;
 
+  private static final int MINIMUM_BYTES_TO_COMPRESS = 5;
+
   public static <T extends ErlangTerm> T newInstance (@NonNull ByteBuffer byteBuffer) {
     val buffer = Bytes.wrap(byteBuffer);
     return newInstance(buffer);
@@ -70,7 +72,7 @@ public abstract class ErlangTerm implements IntegerTerm,
   }
 
   @SneakyThrows
-  // @SuppressWarnings("unchecked")
+  @SuppressWarnings("unchecked")
   public static <T extends ErlangTerm> T newInstance (@NonNull Bytes buffer) {
     val type = TermType.of(buffer.getByte());
     Class<T> klass = (Class<T>) type.getType();
@@ -82,7 +84,7 @@ public abstract class ErlangTerm implements IntegerTerm,
 
   @SneakyThrows
   public static byte[] decompress (@NonNull Bytes bytes) {
-    if (bytes.getByte() != 80) {
+    if (bytes.getByte() != TermType.COMPRESSED.getCode()) {
       // no compression tag
       return bytes.array();
     }
@@ -112,7 +114,7 @@ public abstract class ErlangTerm implements IntegerTerm,
      * compression uses 5 extra bytes (COMPRESSED tag + size), don't
      * compress if the original term is smaller.
      */
-    if (bytes.length < 5) {
+    if (bytes.length < MINIMUM_BYTES_TO_COMPRESS) {
       return bytes;
     }
     val deflater = new Deflater(BEST_COMPRESSION);
@@ -123,8 +125,8 @@ public abstract class ErlangTerm implements IntegerTerm,
     }
     deflater.end();
 
-    return Bytes.allocate(3)
-        .put1B(80)
+    return Bytes.allocate()
+        .put1B(TermType.COMPRESSED.getCode())
         .put4B(bytes.length)
         .put(byteArrayOutputStream.toByteArray())
         .array();

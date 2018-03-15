@@ -50,6 +50,8 @@ public class ErlangInteger extends ErlangTerm {
 
   private static final long serialVersionUID = -1757584303003802030L;
 
+  private static final int MAX_SMALL_INTEGER;
+
   private static final int MAX_INTEGER;
 
   private static final int MIN_INTEGER;
@@ -58,14 +60,20 @@ public class ErlangInteger extends ErlangTerm {
 
   private static final int MAX_CACHE;
 
+  private static final int MAX_SMALL_BIG_BYTES_LENGTH;
+
   private static final ErlangInteger[] CACHE;
 
   static {
+    MAX_SMALL_INTEGER = 255;
+
     MAX_INTEGER = (1 << 27) - 1;
     MIN_INTEGER = -(1 << 27) - 1;
 
     MIN_CACHE = -1;
     MAX_CACHE = 256;
+
+    MAX_SMALL_BIG_BYTES_LENGTH = 255;
 
     CACHE = IntStream.range(MIN_CACHE, MAX_CACHE)
         .boxed()
@@ -110,9 +118,9 @@ public class ErlangInteger extends ErlangTerm {
   public ErlangInteger (BigInteger value) {
     this(SMALL_BIG);
     this.value = value;
-    if (value.bitLength() < 64) {
+    if (value.bitLength() < Long.BYTES) {
       setupType(value.longValue());
-    } else if (value.abs().toByteArray().length < 256) {
+    } else if (value.abs().toByteArray().length <= MAX_SMALL_BIG_BYTES_LENGTH) {
       setType(SMALL_BIG);
     } else {
       setType(LARGE_BIG);
@@ -120,11 +128,11 @@ public class ErlangInteger extends ErlangTerm {
   }
 
   private void setupType (long longValue) {
-    if ((longValue & 0xFFL) == longValue) {
+    if ((longValue & MAX_SMALL_INTEGER) == longValue) {
       setType(SMALL_INTEGER);
     } else if (longValue >= MIN_INTEGER && longValue <= MAX_INTEGER) {
       setType(INTEGER);
-    } else if (value.abs().toByteArray().length < 256) {
+    } else if (value.abs().toByteArray().length <= MAX_SMALL_BIG_BYTES_LENGTH) {
       setType(SMALL_BIG);
     }
   }
@@ -221,13 +229,7 @@ public class ErlangInteger extends ErlangTerm {
 
       int sign = buffer.getByte();
       byte[] bytes = buffer.getBytes(arity);
-      // Reverse the array to make it big endian.
-      for (int i = 0, j = bytes.length - 1; i < j; i++, j--) {
-        // Swap [i] with [j]
-        byte tmp = bytes[i];
-        bytes[i] = bytes[j];
-        bytes[j] = tmp;
-      }
+      reverse(bytes);
       value = new BigInteger(bytes);
       if (sign != 0) {
         value = value.negate();
@@ -239,6 +241,7 @@ public class ErlangInteger extends ErlangTerm {
   }
 
   @Override
+  @SuppressWarnings("PMD.CyclomaticComplexity")
   protected void write (@NonNull Bytes buffer) {
     switch (getType()) {
     case SMALL_INTEGER:
@@ -256,15 +259,9 @@ public class ErlangInteger extends ErlangTerm {
       }
 
       byte[] magnitude = Arrays.copyOfRange(bytes, index, bytes.length);
-      int length = magnitude.length;
-      // Reverse the array to make it little endian.
-      for (int i = 0, j = length; i < j--; i++) {
-        // Swap [i] with [j]
-        byte temp = magnitude[i];
-        magnitude[i] = magnitude[j];
-        magnitude[j] = temp;
-      }
+      reverse(magnitude);
 
+      int length = magnitude.length;
       if ((length & 0xFF) == length) {
         buffer.put1B(length); // length
       } else {
@@ -277,7 +274,20 @@ public class ErlangInteger extends ErlangTerm {
       buffer.put(magnitude);
       break;
     default:
-      throw new IllegalArgumentException("");
+      throw new IllegalArgumentException("Unknown type: " + getType());
+    }
+  }
+
+  private void reverse (byte[] data) {
+    int left = 0;
+    int right = data.length - 1;
+    while (left < right) {
+      byte temp = data[left];
+      data[left] = data[right];
+      data[right] = temp;
+
+      left++;
+      right--;
     }
   }
 }

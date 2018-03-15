@@ -27,6 +27,7 @@ import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.TimeUnit;
+import java.util.concurrent.atomic.AtomicBoolean;
 
 import io.appulse.encon.java.Node;
 import io.appulse.encon.java.NodeDescriptor;
@@ -93,8 +94,7 @@ public final class Mailbox implements Closeable {
   @NonFinal
   CompletableFuture<Message> currentFuture;
 
-  @NonFinal
-  volatile boolean closed;
+  AtomicBoolean closed = new AtomicBoolean(false);
 
   public Node getNode () {
     return internal.node();
@@ -181,7 +181,10 @@ public final class Mailbox implements Closeable {
   }
 
   public void exit (@NonNull ErlangTerm reason) {
-    closed = true;
+    if (closed.get()) {
+      return;
+    }
+    closed.set(true);
 
     log.debug("Exiting mailbox '{}:{}'. Reason: '{}'",
               name, pid, reason);
@@ -212,9 +215,6 @@ public final class Mailbox implements Closeable {
 
   @Override
   public void close () {
-    if (closed) {
-      return;
-    }
     exit("normal");
   }
 
@@ -227,6 +227,7 @@ public final class Mailbox implements Closeable {
   }
 
   @Synchronized
+  @SuppressWarnings("PMD.NullAssignment")
   private void handle (@NonNull Message message) {
     if (currentFuture != null) {
       if (message.getHeader().getTag() == EXIT || message.getHeader().getTag() == EXIT2) {

@@ -28,7 +28,6 @@ import lombok.Value;
  */
 @Value
 @EqualsAndHashCode(callSuper = false)
-@SuppressWarnings("checkstyle:MutableException") // checkstyle bug, all variables are already final
 public class MailboxWithSuchPidDoesntExistException extends NoSuchMailboxException {
 
   private static final long serialVersionUID = 2742510481673158004L;

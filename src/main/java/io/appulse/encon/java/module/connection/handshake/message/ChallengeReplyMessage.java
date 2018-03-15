@@ -51,7 +51,7 @@ public class ChallengeReplyMessage extends Message {
   private ChallengeReplyMessage (int challenge, @NonNull byte[] digest) {
     this();
     this.challenge = challenge;
-    this.digest = digest;
+    this.digest = digest.clone();
   }
 
   @Override

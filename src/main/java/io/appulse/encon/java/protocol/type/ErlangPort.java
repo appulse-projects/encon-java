@@ -90,7 +90,7 @@ public class ErlangPort extends ErlangTerm {
       creation = buffer.getInt();
       break;
     default:
-      throw new RuntimeException();
+      throw new IllegalArgumentException("Unknown type: " + getType());
     }
     validate();
   }
@@ -108,7 +108,7 @@ public class ErlangPort extends ErlangTerm {
       buffer.put4B(creation);
       break;
     default:
-      throw new RuntimeException();
+      throw new IllegalArgumentException("Unknown type: " + getType());
     }
   }
 

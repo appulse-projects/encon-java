@@ -23,12 +23,14 @@ import static io.appulse.encon.java.protocol.Erlang.tuple;
 import static io.appulse.epmd.java.core.model.NodeType.R6_ERLANG;
 import static io.appulse.epmd.java.core.model.Protocol.TCP;
 import static io.appulse.epmd.java.core.model.Version.R6;
+import static java.util.concurrent.TimeUnit.MILLISECONDS;
 import static java.util.concurrent.TimeUnit.SECONDS;
 import static org.assertj.core.api.Assertions.assertThat;
 
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.CompletionStage;
 import java.util.concurrent.ExecutionException;
+import java.util.concurrent.ThreadLocalRandom;
 
 import io.appulse.encon.java.config.MailboxConfig;
 import io.appulse.encon.java.config.NodeConfig;
@@ -58,19 +60,23 @@ public class NodeTest {
   @Rule
   public TestRule watcher = new TestMethodNamePrinter();
 
+  private static final String ELIXIR_ECHO_SERVER = "echo@localhost";
+
   Node node;
 
   @After
-  public void after () {
+  public void after () throws Exception {
     if (node != null) {
       node.close();
       node = null;
     }
+    MILLISECONDS.sleep(300);
   }
 
   @Test
   public void register () {
-    node = Erts.singleNode("popa");
+    val name = createShortName();
+    node = Nodes.singleNode(name);
 
     assertThat(node.generatePid())
         .isNotNull();
@@ -81,7 +87,7 @@ public class NodeTest {
     assertThat(node.generateReference())
         .isNotNull();
 
-    val optional = node.lookup("popa");
+    val optional = node.lookup(name);
     assertThat(optional).isPresent();
 
     val nodeInfo = optional.get();
@@ -105,41 +111,44 @@ public class NodeTest {
 
   @Test
   public void ping () throws Exception {
-    node = Erts.singleNode("node-1@localhost", NodeConfig.builder()
+    val name1 = createFullName();
+    val name2 = createFullName();
+    node = Nodes.singleNode(name1, NodeConfig.builder()
                            .cookie("secret")
                            .build()
     );
 
-    assertThat(node.ping("echo@localhost").get(2, SECONDS))
+    assertThat(node.ping(ELIXIR_ECHO_SERVER).get(2, SECONDS))
         .isTrue();
-    assertThat(node.ping("echo@localhost").get(2, SECONDS))
+    assertThat(node.ping(ELIXIR_ECHO_SERVER).get(2, SECONDS))
         .isTrue();
-    assertThat(node.ping("echo@localhost").get(2, SECONDS))
+    assertThat(node.ping(ELIXIR_ECHO_SERVER).get(2, SECONDS))
         .isTrue();
-    assertThat(node.ping("echo@localhost").get(2, SECONDS))
-        .isTrue();
-
-    assertThat(node.ping("node-1@localhost").get(2, SECONDS))
+    assertThat(node.ping(ELIXIR_ECHO_SERVER).get(2, SECONDS))
         .isTrue();
 
-    assertThat(node.ping("node-2@localhost").get(2, SECONDS))
+    assertThat(node.ping(name1).get(2, SECONDS))
+        .isTrue();
+
+    assertThat(node.ping(name2).get(2, SECONDS))
         .isFalse();
 
-    try (val node2 = Erts.singleNode("node-2@localhost", NodeConfig.builder()
+    try (val node2 = Nodes.singleNode(name2, NodeConfig.builder()
                                      .cookie("secret")
                                      .build())) {
 
-      assertThat(node.ping("node-2@localhost").get(2, SECONDS))
+      assertThat(node.ping(name2).get(2, SECONDS))
           .isTrue();
 
-      assertThat(node2.ping("node-1@localhost").get(2, SECONDS))
+      assertThat(node2.ping(name1).get(2, SECONDS))
           .isTrue();
     }
   }
 
   @Test
   public void instantiating () throws Exception {
-    node = Erts.singleNode("popa", NodeConfig.builder()
+    val name = createShortName();
+    node = Nodes.singleNode(name, NodeConfig.builder()
                            .mailbox(MailboxConfig.builder()
                                .name("one")
                                .build())
@@ -161,7 +170,10 @@ public class NodeTest {
 
   @Test
   public void sendFromOneToAnotherNode () throws Exception {
-    node = Erts.singleNode("node-1@localhost");
+    val name1 = createFullName();
+    val name2 = createFullName();
+
+    node = Nodes.singleNode(name1);
 
     CompletableFuture<String> future1 = new CompletableFuture<>();
     Mailbox mailbox1 = node.mailbox()
@@ -169,7 +181,7 @@ public class NodeTest {
         .handler((self, header, body) -> future1.complete(body.get().asText()))
         .build();
 
-    try (val node2 = Erts.singleNode("node-2@localhost")) {
+    try (val node2 = Nodes.singleNode(name2)) {
 
       String text1 = "Hello world 1";
       String text2 = "Hello world 2";
@@ -183,7 +195,7 @@ public class NodeTest {
 
       mailbox2.request()
           .body(string(text1))
-          .send("node-1@localhost", "popa1");
+          .send(name1, "popa1");
 
       assertThat(future1.get(2, SECONDS))
           .isEqualTo(text1);
@@ -196,7 +208,7 @@ public class NodeTest {
 
       mailbox1.request()
           .body(string(text2))
-          .send("node-2@localhost", "popa2");
+          .send(name2, "popa2");
 
       assertThat(stage2.toCompletableFuture().get(2, SECONDS))
           .isNotNull();
@@ -205,7 +217,8 @@ public class NodeTest {
 
   @Test
   public void send () throws Exception {
-    node = Erts.singleNode("popa", NodeConfig.builder()
+    val name = createShortName();
+    node = Nodes.singleNode(name, NodeConfig.builder()
                            .server(ServerConfig.builder().port(8500).build())
                            .cookie("secret")
                            .build()
@@ -228,7 +241,7 @@ public class NodeTest {
                 number(42)
             )
         ))
-        .send("echo@localhost", "echo_server");
+        .send(ELIXIR_ECHO_SERVER, "echo_server");
 
     SECONDS.sleep(3);
 
@@ -285,7 +298,9 @@ public class NodeTest {
 
   @Test
   public void link () throws Exception {
-    node = Erts.singleNode("node-1@localhost");
+    val name = createFullName();
+    node = Nodes.singleNode(name);
+
     Mailbox mailbox1 = node.mailbox().build();
     Mailbox mailbox2 = node.mailbox().build();
 
@@ -304,7 +319,9 @@ public class NodeTest {
 
   @Test
   public void exit () throws Exception {
-    node = Erts.singleNode("node-1@localhost");
+    val name = createFullName();
+    node = Nodes.singleNode(name);
+
     Mailbox mailbox1 = node.mailbox().build();
     Mailbox mailbox2 = node.mailbox().build();
 
@@ -328,5 +345,20 @@ public class NodeTest {
       assertThat(exitException.getReason())
           .isEqualTo(new ErlangAtom("popa"));
     }
+  }
+
+  private String createShortName () {
+    return new StringBuilder()
+        .append("node-")
+        .append(ThreadLocalRandom.current().nextInt())
+        .toString();
+  }
+
+  private String createFullName () {
+    return new StringBuilder()
+        .append("node-")
+        .append(ThreadLocalRandom.current().nextInt())
+        .append("@localhost")
+        .toString();
   }
 }

@@ -50,6 +50,8 @@ public class Exit extends ControlMessage {
   ErlangTerm reason;
 
   public Exit (@NonNull ErlangTuple tuple) {
+    super();
+
     from = tuple.get(1)
         .filter(ErlangTerm::isPid)
         .map(ErlangTerm::asPid)

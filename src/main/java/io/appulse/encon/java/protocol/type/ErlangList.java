@@ -70,14 +70,14 @@ public class ErlangList extends ErlangTerm {
   public ErlangList (@NonNull List<ErlangTerm> elements) {
     this(LIST);
 
-    this.elements = elements.toArray(new ErlangTerm[elements.size()]);
+    this.elements = elements.toArray(new ErlangTerm[0]);
   }
 
   @Builder
   public ErlangList (ErlangTerm tail, @Singular List<ErlangTerm> elements) {
     this(LIST);
     this.elements = ofNullable(elements)
-        .map(it -> it.toArray(new ErlangTerm[it.size()]))
+        .map(it -> it.toArray(new ErlangTerm[0]))
         .orElse(new ErlangTerm[0]);
 
     this.tail = tail;
