@@ -24,7 +24,7 @@ limitations under the License.
 
   <groupId>io.appulse</groupId>
   <artifactId>encon-java</artifactId>
-  <version>0.0.1</version>
+  <version>1.0.0</version>
 
   <packaging>jar</packaging>
 
@@ -63,7 +63,7 @@ limitations under the License.
     <url>https://github.com/appulse-projects/encon-java</url>
     <connection>scm:git:https://github.com/appulse-projects/encon-java.git</connection>
     <developerConnection>scm:git:https://github.com/appulse-projects/encon-java.git</developerConnection>
-    <tag>0.0.1</tag>
+    <tag>1.0.0</tag>
   </scm>
 
   <distributionManagement>
@@ -112,17 +112,17 @@ limitations under the License.
     <dependency>
       <groupId>io.appulse</groupId>
       <artifactId>logging-java</artifactId>
-      <version>1.0.0</version>
+      <version>1.0.2</version>
     </dependency>
     <dependency>
       <groupId>io.appulse</groupId>
       <artifactId>utils-java</artifactId>
-      <version>1.3.2</version>
+      <version>1.3.3</version>
     </dependency>
     <dependency>
       <groupId>io.appulse.epmd.java</groupId>
       <artifactId>client</artifactId>
-      <version>0.4.2</version>
+      <version>1.0.0</version>
     </dependency>
 
     <dependency>
@@ -165,7 +165,7 @@ limitations under the License.
     <dependency>
       <groupId>io.appulse.epmd.java</groupId>
       <artifactId>server</artifactId>
-      <version>0.4.2</version>
+      <version>1.0.0</version>
       <scope>test</scope>
     </dependency>
   </dependencies>

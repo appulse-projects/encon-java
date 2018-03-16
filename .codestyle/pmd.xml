@@ -47,6 +47,7 @@ limitations under the License.
     <exclude name="AvoidRethrowingException" />
     <exclude name="AvoidThrowingNullPointerException" />
     <exclude name="ExcessiveImports" />
+    <exclude name="ExcessivePublicCount" />
     <exclude name="LawOfDemeter" />
     <exclude name="LoosePackageCoupling" />
     <exclude name="TooManyFields" />
