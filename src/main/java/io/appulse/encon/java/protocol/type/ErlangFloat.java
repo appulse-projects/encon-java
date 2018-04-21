@@ -20,13 +20,12 @@ import static io.appulse.encon.java.protocol.TermType.NEW_FLOAT;
 import static java.nio.charset.StandardCharsets.ISO_8859_1;
 import static lombok.AccessLevel.PRIVATE;
 
-import java.math.BigDecimal;
-import java.math.BigInteger;
-
 import io.appulse.encon.java.protocol.TermType;
 import io.appulse.encon.java.protocol.term.ErlangTerm;
 import io.appulse.utils.Bytes;
-
+import io.netty.buffer.ByteBuf;
+import java.math.BigDecimal;
+import java.math.BigInteger;
 import lombok.EqualsAndHashCode;
 import lombok.NonNull;
 import lombok.ToString;
@@ -139,6 +138,24 @@ public class ErlangFloat extends ErlangTerm {
   }
 
   @Override
+  protected void read (ByteBuf buffer) {
+    switch (getType()) {
+    case FLOAT:
+      val bytes = new byte[31];
+      buffer.readBytes(bytes);
+      val string = new String(bytes, ISO_8859_1);
+      value = Double.valueOf(string);
+      break;
+    case NEW_FLOAT:
+      val bits = buffer.readLong();
+      value = Double.longBitsToDouble(bits);
+      break;
+    default:
+      throw new IllegalArgumentException("");
+    }
+  }
+
+  @Override
   protected void write (@NonNull Bytes buffer) {
     switch (getType()) {
     case FLOAT:
@@ -149,6 +166,22 @@ public class ErlangFloat extends ErlangTerm {
     case NEW_FLOAT:
       val bits = Double.doubleToLongBits(value);
       buffer.put8B(bits);
+      break;
+    default:
+      throw new IllegalArgumentException("");
+    }
+  }
+
+  @Override
+  protected void write (ByteBuf buffer) {
+    switch (getType()) {
+    case FLOAT:
+      val string = String.format("%031.20e", value);
+      buffer.writeCharSequence(string, ISO_8859_1);
+      break;
+    case NEW_FLOAT:
+      val bits = Double.doubleToLongBits(value);
+      buffer.writeLong(bits);
       break;
     default:
       throw new IllegalArgumentException("");

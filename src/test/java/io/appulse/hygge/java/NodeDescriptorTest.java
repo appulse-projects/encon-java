@@ -18,7 +18,7 @@ package io.appulse.encon.java;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
-import io.appulse.encon.java.util.TestMethodNamePrinter;
+import io.appulse.utils.test.TestMethodNamePrinter;
 
 import org.assertj.core.api.SoftAssertions;
 import org.junit.Rule;

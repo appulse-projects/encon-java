@@ -41,7 +41,7 @@ import io.appulse.encon.java.module.mailbox.exception.ReceivedExitException;
 import io.appulse.encon.java.protocol.term.ErlangTerm;
 import io.appulse.encon.java.protocol.type.ErlangAtom;
 import io.appulse.encon.java.protocol.type.ErlangString;
-import io.appulse.encon.java.util.TestMethodNamePrinter;
+import io.appulse.utils.test.TestMethodNamePrinter;
 
 import lombok.val;
 import org.assertj.core.api.SoftAssertions;

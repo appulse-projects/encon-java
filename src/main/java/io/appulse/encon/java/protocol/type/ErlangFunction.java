@@ -21,13 +21,13 @@ import static io.appulse.encon.java.protocol.TermType.NEW_FUNCTION;
 import static java.util.Optional.ofNullable;
 import static lombok.AccessLevel.PRIVATE;
 
-import java.util.stream.IntStream;
-import java.util.stream.Stream;
-
+import io.appulse.encon.java.protocol.Erlang;
 import io.appulse.encon.java.protocol.TermType;
 import io.appulse.encon.java.protocol.term.ErlangTerm;
 import io.appulse.utils.Bytes;
-
+import io.netty.buffer.ByteBuf;
+import java.util.stream.IntStream;
+import java.util.stream.Stream;
 import lombok.Builder;
 import lombok.EqualsAndHashCode;
 import lombok.Getter;
@@ -72,8 +72,8 @@ public class ErlangFunction extends ErlangTerm {
   private ErlangFunction (ErlangPid pid, String module, int index, int unique, ErlangTerm[] variables,
                           int arity, byte[] md5, int oldIndex) {
     super(md5 == null
-        ? FUNCTION
-        : NEW_FUNCTION);
+          ? FUNCTION
+          : NEW_FUNCTION);
 
     this.pid = pid;
     this.module = module;
@@ -136,6 +136,53 @@ public class ErlangFunction extends ErlangTerm {
   }
 
   @Override
+  protected void read (ByteBuf buffer) {
+    int freeVariablesCount = 0;
+
+    if (getType() == FUNCTION) {
+      freeVariablesCount = buffer.readInt();
+
+      pid = ErlangTerm.newInstance(buffer);
+
+      ErlangAtom atomModule = ErlangTerm.newInstance(buffer);
+      module = atomModule.asText();
+
+      ErlangInteger numberIndex = ErlangTerm.newInstance(buffer);
+      index = numberIndex.asInt();
+
+      ErlangInteger numberUnique = ErlangTerm.newInstance(buffer);
+      unique = numberUnique.asInt();
+
+    } else if (getType() == NEW_FUNCTION) {
+      buffer.readInt(); // skip size
+
+      arity = buffer.readByte();
+
+      md5 = new byte[16];
+      buffer.readBytes(md5);
+
+      index = buffer.readInt();
+
+      freeVariablesCount = buffer.readInt();
+
+      ErlangAtom atomModule = ErlangTerm.newInstance(buffer);
+      module = atomModule.asText();
+
+      ErlangInteger numberOldIndex = ErlangTerm.newInstance(buffer);
+      oldIndex = numberOldIndex.asInt();
+
+      ErlangInteger numberUnique = ErlangTerm.newInstance(buffer);
+      unique = numberUnique.asInt();
+
+      pid = ErlangTerm.newInstance(buffer);
+    }
+
+    variables = IntStream.range(0, freeVariablesCount)
+        .mapToObj(it -> ErlangTerm.newInstance(buffer))
+        .toArray(ErlangTerm[]::new);
+  }
+
+  @Override
   @SuppressWarnings("checkstyle:VariableDeclarationUsageDistance")
   protected void write (@NonNull Bytes buffer) {
     switch (getType()) {
@@ -164,6 +211,41 @@ public class ErlangFunction extends ErlangTerm {
           .map(ErlangTerm::toBytes)
           .forEach(buffer::put);
       buffer.put4B(position, buffer.position() - position);
+      break;
+    default:
+      throw new IllegalArgumentException("Unknown type: " + getType());
+    }
+  }
+
+  @Override
+  protected void write (ByteBuf buffer) {
+    switch (getType()) {
+    case FUNCTION:
+      buffer.writeInt(variables.length);
+      pid.writeTo(buffer);
+      Erlang.atom(module).writeTo(buffer);
+      Erlang.number(index).writeTo(buffer);
+      Erlang.number(unique).writeTo(buffer);
+      Stream.of(variables)
+          .forEach(it -> it.writeTo(buffer));
+      break;
+    case NEW_FUNCTION:
+      if (true) {
+        throw new RuntimeException();
+      }
+      int position = buffer.writerIndex();
+      buffer.writeInt(-1);
+      buffer.writeByte(arity);
+      buffer.writeBytes(md5);
+      buffer.writeInt(index);
+      buffer.writeInt(variables.length);
+      Erlang.atom(module).writeTo(buffer);
+      Erlang.number(oldIndex).writeTo(buffer);
+      Erlang.number(unique).writeTo(buffer);
+      pid.writeTo(buffer);
+      Stream.of(variables)
+          .forEach(it -> it.writeTo(buffer));
+//      buffer.put4B(position, buffer.position() - position);
       break;
     default:
       throw new IllegalArgumentException("Unknown type: " + getType());

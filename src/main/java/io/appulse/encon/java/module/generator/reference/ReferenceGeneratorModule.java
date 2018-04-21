@@ -58,7 +58,7 @@ public final class ReferenceGeneratorModule implements ReferenceGeneratorModuleA
 
     return ErlangReference.builder()
         .node(internal.node().getDescriptor().getFullName())
-        .ids(new int[] { nextId1, nextId2, nextId3 })
+        .ids(new long[] { nextId1, nextId2, nextId3 })
         .creation(internal.creation())
         .build();
   }

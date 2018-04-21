@@ -21,6 +21,10 @@ import static java.util.Optional.ofNullable;
 import static java.util.stream.Collectors.toMap;
 import static lombok.AccessLevel.PRIVATE;
 
+import io.appulse.encon.java.protocol.TermType;
+import io.appulse.encon.java.protocol.term.ErlangTerm;
+import io.appulse.utils.Bytes;
+import io.netty.buffer.ByteBuf;
 import java.util.Iterator;
 import java.util.LinkedHashMap;
 import java.util.Map;
@@ -28,11 +32,6 @@ import java.util.Optional;
 import java.util.function.BinaryOperator;
 import java.util.function.IntFunction;
 import java.util.stream.IntStream;
-
-import io.appulse.encon.java.protocol.TermType;
-import io.appulse.encon.java.protocol.term.ErlangTerm;
-import io.appulse.utils.Bytes;
-
 import lombok.EqualsAndHashCode;
 import lombok.NonNull;
 import lombok.ToString;
@@ -106,8 +105,8 @@ public class ErlangMap extends ErlangTerm {
   @Override
   protected void read (@NonNull Bytes buffer) {
     IntFunction<ErlangTerm[]> mapFunction = it -> new ErlangTerm[] {
-        ErlangTerm.newInstance(buffer),
-        ErlangTerm.newInstance(buffer)
+      ErlangTerm.newInstance(buffer),
+      ErlangTerm.newInstance(buffer)
     };
 
     BinaryOperator<ErlangTerm> mergeFunction = (left, right) -> {
@@ -121,11 +120,37 @@ public class ErlangMap extends ErlangTerm {
   }
 
   @Override
+  protected void read (ByteBuf buffer) {
+    IntFunction<ErlangTerm[]> mapFunction = it -> new ErlangTerm[] {
+      ErlangTerm.newInstance(buffer),
+      ErlangTerm.newInstance(buffer)
+    };
+
+    BinaryOperator<ErlangTerm> mergeFunction = (left, right) -> {
+      throw new IllegalStateException("Duplicate key " + left);
+    };
+
+    val arity = buffer.readInt();
+    map = IntStream.range(0, arity)
+        .mapToObj(mapFunction)
+        .collect(toMap(it -> it[0], it -> it[1], mergeFunction, LinkedHashMap::new));
+  }
+
+  @Override
   protected void write (@NonNull Bytes buffer) {
     buffer.put4B(map.size());
     map.entrySet().forEach(it -> {
       buffer.put(it.getKey().toBytes());
       buffer.put(it.getValue().toBytes());
+    });
+  }
+
+  @Override
+  protected void write (ByteBuf buffer) {
+    buffer.writeInt(map.size());
+    map.entrySet().forEach(it -> {
+      it.getKey().writeTo(buffer);
+      it.getValue().writeTo(buffer);
     });
   }
 }

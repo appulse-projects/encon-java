@@ -21,15 +21,16 @@ import static java.util.Optional.ofNullable;
 import static lombok.AccessLevel.PRIVATE;
 
 import io.appulse.encon.java.NodeDescriptor;
+import io.appulse.encon.java.protocol.Erlang;
 import io.appulse.encon.java.protocol.TermType;
 import io.appulse.encon.java.protocol.term.ErlangTerm;
 import io.appulse.utils.Bytes;
-
+import io.appulse.utils.BytesUtils;
+import io.netty.buffer.ByteBuf;
 import lombok.Builder;
 import lombok.EqualsAndHashCode;
 import lombok.Getter;
 import lombok.NonNull;
-import lombok.ToString;
 import lombok.experimental.FieldDefaults;
 
 /**
@@ -38,7 +39,6 @@ import lombok.experimental.FieldDefaults;
  * @since 1.0.0
  */
 @Getter
-@ToString
 @FieldDefaults(level = PRIVATE)
 @EqualsAndHashCode(callSuper = true)
 public class ErlangPort extends ErlangTerm {
@@ -77,6 +77,16 @@ public class ErlangPort extends ErlangTerm {
   }
 
   @Override
+  public String toString () {
+    return new StringBuilder()
+        .append("#Port<")
+        .append(creation).append('.')
+        .append(id)
+        .append('>')
+        .toString();
+  }
+
+  @Override
   protected void read (@NonNull Bytes buffer) {
     ErlangAtom atom = ErlangTerm.newInstance(buffer);
     descriptor = NodeDescriptor.from(atom.asText());
@@ -84,10 +94,29 @@ public class ErlangPort extends ErlangTerm {
 
     switch (getType()) {
     case PORT:
-      creation = buffer.getByte();
+      creation = buffer.getUnsignedByte();
       break;
     case NEW_PORT:
       creation = buffer.getInt();
+      break;
+    default:
+      throw new IllegalArgumentException("Unknown type: " + getType());
+    }
+    validate();
+  }
+
+  @Override
+  protected void read (ByteBuf buffer) {
+    ErlangAtom atom = ErlangTerm.newInstance(buffer);
+    descriptor = NodeDescriptor.from(atom.asText());
+    id = buffer.readInt();
+
+    switch (getType()) {
+    case PORT:
+      creation = BytesUtils.asUnsignedByte(buffer.readByte());
+      break;
+    case NEW_PORT:
+      creation = buffer.readInt();
       break;
     default:
       throw new IllegalArgumentException("Unknown type: " + getType());
@@ -106,6 +135,23 @@ public class ErlangPort extends ErlangTerm {
       break;
     case NEW_PORT:
       buffer.put4B(creation);
+      break;
+    default:
+      throw new IllegalArgumentException("Unknown type: " + getType());
+    }
+  }
+
+  @Override
+  protected void write (ByteBuf buffer) {
+    Erlang.atom(descriptor.getFullName()).writeTo(buffer);
+    buffer.writeInt(id);
+
+    switch (getType()) {
+    case PORT:
+      buffer.writeByte(creation);
+      break;
+    case NEW_PORT:
+      buffer.writeInt(creation);
       break;
     default:
       throw new IllegalArgumentException("Unknown type: " + getType());

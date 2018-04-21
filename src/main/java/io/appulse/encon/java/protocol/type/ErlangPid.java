@@ -21,16 +21,18 @@ import static java.util.Optional.ofNullable;
 import static lombok.AccessLevel.PRIVATE;
 
 import io.appulse.encon.java.NodeDescriptor;
+import io.appulse.encon.java.protocol.Erlang;
 import io.appulse.encon.java.protocol.TermType;
 import io.appulse.encon.java.protocol.term.ErlangTerm;
 import io.appulse.utils.Bytes;
-
+import io.appulse.utils.BytesUtils;
+import io.netty.buffer.ByteBuf;
 import lombok.Builder;
 import lombok.EqualsAndHashCode;
 import lombok.Getter;
 import lombok.NonNull;
-import lombok.ToString;
 import lombok.experimental.FieldDefaults;
+import lombok.val;
 
 /**
  *
@@ -38,7 +40,6 @@ import lombok.experimental.FieldDefaults;
  * @since 1.0.0
  */
 @Getter
-@ToString
 @FieldDefaults(level = PRIVATE)
 @EqualsAndHashCode(callSuper = true)
 public class ErlangPid extends ErlangTerm {
@@ -80,6 +81,17 @@ public class ErlangPid extends ErlangTerm {
   }
 
   @Override
+  public String toString () {
+    return new StringBuilder()
+        .append("#PID<")
+        .append(creation).append('.')
+        .append(id).append('.')
+        .append(serial)
+        .append('>')
+        .toString();
+  }
+
+  @Override
   protected void read (@NonNull Bytes buffer) {
     ErlangAtom atom = ErlangTerm.newInstance(buffer);
     descriptor = NodeDescriptor.from(atom.asText());
@@ -89,10 +101,31 @@ public class ErlangPid extends ErlangTerm {
 
     switch (getType()) {
     case PID:
-      creation = buffer.getByte();
+      creation = buffer.getUnsignedByte();
       break;
     case NEW_PID:
       creation = buffer.getInt();
+      break;
+    default:
+      throw new IllegalArgumentException("Unknown type: " + getType());
+    }
+    validate();
+  }
+
+  @Override
+  protected void read (ByteBuf buffer) {
+    val atom = ErlangTerm.newInstance(buffer);
+    descriptor = NodeDescriptor.from(atom.asText());
+
+    id = buffer.readInt();
+    serial = buffer.readInt();
+
+    switch (getType()) {
+    case PID:
+      creation = BytesUtils.asUnsignedByte(buffer.readByte());
+      break;
+    case NEW_PID:
+      creation = buffer.readInt();
       break;
     default:
       throw new IllegalArgumentException("Unknown type: " + getType());
@@ -112,6 +145,24 @@ public class ErlangPid extends ErlangTerm {
       break;
     case NEW_PID:
       buffer.put4B(creation);
+      break;
+    default:
+      throw new IllegalArgumentException("Unknown type: " + getType());
+    }
+  }
+
+  @Override
+  protected void write (ByteBuf buffer) {
+    Erlang.atom(descriptor.getFullName()).writeTo(buffer);
+    buffer.writeInt(id);
+    buffer.writeInt(serial);
+
+    switch (getType()) {
+    case PID:
+      buffer.writeByte(creation);
+      break;
+    case NEW_PID:
+      buffer.writeInt(creation);
       break;
     default:
       throw new IllegalArgumentException("Unknown type: " + getType());

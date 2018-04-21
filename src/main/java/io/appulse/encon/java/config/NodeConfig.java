@@ -22,15 +22,13 @@ import static java.util.stream.Collectors.toList;
 import static java.util.stream.Collectors.toSet;
 import static lombok.AccessLevel.PRIVATE;
 
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
-
 import io.appulse.encon.java.DistributionFlag;
 import io.appulse.epmd.java.core.model.NodeType;
 import io.appulse.epmd.java.core.model.Protocol;
 import io.appulse.epmd.java.core.model.Version;
-
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
@@ -117,6 +115,12 @@ public class NodeConfig {
         .map(ServerConfig::newInstance)
         .ifPresent(builder::server);
 
+    ofNullable(map.get("compression"))
+        .filter(it -> it instanceof Map)
+        .map(it -> (Map<String, Object>) it)
+        .map(CompressionConfig::newInstance)
+        .ifPresent(builder::compression);
+
     return builder.build();
   }
 
@@ -141,6 +145,8 @@ public class NodeConfig {
   List<MailboxConfig> mailboxes;
 
   ServerConfig server;
+
+  CompressionConfig compression;
 
   /**
    * Method for setting up default values.
@@ -185,6 +191,10 @@ public class NodeConfig {
     server = ofNullable(server)
         .orElse(ServerConfig.builder().build())
         .withDefaultsFrom(defaults.getServer());
+
+    compression = ofNullable(compression)
+        .orElse(CompressionConfig.builder().build())
+        .withDefaultsFrom(defaults.getCompression());
 
     return this;
   }

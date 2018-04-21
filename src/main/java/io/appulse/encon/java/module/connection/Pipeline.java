@@ -16,27 +16,36 @@
 
 package io.appulse.encon.java.module.connection;
 
+import static java.lang.Integer.MAX_VALUE;
+import static java.util.Optional.ofNullable;
 import static lombok.AccessLevel.PRIVATE;
 
-import java.util.concurrent.CompletableFuture;
-
 import io.appulse.encon.java.RemoteNode;
+import io.appulse.encon.java.config.CompressionConfig;
+import io.appulse.encon.java.config.NodeConfig;
 import io.appulse.encon.java.module.NodeInternalApi;
 import io.appulse.encon.java.module.connection.handshake.AbstractHandshakeHandler;
 import io.appulse.encon.java.module.connection.handshake.HandshakeDecoder;
 import io.appulse.encon.java.module.connection.handshake.HandshakeEncoder;
 import io.appulse.encon.java.module.connection.handshake.HandshakeHandlerClient;
 import io.appulse.encon.java.module.connection.handshake.HandshakeHandlerServer;
-import io.appulse.encon.java.module.connection.regular.ClientDecoder;
-import io.appulse.encon.java.module.connection.regular.ClientEncoder;
 import io.appulse.encon.java.module.connection.regular.ClientRegularHandler;
-
+import io.appulse.encon.java.module.connection.regular.CompressionDecoder;
+import io.appulse.encon.java.module.connection.regular.CompressionEncoder;
+import io.appulse.encon.java.module.connection.regular.MessageDecoder;
+import io.appulse.encon.java.module.connection.regular.MessageEncoder;
+import io.appulse.encon.java.module.connection.regular.TickTockHandler;
+import io.netty.channel.ChannelInboundHandler;
 import io.netty.channel.ChannelOutboundHandler;
 import io.netty.channel.ChannelPipeline;
+import io.netty.handler.codec.LengthFieldBasedFrameDecoder;
+import io.netty.handler.codec.LengthFieldPrepender;
+import io.netty.handler.codec.bytes.ByteArrayEncoder;
 import io.netty.handler.timeout.ReadTimeoutHandler;
+import java.util.Objects;
+import java.util.concurrent.CompletableFuture;
 import lombok.Builder;
 import lombok.NonNull;
-import lombok.RequiredArgsConstructor;
 import lombok.experimental.FieldDefaults;
 import lombok.extern.slf4j.Slf4j;
 import lombok.val;
@@ -47,23 +56,41 @@ import lombok.val;
  * @since 1.0.0
  */
 @Slf4j
-@Builder
-@RequiredArgsConstructor
 @FieldDefaults(level = PRIVATE, makeFinal = true)
 public final class Pipeline {
 
   private static final ChannelOutboundHandler HANDSHAKE_ENCODER;
 
-  private static final ChannelOutboundHandler CLIENT_ENCODER;
+  private static final ChannelOutboundHandler LENGTH_FIELD_PREPENDER;
+
+  private static final ChannelOutboundHandler BYTE_ARRAY_ENCODER;
+
+  private static final ChannelInboundHandler TICK_TOCK_HANDLER;
+
+  private static ChannelOutboundHandler COMPRESSION_ENCODER;
+
+  private static final ChannelInboundHandler COMPRESSION_DECODER;
+
+  private static final ChannelOutboundHandler MESSAGE_ENCODER;
+
+  private static final ChannelInboundHandler MESSAGE_DECODER;
 
   private static final String TIMEOUT_HANDLER_NAME;
+
   private static final String DECODER_NAME;
+
   private static final String ENCODER_NAME;
+
   private static final String HANDLER_NAME;
 
   static {
     HANDSHAKE_ENCODER = new HandshakeEncoder();
-    CLIENT_ENCODER = new ClientEncoder();
+    LENGTH_FIELD_PREPENDER = new LengthFieldPrepender(4, false);
+    BYTE_ARRAY_ENCODER = new ByteArrayEncoder();
+    TICK_TOCK_HANDLER = new TickTockHandler();
+    COMPRESSION_DECODER = new CompressionDecoder();
+    MESSAGE_ENCODER = new MessageEncoder();
+    MESSAGE_DECODER = new MessageDecoder();
 
     TIMEOUT_HANDLER_NAME = "readTimeoutHandler";
     DECODER_NAME = "decoder";
@@ -71,11 +98,26 @@ public final class Pipeline {
     HANDLER_NAME = "handler";
   }
 
-  @NonNull
   NodeInternalApi internal;
 
-  @NonNull
   CompletableFuture<Connection> future;
+
+  @Builder
+  public Pipeline (@NonNull NodeInternalApi internal, @NonNull CompletableFuture<Connection> future) {
+    this.internal = internal;
+    this.future = future;
+    if (COMPRESSION_ENCODER == null) {
+      ofNullable(internal)
+          .map(NodeInternalApi::config)
+          .filter(Objects::nonNull)
+          .map(NodeConfig::getCompression)
+          .filter(Objects::nonNull)
+          .filter(CompressionConfig::getEnabled)
+          .ifPresent(it -> {
+            COMPRESSION_ENCODER = new CompressionEncoder(it.getLevel());
+          });
+    }
+  }
 
   public void setupClientHandshake (@NonNull ChannelPipeline pipeline, @NonNull RemoteNode remote) {
     pipeline
@@ -103,9 +145,23 @@ public final class Pipeline {
     val handler = new ClientRegularHandler(internal, remote, future);
 
     pipeline.remove(TIMEOUT_HANDLER_NAME);
-    pipeline.replace(DECODER_NAME, DECODER_NAME, new ClientDecoder());
-    pipeline.replace(ENCODER_NAME, ENCODER_NAME, CLIENT_ENCODER);
-    pipeline.replace(HANDLER_NAME, HANDLER_NAME, handler);
+    pipeline.remove(DECODER_NAME);
+    pipeline.remove(ENCODER_NAME);
+    pipeline.remove(HANDLER_NAME);
+
+    pipeline.addLast(LENGTH_FIELD_PREPENDER);
+    pipeline.addLast(BYTE_ARRAY_ENCODER);
+
+    pipeline.addLast(new LengthFieldBasedFrameDecoder(MAX_VALUE, 0, 4));
+//    pipeline.addLast(new ByteArrayDecoder());
+
+//    pipeline.addLast(TICK_TOCK_HANDLER);
+//    pipeline.addLast(COMPRESSION_DECODER);
+//    ofNullable(COMPRESSION_ENCODER)
+//        .ifPresent(pipeline::addLast);
+    pipeline.addLast(MESSAGE_ENCODER);
+    pipeline.addLast(MESSAGE_DECODER);
+    pipeline.addLast(handler);
 
     val connection = new Connection(remote, handler);
     future.complete(connection);

@@ -33,8 +33,8 @@ import erlang.OtpInputStream;
 import erlang.OtpOutputStream;
 
 import io.appulse.encon.java.protocol.term.ErlangTerm;
-import io.appulse.encon.java.util.TestMethodNamePrinter;
 import io.appulse.utils.Bytes;
+import io.appulse.utils.test.TestMethodNamePrinter;
 
 import lombok.SneakyThrows;
 import lombok.val;

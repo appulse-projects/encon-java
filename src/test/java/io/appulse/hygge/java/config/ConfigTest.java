@@ -48,11 +48,11 @@ import java.util.Set;
 import io.appulse.encon.java.DistributionFlag;
 import io.appulse.encon.java.module.mailbox.MailboxHandler;
 import io.appulse.encon.java.module.mailbox.MailboxType;
-import io.appulse.encon.java.util.TestMethodNamePrinter;
 import io.appulse.epmd.java.client.EpmdClient;
 import io.appulse.epmd.java.core.model.NodeType;
 import io.appulse.epmd.java.core.model.Protocol;
 import io.appulse.epmd.java.core.model.Version;
+import io.appulse.utils.test.TestMethodNamePrinter;
 
 import org.assertj.core.api.SoftAssertions;
 import org.junit.Rule;

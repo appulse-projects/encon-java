@@ -19,12 +19,13 @@ package io.appulse.encon.java.protocol.type;
 import static io.appulse.encon.java.protocol.TermType.BIT_BINNARY;
 import static lombok.AccessLevel.PRIVATE;
 
+import io.appulse.encon.java.protocol.Erlang;
 import io.appulse.encon.java.protocol.TermType;
 import io.appulse.encon.java.protocol.exception.ErlangTermDecodeException;
 import io.appulse.encon.java.protocol.exception.ErlangTermValidationException;
 import io.appulse.encon.java.protocol.term.ErlangTerm;
 import io.appulse.utils.Bytes;
-
+import io.netty.buffer.ByteBuf;
 import lombok.Builder;
 import lombok.EqualsAndHashCode;
 import lombok.Getter;
@@ -95,6 +96,25 @@ public class ErlangBitString extends ErlangTerm {
   }
 
   @Override
+  protected void read (ByteBuf buffer) {
+    val length = buffer.readInt();
+    val tail = buffer.readByte();
+
+    if (tail < 0 || tail > 7) {
+      throw new ErlangTermDecodeException("Wrong tail bit count: " + tail);
+    }
+    if (length == 0 && tail != 0) {
+      throw new ErlangTermDecodeException("Length 0 on BitString with tail bit count: " + tail);
+    }
+
+    bits = new byte[length];
+    buffer.readBytes(bits);
+    pad = 8 - tail;
+
+    validate();
+  }
+
+  @Override
   protected void write (@NonNull Bytes buffer) {
     if (pad == 0) {
       val position = buffer.position();
@@ -104,6 +124,19 @@ public class ErlangBitString extends ErlangTerm {
     buffer.put4B(bits.length);
     buffer.put1B(8 - pad);
     buffer.put(bits);
+  }
+
+  @Override
+  protected void write (ByteBuf buffer) {
+    if (pad == 0) {
+      val position = buffer.writerIndex();
+      buffer.writerIndex(position - 1);
+      Erlang.binary(bits).writeTo(buffer);
+      return;
+    }
+    buffer.writeInt(bits.length);
+    buffer.writeByte(8 - pad);
+    buffer.writeBytes(bits);
   }
 
   private void validate () {

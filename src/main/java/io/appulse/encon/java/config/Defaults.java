@@ -29,12 +29,18 @@ import static io.appulse.encon.java.module.mailbox.MailboxType.SINGLE;
 import static io.appulse.epmd.java.core.model.NodeType.R6_ERLANG;
 import static io.appulse.epmd.java.core.model.Protocol.TCP;
 import static io.appulse.epmd.java.core.model.Version.R6;
+import static java.lang.Boolean.FALSE;
 import static java.util.Arrays.asList;
 import static java.util.Locale.ENGLISH;
 import static java.util.Optional.ofNullable;
 import static java.util.stream.Collectors.toSet;
 import static lombok.AccessLevel.PRIVATE;
 
+import io.appulse.encon.java.DistributionFlag;
+import io.appulse.epmd.java.client.EpmdClient;
+import io.appulse.epmd.java.core.model.NodeType;
+import io.appulse.epmd.java.core.model.Protocol;
+import io.appulse.epmd.java.core.model.Version;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Paths;
@@ -43,13 +49,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.Objects;
 import java.util.Set;
-
-import io.appulse.encon.java.DistributionFlag;
-import io.appulse.epmd.java.client.EpmdClient;
-import io.appulse.epmd.java.core.model.NodeType;
-import io.appulse.epmd.java.core.model.Protocol;
-import io.appulse.epmd.java.core.model.Version;
-
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
@@ -163,6 +162,12 @@ public class Defaults {
         .map(ServerConfig::newInstance)
         .ifPresent(builder::server);
 
+    ofNullable(map.get("compression"))
+        .filter(it -> it instanceof Map)
+        .map(it -> (Map<String, Object>) it)
+        .map(CompressionConfig::newInstance)
+        .ifPresent(builder::compression);
+
     return builder.build();
   }
 
@@ -210,5 +215,11 @@ public class Defaults {
   ServerConfig server = ServerConfig.builder()
       .bossThreads(1)
       .workerThreads(2)
+      .build();
+
+  @Builder.Default
+  CompressionConfig compression = CompressionConfig.builder()
+      .enabled(FALSE)
+      .level(-1)
       .build();
 }

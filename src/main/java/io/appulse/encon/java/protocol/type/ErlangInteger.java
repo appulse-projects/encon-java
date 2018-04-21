@@ -23,15 +23,15 @@ import static io.appulse.encon.java.protocol.TermType.SMALL_INTEGER;
 import static java.math.BigInteger.ZERO;
 import static lombok.AccessLevel.PRIVATE;
 
+import io.appulse.encon.java.protocol.TermType;
+import io.appulse.encon.java.protocol.term.ErlangTerm;
+import io.appulse.utils.Bytes;
+import io.appulse.utils.BytesUtils;
+import io.netty.buffer.ByteBuf;
 import java.math.BigDecimal;
 import java.math.BigInteger;
 import java.util.Arrays;
 import java.util.stream.IntStream;
-
-import io.appulse.encon.java.protocol.TermType;
-import io.appulse.encon.java.protocol.term.ErlangTerm;
-import io.appulse.utils.Bytes;
-
 import lombok.EqualsAndHashCode;
 import lombok.NonNull;
 import lombok.ToString;
@@ -241,6 +241,35 @@ public class ErlangInteger extends ErlangTerm {
   }
 
   @Override
+  protected void read (ByteBuf buffer) {
+    switch (getType()) {
+    case SMALL_INTEGER:
+      value = BigInteger.valueOf(BytesUtils.asUnsignedByte(buffer.readByte()));
+      break;
+    case INTEGER:
+      value = BigInteger.valueOf(buffer.readInt());
+      break;
+    case SMALL_BIG:
+    case LARGE_BIG:
+      int arity = getType() == SMALL_BIG
+                  ? buffer.readByte()
+                  : buffer.readInt();
+
+      int sign = buffer.readByte();
+      byte[] bytes = new byte[arity];
+      buffer.readBytes(bytes);
+      reverse(bytes);
+      value = new BigInteger(bytes);
+      if (sign != 0) {
+        value = value.negate();
+      }
+      break;
+    default:
+      throw new IllegalArgumentException("Unknown type: " + getType());
+    }
+  }
+
+  @Override
   @SuppressWarnings("PMD.CyclomaticComplexity")
   protected void write (@NonNull Bytes buffer) {
     switch (getType()) {
@@ -272,6 +301,43 @@ public class ErlangInteger extends ErlangTerm {
                  : 0;
       buffer.put1B(sign);
       buffer.put(magnitude);
+      break;
+    default:
+      throw new IllegalArgumentException("Unknown type: " + getType());
+    }
+  }
+
+  @Override
+  protected void write (ByteBuf buffer) {
+    switch (getType()) {
+    case SMALL_INTEGER:
+      buffer.writeByte(value.shortValue());
+      break;
+    case INTEGER:
+      buffer.writeInt(value.intValue());
+      break;
+    case SMALL_BIG:
+    case LARGE_BIG:
+      byte[] bytes = value.abs().toByteArray();
+      int index = 0;
+      for (; index < bytes.length && bytes[index] == 0; index++) {
+        // skip leading zeros
+      }
+
+      byte[] magnitude = Arrays.copyOfRange(bytes, index, bytes.length);
+      reverse(magnitude);
+
+      int length = magnitude.length;
+      if ((length & 0xFF) == length) {
+        buffer.writeByte(length); // length
+      } else {
+        buffer.writeInt(length); // length
+      }
+      val sign = value.signum() < 0
+                 ? 1
+                 : 0;
+      buffer.writeByte(sign);
+      buffer.writeBytes(magnitude);
       break;
     default:
       throw new IllegalArgumentException("Unknown type: " + getType());

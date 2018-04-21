@@ -20,6 +20,9 @@ import static java.util.zip.Deflater.BEST_COMPRESSION;
 import static lombok.AccessLevel.PRIVATE;
 import static lombok.AccessLevel.PROTECTED;
 
+import io.appulse.encon.java.protocol.TermType;
+import io.appulse.utils.Bytes;
+import io.netty.buffer.ByteBuf;
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.Serializable;
@@ -29,10 +32,6 @@ import java.util.zip.Deflater;
 import java.util.zip.DeflaterOutputStream;
 import java.util.zip.Inflater;
 import java.util.zip.InflaterInputStream;
-
-import io.appulse.encon.java.protocol.TermType;
-import io.appulse.utils.Bytes;
-
 import lombok.EqualsAndHashCode;
 import lombok.Getter;
 import lombok.NonNull;
@@ -60,6 +59,17 @@ public abstract class ErlangTerm implements IntegerTerm,
   private static final long serialVersionUID = 5430854281567501819L;
 
   private static final int MINIMUM_BYTES_TO_COMPRESS = 5;
+
+  @SneakyThrows
+  @SuppressWarnings("unchecked")
+  public static <T extends ErlangTerm> T newInstance (@NonNull ByteBuf buffer) {
+    val type = TermType.of(buffer.readByte());
+    Class<T> klass = (Class<T>) type.getType();
+    Constructor<T> constructor = klass.getConstructor(TermType.class);
+    T result = (T) constructor.newInstance(type);
+    result.read(buffer);
+    return result;
+  }
 
   public static <T extends ErlangTerm> T newInstance (@NonNull ByteBuffer byteBuffer) {
     val buffer = Bytes.wrap(byteBuffer);
@@ -139,7 +149,12 @@ public abstract class ErlangTerm implements IntegerTerm,
     this.type = type;
   }
 
-  public final byte[] toBytes () {
+  /**
+   * Converts term to byte representation.
+   *
+   * @return byte array
+   */
+  public byte[] toBytes () {
     val buffer = Bytes.allocate();
     writeTo(buffer);
     return buffer.array();
@@ -150,7 +165,16 @@ public abstract class ErlangTerm implements IntegerTerm,
     write(buffer);
   }
 
+  public final void writeTo (@NonNull ByteBuf buffer) {
+    buffer.writeByte(type.getCode());
+    write(buffer);
+  }
+
   protected abstract void read (Bytes buffer);
 
+  protected abstract void read (ByteBuf buffer);
+
   protected abstract void write (Bytes buffer);
+
+  protected abstract void write (ByteBuf buffer);
 }

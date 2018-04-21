@@ -24,8 +24,8 @@ import static org.assertj.core.api.Assertions.assertThat;
 import java.util.stream.IntStream;
 
 import io.appulse.encon.java.protocol.term.ErlangTerm;
-import io.appulse.encon.java.util.TestMethodNamePrinter;
 import io.appulse.utils.Bytes;
+import io.appulse.utils.test.TestMethodNamePrinter;
 
 import erlang.OtpInputStream;
 import erlang.OtpOutputStream;

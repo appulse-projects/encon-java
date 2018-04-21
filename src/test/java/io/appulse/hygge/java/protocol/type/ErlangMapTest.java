@@ -23,7 +23,7 @@ import java.util.LinkedHashMap;
 import java.util.List;
 
 import io.appulse.encon.java.protocol.term.ErlangTerm;
-import io.appulse.encon.java.util.TestMethodNamePrinter;
+import io.appulse.utils.test.TestMethodNamePrinter;
 
 import erlang.OtpErlangMap;
 import erlang.OtpErlangObject;
