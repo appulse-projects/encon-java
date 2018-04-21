@@ -23,7 +23,7 @@ import io.appulse.encon.java.config.Defaults;
 import io.appulse.encon.java.config.MailboxConfig;
 import io.appulse.encon.java.config.NodeConfig;
 import io.appulse.encon.java.config.ServerConfig;
-import io.appulse.encon.java.util.TestMethodNamePrinter;
+import io.appulse.utils.test.TestMethodNamePrinter;
 
 import lombok.val;
 import org.junit.Rule;

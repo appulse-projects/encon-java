@@ -23,7 +23,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 
 import java.util.stream.Stream;
 
-import io.appulse.encon.java.util.TestMethodNamePrinter;
+import io.appulse.utils.test.TestMethodNamePrinter;
 
 import org.junit.Rule;
 import org.junit.rules.TestRule;

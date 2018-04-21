@@ -21,17 +21,19 @@ import static io.appulse.encon.java.protocol.TermType.NEW_REFERENCE;
 import static io.appulse.encon.java.protocol.TermType.REFERENCE;
 import static org.assertj.core.api.Assertions.assertThat;
 
-import java.util.stream.IntStream;
+import java.util.stream.LongStream;
 
 import io.appulse.encon.java.protocol.term.ErlangTerm;
-import io.appulse.encon.java.util.TestMethodNamePrinter;
 import io.appulse.utils.Bytes;
+import io.appulse.utils.test.TestMethodNamePrinter;
 
 import erlang.OtpErlangRef;
 import erlang.OtpInputStream;
 import erlang.OtpOutputStream;
 import lombok.SneakyThrows;
 import lombok.val;
+import lombok.extern.slf4j.Slf4j;
+
 import org.assertj.core.api.SoftAssertions;
 import org.junit.Rule;
 import org.junit.Test;
@@ -42,6 +44,7 @@ import org.junit.rules.TestRule;
  * @author Artem Labazin
  * @since 1.0.0
  */
+@Slf4j
 public class ErlangReferenceTest {
 
   @Rule
@@ -62,7 +65,7 @@ public class ErlangReferenceTest {
   @Test
   public void newInstance () {
     val node = "popa@localhost";
-    val ids = new int[] { 1, 0, 0 };
+    val ids = new long[] { 1, 0, 0 };
     val creation = 42;
 
     val builder = Bytes.allocate()
@@ -72,7 +75,7 @@ public class ErlangReferenceTest {
         .put1B(creation)
         .put4B(ids[0]);
 
-    IntStream.of(ids)
+    LongStream.of(ids)
         .skip(1)
         .forEachOrdered(builder::put4B);
 
@@ -99,7 +102,7 @@ public class ErlangReferenceTest {
   @Test
   public void toBytes () {
     val node = "popa@localhost";
-    val ids = new int[] { 1, 0, 0 };
+    val ids = new long[] { 1, 0, 0 };
     val creation = 42;
 
     val builder = Bytes.allocate()
@@ -109,7 +112,7 @@ public class ErlangReferenceTest {
         .put1B(creation & 0x3)
         .put4B(ids[0] & 0x3FFFF);
 
-    IntStream.of(ids)
+    LongStream.of(ids)
         .skip(1)
         .forEachOrdered(builder::put4B);
 
@@ -129,22 +132,22 @@ public class ErlangReferenceTest {
   public void encode () {
     assertThat(ErlangReference.builder()
         .node("popa@localhost")
-        .ids(new int[] { 1 })
+        .ids(new long[] { 1 })
         .creation(4)
         .build()
         .toBytes()
     )
-    .isEqualTo(bytes(NEW_REFERENCE.getCode(), "popa@localhost", new int[] { 1 }, 4));
+    .isEqualTo(bytes(NEW_REFERENCE.getCode(), "popa@localhost", new long[] { 1 }, 4));
 
     assertThat(ErlangReference.builder()
         .node("popa@localhost")
         .type(NEWER_REFERENCE)
-        .ids(new int[] { 1 })
+        .ids(new long[] { 1 })
         .creation(4)
         .build()
         .toBytes()
     )
-    .isEqualTo(bytes(NEWER_REFERENCE.getCode(), "popa@localhost", new int[] { 1 }, 4));
+    .isEqualTo(bytes(NEWER_REFERENCE.getCode(), "popa@localhost", new long[] { 1 }, 4));
 
     assertThat(ErlangReference.builder()
         .node("popa@localhost")
@@ -153,7 +156,7 @@ public class ErlangReferenceTest {
         .build()
         .toBytes()
     )
-    .isEqualTo(bytes(NEW_REFERENCE.getCode(), "popa@localhost", new int[] { 42 }, 4));
+    .isEqualTo(bytes(NEW_REFERENCE.getCode(), "popa@localhost", new long[] { 42 }, 4));
   }
 
   @Test
@@ -176,7 +179,7 @@ public class ErlangReferenceTest {
           .isEqualTo(otpRef.id());
 
       assertThat(reference.getIds())
-          .isEqualTo(otpRef.ids());
+          .isEqualTo(convert(otpRef.ids()));
 
       assertThat(reference.getCreation())
           .isEqualTo(otpRef.creation());
@@ -203,14 +206,14 @@ public class ErlangReferenceTest {
           .isEqualTo(otpRef.id());
 
       assertThat(reference.getIds())
-          .isEqualTo(otpRef.ids());
+          .isEqualTo(convert(otpRef.ids()));
 
       assertThat(reference.getCreation())
           .isEqualTo(otpRef.creation());
     }
 
     byte[] bytes3 = Bytes.allocate()
-        .put1B(NEW_REFERENCE.getCode())
+        .put1B(NEWER_REFERENCE.getCode())
         .put2B(3)
         .put(new ErlangAtom("popa@localhost").toBytes())
         .put4B(Integer.MAX_VALUE)
@@ -230,7 +233,7 @@ public class ErlangReferenceTest {
           .isEqualTo(otpRef.id());
 
       assertThat(reference.getIds())
-          .isEqualTo(otpRef.ids());
+          .isEqualTo(convert(otpRef.ids()));
 
       assertThat(reference.getCreation())
           .isEqualTo(otpRef.creation());
@@ -238,12 +241,28 @@ public class ErlangReferenceTest {
   }
 
   @SneakyThrows
-  private byte[] bytes (int tag, String node, int[] ids, int creation) {
-    OtpErlangRef reference = new OtpErlangRef(tag, node, ids, creation);
+  private byte[] bytes (int tag, String node, long[] ids, int creation) {
+    OtpErlangRef reference = new OtpErlangRef(tag, node, convert(ids), creation);
     try (OtpOutputStream output = new OtpOutputStream()) {
       reference.encode(output);
       output.trimToSize();
       return output.toByteArray();
     }
+  }
+
+  private int[] convert (long[] ids) {
+    int[] result = new int[ids.length];
+    for (int index = 0; index < ids.length; index++) {
+        result[index] = (int) ids[index];
+    }
+    return result;
+  }
+
+  private long[] convert (int[] ids) {
+    long[] result = new long[ids.length];
+    for (int index = 0; index < ids.length; index++) {
+        result[index] = (long) ids[index];
+    }
+    return result;
   }
 }

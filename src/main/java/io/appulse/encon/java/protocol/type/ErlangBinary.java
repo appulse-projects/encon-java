@@ -22,7 +22,7 @@ import static lombok.AccessLevel.PRIVATE;
 import io.appulse.encon.java.protocol.TermType;
 import io.appulse.encon.java.protocol.term.ErlangTerm;
 import io.appulse.utils.Bytes;
-
+import io.netty.buffer.ByteBuf;
 import lombok.EqualsAndHashCode;
 import lombok.NonNull;
 import lombok.ToString;
@@ -66,8 +66,21 @@ public class ErlangBinary extends ErlangTerm {
   }
 
   @Override
+  protected void read (ByteBuf buffer) {
+    val length = buffer.readInt();
+    bytes = new byte[length];
+    buffer.readBytes(bytes);
+  }
+
+  @Override
   protected void write (@NonNull Bytes buffer) {
     buffer.put4B(bytes.length);
     buffer.put(bytes);
+  }
+
+  @Override
+  protected void write (ByteBuf buffer) {
+    buffer.writeInt(bytes.length);
+    buffer.writeBytes(bytes);
   }
 }

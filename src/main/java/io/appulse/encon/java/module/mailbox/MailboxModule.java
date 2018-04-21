@@ -24,16 +24,19 @@ import java.io.Closeable;
 import java.util.Map;
 import java.util.Optional;
 import java.util.concurrent.ConcurrentHashMap;
-import java.util.concurrent.Executors;
+import java.util.concurrent.ExecutorService;
 
 import io.appulse.encon.java.module.NodeInternalApi;
 import io.appulse.encon.java.protocol.type.ErlangPid;
+import io.appulse.utils.threads.AppulseExecutors;
+import io.appulse.utils.threads.AppulseThreadFactory;
 
 import lombok.NoArgsConstructor;
 import lombok.NonNull;
 import lombok.RequiredArgsConstructor;
 import lombok.SneakyThrows;
 import lombok.experimental.FieldDefaults;
+import lombok.val;
 
 /**
  *
@@ -145,20 +148,36 @@ public final class MailboxModule implements MailboxModuleApi, Closeable {
     }
 
     public Mailbox build () {
+      ErlangPid pid = internal.node().generatePid();
+      val threadFactory = AppulseThreadFactory.builder()
+          .name(pid.toString())
+          .daemon(false)
+          .build();
+
+      ExecutorService executor;
       switch (type) {
       case SINGLE:
-        builder.executor(Executors.newSingleThreadExecutor());
+        executor = AppulseExecutors.newSingleThreadExecutor()
+            .threadFactory(threadFactory)
+//            .enableClientTrace()
+//            .enableTimeLogging()
+            .build();
         break;
       case CACHED:
-        builder.executor(Executors.newCachedThreadPool());
+        executor = AppulseExecutors.newCachedThreadPool()
+            .threadFactory(threadFactory)
+//            .enableClientTrace()
+//            .enableTimeLogging()
+            .build();
         break;
       default:
         throw new UnsupportedOperationException("Unsupported type " + type);
       }
+      builder.executor(executor);
 
       Mailbox mailbox = builder
           .internal(internal)
-          .pid(internal.node().generatePid())
+          .pid(pid)
           .build();
 
       pids.put(mailbox.getPid(), mailbox);

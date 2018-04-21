@@ -16,9 +16,13 @@
 
 package io.appulse.encon.java.module.lookup;
 
+import static java.util.Optional.ofNullable;
 import static lombok.AccessLevel.PRIVATE;
 
+import java.util.Map;
 import java.util.Optional;
+import java.util.concurrent.ConcurrentHashMap;
+import java.util.function.Function;
 
 import io.appulse.encon.java.NodeDescriptor;
 import io.appulse.encon.java.RemoteNode;
@@ -27,7 +31,6 @@ import io.appulse.encon.java.protocol.type.ErlangPid;
 import io.appulse.epmd.java.core.model.response.NodeInfo;
 
 import lombok.NonNull;
-import lombok.RequiredArgsConstructor;
 import lombok.experimental.FieldDefaults;
 import lombok.extern.slf4j.Slf4j;
 import lombok.val;
@@ -38,11 +41,35 @@ import lombok.val;
  * @since 1.0.0
  */
 @Slf4j
-@RequiredArgsConstructor
 @FieldDefaults(level = PRIVATE, makeFinal = true)
 public final class LookupModule implements LookupModuleApi {
 
   NodeInternalApi internal;
+
+  Map<NodeDescriptor, RemoteNode> cache;
+
+  Function<NodeDescriptor, RemoteNode> compute;
+
+  public LookupModule (@NonNull NodeInternalApi internal) {
+    this.internal = internal;
+
+    cache = new ConcurrentHashMap<>();
+    compute = descriptor -> {
+      return this.internal.epmd()
+          .lookup(descriptor.getShortName(), descriptor.getAddress())
+          .filter(NodeInfo::isOk)
+          .map(it -> RemoteNode.builder()
+              .descriptor(descriptor)
+              .protocol(it.getProtocol().get())
+              .type(it.getType().get())
+              .high(it.getHigh().get())
+              .low(it.getLow().get())
+              .port(it.getPort().get())
+              .build()
+          )
+          .orElse(null);
+      };
+  }
 
   @Override
   public Optional<RemoteNode> lookup (@NonNull String node) {
@@ -59,17 +86,6 @@ public final class LookupModule implements LookupModuleApi {
   @Override
   public Optional<RemoteNode> lookup (@NonNull NodeDescriptor descriptor) {
     log.debug("Looking up: {}", descriptor);
-    return internal.epmd()
-        .lookup(descriptor.getShortName(), descriptor.getAddress())
-        .filter(NodeInfo::isOk)
-        .map(it -> RemoteNode.builder()
-            .descriptor(descriptor)
-            .protocol(it.getProtocol().get())
-            .type(it.getType().get())
-            .high(it.getHigh().get())
-            .low(it.getLow().get())
-            .port(it.getPort().get())
-            .build()
-        );
+    return ofNullable(cache.computeIfAbsent(descriptor, compute));
   }
 }

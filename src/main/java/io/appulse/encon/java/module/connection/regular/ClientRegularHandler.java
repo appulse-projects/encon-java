@@ -16,6 +16,7 @@
 
 package io.appulse.encon.java.module.connection.regular;
 
+import static io.appulse.encon.java.module.connection.control.ControlMessageTag.UNDEFINED;
 import static java.util.Optional.empty;
 import static lombok.AccessLevel.PRIVATE;
 
@@ -93,6 +94,9 @@ public final class ClientRegularHandler extends ChannelInboundHandlerAdapter imp
 
   public void send (Message container) {
     log.debug("Sending {}", container);
+    while (!channel.isWritable()) {
+      log.debug("Channel is not writable");
+    }
     channel.writeAndFlush(container);
   }
 
@@ -101,6 +105,12 @@ public final class ClientRegularHandler extends ChannelInboundHandlerAdapter imp
     val message = (Message) obj;
     log.debug("Received message: {}", message);
     ControlMessage header = message.getHeader();
+
+    if (header.getTag() == UNDEFINED) {
+      context.channel().writeAndFlush(obj);
+      log.debug("Message was turned back");
+      return;
+    }
 
     val optional = findMailbox(header);
     if (optional.isPresent()) {

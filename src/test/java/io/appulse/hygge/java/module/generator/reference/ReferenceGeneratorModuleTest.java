@@ -24,7 +24,7 @@ import io.appulse.encon.java.module.NodeInternalApi;
 import io.appulse.encon.java.Node;
 import io.appulse.encon.java.NodeDescriptor;
 import io.appulse.encon.java.protocol.type.ErlangReference;
-import io.appulse.encon.java.util.TestMethodNamePrinter;
+import io.appulse.utils.test.TestMethodNamePrinter;
 
 import org.assertj.core.api.SoftAssertions;
 import org.junit.Rule;
@@ -64,7 +64,7 @@ public class ReferenceGeneratorModuleTest {
 
       softly.assertThat(reference.getIds())
           .isNotNull()
-          .isEqualTo(new int[] { 1, 0, 0 });
+          .isEqualTo(new long[] { 1, 0, 0 });
 
       softly.assertThat(reference.getCreation())
           .isEqualTo(1);

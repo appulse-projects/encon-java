@@ -16,9 +16,13 @@
 
 package io.appulse.encon.java.module.server;
 
+import static io.netty.channel.ChannelOption.ALLOCATOR;
 import static io.netty.channel.ChannelOption.SO_BACKLOG;
 import static io.netty.channel.ChannelOption.SO_KEEPALIVE;
+import static io.netty.channel.ChannelOption.SO_LINGER;
+import static io.netty.channel.ChannelOption.SO_REUSEADDR;
 import static io.netty.channel.ChannelOption.TCP_NODELAY;
+import static io.netty.channel.ChannelOption.WRITE_BUFFER_WATER_MARK;
 import static lombok.AccessLevel.PRIVATE;
 
 import java.io.Closeable;
@@ -30,8 +34,13 @@ import io.appulse.encon.java.module.connection.Connection;
 import io.appulse.encon.java.module.connection.Pipeline;
 
 import io.netty.bootstrap.ServerBootstrap;
+import io.netty.buffer.PooledByteBufAllocator;
 import io.netty.channel.ChannelInitializer;
 import io.netty.channel.EventLoopGroup;
+import io.netty.channel.WriteBufferWaterMark;
+import io.netty.channel.epoll.Epoll;
+import io.netty.channel.epoll.EpollEventLoopGroup;
+import io.netty.channel.epoll.EpollServerSocketChannel;
 import io.netty.channel.nio.NioEventLoopGroup;
 import io.netty.channel.socket.SocketChannel;
 import io.netty.channel.socket.nio.NioServerSocketChannel;
@@ -67,14 +76,25 @@ public final class ServerModule implements ServerModuleApi, Closeable {
     val serverConfig = internal.config().getServer();
     port = serverConfig.getPort();
 
-    bossGroup = new NioEventLoopGroup(
-        serverConfig.getBossThreads(),
-        new DefaultThreadFactory(getThreadName("boss"))
-    );
-    workerGroup = new NioEventLoopGroup(
-        serverConfig.getWorkerThreads(),
-        new DefaultThreadFactory(getThreadName("worker"))
-    );
+    if (Epoll.isAvailable()) {
+      bossGroup = new EpollEventLoopGroup(
+          serverConfig.getBossThreads(),
+          new DefaultThreadFactory(getThreadName("boss"))
+      );
+      workerGroup = new EpollEventLoopGroup(
+          serverConfig.getWorkerThreads(),
+          new DefaultThreadFactory(getThreadName("worker"))
+      );
+    } else {
+      bossGroup = new NioEventLoopGroup(
+          serverConfig.getBossThreads(),
+          new DefaultThreadFactory(getThreadName("boss"))
+      );
+      workerGroup = new NioEventLoopGroup(
+          serverConfig.getWorkerThreads(),
+          new DefaultThreadFactory(getThreadName("worker"))
+      );
+    }
 
     start();
   }
@@ -82,9 +102,8 @@ public final class ServerModule implements ServerModuleApi, Closeable {
   @SneakyThrows
   private void start () {
     log.debug("Starting server on port {}", port);
-    new ServerBootstrap()
+    val bootstrap = new ServerBootstrap()
         .group(bossGroup, workerGroup)
-        .channel(NioServerSocketChannel.class)
         .childHandler(new ChannelInitializer<SocketChannel>() {
 
           @Override
@@ -100,10 +119,23 @@ public final class ServerModule implements ServerModuleApi, Closeable {
             internal.connections().addConnection(future);
           }
         })
-        .option(SO_BACKLOG, 128)
+        .option(SO_BACKLOG, 1024)
+        .option(SO_REUSEADDR, true)
+//        .option(SO_KEEPALIVE, true)
+//        .option(SO_LINGER, 3)
         .childOption(SO_KEEPALIVE, true)
+        .childOption(SO_REUSEADDR, true)
+        .childOption(SO_LINGER, 3)
         .childOption(TCP_NODELAY, true)
-        .bind(port);
+        .childOption(WRITE_BUFFER_WATER_MARK, new WriteBufferWaterMark(64 * 1024, 128 * 1024))
+        .childOption(ALLOCATOR, new PooledByteBufAllocator(false));
+
+    if (Epoll.isAvailable()) {
+      bootstrap.channel(EpollServerSocketChannel.class);
+    } else {
+      bootstrap.channel(NioServerSocketChannel.class);
+    }
+    bootstrap.bind(port);
   }
 
   @Override

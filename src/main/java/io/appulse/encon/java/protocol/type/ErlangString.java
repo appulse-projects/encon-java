@@ -25,7 +25,7 @@ import io.appulse.encon.java.protocol.Erlang;
 import io.appulse.encon.java.protocol.TermType;
 import io.appulse.encon.java.protocol.term.ErlangTerm;
 import io.appulse.utils.Bytes;
-
+import io.netty.buffer.ByteBuf;
 import lombok.EqualsAndHashCode;
 import lombok.NonNull;
 import lombok.ToString;
@@ -76,6 +76,12 @@ public class ErlangString extends ErlangTerm {
   }
 
   @Override
+  protected void read (ByteBuf buffer) {
+    val length = buffer.readShort();
+    value = buffer.readCharSequence(length, ISO_8859_1).toString();
+  }
+
+  @Override
   protected void write (@NonNull Bytes buffer) {
     val positionBefore = buffer.position() - 1;
     if (value.isEmpty()) {
@@ -99,6 +105,36 @@ public class ErlangString extends ErlangTerm {
       break;
     default:
       buffer.put(positionBefore, new ErlangNil().toBytes());
+    }
+  }
+
+  @Override
+  protected void write (ByteBuf buffer) {
+    val positionBefore = buffer.writerIndex() - 1;
+    if (value.isEmpty()) {
+      buffer.writerIndex(positionBefore);
+      Erlang.NIL.writeTo(buffer);
+      return;
+    }
+
+    val length = value.length();
+    switch (getType()) {
+    case STRING:
+      buffer.writeShort(length);
+      buffer.writeCharSequence(value, ISO_8859_1);
+      break;
+    case LIST:
+      val elements = value.codePoints()
+          .boxed()
+          .map(ErlangInteger::from)
+          .toArray(ErlangInteger[]::new);
+
+      buffer.writerIndex(positionBefore);
+      Erlang.list(elements).writeTo(buffer);
+      break;
+    default:
+      buffer.writerIndex(positionBefore);
+      Erlang.NIL.writeTo(buffer);
     }
   }
 

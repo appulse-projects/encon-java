@@ -18,16 +18,15 @@ package io.appulse.encon.java.module.connection.control;
 
 import static java.util.stream.Collectors.toCollection;
 
-import java.lang.reflect.Constructor;
-import java.util.LinkedList;
-import java.util.stream.Stream;
-
 import io.appulse.encon.java.module.connection.control.exception.ControlMessageParsingException;
 import io.appulse.encon.java.protocol.term.ErlangTerm;
 import io.appulse.encon.java.protocol.type.ErlangInteger;
 import io.appulse.encon.java.protocol.type.ErlangNil;
 import io.appulse.encon.java.protocol.type.ErlangTuple;
-
+import io.netty.buffer.ByteBuf;
+import java.lang.reflect.Constructor;
+import java.util.LinkedList;
+import java.util.stream.Stream;
 import lombok.NonNull;
 import lombok.SneakyThrows;
 import lombok.val;
@@ -52,7 +51,7 @@ public abstract class ControlMessage {
     val code = tuple.get(0)
         .filter(ErlangTerm::isNumber)
         .map(ErlangTerm::asInt)
-        .orElseThrow(() ->  ControlMessageParsingException.fieldException(tuple, 0, Integer.class));
+        .orElseThrow(() -> ControlMessageParsingException.fieldException(tuple, 0, Integer.class));
 
     val tag = Stream.of(ControlMessageTag.values())
         .filter(it -> it.getCode() == code)
@@ -72,8 +71,17 @@ public abstract class ControlMessage {
     return new ErlangTuple(elements);
   }
 
-  public final byte[] toBytes () {
+  /**
+   * Converts this control message to bytes.
+   *
+   * @return byte array
+   */
+  public byte[] toBytes () {
     return toTuple().toBytes();
+  }
+
+  public void writeTo (ByteBuf buffer) {
+    toTuple().writeTo(buffer);
   }
 
   public abstract ControlMessageTag getTag ();

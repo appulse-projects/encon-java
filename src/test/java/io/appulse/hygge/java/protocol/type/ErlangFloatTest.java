@@ -22,8 +22,8 @@ import static java.nio.charset.StandardCharsets.ISO_8859_1;
 import static org.assertj.core.api.Assertions.assertThat;
 
 import io.appulse.encon.java.protocol.term.ErlangTerm;
-import io.appulse.encon.java.util.TestMethodNamePrinter;
 import io.appulse.utils.Bytes;
+import io.appulse.utils.test.TestMethodNamePrinter;
 
 import erlang.OtpErlangDouble;
 import erlang.OtpErlangFloat;

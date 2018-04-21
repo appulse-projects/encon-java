@@ -19,16 +19,15 @@ package io.appulse.encon.java.module.connection.regular;
 import static java.util.Optional.empty;
 import static java.util.Optional.ofNullable;
 
-import java.util.List;
-import java.util.Optional;
-
 import io.appulse.encon.java.module.connection.control.ControlMessage;
 import io.appulse.encon.java.protocol.term.ErlangTerm;
-import io.appulse.utils.Bytes;
-
+import io.appulse.utils.BytesUtils;
 import io.netty.buffer.ByteBuf;
+import io.netty.channel.ChannelHandler.Sharable;
 import io.netty.channel.ChannelHandlerContext;
-import io.netty.handler.codec.ReplayingDecoder;
+import io.netty.handler.codec.MessageToMessageDecoder;
+import java.util.List;
+import java.util.Optional;
 import lombok.extern.slf4j.Slf4j;
 import lombok.val;
 
@@ -38,7 +37,8 @@ import lombok.val;
  * @since 1.0.0
  */
 @Slf4j
-public class ClientDecoder extends ReplayingDecoder<Message> {
+@Sharable
+public class MessageDecoder extends MessageToMessageDecoder<ByteBuf> {
 
   @Override
   public void exceptionCaught (ChannelHandlerContext context, Throwable cause) throws Exception {
@@ -51,30 +51,20 @@ public class ClientDecoder extends ReplayingDecoder<Message> {
   }
 
   @Override
-  protected void decode (ChannelHandlerContext context, ByteBuf buffer, List<Object> out) throws Exception {
-    log.debug("Decoding...");
-    val messageSize = buffer.readShort();
-    log.debug("Decoding message size: {}", messageSize);
-    if (messageSize == 0) {
-      return;
-    }
+  protected void decode (ChannelHandlerContext context, ByteBuf msg, List<Object> out) throws Exception {
+    log.debug("Wrapping bytes:\n{}", msg);
+    msg.readInt(); // skip size
+    log.debug("Pass through: {}", msg.readByte() == 112);
 
-    ByteBuf buf = buffer.readBytes(messageSize);
-    val messageBytes = new byte[messageSize];
-    buf.getBytes(0, messageBytes);
-
-    Bytes bytes = Bytes.wrap(messageBytes);
-    log.debug("Pass through: {}", bytes.getByte() == 112);
-
-    ErlangTerm header = readTerm(bytes);
+    val header = readTerm(msg);
     log.debug("Received header:\n{}\n", header);
 
-    ControlMessage controlMessage = ControlMessage.parse(header);
+    val controlMessage = ControlMessage.parse(header);
     log.debug("Received control message:\n{}\n", controlMessage);
 
     Optional<ErlangTerm> optionalBody = empty();
-    if (bytes.remaining() > 0) {
-      ErlangTerm body = readTerm(bytes);
+    if (msg.readerIndex() < msg.capacity()) {
+      val body = readTerm(msg);
       log.debug("Received body:\n{}\n", body);
       optionalBody = ofNullable(body);
     }
@@ -82,8 +72,11 @@ public class ClientDecoder extends ReplayingDecoder<Message> {
     out.add(new Message(controlMessage, optionalBody));
   }
 
-  private ErlangTerm readTerm (Bytes bytes) {
-    log.debug("Version byte: {}", bytes.getUnsignedByte());
-    return ErlangTerm.newInstance(bytes);
+  private ErlangTerm readTerm (ByteBuf buffer) {
+    val version = buffer.readByte(); // skip version byte;
+    if (log.isDebugEnabled()) {
+      log.debug("Version byte: {}", BytesUtils.asUnsignedByte(version));
+    }
+    return ErlangTerm.newInstance(buffer);
   }
 }

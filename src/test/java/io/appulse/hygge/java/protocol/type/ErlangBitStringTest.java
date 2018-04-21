@@ -22,8 +22,8 @@ import static org.assertj.core.api.Assertions.assertThatThrownBy;
 
 import io.appulse.encon.java.protocol.exception.ErlangTermValidationException;
 import io.appulse.encon.java.protocol.term.ErlangTerm;
-import io.appulse.encon.java.util.TestMethodNamePrinter;
 import io.appulse.utils.Bytes;
+import io.appulse.utils.test.TestMethodNamePrinter;
 
 import erlang.OtpErlangBitstr;
 import erlang.OtpInputStream;

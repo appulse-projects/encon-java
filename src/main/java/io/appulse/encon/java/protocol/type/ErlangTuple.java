@@ -22,17 +22,16 @@ import static java.util.Optional.empty;
 import static java.util.Optional.of;
 import static lombok.AccessLevel.PRIVATE;
 
+import io.appulse.encon.java.protocol.TermType;
+import io.appulse.encon.java.protocol.term.ErlangTerm;
+import io.appulse.utils.Bytes;
+import io.netty.buffer.ByteBuf;
 import java.util.Arrays;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Optional;
 import java.util.stream.IntStream;
 import java.util.stream.Stream;
-
-import io.appulse.encon.java.protocol.TermType;
-import io.appulse.encon.java.protocol.term.ErlangTerm;
-import io.appulse.utils.Bytes;
-
 import lombok.Builder;
 import lombok.EqualsAndHashCode;
 import lombok.NonNull;
@@ -114,6 +113,25 @@ public class ErlangTuple extends ErlangTerm {
   }
 
   @Override
+  protected void read (ByteBuf buffer) {
+    int arity;
+    switch (getType()) {
+    case SMALL_TUPLE:
+      arity = buffer.readByte();
+      break;
+    case LARGE_TUPLE:
+      arity = buffer.readInt();
+      break;
+    default:
+      throw new IllegalArgumentException("Unknown type: " + getType());
+    }
+
+    elements = IntStream.range(0, arity)
+        .mapToObj(it -> ErlangTerm.newInstance(buffer))
+        .toArray(ErlangTerm[]::new);
+  }
+
+  @Override
   protected void write (@NonNull Bytes buffer) {
     switch (getType()) {
     case SMALL_TUPLE:
@@ -129,5 +147,21 @@ public class ErlangTuple extends ErlangTerm {
     Stream.of(elements)
         .map(ErlangTerm::toBytes)
         .forEachOrdered(buffer::put);
+  }
+
+  @Override
+  protected void write (ByteBuf buffer) {
+    switch (getType()) {
+    case SMALL_TUPLE:
+      buffer.writeByte(elements.length);
+      break;
+    case LARGE_TUPLE:
+      buffer.writeInt(elements.length);
+      break;
+    default:
+      throw new IllegalArgumentException("Unknown type: " + getType());
+    }
+    Stream.of(elements)
+        .forEachOrdered(it -> it.writeTo(buffer));
   }
 }

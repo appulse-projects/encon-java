@@ -40,7 +40,8 @@ public enum ControlMessageTag {
   EXIT2_TT(18, Exit2TraceToken.class),
   MONITOR_P(19, MonitorProcess.class),
   DEMONITOR_P(20, DemonitorProcess.class),
-  MONITOR_P_EXIT(21, MonitorProcessExit.class);
+  MONITOR_P_EXIT(21, MonitorProcessExit.class),
+  UNDEFINED(-1, ControlMessage.class);
 
   private final int code;
 
