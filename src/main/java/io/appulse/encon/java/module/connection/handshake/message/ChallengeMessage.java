@@ -20,12 +20,11 @@ import static io.appulse.encon.java.module.connection.handshake.message.MessageT
 import static java.nio.charset.StandardCharsets.ISO_8859_1;
 import static lombok.AccessLevel.PRIVATE;
 
-import java.util.Set;
-
 import io.appulse.encon.java.DistributionFlag;
 import io.appulse.epmd.java.core.model.Version;
 import io.appulse.utils.Bytes;
-
+import io.netty.buffer.ByteBuf;
+import java.util.Set;
 import lombok.Builder;
 import lombok.EqualsAndHashCode;
 import lombok.Getter;
@@ -77,10 +76,26 @@ public class ChallengeMessage extends Message {
   }
 
   @Override
+  void write (ByteBuf buffer) {
+    buffer.writeShort(distribution.getCode());
+    buffer.writeInt(DistributionFlag.bitwiseOr(flags));
+    buffer.writeInt(challenge);
+    buffer.writeCharSequence(fullName, ISO_8859_1);
+  }
+
+  @Override
   void read (@NonNull Bytes buffer) {
     distribution = Version.of(buffer.getShort());
     flags = DistributionFlag.parse(buffer.getInt());
     challenge = buffer.getInt();
     fullName = buffer.getString(ISO_8859_1);
+  }
+
+  @Override
+  void read (ByteBuf buffer) {
+    distribution = Version.of(buffer.readShort());
+    flags = DistributionFlag.parse(buffer.readInt());
+    challenge = buffer.readInt();
+    fullName = buffer.readCharSequence(buffer.readableBytes(), ISO_8859_1).toString();
   }
 }

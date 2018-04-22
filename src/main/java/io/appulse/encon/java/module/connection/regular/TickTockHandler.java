@@ -16,10 +16,10 @@
 
 package io.appulse.encon.java.module.connection.regular;
 
+import io.netty.buffer.ByteBuf;
 import io.netty.channel.ChannelHandler.Sharable;
 import io.netty.channel.ChannelHandlerContext;
 import io.netty.channel.ChannelInboundHandlerAdapter;
-import java.util.Arrays;
 import lombok.extern.slf4j.Slf4j;
 import lombok.val;
 
@@ -30,8 +30,6 @@ import lombok.val;
 @Slf4j
 @Sharable
 public class TickTockHandler extends ChannelInboundHandlerAdapter {
-
-  private static final byte[] TICK_TOCK_MESSAGE = new byte[4];
 
   private static final byte[] TICK_TOCK_RESPONSE = new byte[0];
 
@@ -47,8 +45,8 @@ public class TickTockHandler extends ChannelInboundHandlerAdapter {
 
   @Override
   public void channelRead (ChannelHandlerContext context, Object msg) throws Exception {
-    byte[] bytes = (byte[]) msg;
-    if (Arrays.equals(bytes, TICK_TOCK_MESSAGE)) {
+    ByteBuf buffer = (ByteBuf) msg;
+    if (buffer.getInt(0) == 0) {
       context.writeAndFlush(TICK_TOCK_RESPONSE);
       return;
     }

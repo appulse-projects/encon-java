@@ -40,7 +40,6 @@ import io.netty.channel.ChannelOutboundHandler;
 import io.netty.channel.ChannelPipeline;
 import io.netty.handler.codec.LengthFieldBasedFrameDecoder;
 import io.netty.handler.codec.LengthFieldPrepender;
-import io.netty.handler.codec.bytes.ByteArrayEncoder;
 import io.netty.handler.timeout.ReadTimeoutHandler;
 import java.util.Objects;
 import java.util.concurrent.CompletableFuture;
@@ -59,11 +58,15 @@ import lombok.val;
 @FieldDefaults(level = PRIVATE, makeFinal = true)
 public final class Pipeline {
 
+  private static final ChannelOutboundHandler HANDSHAKE_LENGTH_FIELD_PREPENDER;
+
   private static final ChannelOutboundHandler HANDSHAKE_ENCODER;
 
-  private static final ChannelOutboundHandler LENGTH_FIELD_PREPENDER;
+  private static final ChannelInboundHandler HANDSHAKE_DECODER_CLIENT;
 
-  private static final ChannelOutboundHandler BYTE_ARRAY_ENCODER;
+  private static final ChannelInboundHandler HANDSHAKE_DECODER_SERVER;
+
+  private static final ChannelOutboundHandler LENGTH_FIELD_PREPENDER;
 
   private static final ChannelInboundHandler TICK_TOCK_HANDLER;
 
@@ -84,9 +87,12 @@ public final class Pipeline {
   private static final String HANDLER_NAME;
 
   static {
+    HANDSHAKE_LENGTH_FIELD_PREPENDER = new LengthFieldPrepender(2, false);
     HANDSHAKE_ENCODER = new HandshakeEncoder();
+    HANDSHAKE_DECODER_CLIENT = new HandshakeDecoder(true);
+    HANDSHAKE_DECODER_SERVER = new HandshakeDecoder(false);
+
     LENGTH_FIELD_PREPENDER = new LengthFieldPrepender(4, false);
-    BYTE_ARRAY_ENCODER = new ByteArrayEncoder();
     TICK_TOCK_HANDLER = new TickTockHandler();
     COMPRESSION_DECODER = new CompressionDecoder();
     MESSAGE_ENCODER = new MessageEncoder();
@@ -122,7 +128,9 @@ public final class Pipeline {
   public void setupClientHandshake (@NonNull ChannelPipeline pipeline, @NonNull RemoteNode remote) {
     pipeline
         .addLast(TIMEOUT_HANDLER_NAME, new ReadTimeoutHandler(5))
-        .addLast(DECODER_NAME, new HandshakeDecoder(true))
+        .addLast("1", HANDSHAKE_LENGTH_FIELD_PREPENDER)
+        .addLast("2", new LengthFieldBasedFrameDecoder(MAX_VALUE, 0, 2))
+        .addLast(DECODER_NAME, HANDSHAKE_DECODER_CLIENT)
         .addLast(ENCODER_NAME, HANDSHAKE_ENCODER)
         .addLast(HANDLER_NAME, new HandshakeHandlerClient(this, internal, remote));
 
@@ -132,7 +140,9 @@ public final class Pipeline {
   public void setupServerHandshake (@NonNull ChannelPipeline pipeline) {
     pipeline
         .addLast(TIMEOUT_HANDLER_NAME, new ReadTimeoutHandler(5))
-        .addLast(DECODER_NAME, new HandshakeDecoder(false))
+        .addLast("1", HANDSHAKE_LENGTH_FIELD_PREPENDER)
+        .addLast("2", new LengthFieldBasedFrameDecoder(MAX_VALUE, 0, 2))
+        .addLast(DECODER_NAME, HANDSHAKE_DECODER_SERVER)
         .addLast(ENCODER_NAME, HANDSHAKE_ENCODER)
         .addLast(HANDLER_NAME, new HandshakeHandlerServer(this, internal));
 
@@ -145,17 +155,17 @@ public final class Pipeline {
     val handler = new ClientRegularHandler(internal, remote, future);
 
     pipeline.remove(TIMEOUT_HANDLER_NAME);
+    pipeline.remove("1");
+    pipeline.remove("2");
     pipeline.remove(DECODER_NAME);
     pipeline.remove(ENCODER_NAME);
     pipeline.remove(HANDLER_NAME);
 
     pipeline.addLast(LENGTH_FIELD_PREPENDER);
-    pipeline.addLast(BYTE_ARRAY_ENCODER);
 
     pipeline.addLast(new LengthFieldBasedFrameDecoder(MAX_VALUE, 0, 4));
-//    pipeline.addLast(new ByteArrayDecoder());
 
-//    pipeline.addLast(TICK_TOCK_HANDLER);
+    pipeline.addLast(TICK_TOCK_HANDLER);
 //    pipeline.addLast(COMPRESSION_DECODER);
 //    ofNullable(COMPRESSION_ENCODER)
 //        .ifPresent(pipeline::addLast);

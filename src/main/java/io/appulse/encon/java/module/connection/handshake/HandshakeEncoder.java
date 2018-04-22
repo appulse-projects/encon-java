@@ -17,7 +17,6 @@
 package io.appulse.encon.java.module.connection.handshake;
 
 import io.appulse.encon.java.module.connection.handshake.message.Message;
-
 import io.netty.buffer.ByteBuf;
 import io.netty.channel.ChannelHandler.Sharable;
 import io.netty.channel.ChannelHandlerContext;
@@ -34,6 +33,10 @@ import lombok.val;
 @Sharable
 public class HandshakeEncoder extends MessageToByteEncoder<Message> {
 
+  public HandshakeEncoder () {
+    super(false);
+  }
+
   @Override
   public void exceptionCaught (ChannelHandlerContext context, Throwable cause) throws Exception {
     val message = String.format("Error during channel connection with %s",
@@ -46,10 +49,10 @@ public class HandshakeEncoder extends MessageToByteEncoder<Message> {
 
   @Override
   protected void encode (ChannelHandlerContext context, Message message, ByteBuf out) throws Exception {
+    log.debug("Encoding handshake message {} for {}", message, context.channel().remoteAddress());
     try {
-      val bytes = message.toBytes();
-      out.writeBytes(bytes);
-      log.debug("Encoded message {} for {}", message, context.channel().remoteAddress());
+      message.writeTo(out);
+      log.debug("Handshake message was sent");
     } catch (Exception ex) {
       log.error("Error during encoding message {} for {}", message, context.channel().remoteAddress());
       throw ex;

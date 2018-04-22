@@ -21,10 +21,9 @@ import static java.nio.charset.StandardCharsets.ISO_8859_1;
 import static java.util.Locale.ENGLISH;
 import static lombok.AccessLevel.PRIVATE;
 
-import java.util.stream.Stream;
-
 import io.appulse.utils.Bytes;
-
+import io.netty.buffer.ByteBuf;
+import java.util.stream.Stream;
 import lombok.Builder;
 import lombok.EqualsAndHashCode;
 import lombok.Getter;
@@ -62,8 +61,20 @@ public class StatusMessage extends Message {
   }
 
   @Override
+  void write (ByteBuf buffer) {
+    buffer.writeCharSequence(status.name(), ISO_8859_1);
+//    buffer.writeBytes(status.getBytes());
+  }
+
+  @Override
   void read (@NonNull Bytes buffer) {
     val string = buffer.getString(ISO_8859_1);
+    status = Status.of(string);
+  }
+
+  @Override
+  void read (ByteBuf buffer) {
+    val string = buffer.readCharSequence(buffer.readableBytes(), ISO_8859_1).toString();
     status = Status.of(string);
   }
 

@@ -18,10 +18,9 @@ package io.appulse.encon.java.module.connection.handshake.message;
 
 import static lombok.AccessLevel.PRIVATE;
 
-import java.nio.ByteBuffer;
-
 import io.appulse.utils.Bytes;
-
+import io.netty.buffer.ByteBuf;
+import java.nio.ByteBuffer;
 import lombok.Getter;
 import lombok.NonNull;
 import lombok.SneakyThrows;
@@ -57,6 +56,16 @@ public abstract class Message {
     return result;
   }
 
+  @SneakyThrows
+  public static <T extends Message> T parse (@NonNull ByteBuf buffer, @NonNull Class<T> type) {
+    if (!MessageType.check(buffer.readByte(), type)) {
+      throw new IllegalArgumentException();
+    }
+    T result = type.newInstance();
+    result.read(buffer);
+    return result;
+  }
+
   MessageType type;
 
   protected Message (@NonNull MessageType type) {
@@ -81,6 +90,11 @@ public abstract class Message {
         .array();
   }
 
+  public void writeTo (ByteBuf buffer) {
+    buffer.writeByte(type.getTag());
+    write(buffer);
+  }
+
   /**
    * Writes instance state to byte buffer.
    *
@@ -88,10 +102,21 @@ public abstract class Message {
    */
   abstract void write (Bytes buffer);
 
+  abstract void write (ByteBuf buffer);
+
   /**
    * Reads message's fields values from byte buffer.
    *
    * @param buffer byte buffer
    */
   abstract void read (Bytes buffer);
+
+  abstract void read (ByteBuf buffer);
+
+  protected byte[] readAllRestBytes (ByteBuf buffer) {
+    int length = buffer.readableBytes();
+    byte[] result = new byte[length];
+    buffer.readBytes(result);
+    return result;
+  }
 }

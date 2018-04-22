@@ -20,7 +20,7 @@ import static io.appulse.encon.java.module.connection.handshake.message.MessageT
 import static lombok.AccessLevel.PRIVATE;
 
 import io.appulse.utils.Bytes;
-
+import io.netty.buffer.ByteBuf;
 import lombok.Builder;
 import lombok.EqualsAndHashCode;
 import lombok.Getter;
@@ -56,7 +56,17 @@ public class ChallengeAcknowledgeMessage extends Message {
   }
 
   @Override
+  void write (ByteBuf buffer) {
+    buffer.writeBytes(digest);
+  }
+
+  @Override
   void read (Bytes buffer) {
     digest = buffer.getBytes();
+  }
+
+  @Override
+  void read (ByteBuf buffer) {
+    digest = readAllRestBytes(buffer);
   }
 }
