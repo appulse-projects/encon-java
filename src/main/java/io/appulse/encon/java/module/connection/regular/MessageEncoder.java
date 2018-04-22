@@ -49,7 +49,6 @@ public class MessageEncoder extends MessageToByteEncoder<Message> {
   @Override
   protected void encode (ChannelHandlerContext context, Message message, ByteBuf out) throws Exception {
     log.debug("Encoding message {} for {}", message, context.channel().remoteAddress());
-
     try {
       out.writeByte(0x70);
       out.writeByte(0x83);
@@ -58,24 +57,6 @@ public class MessageEncoder extends MessageToByteEncoder<Message> {
         out.writeByte(0x83);
         it.writeTo(out);
       });
-
-//      val bytes = Bytes.allocate()
-//          //          .put4B(0)
-//          .put1B(0x70) // 112
-//          .put1B(0x83) // 131
-//          // .put(EMPTY_DISTRIBUTION_HEADER)
-//          .put(message.getHeader().toBytes());
-//
-//      message.getBody().ifPresent(it -> {
-//        bytes
-//            .put1B(0x83) // 131
-//            .put(it.toBytes());
-//      });
-//      val length = bytes.limit() - Integer.BYTES;
-//      log.debug("Outgoing message length is: {}", length);
-//      val array = bytes/*.put4B(0, length)*/.array();
-//      log.debug("Output array:\n{}", array);
-//      out.writeBytes(array);
       log.debug("Message was sent");
     } catch (Exception ex) {
       log.error("Error during encoding message {} for {}", message, context.channel().remoteAddress());

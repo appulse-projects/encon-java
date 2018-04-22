@@ -21,17 +21,15 @@ import static io.appulse.encon.java.module.connection.handshake.message.MessageT
 import static io.appulse.encon.java.module.connection.handshake.message.MessageType.UNDEFINED;
 import static lombok.AccessLevel.PRIVATE;
 
-import java.util.List;
-import java.util.stream.Stream;
-
 import io.appulse.encon.java.module.connection.handshake.exception.HandshakeException;
 import io.appulse.encon.java.module.connection.handshake.message.Message;
 import io.appulse.encon.java.module.connection.handshake.message.MessageType;
-import io.appulse.utils.Bytes;
-
 import io.netty.buffer.ByteBuf;
+import io.netty.channel.ChannelHandler.Sharable;
 import io.netty.channel.ChannelHandlerContext;
-import io.netty.handler.codec.ReplayingDecoder;
+import io.netty.handler.codec.MessageToMessageDecoder;
+import java.util.List;
+import java.util.stream.Stream;
 import lombok.RequiredArgsConstructor;
 import lombok.experimental.FieldDefaults;
 import lombok.extern.slf4j.Slf4j;
@@ -43,9 +41,10 @@ import lombok.val;
  * @since 1.0.0
  */
 @Slf4j
+@Sharable
 @RequiredArgsConstructor
 @FieldDefaults(level = PRIVATE, makeFinal = true)
-public class HandshakeDecoder extends ReplayingDecoder<Message> {
+public class HandshakeDecoder extends MessageToMessageDecoder<ByteBuf> {
 
   boolean isClient;
 
@@ -64,26 +63,16 @@ public class HandshakeDecoder extends ReplayingDecoder<Message> {
     val messageSize = buffer.readShort();
     log.debug("Decoding message size: {}", messageSize);
 
-    ByteBuf buf = buffer.readBytes(messageSize);
-    val messageBytes = new byte[messageSize];
-    buf.getBytes(0, messageBytes);
-
-    Bytes bytes = Bytes.wrap(messageBytes);
-
-    val message = parse(bytes);
-
-    out.add(message);
-    log.debug("Decoded message {} from {}", message, context.channel().remoteAddress());
-  }
-
-  private Message parse (Bytes bytes) {
-    val tag = bytes.getByte(0);
-    return Stream.of(MessageType.values())
+    val tag = buffer.getByte(buffer.readerIndex());
+    val message = Stream.of(MessageType.values())
         .filter(it -> it != UNDEFINED)
         .filter(it -> (isClient && it != NAME) || (!isClient && it != CHALLENGE))
         .filter(it -> it.getTag() == tag)
         .findFirst()
-        .map(it -> Message.parse(bytes, it.getType()))
+        .map(it -> Message.parse(buffer, it.getType()))
         .orElseThrow(() -> new HandshakeException("Unknown income message with tag " + tag));
+
+    out.add(message);
+    log.debug("Decoded message {} from {}", message, context.channel().remoteAddress());
   }
 }
