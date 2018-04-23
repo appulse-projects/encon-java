@@ -17,6 +17,7 @@
 package io.appulse.encon.java.module.connection.handshake;
 
 import io.appulse.encon.java.module.connection.handshake.message.Message;
+
 import io.netty.buffer.ByteBuf;
 import io.netty.channel.ChannelHandler.Sharable;
 import io.netty.channel.ChannelHandlerContext;
@@ -31,9 +32,9 @@ import lombok.val;
  */
 @Slf4j
 @Sharable
-public class HandshakeEncoder extends MessageToByteEncoder<Message> {
+class HandshakeEncoder extends MessageToByteEncoder<Message> {
 
-  public HandshakeEncoder () {
+  HandshakeEncoder () {
     super(false);
   }
 

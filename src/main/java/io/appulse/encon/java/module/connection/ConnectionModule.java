@@ -29,15 +29,13 @@ import java.util.concurrent.TimeUnit;
 
 import io.appulse.encon.java.RemoteNode;
 import io.appulse.encon.java.module.NodeInternalApi;
+import io.appulse.encon.java.module.connection.handshake.HandshakeClientInitializer;
 
 import io.netty.bootstrap.Bootstrap;
-import io.netty.channel.ChannelInitializer;
 import io.netty.channel.EventLoopGroup;
 import io.netty.channel.nio.NioEventLoopGroup;
-import io.netty.channel.socket.SocketChannel;
 import io.netty.channel.socket.nio.NioSocketChannel;
 import io.netty.util.concurrent.DefaultThreadFactory;
-import lombok.Builder;
 import lombok.NonNull;
 import lombok.SneakyThrows;
 import lombok.experimental.FieldDefaults;
@@ -138,10 +136,10 @@ public final class ConnectionModule implements ConnectionModuleApi, Closeable {
         .channel(NioSocketChannel.class)
         .option(SO_KEEPALIVE, true)
         .option(CONNECT_TIMEOUT_MILLIS, 5000)
-        .handler(Initializer.builder()
+        .handler(HandshakeClientInitializer.builder()
+            .internal(internal)
             .future(future)
             .remote(remote)
-            .internal(internal)
             .build()
         )
         .connect(remote.getDescriptor().getAddress(), remote.getPort());
@@ -154,29 +152,5 @@ public final class ConnectionModule implements ConnectionModuleApi, Closeable {
         remove(remote);
       }
     });
-  }
-
-  private static class Initializer extends ChannelInitializer<SocketChannel> {
-
-    Pipeline pipeline;
-
-    RemoteNode remote;
-
-    @Builder
-    Initializer (@NonNull CompletableFuture<Connection> future, @NonNull RemoteNode remote, @NonNull NodeInternalApi internal) {
-      super();
-
-      pipeline = Pipeline.builder()
-          .internal(internal)
-          .future(future)
-          .build();
-
-      this.remote = remote;
-    }
-
-    @Override
-    public void initChannel (SocketChannel channel) throws Exception {
-      pipeline.setupClientHandshake(channel.pipeline(), remote);
-    }
   }
 }

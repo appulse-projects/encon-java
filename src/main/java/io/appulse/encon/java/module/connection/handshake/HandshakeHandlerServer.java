@@ -20,11 +20,12 @@ import static io.appulse.encon.java.module.connection.handshake.message.StatusMe
 import static lombok.AccessLevel.PRIVATE;
 
 import java.util.Arrays;
+import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.ThreadLocalRandom;
 
 import io.appulse.encon.java.RemoteNode;
 import io.appulse.encon.java.module.NodeInternalApi;
-import io.appulse.encon.java.module.connection.Pipeline;
+import io.appulse.encon.java.module.connection.Connection;
 import io.appulse.encon.java.module.connection.handshake.exception.HandshakeException;
 import io.appulse.encon.java.module.connection.handshake.message.ChallengeAcknowledgeMessage;
 import io.appulse.encon.java.module.connection.handshake.message.ChallengeMessage;
@@ -34,6 +35,7 @@ import io.appulse.encon.java.module.connection.handshake.message.NameMessage;
 import io.appulse.encon.java.module.connection.handshake.message.StatusMessage;
 
 import io.netty.channel.ChannelHandlerContext;
+import lombok.Builder;
 import lombok.NonNull;
 import lombok.experimental.FieldDefaults;
 import lombok.experimental.NonFinal;
@@ -47,19 +49,16 @@ import lombok.val;
  */
 @Slf4j
 @FieldDefaults(level = PRIVATE, makeFinal = true)
-public class HandshakeHandlerServer extends AbstractHandshakeHandler {
-
-  NodeInternalApi internal;
-
-  @NonFinal
-  RemoteNode remote;
+class HandshakeHandlerServer extends AbstractHandshakeHandler {
 
   @NonFinal
   int ourChallenge;
 
-  public HandshakeHandlerServer (Pipeline pipeline, @NonNull NodeInternalApi internal) {
-    super(pipeline);
-    this.internal = internal;
+  @Builder
+  HandshakeHandlerServer (@NonNull NodeInternalApi internal,
+                          @NonNull CompletableFuture<Connection> future
+  ) {
+    super(internal, future);
   }
 
   @Override
@@ -82,11 +81,11 @@ public class HandshakeHandlerServer extends AbstractHandshakeHandler {
 
   @Override
   public RemoteNode getRemoteNode () {
-    return remote;
+    return remoteNode;
   }
 
   private void handle (NameMessage message, ChannelHandlerContext context) {
-    remote = internal.node()
+    remoteNode = internal.node()
         .lookup(message.getFullNodeName())
         .orElseThrow(HandshakeException::new);
 
