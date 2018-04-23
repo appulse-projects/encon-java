@@ -19,11 +19,12 @@ package io.appulse.encon.java.module.connection.handshake;
 import static lombok.AccessLevel.PRIVATE;
 
 import java.util.Arrays;
+import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.ThreadLocalRandom;
 
 import io.appulse.encon.java.RemoteNode;
 import io.appulse.encon.java.module.NodeInternalApi;
-import io.appulse.encon.java.module.connection.Pipeline;
+import io.appulse.encon.java.module.connection.Connection;
 import io.appulse.encon.java.module.connection.handshake.exception.HandshakeException;
 import io.appulse.encon.java.module.connection.handshake.message.ChallengeAcknowledgeMessage;
 import io.appulse.encon.java.module.connection.handshake.message.ChallengeMessage;
@@ -33,6 +34,7 @@ import io.appulse.encon.java.module.connection.handshake.message.NameMessage;
 import io.appulse.encon.java.module.connection.handshake.message.StatusMessage;
 
 import io.netty.channel.ChannelHandlerContext;
+import lombok.Builder;
 import lombok.NonNull;
 import lombok.experimental.FieldDefaults;
 import lombok.experimental.NonFinal;
@@ -46,19 +48,18 @@ import lombok.val;
  */
 @Slf4j
 @FieldDefaults(level = PRIVATE, makeFinal = true)
-public class HandshakeHandlerClient extends AbstractHandshakeHandler {
-
-  NodeInternalApi internal;
-
-  RemoteNode remote;
+class HandshakeHandlerClient extends AbstractHandshakeHandler {
 
   @NonFinal
   int myChallenge;
 
-  public HandshakeHandlerClient (Pipeline pipeline, @NonNull NodeInternalApi internal, @NonNull RemoteNode remote) {
-    super(pipeline);
-    this.internal = internal;
-    this.remote = remote;
+  @Builder
+  HandshakeHandlerClient (@NonNull NodeInternalApi internal,
+                          @NonNull CompletableFuture<Connection> future,
+                          @NonNull RemoteNode remote
+  ) {
+    super(internal, future);
+    this.remoteNode = remote;
   }
 
   @Override
@@ -76,7 +77,7 @@ public class HandshakeHandlerClient extends AbstractHandshakeHandler {
     super.channelActive(context);
     context.writeAndFlush(NameMessage.builder()
         .fullNodeName(internal.node().getDescriptor().getFullName())
-        .distribution(HandshakeUtils.findHighestCommonVerion(internal.node(), remote))
+        .distribution(HandshakeUtils.findHighestCommonVerion(internal.node(), remoteNode))
         .flags(internal.node().getMeta().getFlags())
         .build());
   }
@@ -104,7 +105,7 @@ public class HandshakeHandlerClient extends AbstractHandshakeHandler {
 
   @Override
   public RemoteNode getRemoteNode () {
-    return remote;
+    return remoteNode;
   }
 
   private void handle (StatusMessage message, ChannelHandlerContext context) {
@@ -141,7 +142,7 @@ public class HandshakeHandlerClient extends AbstractHandshakeHandler {
     }
     log.debug("Sucessfull handshake from {} to {}",
               internal.node().getDescriptor().getFullName(),
-              remote.getDescriptor().getFullName());
+              remoteNode.getDescriptor().getFullName());
 
     successHandshake(context);
   }

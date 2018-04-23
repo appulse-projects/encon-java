@@ -26,23 +26,19 @@ import static io.netty.channel.ChannelOption.WRITE_BUFFER_WATER_MARK;
 import static lombok.AccessLevel.PRIVATE;
 
 import java.io.Closeable;
-import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.atomic.AtomicBoolean;
 
 import io.appulse.encon.java.module.NodeInternalApi;
-import io.appulse.encon.java.module.connection.Connection;
-import io.appulse.encon.java.module.connection.Pipeline;
+import io.appulse.encon.java.module.connection.handshake.HandshakeServerInitializer;
 
 import io.netty.bootstrap.ServerBootstrap;
 import io.netty.buffer.PooledByteBufAllocator;
-import io.netty.channel.ChannelInitializer;
 import io.netty.channel.EventLoopGroup;
 import io.netty.channel.WriteBufferWaterMark;
 import io.netty.channel.epoll.Epoll;
 import io.netty.channel.epoll.EpollEventLoopGroup;
 import io.netty.channel.epoll.EpollServerSocketChannel;
 import io.netty.channel.nio.NioEventLoopGroup;
-import io.netty.channel.socket.SocketChannel;
 import io.netty.channel.socket.nio.NioServerSocketChannel;
 import io.netty.util.concurrent.DefaultThreadFactory;
 import lombok.NonNull;
@@ -104,25 +100,11 @@ public final class ServerModule implements ServerModuleApi, Closeable {
     log.debug("Starting server on port {}", port);
     val bootstrap = new ServerBootstrap()
         .group(bossGroup, workerGroup)
-        .childHandler(new ChannelInitializer<SocketChannel>() {
-
-          @Override
-          public void initChannel (SocketChannel channel) throws Exception {
-            CompletableFuture<Connection> future = new CompletableFuture<>();
-
-            Pipeline.builder()
-                .internal(internal)
-                .future(future)
-                .build()
-                .setupServerHandshake(channel.pipeline());
-
-            internal.connections().addConnection(future);
-          }
-        })
+        .childHandler(HandshakeServerInitializer.builder()
+            .internal(internal)
+            .build())
         .option(SO_BACKLOG, 1024)
         .option(SO_REUSEADDR, true)
-//        .option(SO_KEEPALIVE, true)
-//        .option(SO_LINGER, 3)
         .childOption(SO_KEEPALIVE, true)
         .childOption(SO_REUSEADDR, true)
         .childOption(SO_LINGER, 3)

@@ -22,11 +22,9 @@ import static lombok.AccessLevel.PRIVATE;
 
 import java.io.Closeable;
 import java.util.Optional;
-import java.util.concurrent.CompletableFuture;
 
 import io.appulse.encon.java.RemoteNode;
 import io.appulse.encon.java.module.NodeInternalApi;
-import io.appulse.encon.java.module.connection.Connection;
 import io.appulse.encon.java.module.connection.control.ControlMessage;
 import io.appulse.encon.java.module.connection.control.Exit;
 import io.appulse.encon.java.module.connection.control.Exit2;
@@ -62,22 +60,18 @@ public final class ClientRegularHandler extends ChannelInboundHandlerAdapter imp
   @NonNull
   RemoteNode remote;
 
-  @NonNull
-  CompletableFuture<Connection> future;
-
   @NonFinal
   Channel channel;
 
   @Override
   public void exceptionCaught (ChannelHandlerContext context, Throwable cause) throws Exception {
-    val message = String.format("Error during channel connection with %s",
-                                context.channel().remoteAddress().toString());
+    log.error("Error during channel connection with {}",
+              context.channel().remoteAddress(),
+              cause);
 
-    log.error(message, cause);
     context.fireExceptionCaught(cause);
     context.close();
     close();
-    future.completeExceptionally(cause);
   }
 
   @Override
@@ -144,7 +138,6 @@ public final class ClientRegularHandler extends ChannelInboundHandlerAdapter imp
     case EXIT2:
       return handle((Exit2) header);
     default:
-
       return empty();
     }
   }

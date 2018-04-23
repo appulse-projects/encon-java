@@ -16,16 +16,21 @@
 
 package io.appulse.encon.java.module.connection.handshake;
 
-import static lombok.AccessLevel.PRIVATE;
+import static lombok.AccessLevel.PROTECTED;
+
+import java.util.concurrent.CompletableFuture;
 
 import io.appulse.encon.java.RemoteNode;
-import io.appulse.encon.java.module.connection.Pipeline;
+import io.appulse.encon.java.module.NodeInternalApi;
+import io.appulse.encon.java.module.connection.Connection;
+import io.appulse.encon.java.module.connection.regular.RegularPipeline;
 
 import io.netty.channel.ChannelHandlerContext;
 import io.netty.channel.ChannelInboundHandlerAdapter;
 import lombok.NonNull;
 import lombok.RequiredArgsConstructor;
 import lombok.experimental.FieldDefaults;
+import lombok.experimental.NonFinal;
 import lombok.extern.slf4j.Slf4j;
 import lombok.val;
 
@@ -35,12 +40,18 @@ import lombok.val;
  * @since 1.0.0
  */
 @Slf4j
-@RequiredArgsConstructor
-@FieldDefaults(level = PRIVATE, makeFinal = true)
-public abstract class AbstractHandshakeHandler extends ChannelInboundHandlerAdapter {
+@RequiredArgsConstructor(access = PROTECTED)
+@FieldDefaults(level = PROTECTED, makeFinal = true)
+abstract class AbstractHandshakeHandler extends ChannelInboundHandlerAdapter {
 
   @NonNull
-  Pipeline pipeline;
+  NodeInternalApi internal;
+
+  @NonNull
+  CompletableFuture<Connection> future;
+
+  @NonFinal
+  RemoteNode remoteNode;
 
   public abstract RemoteNode getRemoteNode ();
 
@@ -52,16 +63,23 @@ public abstract class AbstractHandshakeHandler extends ChannelInboundHandlerAdap
     log.error(message, cause);
     context.fireExceptionCaught(cause);
     context.close();
-    pipeline.exception(cause);
+    future.completeExceptionally(cause);
   }
 
   /**
-   * Replaces handshake pipeline with regular pipeline after successfull handshake process.
+   * Replaces handshake pipeline with regular pipeline after successful handshake process.
    *
    * @param context connection context
    */
   protected void successHandshake (@NonNull ChannelHandlerContext context) {
+    val pipeline = context.pipeline();
     log.debug("Replacing pipline to regular for {}", context.channel().remoteAddress());
-    pipeline.setupPipeline(context.pipeline());
+
+    val remote = AbstractHandshakeChannelInitializer.cleanup(pipeline);
+    val handler = RegularPipeline.setup(pipeline, internal, remote);
+
+    future.complete(new Connection(remote, handler));
+
+    log.debug("Connection for {} was added to pool", remote);
   }
 }

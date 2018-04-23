@@ -21,15 +21,17 @@ import static io.appulse.encon.java.module.connection.handshake.message.MessageT
 import static io.appulse.encon.java.module.connection.handshake.message.MessageType.UNDEFINED;
 import static lombok.AccessLevel.PRIVATE;
 
+import java.util.List;
+import java.util.stream.Stream;
+
 import io.appulse.encon.java.module.connection.handshake.exception.HandshakeException;
 import io.appulse.encon.java.module.connection.handshake.message.Message;
 import io.appulse.encon.java.module.connection.handshake.message.MessageType;
+
 import io.netty.buffer.ByteBuf;
 import io.netty.channel.ChannelHandler.Sharable;
 import io.netty.channel.ChannelHandlerContext;
 import io.netty.handler.codec.MessageToMessageDecoder;
-import java.util.List;
-import java.util.stream.Stream;
 import lombok.RequiredArgsConstructor;
 import lombok.experimental.FieldDefaults;
 import lombok.extern.slf4j.Slf4j;
@@ -44,7 +46,7 @@ import lombok.val;
 @Sharable
 @RequiredArgsConstructor
 @FieldDefaults(level = PRIVATE, makeFinal = true)
-public class HandshakeDecoder extends MessageToMessageDecoder<ByteBuf> {
+class HandshakeDecoder extends MessageToMessageDecoder<ByteBuf> {
 
   boolean isClient;
 
