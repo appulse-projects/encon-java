@@ -18,17 +18,21 @@ package io.appulse.encon.java.protocol.type;
 
 import static io.appulse.encon.java.protocol.TermType.ATOM_UTF8;
 import static io.appulse.encon.java.protocol.TermType.SMALL_ATOM_UTF8;
+import static io.netty.buffer.Unpooled.wrappedBuffer;
 import static java.nio.charset.StandardCharsets.UTF_8;
 import static org.assertj.core.api.Assertions.assertThat;
 
 import java.util.stream.IntStream;
 
+
+import io.appulse.encon.java.protocol.Erlang;
 import io.appulse.encon.java.protocol.term.ErlangTerm;
 import io.appulse.utils.Bytes;
 import io.appulse.utils.test.TestMethodNamePrinter;
 
 import erlang.OtpInputStream;
 import erlang.OtpOutputStream;
+import io.netty.buffer.Unpooled;
 import lombok.SneakyThrows;
 import lombok.val;
 import org.assertj.core.api.SoftAssertions;
@@ -67,7 +71,7 @@ public class ErlangAtomTest {
         .put(value.getBytes(UTF_8))
         .array();
 
-    ErlangAtom atom = ErlangTerm.newInstance(bytes);
+    ErlangAtom atom = ErlangTerm.newInstance(wrappedBuffer(bytes));
     assertThat(atom).isNotNull();
 
     SoftAssertions.assertSoftly(softly -> {
@@ -91,7 +95,7 @@ public class ErlangAtomTest {
         .put(value.getBytes(UTF_8))
         .array();
 
-    assertThat(new ErlangAtom(value).toBytes())
+    assertThat(Erlang.atom(value).toBytes())
         .isEqualTo(expected);
   }
 
@@ -137,7 +141,7 @@ public class ErlangAtomTest {
         .array();
 
     try (val input = new OtpInputStream(bytes1)) {
-      ErlangAtom atom = ErlangTerm.newInstance(bytes1);
+      ErlangAtom atom = ErlangTerm.newInstance(Unpooled.wrappedBuffer(bytes1));
       assertThat(atom.asText())
           .isEqualTo(input.read_atom());
     }
@@ -151,7 +155,7 @@ public class ErlangAtomTest {
         .array();
 
     try (val input = new OtpInputStream(bytes2)) {
-      ErlangAtom atom = ErlangTerm.newInstance(bytes2);
+      ErlangAtom atom = ErlangTerm.newInstance(Unpooled.wrappedBuffer(bytes2));
       assertThat(atom.asText())
           .isEqualTo(input.read_atom());
     }

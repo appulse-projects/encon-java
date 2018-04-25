@@ -18,6 +18,7 @@ package io.appulse.encon.java.protocol.type;
 
 import static io.appulse.encon.java.protocol.TermType.NEW_PORT;
 import static io.appulse.encon.java.protocol.TermType.PORT;
+import static io.netty.buffer.Unpooled.wrappedBuffer;
 import static org.assertj.core.api.Assertions.assertThat;
 
 import io.appulse.encon.java.protocol.term.ErlangTerm;
@@ -57,7 +58,7 @@ public class ErlangPortTest {
         .put1B(creation & 0x3)
         .array();
 
-    ErlangPort port = ErlangTerm.newInstance(bytes);
+    ErlangPort port = ErlangTerm.newInstance(wrappedBuffer(bytes));
     assertThat(port).isNotNull();
 
     SoftAssertions.assertSoftly(softly -> {
@@ -127,7 +128,7 @@ public class ErlangPortTest {
         .array();
 
     try (val input = new OtpInputStream(bytes1)) {
-      ErlangPort port = ErlangTerm.newInstance(bytes1);
+      ErlangPort port = ErlangTerm.newInstance(wrappedBuffer(bytes1));
       OtpErlangPort otpPid = input.read_port();
 
       assertThat(port.getDescriptor().getFullName())
@@ -148,7 +149,7 @@ public class ErlangPortTest {
         .array();
 
     try (val input = new OtpInputStream(bytes2)) {
-      ErlangPort port = ErlangTerm.newInstance(bytes2);
+      ErlangPort port = ErlangTerm.newInstance(wrappedBuffer(bytes2));
       OtpErlangPort otpPid = input.read_port();
 
       assertThat(port.getDescriptor().getFullName())

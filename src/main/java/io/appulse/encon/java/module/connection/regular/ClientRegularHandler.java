@@ -16,7 +16,6 @@
 
 package io.appulse.encon.java.module.connection.regular;
 
-import static io.appulse.encon.java.module.connection.control.ControlMessageTag.UNDEFINED;
 import static java.util.Optional.empty;
 import static lombok.AccessLevel.PRIVATE;
 
@@ -81,15 +80,17 @@ public final class ClientRegularHandler extends ChannelInboundHandlerAdapter imp
     log.debug("Channel is: {}", channel);
   }
 
-  public boolean wasAdded () {
-    log.debug("Was added: {}", channel != null);
-    return channel != null;
+  @Override
+  public void channelInactive (ChannelHandlerContext context) throws Exception {
+    log.debug("Channel {} is inactive", context);
+    close();
   }
 
   public void send (Message container) {
     log.debug("Sending {}", container);
-    while (!channel.isWritable()) {
-      log.debug("Channel is not writable");
+    if (!channel.isWritable()) {
+      log.error("Channel is not writable - {}", channel);
+      throw new RuntimeException("Channel is not writable");
     }
     channel.writeAndFlush(container);
   }
@@ -99,12 +100,6 @@ public final class ClientRegularHandler extends ChannelInboundHandlerAdapter imp
     val message = (Message) obj;
     log.debug("Received message: {}", message);
     ControlMessage header = message.getHeader();
-
-    if (header.getTag() == UNDEFINED) {
-      context.channel().writeAndFlush(obj);
-      log.debug("Message was turned back");
-      return;
-    }
 
     val optional = findMailbox(header);
     if (optional.isPresent()) {
@@ -119,7 +114,7 @@ public final class ClientRegularHandler extends ChannelInboundHandlerAdapter imp
   public void close () {
     log.debug("Closing client handler");
     channel.close();
-    internal.connections().remove(remote);
+    internal.clearCachesFor(remote);
     log.debug("Client handler was closed");
   }
 

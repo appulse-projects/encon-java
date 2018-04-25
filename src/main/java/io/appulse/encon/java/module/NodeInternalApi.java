@@ -17,6 +17,7 @@
 package io.appulse.encon.java.module;
 
 import io.appulse.encon.java.Node;
+import io.appulse.encon.java.RemoteNode;
 import io.appulse.encon.java.config.NodeConfig;
 import io.appulse.encon.java.module.connection.ConnectionModule;
 import io.appulse.encon.java.module.mailbox.MailboxModule;
@@ -40,4 +41,6 @@ public interface NodeInternalApi {
   ConnectionModule connections ();
 
   NodeConfig config ();
+
+  void clearCachesFor (RemoteNode remoteNode);
 }

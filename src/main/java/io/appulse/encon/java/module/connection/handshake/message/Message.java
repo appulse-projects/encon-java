@@ -18,14 +18,11 @@ package io.appulse.encon.java.module.connection.handshake.message;
 
 import static lombok.AccessLevel.PRIVATE;
 
-import io.appulse.utils.Bytes;
 import io.netty.buffer.ByteBuf;
-import java.nio.ByteBuffer;
 import lombok.Getter;
 import lombok.NonNull;
 import lombok.SneakyThrows;
 import lombok.experimental.FieldDefaults;
-import lombok.val;
 
 /**
  *
@@ -35,26 +32,6 @@ import lombok.val;
 @Getter
 @FieldDefaults(level = PRIVATE, makeFinal = true)
 public abstract class Message {
-
-  public static <T extends Message> T parse (@NonNull ByteBuffer byteBuffer, @NonNull Class<T> type) {
-    val buffer = Bytes.wrap(byteBuffer);
-    return parse(buffer, type);
-  }
-
-  public static <T extends Message> T parse (@NonNull byte[] byteBuffer, @NonNull Class<T> type) {
-    val buffer = Bytes.wrap(byteBuffer);
-    return parse(buffer, type);
-  }
-
-  @SneakyThrows
-  public static <T extends Message> T parse (@NonNull Bytes buffer, @NonNull Class<T> type) {
-    if (!MessageType.check(buffer.getByte(), type)) {
-      throw new IllegalArgumentException();
-    }
-    T result = type.newInstance();
-    result.read(buffer);
-    return result;
-  }
 
   @SneakyThrows
   public static <T extends Message> T parse (@NonNull ByteBuf buffer, @NonNull Class<T> type) {
@@ -72,24 +49,6 @@ public abstract class Message {
     this.type = type;
   }
 
-  /**
-   * Returns byte array representation of this message instance.
-   * <p>
-   * Length and tag of the message setup automaticaly.
-   *
-   * @return byte array
-   */
-  public byte[] toBytes () {
-    val buffer = Bytes.allocate()
-        .put2B(0) // reserve space for final request length
-        .put1B(type.getTag());
-
-    write(buffer);
-    return buffer
-        .put2B(0, buffer.limit() - Short.BYTES) // put real size
-        .array();
-  }
-
   public void writeTo (ByteBuf buffer) {
     buffer.writeByte(type.getTag());
     write(buffer);
@@ -100,8 +59,6 @@ public abstract class Message {
    *
    * @param buffer byte buffer
    */
-  abstract void write (Bytes buffer);
-
   abstract void write (ByteBuf buffer);
 
   /**
@@ -109,8 +66,6 @@ public abstract class Message {
    *
    * @param buffer byte buffer
    */
-  abstract void read (Bytes buffer);
-
   abstract void read (ByteBuf buffer);
 
   protected byte[] readAllRestBytes (ByteBuf buffer) {

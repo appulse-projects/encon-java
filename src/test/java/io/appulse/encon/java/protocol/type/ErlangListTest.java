@@ -16,15 +16,19 @@
 
 package io.appulse.encon.java.protocol.type;
 
-import static io.appulse.encon.java.protocol.TermType.BINARY;
+import static io.appulse.encon.java.protocol.TermType.LIST;
+import static io.netty.buffer.Unpooled.wrappedBuffer;
 import static org.assertj.core.api.Assertions.assertThat;
+
+import java.util.stream.Stream;
+
 
 import io.appulse.encon.java.protocol.term.ErlangTerm;
 import io.appulse.utils.Bytes;
 import io.appulse.utils.test.TestMethodNamePrinter;
 
-import erlang.OtpErlangBinary;
-import erlang.OtpInputStream;
+import erlang.OtpErlangAtom;
+import erlang.OtpErlangList;
 import erlang.OtpOutputStream;
 import lombok.SneakyThrows;
 import lombok.val;
@@ -38,84 +42,82 @@ import org.junit.rules.TestRule;
  * @author Artem Labazin
  * @since 1.0.0
  */
-public class ErlangBinaryTest {
+public class ErlangListTest {
 
   @Rule
   public TestRule watcher = new TestMethodNamePrinter();
 
   @Test
-  public void instantiate () {
-    val value = new byte[] { 1, 2, 3 };
-
-    assertThat(new ErlangBinary(value).asBinary())
-        .isEqualTo(value);
-  }
-
-  @Test
   public void newInstance () {
-    val value = new byte[] { 1, 2, 3 };
-
+    val value = new ErlangNil();
     val bytes = Bytes.allocate()
-        .put1B(BINARY.getCode())
-        .put4B(value.length)
-        .put(value)
+        .put1B(LIST.getCode())
+        .put4B(1)
+        .put(value.toBytes())
+        .put(new ErlangNil().toBytes())
         .array();
 
-    ErlangBinary binary = ErlangTerm.newInstance(bytes);
-    assertThat(binary).isNotNull();
+    ErlangList list = ErlangTerm.newInstance(wrappedBuffer(bytes));
+    assertThat(list).isNotNull();
 
     SoftAssertions.assertSoftly(softly -> {
-      softly.assertThat(binary.isBinary())
+      softly.assertThat(list.isContainerTerm())
           .isTrue();
 
-      softly.assertThat(binary.asBinary())
-          .isEqualTo(value);
+      softly.assertThat(list.isList())
+          .isTrue();
+
+      softly.assertThat(list.get(0))
+          .isPresent()
+          .hasValue(value);
+
+      softly.assertThat(list.size())
+          .isEqualTo(1);
+
+      softly.assertThat(list.getTail())
+          .isEqualTo(new ErlangNil());
     });
   }
 
   @Test
   public void toBytes () {
-    val value = new byte[] { 1, 2, 3 };
-
+    val value = new ErlangNil();
     val expected = Bytes.allocate()
-        .put1B(BINARY.getCode())
-        .put4B(value.length)
-        .put(value)
+        .put1B(LIST.getCode())
+        .put4B(1)
+        .put(value.toBytes())
+        .put(new ErlangNil().toBytes())
         .array();
 
-    assertThat(new ErlangBinary(value).toBytes())
+    assertThat(new ErlangList(value).toBytes())
         .isEqualTo(expected);
   }
 
   @Test
   public void encode () {
-    val binary = new byte[] { 1, 2, 3, 4, 5 };
-    assertThat(new ErlangBinary(binary).toBytes())
-        .isEqualTo(bytes(binary));
-  }
+    String[] values = new String[] {
+        "one",
+        "two",
+        "three"
+    };
 
-  @Test
-  public void decode () throws Exception {
-    val value = new byte[] { 1, 2, 3 };
+    ErlangAtom[] atoms = Stream.of(values)
+        .map(ErlangAtom::new)
+        .toArray(ErlangAtom[]::new);
 
-    val bytes = Bytes.allocate()
-        .put1B(BINARY.getCode())
-        .put4B(value.length)
-        .put(value)
-        .array();
-
-    try (val input = new OtpInputStream(bytes)) {
-      ErlangBinary binary = ErlangTerm.newInstance(bytes);
-      assertThat(binary.asBinary())
-          .isEqualTo(input.read_binary());
-    }
+    assertThat(new ErlangList(atoms).toBytes())
+        .isEqualTo(bytes(values));
   }
 
   @SneakyThrows
-  private byte[] bytes (byte[] value) {
+  private byte[] bytes (String[] values) {
+    OtpErlangAtom[] atoms = Stream.of(values)
+        .map(OtpErlangAtom::new)
+        .toArray(OtpErlangAtom[]::new);
+
+    OtpErlangList list = new OtpErlangList(atoms);
     try (OtpOutputStream output = new OtpOutputStream()) {
-      OtpErlangBinary binary = new OtpErlangBinary(value);
-      binary.encode(output);
+      list.encode(output);
       output.trimToSize();
       return output.toByteArray();
     }

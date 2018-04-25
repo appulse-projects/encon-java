@@ -20,11 +20,12 @@ import static io.appulse.encon.java.module.connection.handshake.message.MessageT
 import static java.nio.charset.StandardCharsets.ISO_8859_1;
 import static lombok.AccessLevel.PRIVATE;
 
+import java.util.Set;
+
 import io.appulse.encon.java.DistributionFlag;
 import io.appulse.epmd.java.core.model.Version;
-import io.appulse.utils.Bytes;
+
 import io.netty.buffer.ByteBuf;
-import java.util.Set;
 import lombok.Builder;
 import lombok.EqualsAndHashCode;
 import lombok.Getter;
@@ -64,24 +65,10 @@ public class NameMessage extends Message {
   }
 
   @Override
-  void write (@NonNull Bytes buffer) {
-    buffer.put2B(distribution.getCode());
-    buffer.put4B(DistributionFlag.bitwiseOr(flags));
-    buffer.put(fullNodeName.getBytes(ISO_8859_1));
-  }
-
-  @Override
   void write (ByteBuf buffer) {
     buffer.writeShort(distribution.getCode());
     buffer.writeInt(DistributionFlag.bitwiseOr(flags));
     buffer.writeCharSequence(fullNodeName, ISO_8859_1);
-  }
-
-  @Override
-  void read (@NonNull Bytes buffer) {
-    distribution = Version.of(buffer.getShort());
-    flags = DistributionFlag.parse(buffer.getInt());
-    fullNodeName = new String(buffer.getBytes(), ISO_8859_1);
   }
 
   @Override

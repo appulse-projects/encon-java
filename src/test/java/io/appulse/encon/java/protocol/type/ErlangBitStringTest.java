@@ -17,9 +17,12 @@
 package io.appulse.encon.java.protocol.type;
 
 import static io.appulse.encon.java.protocol.TermType.BIT_BINNARY;
+import static io.netty.buffer.Unpooled.wrappedBuffer;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 
+
+import io.appulse.encon.java.protocol.Erlang;
 import io.appulse.encon.java.protocol.exception.ErlangTermValidationException;
 import io.appulse.encon.java.protocol.term.ErlangTerm;
 import io.appulse.utils.Bytes;
@@ -68,7 +71,7 @@ public class ErlangBitStringTest {
         .put(value)
         .array();
 
-    ErlangBitString bitString = ErlangTerm.newInstance(bytes);
+    ErlangBitString bitString = ErlangTerm.newInstance(wrappedBuffer(bytes));
     assertThat(bitString).isNotNull();
 
     SoftAssertions.assertSoftly(softly -> {
@@ -92,7 +95,7 @@ public class ErlangBitStringTest {
         .put(new byte[] { 1, 2, 0 })
         .array();
 
-    assertThat(new ErlangBitString(bits, pad).toBytes())
+    assertThat(Erlang.bitstr(bits, pad).toBytes())
         .isEqualTo(bytes);
   }
 
@@ -100,13 +103,13 @@ public class ErlangBitStringTest {
   public void encode () {
     val binary = new byte[] { 1, 2, 3 };
 
-    assertThat(new ErlangBitString(binary, 1).toBytes())
+    assertThat(Erlang.bitstr(binary, 1).toBytes())
         .isEqualTo(bytes(binary, 1));
 
-    assertThat(new ErlangBitString(binary, 4).toBytes())
+    assertThat(Erlang.bitstr(binary, 4).toBytes())
         .isEqualTo(bytes(binary, 4));
 
-    assertThat(new ErlangBitString(binary, 0).toBytes())
+    assertThat(Erlang.bitstr(binary, 0).toBytes())
         .isEqualTo(bytes(binary, 0));
   }
 
@@ -123,7 +126,7 @@ public class ErlangBitStringTest {
         .array();
 
     try (val input = new OtpInputStream(bytes)) {
-      ErlangBitString bitString = ErlangTerm.newInstance(bytes);
+      ErlangBitString bitString = ErlangTerm.newInstance(wrappedBuffer(bytes));
       assertThat(bitString.getBits())
           .isEqualTo(input.read_bitstr(new int[1]));
     }

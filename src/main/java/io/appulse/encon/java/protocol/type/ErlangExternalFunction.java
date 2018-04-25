@@ -22,7 +22,7 @@ import static lombok.AccessLevel.PRIVATE;
 import io.appulse.encon.java.protocol.Erlang;
 import io.appulse.encon.java.protocol.TermType;
 import io.appulse.encon.java.protocol.term.ErlangTerm;
-import io.appulse.utils.Bytes;
+
 import io.netty.buffer.ByteBuf;
 import lombok.Builder;
 import lombok.EqualsAndHashCode;
@@ -64,18 +64,6 @@ public class ErlangExternalFunction extends ErlangTerm {
   }
 
   @Override
-  protected void read (@NonNull Bytes buffer) {
-    ErlangAtom atomModule = ErlangTerm.newInstance(buffer);
-    module = atomModule.asText();
-
-    ErlangAtom atomName = ErlangTerm.newInstance(buffer);
-    name = atomName.asText();
-
-    ErlangInteger numberArity = ErlangTerm.newInstance(buffer);
-    arity = numberArity.asInt();
-  }
-
-  @Override
   protected void read (ByteBuf buffer) {
     ErlangAtom atomModule = ErlangTerm.newInstance(buffer);
     module = atomModule.asText();
@@ -85,13 +73,6 @@ public class ErlangExternalFunction extends ErlangTerm {
 
     ErlangInteger numberArity = ErlangTerm.newInstance(buffer);
     arity = numberArity.asInt();
-  }
-
-  @Override
-  protected void write (@NonNull Bytes buffer) {
-    buffer.put(new ErlangAtom(module).toBytes());
-    buffer.put(new ErlangAtom(name).toBytes());
-    buffer.put(new ErlangInteger(arity).toBytes());
   }
 
   @Override

@@ -21,7 +21,6 @@ import static java.util.Optional.ofNullable;
 
 import io.appulse.encon.java.module.connection.control.ControlMessage;
 import io.appulse.encon.java.protocol.term.ErlangTerm;
-import io.appulse.utils.BytesUtils;
 import io.netty.buffer.ByteBuf;
 import io.netty.channel.ChannelHandler.Sharable;
 import io.netty.channel.ChannelHandlerContext;
@@ -73,10 +72,8 @@ public class MessageDecoder extends MessageToMessageDecoder<ByteBuf> {
   }
 
   private ErlangTerm readTerm (ByteBuf buffer) {
-    val version = buffer.readByte(); // skip version byte;
-    if (log.isDebugEnabled()) {
-      log.debug("Version byte: {}", BytesUtils.asUnsignedByte(version));
-    }
+    val version = buffer.readUnsignedByte(); // skip version byte;
+    log.debug("Version byte: {}", version);
     return ErlangTerm.newInstance(buffer);
   }
 }

@@ -19,7 +19,6 @@ package io.appulse.encon.java.module.server;
 import static io.netty.channel.ChannelOption.ALLOCATOR;
 import static io.netty.channel.ChannelOption.SO_BACKLOG;
 import static io.netty.channel.ChannelOption.SO_KEEPALIVE;
-import static io.netty.channel.ChannelOption.SO_LINGER;
 import static io.netty.channel.ChannelOption.SO_REUSEADDR;
 import static io.netty.channel.ChannelOption.TCP_NODELAY;
 import static io.netty.channel.ChannelOption.WRITE_BUFFER_WATER_MARK;
@@ -40,6 +39,8 @@ import io.netty.channel.epoll.EpollEventLoopGroup;
 import io.netty.channel.epoll.EpollServerSocketChannel;
 import io.netty.channel.nio.NioEventLoopGroup;
 import io.netty.channel.socket.nio.NioServerSocketChannel;
+import io.netty.handler.logging.LogLevel;
+import io.netty.handler.logging.LoggingHandler;
 import io.netty.util.concurrent.DefaultThreadFactory;
 import lombok.NonNull;
 import lombok.SneakyThrows;
@@ -95,31 +96,6 @@ public final class ServerModule implements ServerModuleApi, Closeable {
     start();
   }
 
-  @SneakyThrows
-  private void start () {
-    log.debug("Starting server on port {}", port);
-    val bootstrap = new ServerBootstrap()
-        .group(bossGroup, workerGroup)
-        .childHandler(HandshakeServerInitializer.builder()
-            .internal(internal)
-            .build())
-        .option(SO_BACKLOG, 1024)
-        .option(SO_REUSEADDR, true)
-        .childOption(SO_KEEPALIVE, true)
-        .childOption(SO_REUSEADDR, true)
-        .childOption(SO_LINGER, 3)
-        .childOption(TCP_NODELAY, true)
-        .childOption(WRITE_BUFFER_WATER_MARK, new WriteBufferWaterMark(64 * 1024, 128 * 1024))
-        .childOption(ALLOCATOR, new PooledByteBufAllocator(false));
-
-    if (Epoll.isAvailable()) {
-      bootstrap.channel(EpollServerSocketChannel.class);
-    } else {
-      bootstrap.channel(NioServerSocketChannel.class);
-    }
-    bootstrap.bind(port);
-  }
-
   @Override
   @SneakyThrows
   public void close () {
@@ -138,6 +114,31 @@ public final class ServerModule implements ServerModuleApi, Closeable {
 
     log.debug("Server of {} was closed",
               internal.node().getDescriptor().getFullName());
+  }
+
+  @SneakyThrows
+  private void start () {
+    log.debug("Starting server on port {}", port);
+    val bootstrap = new ServerBootstrap()
+        .group(bossGroup, workerGroup)
+        .handler(new LoggingHandler(LogLevel.DEBUG))
+        .childHandler(HandshakeServerInitializer.builder()
+            .internal(internal)
+            .build())
+        .option(SO_BACKLOG, 1024)
+        .option(SO_REUSEADDR, true)
+        .childOption(SO_REUSEADDR, true)
+        .childOption(SO_KEEPALIVE, true)
+        .childOption(TCP_NODELAY, true)
+        .childOption(WRITE_BUFFER_WATER_MARK, new WriteBufferWaterMark(64 * 1024, 128 * 1024))
+        .childOption(ALLOCATOR, new PooledByteBufAllocator(false));
+
+    if (Epoll.isAvailable()) {
+      bootstrap.channel(EpollServerSocketChannel.class);
+    } else {
+      bootstrap.channel(NioServerSocketChannel.class);
+    }
+    bootstrap.bind(port);
   }
 
   private String getThreadName (@NonNull String suffix) {

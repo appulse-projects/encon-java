@@ -22,17 +22,18 @@ import static java.util.Optional.of;
 import static java.util.Optional.ofNullable;
 import static lombok.AccessLevel.PRIVATE;
 
-import io.appulse.encon.java.protocol.Erlang;
-import io.appulse.encon.java.protocol.TermType;
-import io.appulse.encon.java.protocol.term.ErlangTerm;
-import io.appulse.utils.Bytes;
-import io.netty.buffer.ByteBuf;
 import java.util.Arrays;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Optional;
 import java.util.stream.IntStream;
 import java.util.stream.Stream;
+
+import io.appulse.encon.java.protocol.Erlang;
+import io.appulse.encon.java.protocol.TermType;
+import io.appulse.encon.java.protocol.term.ErlangTerm;
+
+import io.netty.buffer.ByteBuf;
 import lombok.Builder;
 import lombok.EqualsAndHashCode;
 import lombok.Getter;
@@ -133,17 +134,6 @@ public class ErlangList extends ErlangTerm {
   }
 
   @Override
-  protected void read (@NonNull Bytes buffer) {
-    val arity = buffer.getInt();
-    elements = IntStream.range(0, arity)
-        .boxed()
-        .map(it -> ErlangTerm.newInstance(buffer))
-        .toArray(ErlangTerm[]::new);
-
-    tail = ErlangTerm.newInstance(buffer);
-  }
-
-  @Override
   protected void read (ByteBuf buffer) {
     val arity = buffer.readInt();
     elements = IntStream.range(0, arity)
@@ -152,19 +142,6 @@ public class ErlangList extends ErlangTerm {
         .toArray(ErlangTerm[]::new);
 
     tail = ErlangTerm.newInstance(buffer);
-  }
-
-  @Override
-  protected void write (@NonNull Bytes buffer) {
-    buffer.put4B(elements.length);
-    Stream.of(elements)
-        .map(ErlangTerm::toBytes)
-        .forEachOrdered(buffer::put);
-
-    if (tail == null) {
-      tail = new ErlangNil();
-    }
-    buffer.put(tail.toBytes());
   }
 
   @Override

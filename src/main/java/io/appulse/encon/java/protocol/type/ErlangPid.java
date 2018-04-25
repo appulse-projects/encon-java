@@ -24,8 +24,7 @@ import io.appulse.encon.java.NodeDescriptor;
 import io.appulse.encon.java.protocol.Erlang;
 import io.appulse.encon.java.protocol.TermType;
 import io.appulse.encon.java.protocol.term.ErlangTerm;
-import io.appulse.utils.Bytes;
-import io.appulse.utils.BytesUtils;
+
 import io.netty.buffer.ByteBuf;
 import lombok.Builder;
 import lombok.EqualsAndHashCode;
@@ -92,27 +91,6 @@ public class ErlangPid extends ErlangTerm {
   }
 
   @Override
-  protected void read (@NonNull Bytes buffer) {
-    ErlangAtom atom = ErlangTerm.newInstance(buffer);
-    descriptor = NodeDescriptor.from(atom.asText());
-
-    id = buffer.getInt();
-    serial = buffer.getInt();
-
-    switch (getType()) {
-    case PID:
-      creation = buffer.getUnsignedByte();
-      break;
-    case NEW_PID:
-      creation = buffer.getInt();
-      break;
-    default:
-      throw new IllegalArgumentException("Unknown type: " + getType());
-    }
-    validate();
-  }
-
-  @Override
   protected void read (ByteBuf buffer) {
     val atom = ErlangTerm.newInstance(buffer);
     descriptor = NodeDescriptor.from(atom.asText());
@@ -122,7 +100,7 @@ public class ErlangPid extends ErlangTerm {
 
     switch (getType()) {
     case PID:
-      creation = BytesUtils.asUnsignedByte(buffer.readByte());
+      creation = buffer.readUnsignedByte();
       break;
     case NEW_PID:
       creation = buffer.readInt();
@@ -131,24 +109,6 @@ public class ErlangPid extends ErlangTerm {
       throw new IllegalArgumentException("Unknown type: " + getType());
     }
     validate();
-  }
-
-  @Override
-  protected void write (@NonNull Bytes buffer) {
-    buffer.put(new ErlangAtom(descriptor.getFullName()).toBytes());
-    buffer.put4B(id);
-    buffer.put4B(serial);
-
-    switch (getType()) {
-    case PID:
-      buffer.put1B(creation);
-      break;
-    case NEW_PID:
-      buffer.put4B(creation);
-      break;
-    default:
-      throw new IllegalArgumentException("Unknown type: " + getType());
-    }
   }
 
   @Override

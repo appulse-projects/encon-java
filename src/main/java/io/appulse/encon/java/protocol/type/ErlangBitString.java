@@ -24,7 +24,7 @@ import io.appulse.encon.java.protocol.TermType;
 import io.appulse.encon.java.protocol.exception.ErlangTermDecodeException;
 import io.appulse.encon.java.protocol.exception.ErlangTermValidationException;
 import io.appulse.encon.java.protocol.term.ErlangTerm;
-import io.appulse.utils.Bytes;
+
 import io.netty.buffer.ByteBuf;
 import lombok.Builder;
 import lombok.EqualsAndHashCode;
@@ -77,25 +77,6 @@ public class ErlangBitString extends ErlangTerm {
   }
 
   @Override
-  @SuppressWarnings("PMD.PrematureDeclaration")
-  protected void read (@NonNull Bytes buffer) {
-    val length = buffer.getInt();
-    val tail = buffer.getByte();
-
-    if (tail < 0 || tail > 7) {
-      throw new ErlangTermDecodeException("Wrong tail bit count: " + tail);
-    }
-    if (length == 0 && tail != 0) {
-      throw new ErlangTermDecodeException("Length 0 on BitString with tail bit count: " + tail);
-    }
-
-    bits = buffer.getBytes(length);
-    pad = 8 - tail;
-
-    validate();
-  }
-
-  @Override
   protected void read (ByteBuf buffer) {
     val length = buffer.readInt();
     val tail = buffer.readByte();
@@ -112,18 +93,6 @@ public class ErlangBitString extends ErlangTerm {
     pad = 8 - tail;
 
     validate();
-  }
-
-  @Override
-  protected void write (@NonNull Bytes buffer) {
-    if (pad == 0) {
-      val position = buffer.position();
-      buffer.put(position - 1, new ErlangBinary(bits).toBytes());
-      return;
-    }
-    buffer.put4B(bits.length);
-    buffer.put1B(8 - pad);
-    buffer.put(bits);
   }
 
   @Override

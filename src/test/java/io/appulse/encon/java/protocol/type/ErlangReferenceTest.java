@@ -19,6 +19,7 @@ package io.appulse.encon.java.protocol.type;
 import static io.appulse.encon.java.protocol.TermType.NEWER_REFERENCE;
 import static io.appulse.encon.java.protocol.TermType.NEW_REFERENCE;
 import static io.appulse.encon.java.protocol.TermType.REFERENCE;
+import static io.netty.buffer.Unpooled.wrappedBuffer;
 import static org.assertj.core.api.Assertions.assertThat;
 
 import java.util.stream.LongStream;
@@ -31,9 +32,8 @@ import erlang.OtpErlangRef;
 import erlang.OtpInputStream;
 import erlang.OtpOutputStream;
 import lombok.SneakyThrows;
-import lombok.val;
 import lombok.extern.slf4j.Slf4j;
-
+import lombok.val;
 import org.assertj.core.api.SoftAssertions;
 import org.junit.Rule;
 import org.junit.Test;
@@ -81,7 +81,7 @@ public class ErlangReferenceTest {
 
     val expected = builder.array();
 
-    ErlangReference reference = ErlangTerm.newInstance(expected);
+    ErlangReference reference = ErlangTerm.newInstance(wrappedBuffer(expected));
     assertThat(reference).isNotNull();
 
     SoftAssertions.assertSoftly(softly -> {
@@ -169,7 +169,7 @@ public class ErlangReferenceTest {
         .array();
 
     try (val input = new OtpInputStream(bytes1)) {
-      ErlangReference reference = ErlangTerm.newInstance(bytes1);
+      ErlangReference reference = ErlangTerm.newInstance(wrappedBuffer(bytes1));
       OtpErlangRef otpRef = input.read_ref();
 
       assertThat(reference.getDescriptor().getFullName())
@@ -196,7 +196,7 @@ public class ErlangReferenceTest {
         .array();
 
     try (val input = new OtpInputStream(bytes2)) {
-      ErlangReference reference = ErlangTerm.newInstance(bytes2);
+      ErlangReference reference = ErlangTerm.newInstance(wrappedBuffer(bytes2));
       OtpErlangRef otpRef = input.read_ref();
 
       assertThat(reference.getDescriptor().getFullName())
@@ -223,7 +223,7 @@ public class ErlangReferenceTest {
         .array();
 
     try (val input = new OtpInputStream(bytes3)) {
-      ErlangReference reference = ErlangTerm.newInstance(bytes3);
+      ErlangReference reference = ErlangTerm.newInstance(wrappedBuffer(bytes3));
       OtpErlangRef otpRef = input.read_ref();
 
       assertThat(reference.getDescriptor().getFullName())

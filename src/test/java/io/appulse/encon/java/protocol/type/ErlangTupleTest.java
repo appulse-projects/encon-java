@@ -16,9 +16,12 @@
 
 package io.appulse.encon.java.protocol.type;
 
-import static io.appulse.encon.java.protocol.TermType.LIST;
+import static io.appulse.encon.java.protocol.TermType.LARGE_TUPLE;
+import static io.appulse.encon.java.protocol.TermType.SMALL_TUPLE;
+import static io.netty.buffer.Unpooled.wrappedBuffer;
 import static org.assertj.core.api.Assertions.assertThat;
 
+import java.util.stream.IntStream;
 import java.util.stream.Stream;
 
 import io.appulse.encon.java.protocol.term.ErlangTerm;
@@ -26,7 +29,7 @@ import io.appulse.utils.Bytes;
 import io.appulse.utils.test.TestMethodNamePrinter;
 
 import erlang.OtpErlangAtom;
-import erlang.OtpErlangList;
+import erlang.OtpErlangTuple;
 import erlang.OtpOutputStream;
 import lombok.SneakyThrows;
 import lombok.val;
@@ -40,40 +43,50 @@ import org.junit.rules.TestRule;
  * @author Artem Labazin
  * @since 1.0.0
  */
-public class ErlangListTest {
+public class ErlangTupleTest {
 
   @Rule
   public TestRule watcher = new TestMethodNamePrinter();
 
   @Test
+  public void instantiate () {
+    assertThat(new ErlangTuple(new ErlangNil()).getType())
+        .isEqualTo(SMALL_TUPLE);
+
+    val elements = IntStream.range(0, 257)
+        .boxed()
+        .map(it -> new ErlangNil())
+        .toArray(ErlangTerm[]::new);
+
+    assertThat(new ErlangTuple(elements).getType())
+        .isEqualTo(LARGE_TUPLE);
+  }
+
+  @Test
   public void newInstance () {
     val value = new ErlangNil();
     val bytes = Bytes.allocate()
-        .put1B(LIST.getCode())
-        .put4B(1)
+        .put1B(SMALL_TUPLE.getCode())
+        .put1B(1)
         .put(value.toBytes())
-        .put(new ErlangNil().toBytes())
         .array();
 
-    ErlangList list = ErlangTerm.newInstance(bytes);
-    assertThat(list).isNotNull();
+    ErlangTuple tuple = ErlangTerm.newInstance(wrappedBuffer(bytes));
+    assertThat(tuple).isNotNull();
 
     SoftAssertions.assertSoftly(softly -> {
-      softly.assertThat(list.isContainerTerm())
+      softly.assertThat(tuple.isContainerTerm())
           .isTrue();
 
-      softly.assertThat(list.isList())
+      softly.assertThat(tuple.isTuple())
           .isTrue();
 
-      softly.assertThat(list.get(0))
+      softly.assertThat(tuple.get(0))
           .isPresent()
           .hasValue(value);
 
-      softly.assertThat(list.size())
+      softly.assertThat(tuple.size())
           .isEqualTo(1);
-
-      softly.assertThat(list.getTail())
-          .isEqualTo(new ErlangNil());
     });
   }
 
@@ -81,13 +94,12 @@ public class ErlangListTest {
   public void toBytes () {
     val value = new ErlangNil();
     val expected = Bytes.allocate()
-        .put1B(LIST.getCode())
-        .put4B(1)
+        .put1B(SMALL_TUPLE.getCode())
+        .put1B(1)
         .put(value.toBytes())
-        .put(new ErlangNil().toBytes())
         .array();
 
-    assertThat(new ErlangList(value).toBytes())
+    assertThat(new ErlangTuple(value).toBytes())
         .isEqualTo(expected);
   }
 
@@ -103,7 +115,7 @@ public class ErlangListTest {
         .map(ErlangAtom::new)
         .toArray(ErlangAtom[]::new);
 
-    assertThat(new ErlangList(atoms).toBytes())
+    assertThat(new ErlangTuple(atoms).toBytes())
         .isEqualTo(bytes(values));
   }
 
@@ -113,9 +125,9 @@ public class ErlangListTest {
         .map(OtpErlangAtom::new)
         .toArray(OtpErlangAtom[]::new);
 
-    OtpErlangList list = new OtpErlangList(atoms);
+    OtpErlangTuple tuple = new OtpErlangTuple(atoms);
     try (OtpOutputStream output = new OtpOutputStream()) {
-      list.encode(output);
+      tuple.encode(output);
       output.trimToSize();
       return output.toByteArray();
     }

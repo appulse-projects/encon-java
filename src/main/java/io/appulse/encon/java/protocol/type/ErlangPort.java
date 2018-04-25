@@ -24,8 +24,7 @@ import io.appulse.encon.java.NodeDescriptor;
 import io.appulse.encon.java.protocol.Erlang;
 import io.appulse.encon.java.protocol.TermType;
 import io.appulse.encon.java.protocol.term.ErlangTerm;
-import io.appulse.utils.Bytes;
-import io.appulse.utils.BytesUtils;
+
 import io.netty.buffer.ByteBuf;
 import lombok.Builder;
 import lombok.EqualsAndHashCode;
@@ -87,25 +86,6 @@ public class ErlangPort extends ErlangTerm {
   }
 
   @Override
-  protected void read (@NonNull Bytes buffer) {
-    ErlangAtom atom = ErlangTerm.newInstance(buffer);
-    descriptor = NodeDescriptor.from(atom.asText());
-    id = buffer.getInt();
-
-    switch (getType()) {
-    case PORT:
-      creation = buffer.getUnsignedByte();
-      break;
-    case NEW_PORT:
-      creation = buffer.getInt();
-      break;
-    default:
-      throw new IllegalArgumentException("Unknown type: " + getType());
-    }
-    validate();
-  }
-
-  @Override
   protected void read (ByteBuf buffer) {
     ErlangAtom atom = ErlangTerm.newInstance(buffer);
     descriptor = NodeDescriptor.from(atom.asText());
@@ -113,7 +93,7 @@ public class ErlangPort extends ErlangTerm {
 
     switch (getType()) {
     case PORT:
-      creation = BytesUtils.asUnsignedByte(buffer.readByte());
+      creation = buffer.readUnsignedByte();
       break;
     case NEW_PORT:
       creation = buffer.readInt();
@@ -122,23 +102,6 @@ public class ErlangPort extends ErlangTerm {
       throw new IllegalArgumentException("Unknown type: " + getType());
     }
     validate();
-  }
-
-  @Override
-  protected void write (@NonNull Bytes buffer) {
-    buffer.put(new ErlangAtom(descriptor.getFullName()).toBytes());
-    buffer.put4B(id);
-
-    switch (getType()) {
-    case PORT:
-      buffer.put1B(creation);
-      break;
-    case NEW_PORT:
-      buffer.put4B(creation);
-      break;
-    default:
-      throw new IllegalArgumentException("Unknown type: " + getType());
-    }
   }
 
   @Override

@@ -24,7 +24,7 @@ import static lombok.AccessLevel.PRIVATE;
 import io.appulse.encon.java.protocol.Erlang;
 import io.appulse.encon.java.protocol.TermType;
 import io.appulse.encon.java.protocol.term.ErlangTerm;
-import io.appulse.utils.Bytes;
+
 import io.netty.buffer.ByteBuf;
 import lombok.EqualsAndHashCode;
 import lombok.NonNull;
@@ -69,43 +69,9 @@ public class ErlangString extends ErlangTerm {
   }
 
   @Override
-  protected void read (@NonNull Bytes buffer) {
-    val length = buffer.getShort();
-    val bytes = buffer.getBytes(length);
-    value = new String(bytes, ISO_8859_1);
-  }
-
-  @Override
   protected void read (ByteBuf buffer) {
     val length = buffer.readShort();
     value = buffer.readCharSequence(length, ISO_8859_1).toString();
-  }
-
-  @Override
-  protected void write (@NonNull Bytes buffer) {
-    val positionBefore = buffer.position() - 1;
-    if (value.isEmpty()) {
-      buffer.put(positionBefore, new ErlangNil().toBytes());
-      return;
-    }
-
-    val length = value.length();
-    switch (getType()) {
-    case STRING:
-      buffer.put2B(length);
-      buffer.put(value, ISO_8859_1);
-      break;
-    case LIST:
-      val elements = value.codePoints()
-          .boxed()
-          .map(ErlangInteger::from)
-          .toArray(ErlangInteger[]::new);
-
-      buffer.put(positionBefore, Erlang.list(elements).toBytes());
-      break;
-    default:
-      buffer.put(positionBefore, new ErlangNil().toBytes());
-    }
   }
 
   @Override

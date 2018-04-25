@@ -16,29 +16,29 @@
 
 package io.appulse.encon.java.protocol.type;
 
-import static org.assertj.core.api.Assertions.assertThat;
 import static io.appulse.encon.java.protocol.TermType.INTEGER;
 import static io.appulse.encon.java.protocol.TermType.LARGE_BIG;
 import static io.appulse.encon.java.protocol.TermType.SMALL_BIG;
 import static io.appulse.encon.java.protocol.TermType.SMALL_INTEGER;
+import static io.netty.buffer.Unpooled.wrappedBuffer;
+import static org.assertj.core.api.Assertions.assertThat;
 
 import java.math.BigInteger;
 import java.util.Arrays;
 import java.util.stream.IntStream;
 
-import org.junit.Test;
-
-import erlang.OtpErlangLong;
-import erlang.OtpInputStream;
-import erlang.OtpOutputStream;
 
 import io.appulse.encon.java.protocol.term.ErlangTerm;
 import io.appulse.utils.Bytes;
 import io.appulse.utils.test.TestMethodNamePrinter;
 
+import erlang.OtpErlangLong;
+import erlang.OtpInputStream;
+import erlang.OtpOutputStream;
 import lombok.SneakyThrows;
 import lombok.val;
 import org.junit.Rule;
+import org.junit.Test;
 import org.junit.rules.TestRule;
 
 /**
@@ -126,7 +126,7 @@ public class ErlangIntegerTest {
         .array();
 
     try (val input = new OtpInputStream(bytes1)) {
-      ErlangInteger inte = ErlangTerm.newInstance(bytes1);
+      ErlangInteger inte = ErlangTerm.newInstance(wrappedBuffer(bytes1));
       assertThat(inte.asInt())
           .isEqualTo(input.read_int());
     }
@@ -137,7 +137,7 @@ public class ErlangIntegerTest {
         .array();
 
     try (val input = new OtpInputStream(bytes2)) {
-      ErlangInteger inte = ErlangTerm.newInstance(bytes2);
+      ErlangInteger inte = ErlangTerm.newInstance(wrappedBuffer(bytes2));
       assertThat(inte.asInt())
           .isEqualTo(input.read_int());
     }
@@ -145,7 +145,7 @@ public class ErlangIntegerTest {
     val bytes3 = bigBytes(BigInteger.valueOf(Long.MAX_VALUE));
 
     try (val input = new OtpInputStream(bytes3)) {
-      ErlangInteger inte = ErlangTerm.newInstance(bytes3);
+      ErlangInteger inte = ErlangTerm.newInstance(wrappedBuffer(bytes3));
       assertThat(inte.asLong())
           .isEqualTo(input.read_long());
     }
@@ -157,7 +157,7 @@ public class ErlangIntegerTest {
     val bytes4 = bigBytes(value);
 
     try (val input = new OtpInputStream(bytes4)) {
-      ErlangInteger inte = ErlangTerm.newInstance(bytes4);
+      ErlangInteger inte = ErlangTerm.newInstance(wrappedBuffer(bytes4));
       OtpErlangLong ll = (OtpErlangLong) input.read_any();
 
       assertThat(inte.asBigInteger())

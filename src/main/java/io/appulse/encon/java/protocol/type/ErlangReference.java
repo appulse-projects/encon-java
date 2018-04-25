@@ -20,13 +20,14 @@ import static io.appulse.encon.java.protocol.TermType.NEW_REFERENCE;
 import static java.util.Optional.ofNullable;
 import static lombok.AccessLevel.PRIVATE;
 
+import java.util.stream.LongStream;
+
 import io.appulse.encon.java.NodeDescriptor;
 import io.appulse.encon.java.protocol.Erlang;
 import io.appulse.encon.java.protocol.TermType;
 import io.appulse.encon.java.protocol.term.ErlangTerm;
-import io.appulse.utils.Bytes;
+
 import io.netty.buffer.ByteBuf;
-import java.util.stream.LongStream;
 import lombok.Builder;
 import lombok.EqualsAndHashCode;
 import lombok.Getter;
@@ -121,45 +122,6 @@ public class ErlangReference extends ErlangTerm {
   }
 
   @Override
-  protected void read (@NonNull Bytes buffer) {
-    switch (getType()) {
-    case REFERENCE:
-      ErlangAtom atom = ErlangTerm.newInstance(buffer);
-      descriptor = NodeDescriptor.from(atom.asText());
-      ids = new long[] { buffer.getInt() & 0x3FFFF };
-      creation = buffer.getByte() & 0x03;
-      return;
-    case NEW_REFERENCE:
-    case NEWER_REFERENCE:
-      break;
-    default:
-      throw new IllegalArgumentException("Unknown type: " + getType());
-    }
-
-    val arity = buffer.getShort();
-    if (arity > MAX_REFERENCE_ARITY) {
-      throw new IllegalArgumentException("Maximum arity value is " + MAX_REFERENCE_ARITY + ", but was " + arity);
-    }
-
-    ErlangAtom atom = ErlangTerm.newInstance(buffer);
-    descriptor = NodeDescriptor.from(atom.asText());
-
-    if (getType() == NEW_REFERENCE) {
-      creation = buffer.getByte() & 0x3;
-    } else {
-      creation = buffer.getInt();
-    }
-
-    ids = LongStream.range(0, arity)
-        .map(it -> buffer.getUnsignedInt())
-        .toArray();
-
-    if (getType() == NEW_REFERENCE) {
-      ids[0] &= 0x3FFFF;
-    }
-  }
-
-  @Override
   protected void read (ByteBuf buffer) {
     switch (getType()) {
     case REFERENCE:
@@ -196,40 +158,6 @@ public class ErlangReference extends ErlangTerm {
     if (getType() == NEW_REFERENCE) {
       ids[0] &= 0x3FFFF;
     }
-  }
-
-  @Override
-  protected void write (@NonNull Bytes buffer) {
-    switch (getType()) {
-    case REFERENCE:
-      buffer.put(new ErlangAtom(descriptor.getFullName()).toBytes());
-      buffer.put4B(ids[0] & 0x3FFFF);
-      buffer.put1B(creation);
-      return;
-    case NEW_REFERENCE:
-    case NEWER_REFERENCE:
-      break;
-    default:
-      throw new IllegalArgumentException("Unknown type: " + getType());
-    }
-
-    buffer.put2B(ids.length);
-    buffer.put(new ErlangAtom(descriptor.getFullName()).toBytes());
-
-    switch (getType()) {
-    case NEW_REFERENCE:
-      buffer.put1B(creation);
-      buffer.put4B(ids[0] & 0x3FFFF);
-      break;
-    case NEWER_REFERENCE:
-    default:
-      buffer.put4B(creation);
-      buffer.put4B(ids[0]);
-    }
-
-    LongStream.of(ids)
-        .skip(1)
-        .forEachOrdered(buffer::put4B);
   }
 
   @Override

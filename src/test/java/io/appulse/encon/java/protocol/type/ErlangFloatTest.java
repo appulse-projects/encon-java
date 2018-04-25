@@ -18,9 +18,11 @@ package io.appulse.encon.java.protocol.type;
 
 import static io.appulse.encon.java.protocol.TermType.FLOAT;
 import static io.appulse.encon.java.protocol.TermType.NEW_FLOAT;
+import static io.netty.buffer.Unpooled.wrappedBuffer;
 import static java.nio.charset.StandardCharsets.ISO_8859_1;
 import static org.assertj.core.api.Assertions.assertThat;
 
+import io.appulse.encon.java.protocol.Erlang;
 import io.appulse.encon.java.protocol.term.ErlangTerm;
 import io.appulse.utils.Bytes;
 import io.appulse.utils.test.TestMethodNamePrinter;
@@ -47,22 +49,22 @@ public class ErlangFloatTest {
 
   @Test
   public void encode () {
-    assertThat(new ErlangFloat(Float.MIN_NORMAL).toBytes())
+    assertThat(Erlang.number(Float.MIN_NORMAL).toBytes())
         .isEqualTo(bytes(Float.MIN_NORMAL));
 
-    assertThat(new ErlangFloat(Float.MAX_VALUE).toBytes())
+    assertThat(Erlang.number(Float.MAX_VALUE).toBytes())
         .isEqualTo(bytes(Float.MAX_VALUE));
 
-    assertThat(new ErlangFloat(Float.MIN_VALUE).toBytes())
+    assertThat(Erlang.number(Float.MIN_VALUE).toBytes())
         .isEqualTo(bytes(Float.MIN_VALUE));
 
-    assertThat(new ErlangFloat(Double.MIN_NORMAL).toBytes())
+    assertThat(Erlang.number(Double.MIN_NORMAL).toBytes())
         .isEqualTo(bytes(Double.MIN_NORMAL));
 
-    assertThat(new ErlangFloat(Double.MAX_VALUE).toBytes())
+    assertThat(Erlang.number(Double.MAX_VALUE).toBytes())
         .isEqualTo(bytes(Double.MAX_VALUE));
 
-    assertThat(new ErlangFloat(Double.MIN_VALUE).toBytes())
+    assertThat(Erlang.number(Double.MIN_VALUE).toBytes())
         .isEqualTo(bytes(Double.MIN_VALUE));
   }
 
@@ -74,7 +76,7 @@ public class ErlangFloatTest {
         .array();
 
     try (val input = new OtpInputStream(bytes1)) {
-      ErlangFloat fl = ErlangTerm.newInstance(bytes1);
+      ErlangFloat fl = ErlangTerm.newInstance(wrappedBuffer(bytes1));
       assertThat(fl.asFloat())
           .isEqualTo(input.read_float());
     }
@@ -86,7 +88,7 @@ public class ErlangFloatTest {
         .array();
 
     try (val input = new OtpInputStream(bytes2)) {
-      ErlangFloat fl = ErlangTerm.newInstance(bytes2);
+      ErlangFloat fl = ErlangTerm.newInstance(wrappedBuffer(bytes2));
       assertThat(fl.asDouble())
           .isEqualTo(input.read_double());
     }
