@@ -110,12 +110,15 @@ class HandshakeHandlerServer extends AbstractHandshakeHandler {
       log.error("Remote and own digest are not equal");
       throw new HandshakeException("Remote and own digest are not equal");
     }
+
     val remoteChallenge = message.getChallenge();
     val ourDigest = HandshakeUtils.generateDigest(remoteChallenge, internal.node().getCookie());
+
     context.writeAndFlush(ChallengeAcknowledgeMessage.builder()
         .digest(ourDigest)
-        .build());
-
-    successHandshake(context);
+        .build()
+    ).addListener(future -> {
+      successHandshake(context);
+    });
   }
 }

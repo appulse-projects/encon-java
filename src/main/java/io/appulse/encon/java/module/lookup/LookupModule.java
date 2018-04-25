@@ -17,6 +17,7 @@
 package io.appulse.encon.java.module.lookup;
 
 import static java.util.Optional.ofNullable;
+import static java.util.stream.Collectors.joining;
 import static lombok.AccessLevel.PRIVATE;
 
 import java.util.Map;
@@ -68,7 +69,7 @@ public final class LookupModule implements LookupModuleApi {
               .build()
           )
           .orElse(null);
-      };
+    };
   }
 
   @Override
@@ -87,5 +88,21 @@ public final class LookupModule implements LookupModuleApi {
   public Optional<RemoteNode> lookup (@NonNull NodeDescriptor descriptor) {
     log.debug("Looking up: {}", descriptor);
     return ofNullable(cache.computeIfAbsent(descriptor, compute));
+  }
+
+  public void remove (@NonNull RemoteNode remoteNode) {
+    val remote = cache.remove(remoteNode.getDescriptor());
+    log.debug("Clear lookup cache for {} (existed: {})",
+              remoteNode, remote != null);
+
+    if (log.isDebugEnabled() && remote == null) {
+      val keys = cache.keySet()
+          .stream()
+          .map(NodeDescriptor::toString)
+          .map("  - "::concat)
+          .collect(joining("\n"));
+
+      log.debug("Cache keys:\n{}", keys);
+    }
   }
 }

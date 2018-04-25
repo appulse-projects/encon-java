@@ -19,7 +19,6 @@ package io.appulse.encon.java.module.connection.handshake.message;
 import static io.appulse.encon.java.module.connection.handshake.message.MessageType.CHALLENGE_REPLY;
 import static lombok.AccessLevel.PRIVATE;
 
-import io.appulse.utils.Bytes;
 import io.netty.buffer.ByteBuf;
 import lombok.Builder;
 import lombok.EqualsAndHashCode;
@@ -55,21 +54,9 @@ public class ChallengeReplyMessage extends Message {
   }
 
   @Override
-  void write (@NonNull Bytes buffer) {
-    buffer.put4B(challenge);
-    buffer.put(digest);
-  }
-
-  @Override
   void write (ByteBuf buffer) {
     buffer.writeInt(challenge);
     buffer.writeBytes(digest);
-  }
-
-  @Override
-  void read (@NonNull Bytes buffer) {
-    challenge = buffer.getInt();
-    digest = buffer.getBytes();
   }
 
   @Override

@@ -32,7 +32,7 @@ import lombok.experimental.FieldDefaults;
  *
  * @author alabazin
  */
-@FieldDefaults(level = PRIVATE, makeFinal = true)
+@FieldDefaults(level = PRIVATE)
 public final class HandshakeServerInitializer extends AbstractHandshakeChannelInitializer {
 
   private static final ChannelInboundHandler DECODER;
@@ -41,7 +41,7 @@ public final class HandshakeServerInitializer extends AbstractHandshakeChannelIn
     DECODER = new HandshakeDecoder(false);
   }
 
-  NodeInternalApi internal;
+  final NodeInternalApi internal;
 
   CompletableFuture<Connection> future;
 
@@ -49,17 +49,17 @@ public final class HandshakeServerInitializer extends AbstractHandshakeChannelIn
   public HandshakeServerInitializer (@NonNull NodeInternalApi internal) {
     super(DECODER);
     this.internal = internal;
-    this.future = new CompletableFuture<>();
   }
 
   @Override
-  protected void initChannel(SocketChannel socketChannel) throws Exception {
+  protected void initChannel (SocketChannel socketChannel) throws Exception {
+    this.future = new CompletableFuture<>();
     super.initChannel(socketChannel);
     internal.connections().addConnection(future);
   }
 
   @Override
-  protected AbstractHandshakeHandler createHandler() {
+  protected AbstractHandshakeHandler createHandler () {
     return new HandshakeHandlerServer(internal, future);
   }
 }

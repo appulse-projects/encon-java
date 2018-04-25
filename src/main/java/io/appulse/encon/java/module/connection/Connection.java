@@ -54,7 +54,7 @@ public final class Connection implements Closeable {
   @Override
   public void close () {
     log.debug("Closing connection to {}", remote);
-    handler.close();
+//    handler.close();
     log.debug("Connection to {} was closed", remote);
   }
 }

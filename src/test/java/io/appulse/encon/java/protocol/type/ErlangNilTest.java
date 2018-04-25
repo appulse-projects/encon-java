@@ -16,20 +16,17 @@
 
 package io.appulse.encon.java.protocol.type;
 
+import static io.appulse.encon.java.protocol.TermType.NIL;
+import static io.netty.buffer.Unpooled.wrappedBuffer;
 import static org.assertj.core.api.Assertions.assertThat;
 
-import java.util.ArrayList;
-import java.util.LinkedHashMap;
-import java.util.List;
-
 import io.appulse.encon.java.protocol.term.ErlangTerm;
+import io.appulse.utils.Bytes;
 import io.appulse.utils.test.TestMethodNamePrinter;
 
-import erlang.OtpErlangMap;
-import erlang.OtpErlangObject;
-import erlang.OtpErlangString;
 import erlang.OtpOutputStream;
 import lombok.SneakyThrows;
+import lombok.val;
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.rules.TestRule;
@@ -39,44 +36,43 @@ import org.junit.rules.TestRule;
  * @author Artem Labazin
  * @since 1.0.0
  */
-public class ErlangMapTest {
+public class ErlangNilTest {
 
   @Rule
   public TestRule watcher = new TestMethodNamePrinter();
 
   @Test
-  public void encode () {
-    LinkedHashMap<String, String> value = new LinkedHashMap<>(3);
-    value.put("one", "1");
-    value.put("two", "2");
-    value.put("three", "3");
+  public void newInstance () {
+    val bytes = Bytes.allocate()
+        .put1B(NIL.getCode())
+        .array();
 
-    LinkedHashMap<ErlangTerm, ErlangTerm> map = new LinkedHashMap<>(3);
-    value.forEach((k, v) -> {
-      map.put(new ErlangString(k), new ErlangString(v));
-    });
-
-    assertThat(new ErlangMap(map).toBytes())
-        .isEqualTo(bytes(value));
+    ErlangNil nil = ErlangTerm.newInstance(wrappedBuffer(bytes));
+    assertThat(nil).isNotNull();
+    assertThat(nil.getType())
+        .isEqualTo(NIL);
   }
 
+  @Test
+  public void toBytes () {
+    val expected = Bytes.allocate()
+        .put1B(NIL.getCode())
+        .array();
+
+    assertThat(new ErlangNil().toBytes())
+        .isEqualTo(expected);
+  }
+
+  @Test
+  public void encode () {
+    assertThat(new ErlangNil().toBytes())
+        .isEqualTo(bytes());
+  }
 
   @SneakyThrows
-  private byte[] bytes (LinkedHashMap<String, String> value) {
-    List<OtpErlangObject> keys = new ArrayList<>();
-    List<OtpErlangObject> values = new ArrayList<>();
-
-    value.entrySet().forEach(it -> {
-      keys.add(new OtpErlangString(it.getKey()));
-      values.add(new OtpErlangString(it.getValue()));
-    });
-
-    OtpErlangMap map = new OtpErlangMap(
-        keys.toArray(new OtpErlangObject[keys.size()]),
-        values.toArray(new OtpErlangObject[values.size()])
-    );
+  private byte[] bytes () {
     try (OtpOutputStream output = new OtpOutputStream()) {
-      map.encode(output);
+      output.write_nil();
       output.trimToSize();
       return output.toByteArray();
     }

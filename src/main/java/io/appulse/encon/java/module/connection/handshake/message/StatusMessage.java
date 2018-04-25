@@ -21,9 +21,9 @@ import static java.nio.charset.StandardCharsets.ISO_8859_1;
 import static java.util.Locale.ENGLISH;
 import static lombok.AccessLevel.PRIVATE;
 
-import io.appulse.utils.Bytes;
-import io.netty.buffer.ByteBuf;
 import java.util.stream.Stream;
+
+import io.netty.buffer.ByteBuf;
 import lombok.Builder;
 import lombok.EqualsAndHashCode;
 import lombok.Getter;
@@ -56,20 +56,9 @@ public class StatusMessage extends Message {
   }
 
   @Override
-  void write (@NonNull Bytes buffer) {
-    buffer.put(status.getBytes());
-  }
-
-  @Override
   void write (ByteBuf buffer) {
-    buffer.writeCharSequence(status.name(), ISO_8859_1);
-//    buffer.writeBytes(status.getBytes());
-  }
-
-  @Override
-  void read (@NonNull Bytes buffer) {
-    val string = buffer.getString(ISO_8859_1);
-    status = Status.of(string);
+    val statusName = status.name().toLowerCase(ENGLISH);
+    buffer.writeCharSequence(statusName, ISO_8859_1);
   }
 
   @Override
@@ -113,10 +102,6 @@ public class StatusMessage extends Message {
           .filter(it -> it.name().equalsIgnoreCase(string))
           .findAny()
           .orElse(UNDEFINED);
-    }
-
-    public byte[] getBytes () {
-      return name().toLowerCase(ENGLISH).getBytes(ISO_8859_1);
     }
   }
 }

@@ -17,6 +17,7 @@
 package io.appulse.encon.java.protocol.type;
 
 import static io.appulse.encon.java.protocol.TermType.STRING;
+import static io.netty.buffer.Unpooled.wrappedBuffer;
 import static java.nio.charset.StandardCharsets.ISO_8859_1;
 import static org.assertj.core.api.Assertions.assertThat;
 
@@ -71,7 +72,7 @@ public class ErlangStringTest {
         .array();
 
     try (val input = new OtpInputStream(bytes)) {
-      ErlangString string = ErlangTerm.newInstance(bytes);
+      ErlangString string = ErlangTerm.newInstance(wrappedBuffer(bytes));
       assertThat(string.asText())
           .isEqualTo(input.read_string());
     }

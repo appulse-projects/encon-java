@@ -19,12 +19,13 @@ import static java.lang.Integer.MAX_VALUE;
 
 import io.appulse.encon.java.RemoteNode;
 import io.appulse.encon.java.module.NodeInternalApi;
-
 import io.netty.channel.ChannelInboundHandler;
 import io.netty.channel.ChannelOutboundHandler;
 import io.netty.channel.ChannelPipeline;
 import io.netty.handler.codec.LengthFieldBasedFrameDecoder;
 import io.netty.handler.codec.LengthFieldPrepender;
+import io.netty.handler.logging.LogLevel;
+import io.netty.handler.logging.LoggingHandler;
 import lombok.NonNull;
 import lombok.val;
 
@@ -41,7 +42,6 @@ public class RegularPipeline {
 //  private static ChannelOutboundHandler COMPRESSION_ENCODER;
 //
 //  private static final ChannelInboundHandler COMPRESSION_DECODER;
-
   private static final ChannelOutboundHandler MESSAGE_ENCODER;
 
   private static final ChannelInboundHandler MESSAGE_DECODER;
@@ -61,6 +61,7 @@ public class RegularPipeline {
     val handler = new ClientRegularHandler(internal, remoteNode);
 
     pipeline
+        .addLast(new LoggingHandler(LogLevel.DEBUG))
         .addLast(LENGTH_FIELD_PREPENDER)
         .addLast(new LengthFieldBasedFrameDecoder(MAX_VALUE, 0, 4))
         .addLast(TICK_TOCK_HANDLER);

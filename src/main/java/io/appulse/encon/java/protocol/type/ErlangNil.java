@@ -20,7 +20,7 @@ import static io.appulse.encon.java.protocol.TermType.NIL;
 
 import io.appulse.encon.java.protocol.TermType;
 import io.appulse.encon.java.protocol.term.ErlangTerm;
-import io.appulse.utils.Bytes;
+
 import io.netty.buffer.ByteBuf;
 import lombok.ToString;
 
@@ -43,17 +43,7 @@ public class ErlangNil extends ErlangTerm {
   }
 
   @Override
-  protected void read (Bytes buffer) {
-    // no body
-  }
-
-  @Override
   protected void read (ByteBuf buffer) {
-    // no body
-  }
-
-  @Override
-  protected void write (Bytes buffer) {
     // no body
   }
 

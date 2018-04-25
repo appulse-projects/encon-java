@@ -25,10 +25,9 @@ import static lombok.AccessLevel.PRIVATE;
 
 import io.appulse.encon.java.protocol.TermType;
 import io.appulse.encon.java.protocol.term.ErlangTerm;
-import io.appulse.utils.Bytes;
+
 import io.netty.buffer.ByteBuf;
 import lombok.EqualsAndHashCode;
-import lombok.NonNull;
 import lombok.ToString;
 import lombok.experimental.FieldDefaults;
 import lombok.val;
@@ -96,23 +95,6 @@ public class ErlangAtom extends ErlangTerm {
 
   @Override
   @SuppressWarnings("deprecation")
-  protected void read (@NonNull Bytes buffer) {
-    val type = getType();
-
-    val length = type == SMALL_ATOM || type == SMALL_ATOM_UTF8
-                 ? buffer.getByte()
-                 : buffer.getShort();
-
-    val charset = type == SMALL_ATOM_UTF8 || type == ATOM_UTF8
-                  ? UTF_8
-                  : ISO_8859_1;
-
-    val bytes = buffer.getBytes(length);
-    this.value = trim(new String(bytes, charset));
-  }
-
-  @Override
-  @SuppressWarnings("deprecation")
   protected void read (ByteBuf buffer) {
     val type = getType();
 
@@ -125,22 +107,6 @@ public class ErlangAtom extends ErlangTerm {
                   : ISO_8859_1;
 
     this.value = trim(buffer.readCharSequence(length, charset).toString());
-  }
-
-  @Override
-  protected void write (@NonNull Bytes buffer) {
-    val bytes = value.getBytes(UTF_8);
-    switch (getType()) {
-    case SMALL_ATOM_UTF8:
-      buffer.put1B(bytes.length);
-      break;
-    case ATOM_UTF8:
-      buffer.put2B(bytes.length);
-      break;
-    default:
-      throw new IllegalArgumentException();
-    }
-    buffer.put(bytes);
   }
 
   @Override

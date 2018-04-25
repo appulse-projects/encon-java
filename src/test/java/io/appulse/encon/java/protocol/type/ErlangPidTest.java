@@ -18,6 +18,7 @@ package io.appulse.encon.java.protocol.type;
 
 import static io.appulse.encon.java.protocol.TermType.NEW_PID;
 import static io.appulse.encon.java.protocol.TermType.PID;
+import static io.netty.buffer.Unpooled.wrappedBuffer;
 import static org.assertj.core.api.Assertions.assertThat;
 
 import io.appulse.encon.java.NodeDescriptor;
@@ -60,7 +61,7 @@ public class ErlangPidTest {
         .put1B(creation & 0x3)
         .array();
 
-    ErlangPid pid = ErlangTerm.newInstance(bytes);
+    ErlangPid pid = ErlangTerm.newInstance(wrappedBuffer(bytes));
     assertThat(pid).isNotNull();
 
     SoftAssertions.assertSoftly(softly -> {
@@ -139,7 +140,7 @@ public class ErlangPidTest {
         .array();
 
     try (val input = new OtpInputStream(bytes1)) {
-      ErlangPid pid = ErlangTerm.newInstance(bytes1);
+      ErlangPid pid = ErlangTerm.newInstance(wrappedBuffer(bytes1));
       OtpErlangPid otpPid = input.read_pid();
 
       assertThat(pid.getDescriptor().getFullName())
@@ -164,7 +165,7 @@ public class ErlangPidTest {
         .array();
 
     try (val input = new OtpInputStream(bytes2)) {
-      ErlangPid pid = ErlangTerm.newInstance(bytes2);
+      ErlangPid pid = ErlangTerm.newInstance(wrappedBuffer(bytes2));
       OtpErlangPid otpPid = input.read_pid();
 
       assertThat(pid.getDescriptor().getFullName())

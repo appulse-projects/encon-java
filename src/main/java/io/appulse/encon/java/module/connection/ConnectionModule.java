@@ -19,6 +19,7 @@ package io.appulse.encon.java.module.connection;
 import static io.netty.channel.ChannelOption.CONNECT_TIMEOUT_MILLIS;
 import static io.netty.channel.ChannelOption.SO_KEEPALIVE;
 import static java.util.concurrent.TimeUnit.SECONDS;
+import static java.util.stream.Collectors.joining;
 import static lombok.AccessLevel.PRIVATE;
 
 import java.io.Closeable;
@@ -124,8 +125,25 @@ public final class ConnectionModule implements ConnectionModuleApi, Closeable {
     }
   }
 
-  public void remove (@NonNull RemoteNode remote) {
-    cache.remove(remote);
+  @SneakyThrows
+  public void remove (@NonNull RemoteNode remoteNode) {
+    val future = cache.remove(remoteNode);
+    log.debug("Clear connections cache for {} (existed: {})",
+              remoteNode, future != null);
+
+    if (log.isDebugEnabled() && future == null) {
+      val keys = cache.keySet()
+          .stream()
+          .map(RemoteNode::toString)
+          .map("  - "::concat)
+          .collect(joining("\n"));
+
+      log.debug("Cache keys:\n{}", keys);
+    }
+
+    if (future != null && future.isDone()) {
+      future.get().close();
+    }
   }
 
   private CompletableFuture<Connection> createConnection (@NonNull RemoteNode remote) {
