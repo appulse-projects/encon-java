@@ -19,10 +19,10 @@ package io.appulse.encon.java;
 import io.appulse.epmd.java.core.model.NodeType;
 import io.appulse.epmd.java.core.model.Protocol;
 import io.appulse.epmd.java.core.model.Version;
-
 import lombok.Builder;
 import lombok.EqualsAndHashCode;
 import lombok.NonNull;
+import lombok.ToString;
 import lombok.Value;
 
 /**
@@ -32,10 +32,14 @@ import lombok.Value;
  */
 @Value
 @Builder
+@ToString(of = {
+  "descriptor",
+  "port"
+})
 @EqualsAndHashCode(of = {
-    "descriptor",
-    "protocol",
-    "port"
+  "descriptor",
+  "protocol",
+  "port"
 })
 public class RemoteNode {
 

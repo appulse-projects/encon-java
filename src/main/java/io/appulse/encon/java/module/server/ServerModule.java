@@ -22,6 +22,7 @@ import static io.netty.channel.ChannelOption.SO_KEEPALIVE;
 import static io.netty.channel.ChannelOption.SO_REUSEADDR;
 import static io.netty.channel.ChannelOption.TCP_NODELAY;
 import static io.netty.channel.ChannelOption.WRITE_BUFFER_WATER_MARK;
+import static io.netty.handler.logging.LogLevel.DEBUG;
 import static lombok.AccessLevel.PRIVATE;
 
 import java.io.Closeable;
@@ -39,7 +40,6 @@ import io.netty.channel.epoll.EpollEventLoopGroup;
 import io.netty.channel.epoll.EpollServerSocketChannel;
 import io.netty.channel.nio.NioEventLoopGroup;
 import io.netty.channel.socket.nio.NioServerSocketChannel;
-import io.netty.handler.logging.LogLevel;
 import io.netty.handler.logging.LoggingHandler;
 import io.netty.util.concurrent.DefaultThreadFactory;
 import lombok.NonNull;
@@ -121,7 +121,7 @@ public final class ServerModule implements ServerModuleApi, Closeable {
     log.debug("Starting server on port {}", port);
     val bootstrap = new ServerBootstrap()
         .group(bossGroup, workerGroup)
-        .handler(new LoggingHandler(LogLevel.DEBUG))
+        .handler(new LoggingHandler(DEBUG))
         .childHandler(HandshakeServerInitializer.builder()
             .internal(internal)
             .build())

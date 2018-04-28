@@ -15,6 +15,8 @@
  */
 package io.appulse.encon.java.module.connection.handshake;
 
+import static lombok.AccessLevel.PRIVATE;
+
 import java.util.concurrent.CompletableFuture;
 
 import io.appulse.encon.java.RemoteNode;
@@ -22,13 +24,17 @@ import io.appulse.encon.java.module.NodeInternalApi;
 import io.appulse.encon.java.module.connection.Connection;
 
 import io.netty.channel.ChannelInboundHandler;
+import io.netty.channel.socket.SocketChannel;
 import lombok.Builder;
 import lombok.NonNull;
+import lombok.experimental.FieldDefaults;
+import lombok.val;
 
 /**
  *
  * @author alabazin
  */
+@FieldDefaults(level = PRIVATE, makeFinal = true)
 public final class HandshakeClientInitializer extends AbstractHandshakeChannelInitializer {
 
   private static final ChannelInboundHandler DECODER;
@@ -55,7 +61,8 @@ public final class HandshakeClientInitializer extends AbstractHandshakeChannelIn
   }
 
   @Override
-  protected AbstractHandshakeHandler createHandler() {
-    return new HandshakeHandlerClient(internal, future, remote);
+  protected void initChannel(SocketChannel socketChannel) throws Exception {
+    val handler = new HandshakeHandlerClient(internal, future, remote);
+    super.initChannel(socketChannel, handler);
   }
 }

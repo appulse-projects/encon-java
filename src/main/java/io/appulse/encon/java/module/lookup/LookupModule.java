@@ -20,17 +20,15 @@ import static java.util.Optional.ofNullable;
 import static java.util.stream.Collectors.joining;
 import static lombok.AccessLevel.PRIVATE;
 
-import java.util.Map;
-import java.util.Optional;
-import java.util.concurrent.ConcurrentHashMap;
-import java.util.function.Function;
-
 import io.appulse.encon.java.NodeDescriptor;
 import io.appulse.encon.java.RemoteNode;
 import io.appulse.encon.java.module.NodeInternalApi;
 import io.appulse.encon.java.protocol.type.ErlangPid;
 import io.appulse.epmd.java.core.model.response.NodeInfo;
-
+import java.util.Map;
+import java.util.Optional;
+import java.util.concurrent.ConcurrentHashMap;
+import java.util.function.Function;
 import lombok.NonNull;
 import lombok.experimental.FieldDefaults;
 import lombok.extern.slf4j.Slf4j;
@@ -86,7 +84,7 @@ public final class LookupModule implements LookupModuleApi {
 
   @Override
   public Optional<RemoteNode> lookup (@NonNull NodeDescriptor descriptor) {
-    log.debug("Looking up: {}", descriptor);
+    log.debug("Look up\n  {}\n", descriptor);
     return ofNullable(cache.computeIfAbsent(descriptor, compute));
   }
 

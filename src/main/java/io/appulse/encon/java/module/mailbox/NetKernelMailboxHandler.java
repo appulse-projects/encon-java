@@ -57,6 +57,6 @@ public class NetKernelMailboxHandler implements MailboxHandler {
         ))
         .send(tuple.get(0).get().asPid());
 
-    log.debug("Ping response was sent to {}", tuple);
+    log.debug("Ping response was sent");
   }
 }

@@ -19,9 +19,6 @@ package io.appulse.encon.java.module.connection.regular;
 import static java.util.Optional.empty;
 import static lombok.AccessLevel.PRIVATE;
 
-import java.io.Closeable;
-import java.util.Optional;
-
 import io.appulse.encon.java.RemoteNode;
 import io.appulse.encon.java.module.NodeInternalApi;
 import io.appulse.encon.java.module.connection.control.ControlMessage;
@@ -32,10 +29,11 @@ import io.appulse.encon.java.module.connection.control.Send;
 import io.appulse.encon.java.module.connection.control.SendToRegisteredProcess;
 import io.appulse.encon.java.module.connection.control.Unlink;
 import io.appulse.encon.java.module.mailbox.Mailbox;
-
 import io.netty.channel.Channel;
 import io.netty.channel.ChannelHandlerContext;
 import io.netty.channel.ChannelInboundHandlerAdapter;
+import java.io.Closeable;
+import java.util.Optional;
 import lombok.NonNull;
 import lombok.RequiredArgsConstructor;
 import lombok.experimental.FieldDefaults;
@@ -75,30 +73,35 @@ public final class ClientRegularHandler extends ChannelInboundHandlerAdapter imp
 
   @Override
   public void handlerAdded (ChannelHandlerContext context) throws Exception {
-    log.debug("Handler added");
+    super.handlerAdded(context);
     channel = context.channel();
-    log.debug("Channel is: {}", channel);
+    log.debug("Regular handler for channel {} was added with remote node {}",
+              channel.remoteAddress(), remote);
   }
 
   @Override
   public void channelInactive (ChannelHandlerContext context) throws Exception {
-    log.debug("Channel {} is inactive", context);
+    super.channelInactive(context);
+    log.debug("Regular handler for channel {} became inactive. Remote is {}",
+              channel.remoteAddress(), remote);
     close();
   }
 
-  public void send (Message container) {
-    log.debug("Sending {}", container);
+  public void send (Message message) {
+    log.debug("Sending message\nto {}\n  {}\n",
+              remote, message);
     if (!channel.isWritable()) {
-      log.error("Channel is not writable - {}", channel);
+      log.error("Channel for {} is not writable. Remote node is {}",
+                channel.remoteAddress(), remote);
       throw new RuntimeException("Channel is not writable");
     }
-    channel.writeAndFlush(container);
+    channel.writeAndFlush(message);
   }
 
   @Override
   public void channelRead (ChannelHandlerContext context, Object obj) throws Exception {
     val message = (Message) obj;
-    log.debug("Received message: {}", message);
+    log.debug("Received message\nfrom {}\n  {}\n", remote, message);
     ControlMessage header = message.getHeader();
 
     val optional = findMailbox(header);
@@ -106,16 +109,20 @@ public final class ClientRegularHandler extends ChannelInboundHandlerAdapter imp
       optional.get()
           .deliver(message);
     } else {
-      log.warn("There is no mailbox for message: {}", message);
+      log.warn("There is no mailbox for message\n  {}\n", message);
     }
   }
 
   @Override
   public void close () {
-    log.debug("Closing client handler");
-    channel.close();
+    log.debug("Closing regular handler for channel {} and remote node {}",
+              channel.remoteAddress(), remote);
+
+    if (channel.isOpen()) {
+      channel.close();
+    }
     internal.clearCachesFor(remote);
-    log.debug("Client handler was closed");
+    log.debug("Client handler for {} was closed", channel.remoteAddress());
   }
 
   private Optional<Mailbox> findMailbox (@NonNull ControlMessage header) {

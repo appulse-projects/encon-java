@@ -31,7 +31,7 @@ import io.appulse.encon.java.protocol.type.ErlangReference;
  * @author Artem Labazin
  * @since 1.0.0
  */
-public interface SpecificTerm extends ValueTerm {
+public interface NodeContainerTerm extends ValueTerm {
 
   @SuppressWarnings("deprecation")
   default boolean isSpecificTerm () {

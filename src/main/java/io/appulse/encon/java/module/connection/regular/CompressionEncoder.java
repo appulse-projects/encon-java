@@ -48,10 +48,9 @@ public class CompressionEncoder extends ChannelOutboundHandlerAdapter {
 
   @Override
   public void exceptionCaught (ChannelHandlerContext context, Throwable cause) throws Exception {
-    val message = String.format("Error during channel connection with %s",
-                                context.channel().remoteAddress().toString());
+    log.error("Error during channel connection with {}",
+              context.channel().remoteAddress(), cause);
 
-    log.error(message, cause);
     context.fireExceptionCaught(cause);
     context.close();
   }
@@ -61,7 +60,7 @@ public class CompressionEncoder extends ChannelOutboundHandlerAdapter {
     log.debug("Compressing");
     byte[] bytes = (byte[]) msg;
     val compressed = compress(bytes);
-    log.debug("Sending message after compression:\n{}", bytes);
+    log.debug("Sending message after compression:\n  {}\n", bytes);
     context.write(compressed, promise);
   }
 

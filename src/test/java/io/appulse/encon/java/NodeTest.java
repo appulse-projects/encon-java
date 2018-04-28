@@ -23,6 +23,7 @@ import static io.appulse.encon.java.protocol.Erlang.tuple;
 import static io.appulse.epmd.java.core.model.NodeType.R6_ERLANG;
 import static io.appulse.epmd.java.core.model.Protocol.TCP;
 import static io.appulse.epmd.java.core.model.Version.R6;
+import static java.lang.Boolean.FALSE;
 import static java.util.concurrent.TimeUnit.MILLISECONDS;
 import static java.util.concurrent.TimeUnit.SECONDS;
 import static org.assertj.core.api.Assertions.assertThat;
@@ -215,6 +216,77 @@ public class NodeTest {
     }
   }
 
+//  @Test
+  public void sendWithRedirect () throws Exception {
+    val config = NodeConfig.builder()
+        .cookie("secret")
+        .build();
+
+    val name1 = createShortName();
+    val name2 = createShortName();
+
+    node = Nodes.singleNode(name1, config);
+
+    try (Node node2 = Nodes.singleNode(name2, config)) {
+      Mailbox mailbox1 = node.mailbox().build();
+      Mailbox mailbox2 = node2.mailbox().name("popka").build();
+
+      CompletableFuture<ErlangTerm> future = mailbox2.receiveAsync()
+          .thenApplyAsync(message -> message.getBody().get().asTuple().get(1).get() );
+
+      val reference = node.generateReference();
+      mailbox1.request()
+          .body(tuple(
+              mailbox1.getPid(),
+              mailbox2.getPid(),
+              tuple(
+                  string("hello, world"),
+                  atom("popa"),
+                  atom(false),
+                  number(42),
+                  reference
+              )
+          ))
+          .send(ELIXIR_ECHO_SERVER, "echo_server");
+
+      SECONDS.sleep(10);
+
+      assertThat(future)
+          .isCompleted()
+          .isCompletedWithValueMatching(ErlangTerm::isTuple, "It is not a tuple")
+          .isCompletedWithValueMatching(it -> it.get(0)
+              .filter(ErlangTerm::isTextual)
+              .map(ErlangTerm::asText)
+              .map("hello, world"::equals)
+              .orElse(false)
+          , "Tuple(0)")
+          .isCompletedWithValueMatching(it -> it.get(1)
+              .filter(ErlangTerm::isAtom)
+              .map(ErlangTerm::asText)
+              .map("popa"::equals)
+              .orElse(false)
+          , "Tuple(1)")
+          .isCompletedWithValueMatching(it -> it.get(2)
+              .filter(ErlangTerm::isBoolean)
+              .map(ErlangTerm::asBoolean)
+              .map(FALSE::equals)
+              .orElse(false)
+          , "Tuple(2)")
+          .isCompletedWithValueMatching(it -> it.get(3)
+              .filter(ErlangTerm::isInt)
+              .map(ErlangTerm::asInt)
+              .map(value -> value == 42)
+              .orElse(false)
+          , "Tuple(3)")
+          .isCompletedWithValueMatching(it -> it.get(4)
+              .filter(ErlangTerm::isReference)
+              .map(ErlangTerm::asReference)
+              .map(reference::equals)
+              .orElse(false)
+          , "Tuple(4)");
+    }
+  }
+
   @Test
   public void send () throws Exception {
     val name = createShortName();
@@ -231,6 +303,7 @@ public class NodeTest {
         })
         .build();
 
+    val reference = node.generateReference();
     mailbox.request()
         .body(tuple(
             mailbox.getPid(),
@@ -238,62 +311,47 @@ public class NodeTest {
                 string("hello, world"),
                 atom("popa"),
                 atom(false),
-                number(42)
+                number(42),
+                reference
             )
         ))
         .send(ELIXIR_ECHO_SERVER, "echo_server");
 
-    SECONDS.sleep(3);
+    SECONDS.sleep(2);
 
     assertThat(future)
         .isCompleted()
-        .isCompletedWithValueMatching(it -> it.isTuple(), "It is not a tuple")
-        .isCompletedWithValueMatching(it -> {
-          val optional = it.get(0);
-          if (!optional.isPresent()) {
-            return false;
-          }
-          if (!optional.get().isTextual()) {
-            return false;
-          }
-          return optional.get()
-              .asText()
-              .equals("hello, world");
-        }, "Tuple(0)")
-        .isCompletedWithValueMatching(it -> {
-          val optional = it.get(1);
-          if (!optional.isPresent()) {
-            return false;
-          }
-          if (!optional.get().isAtom()) {
-            return false;
-          }
-          return optional.get()
-              .asText()
-              .equals("popa");
-        }, "Tuple(1)")
-        .isCompletedWithValueMatching(it -> {
-          val optional = it.get(2);
-          if (!optional.isPresent()) {
-            return false;
-          }
-          if (!optional.get().isBoolean()) {
-            return false;
-          }
-          return optional.get()
-              .asBoolean() == false;
-        }, "Tuple(2)")
-        .isCompletedWithValueMatching(it -> {
-          val optional = it.get(3);
-          if (!optional.isPresent()) {
-            return false;
-          }
-          if (!optional.get().isInt()) {
-            return false;
-          }
-          return optional.get()
-              .asInt() == 42;
-        }, "Tuple(3)");
+        .isCompletedWithValueMatching(ErlangTerm::isTuple, "It is not a tuple")
+        .isCompletedWithValueMatching(it -> it.get(0)
+            .filter(ErlangTerm::isTextual)
+            .map(ErlangTerm::asText)
+            .map("hello, world"::equals)
+            .orElse(false)
+        , "Tuple(0)")
+        .isCompletedWithValueMatching(it -> it.get(1)
+            .filter(ErlangTerm::isAtom)
+            .map(ErlangTerm::asText)
+            .map("popa"::equals)
+            .orElse(false)
+        , "Tuple(1)")
+        .isCompletedWithValueMatching(it -> it.get(2)
+            .filter(ErlangTerm::isBoolean)
+            .map(ErlangTerm::asBoolean)
+            .map(FALSE::equals)
+            .orElse(false)
+        , "Tuple(2)")
+        .isCompletedWithValueMatching(it -> it.get(3)
+            .filter(ErlangTerm::isInt)
+            .map(ErlangTerm::asInt)
+            .map(value -> value == 42)
+            .orElse(false)
+        , "Tuple(3)")
+        .isCompletedWithValueMatching(it -> it.get(4)
+            .filter(ErlangTerm::isReference)
+            .map(ErlangTerm::asReference)
+            .map(reference::equals)
+            .orElse(false)
+        , "Tuple(4)");
   }
 
   @Test
@@ -349,15 +407,15 @@ public class NodeTest {
 
   private String createShortName () {
     return new StringBuilder()
-        .append("node-")
-        .append(ThreadLocalRandom.current().nextInt())
+        .append("node_")
+        .append(ThreadLocalRandom.current().nextInt(1000))
         .toString();
   }
 
   private String createFullName () {
     return new StringBuilder()
-        .append("node-")
-        .append(ThreadLocalRandom.current().nextInt())
+        .append("node_")
+        .append(ThreadLocalRandom.current().nextInt(1000))
         .append("@localhost")
         .toString();
   }

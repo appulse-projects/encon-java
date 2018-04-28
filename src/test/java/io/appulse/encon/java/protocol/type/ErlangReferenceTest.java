@@ -137,7 +137,7 @@ public class ErlangReferenceTest {
         .build()
         .toBytes()
     )
-    .isEqualTo(bytes(NEW_REFERENCE.getCode(), "popa@localhost", new long[] { 1 }, 4));
+    .isEqualTo(bytes(new OtpErlangRef(NEW_REFERENCE.getCode(), "popa@localhost", new int[] { 1 }, 4)));
 
     assertThat(ErlangReference.builder()
         .node("popa@localhost")
@@ -147,16 +147,24 @@ public class ErlangReferenceTest {
         .build()
         .toBytes()
     )
-    .isEqualTo(bytes(NEWER_REFERENCE.getCode(), "popa@localhost", new long[] { 1 }, 4));
+    .isEqualTo(bytes(new OtpErlangRef(NEWER_REFERENCE.getCode(), "popa@localhost", new int[] { 1 }, 4)));
 
     assertThat(ErlangReference.builder()
         .node("popa@localhost")
-        .id(42)
+        .ids(new long[] { 42 })
         .creation(4)
         .build()
         .toBytes()
     )
-    .isEqualTo(bytes(NEW_REFERENCE.getCode(), "popa@localhost", new long[] { 42 }, 4));
+    .isEqualTo(bytes(new OtpErlangRef(NEW_REFERENCE.getCode(), "popa@localhost", new int[] { 42 }, 4)));
+
+    assertThat(ErlangReference.builder()
+        .node("popa@localhost")
+        .id(3)
+        .creation(3)
+        .build()
+        .toBytes()
+    ).isEqualTo(bytes(new OtpErlangRef("popa@localhost", 3, 3)));
   }
 
   @Test
@@ -241,21 +249,12 @@ public class ErlangReferenceTest {
   }
 
   @SneakyThrows
-  private byte[] bytes (int tag, String node, long[] ids, int creation) {
-    OtpErlangRef reference = new OtpErlangRef(tag, node, convert(ids), creation);
+  private byte[] bytes (OtpErlangRef ref) {
     try (OtpOutputStream output = new OtpOutputStream()) {
-      reference.encode(output);
+      ref.encode(output);
       output.trimToSize();
       return output.toByteArray();
     }
-  }
-
-  private int[] convert (long[] ids) {
-    int[] result = new int[ids.length];
-    for (int index = 0; index < ids.length; index++) {
-        result[index] = (int) ids[index];
-    }
-    return result;
   }
 
   private long[] convert (int[] ids) {

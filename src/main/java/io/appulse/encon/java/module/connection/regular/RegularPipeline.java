@@ -15,16 +15,17 @@
  */
 package io.appulse.encon.java.module.connection.regular;
 
+import static io.netty.handler.logging.LogLevel.DEBUG;
 import static java.lang.Integer.MAX_VALUE;
 
 import io.appulse.encon.java.RemoteNode;
 import io.appulse.encon.java.module.NodeInternalApi;
+import io.netty.channel.ChannelDuplexHandler;
 import io.netty.channel.ChannelInboundHandler;
 import io.netty.channel.ChannelOutboundHandler;
 import io.netty.channel.ChannelPipeline;
 import io.netty.handler.codec.LengthFieldBasedFrameDecoder;
 import io.netty.handler.codec.LengthFieldPrepender;
-import io.netty.handler.logging.LogLevel;
 import io.netty.handler.logging.LoggingHandler;
 import lombok.NonNull;
 import lombok.val;
@@ -35,7 +36,9 @@ import lombok.val;
  */
 public class RegularPipeline {
 
-  private static final ChannelOutboundHandler LENGTH_FIELD_PREPENDER;
+  private static final ChannelDuplexHandler LOGGING_HANDLER;
+
+  private static final LengthFieldPrepender LENGTH_FIELD_PREPENDER;
 
   private static final ChannelInboundHandler TICK_TOCK_HANDLER;
 
@@ -47,6 +50,7 @@ public class RegularPipeline {
   private static final ChannelInboundHandler MESSAGE_DECODER;
 
   static {
+    LOGGING_HANDLER = new LoggingHandler(DEBUG);
     LENGTH_FIELD_PREPENDER = new LengthFieldPrepender(4, false);
     TICK_TOCK_HANDLER = new TickTockHandler();
 //    COMPRESSION_DECODER = new CompressionDecoder();
@@ -61,7 +65,7 @@ public class RegularPipeline {
     val handler = new ClientRegularHandler(internal, remoteNode);
 
     pipeline
-        .addLast(new LoggingHandler(LogLevel.DEBUG))
+        .addLast(LOGGING_HANDLER)
         .addLast(LENGTH_FIELD_PREPENDER)
         .addLast(new LengthFieldBasedFrameDecoder(MAX_VALUE, 0, 4))
         .addLast(TICK_TOCK_HANDLER);
