@@ -41,30 +41,25 @@ public class MessageDecoder extends MessageToMessageDecoder<ByteBuf> {
 
   @Override
   public void exceptionCaught (ChannelHandlerContext context, Throwable cause) throws Exception {
-    val message = String.format("Error during channel connection with %s",
-                                context.channel().remoteAddress().toString());
+    log.error("Error during channel connection with {}",
+              context.channel().remoteAddress(), cause);
 
-    log.error(message, cause);
     context.fireExceptionCaught(cause);
     context.close();
   }
 
   @Override
   protected void decode (ChannelHandlerContext context, ByteBuf msg, List<Object> out) throws Exception {
-    log.debug("Wrapping bytes:\n{}", msg);
+    log.debug("Decoding a new message");
     msg.readInt(); // skip size
-    log.debug("Pass through: {}", msg.readByte() == 112);
+    msg.readByte(); // skip pass through
 
     val header = readTerm(msg);
-    log.debug("Received header:\n{}\n", header);
-
     val controlMessage = ControlMessage.parse(header);
-    log.debug("Received control message:\n{}\n", controlMessage);
 
     Optional<ErlangTerm> optionalBody = empty();
     if (msg.readerIndex() < msg.capacity()) {
       val body = readTerm(msg);
-      log.debug("Received body:\n{}\n", body);
       optionalBody = ofNullable(body);
     }
 
@@ -72,8 +67,7 @@ public class MessageDecoder extends MessageToMessageDecoder<ByteBuf> {
   }
 
   private ErlangTerm readTerm (ByteBuf buffer) {
-    val version = buffer.readUnsignedByte(); // skip version byte;
-    log.debug("Version byte: {}", version);
+    buffer.readUnsignedByte(); // skip version byte;
     return ErlangTerm.newInstance(buffer);
   }
 }

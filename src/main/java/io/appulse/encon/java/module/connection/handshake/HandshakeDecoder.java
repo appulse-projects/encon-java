@@ -21,17 +21,15 @@ import static io.appulse.encon.java.module.connection.handshake.message.MessageT
 import static io.appulse.encon.java.module.connection.handshake.message.MessageType.UNDEFINED;
 import static lombok.AccessLevel.PRIVATE;
 
-import java.util.List;
-import java.util.stream.Stream;
-
 import io.appulse.encon.java.module.connection.handshake.exception.HandshakeException;
 import io.appulse.encon.java.module.connection.handshake.message.Message;
 import io.appulse.encon.java.module.connection.handshake.message.MessageType;
-
 import io.netty.buffer.ByteBuf;
 import io.netty.channel.ChannelHandler.Sharable;
 import io.netty.channel.ChannelHandlerContext;
 import io.netty.handler.codec.MessageToMessageDecoder;
+import java.util.List;
+import java.util.stream.Stream;
 import lombok.RequiredArgsConstructor;
 import lombok.experimental.FieldDefaults;
 import lombok.extern.slf4j.Slf4j;
@@ -52,18 +50,17 @@ class HandshakeDecoder extends MessageToMessageDecoder<ByteBuf> {
 
   @Override
   public void exceptionCaught (ChannelHandlerContext context, Throwable cause) throws Exception {
-    val message = String.format("Error during channel connection with %s",
-                                context.channel().remoteAddress().toString());
+    log.error("Error during channel connection with {}",
+              context.channel().remoteAddress(), cause);
 
-    log.error(message, cause);
     context.fireExceptionCaught(cause);
     context.close();
   }
 
   @Override
   protected void decode (ChannelHandlerContext context, ByteBuf buffer, List<Object> out) throws Exception {
-    val messageSize = buffer.readShort();
-    log.debug("Decoding message size: {}", messageSize);
+    log.debug("Decoding a new message");
+    buffer.readShort(); // skip size
 
     val tag = buffer.getByte(buffer.readerIndex());
     val message = Stream.of(MessageType.values())
@@ -75,6 +72,5 @@ class HandshakeDecoder extends MessageToMessageDecoder<ByteBuf> {
         .orElseThrow(() -> new HandshakeException("Unknown income message with tag " + tag));
 
     out.add(message);
-    log.debug("Decoded message {} from {}", message, context.channel().remoteAddress());
   }
 }

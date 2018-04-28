@@ -19,11 +19,6 @@ package io.appulse.encon.java.module.connection.handshake;
 import static io.appulse.encon.java.module.connection.handshake.message.StatusMessage.Status.OK;
 import static lombok.AccessLevel.PRIVATE;
 
-import java.util.Arrays;
-import java.util.concurrent.CompletableFuture;
-import java.util.concurrent.ThreadLocalRandom;
-
-import io.appulse.encon.java.RemoteNode;
 import io.appulse.encon.java.module.NodeInternalApi;
 import io.appulse.encon.java.module.connection.Connection;
 import io.appulse.encon.java.module.connection.handshake.exception.HandshakeException;
@@ -33,8 +28,11 @@ import io.appulse.encon.java.module.connection.handshake.message.ChallengeReplyM
 import io.appulse.encon.java.module.connection.handshake.message.Message;
 import io.appulse.encon.java.module.connection.handshake.message.NameMessage;
 import io.appulse.encon.java.module.connection.handshake.message.StatusMessage;
-
+import io.netty.channel.ChannelFuture;
 import io.netty.channel.ChannelHandlerContext;
+import java.util.Arrays;
+import java.util.concurrent.CompletableFuture;
+import java.util.concurrent.ThreadLocalRandom;
 import lombok.Builder;
 import lombok.NonNull;
 import lombok.experimental.FieldDefaults;
@@ -64,7 +62,8 @@ class HandshakeHandlerServer extends AbstractHandshakeHandler {
   @Override
   public void channelRead (ChannelHandlerContext context, Object obj) throws Exception {
     val message = (Message) obj;
-    log.debug("Received message: {}", message);
+    log.debug("Received message\nfrom {}\n  {}\n",
+              context.channel().remoteAddress(), message);
 
     switch (message.getType()) {
     case NAME:
@@ -79,28 +78,26 @@ class HandshakeHandlerServer extends AbstractHandshakeHandler {
     }
   }
 
-  @Override
-  public RemoteNode getRemoteNode () {
-    return remoteNode;
-  }
-
   private void handle (NameMessage message, ChannelHandlerContext context) {
     remoteNode = internal.node()
         .lookup(message.getFullNodeName())
         .orElseThrow(HandshakeException::new);
 
-    context.write(StatusMessage.builder()
+    val statusMessage = StatusMessage.builder()
         .status(OK)
-        .build());
+        .build();
+    context.write(statusMessage);
+    log.debug("Sending status message\n  {}\n", statusMessage);
 
     ourChallenge = ThreadLocalRandom.current().nextInt();
-
-    context.writeAndFlush(ChallengeMessage.builder()
+    val challengeMessage = ChallengeMessage.builder()
         .distribution(internal.node().getMeta().getLow())
         .flags(internal.node().getMeta().getFlags())
         .challenge(ourChallenge)
         .fullName(internal.node().getDescriptor().getFullName())
-        .build());
+        .build();
+    context.writeAndFlush(challengeMessage);
+    log.debug("Sending challenge message\n  {}\n", challengeMessage);
   }
 
   private void handle (ChallengeReplyMessage message, ChannelHandlerContext context) {
@@ -114,11 +111,15 @@ class HandshakeHandlerServer extends AbstractHandshakeHandler {
     val remoteChallenge = message.getChallenge();
     val ourDigest = HandshakeUtils.generateDigest(remoteChallenge, internal.node().getCookie());
 
-    context.writeAndFlush(ChallengeAcknowledgeMessage.builder()
+    val acknowledgeMessage = ChallengeAcknowledgeMessage.builder()
         .digest(ourDigest)
-        .build()
-    ).addListener(future -> {
-      successHandshake(context);
-    });
+        .build();
+
+    log.debug("Sending challenge acknowledge message\n  {}\n", acknowledgeMessage);
+    context.writeAndFlush(acknowledgeMessage)
+        .addListener((ChannelFuture channelFuture) -> {
+          val channel = channelFuture.channel();
+          successHandshake(channel);
+        });
   }
 }

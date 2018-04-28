@@ -74,7 +74,7 @@ public final class Node implements PingModuleApi, Closeable {
 
     val descriptor = NodeDescriptor.from(name);
     node.setDescriptor(descriptor);
-    log.debug("Creating new Node '{}' with config:\n{}", descriptor.getFullName(), config);
+    log.debug("Creating new Node '{}' with config:\n  {}\n", descriptor.getFullName(), config);
 
     node.setCookie(config.getCookie());
     node.setPort(config.getServer().getPort());
@@ -135,8 +135,12 @@ public final class Node implements PingModuleApi, Closeable {
 
       @Override
       public void clearCachesFor (@NonNull RemoteNode remoteNode) {
-        node.connectionModule.remove(remoteNode);
-        node.lookupModule.remove(remoteNode);
+        if (node.connectionModule != null) {
+          node.connectionModule.remove(remoteNode);
+        }
+        if (node.lookupModule != null) {
+          node.lookupModule.remove(remoteNode);
+        }
       }
     };
 

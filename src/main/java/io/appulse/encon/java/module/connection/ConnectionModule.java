@@ -18,25 +18,24 @@ package io.appulse.encon.java.module.connection;
 
 import static io.netty.channel.ChannelOption.CONNECT_TIMEOUT_MILLIS;
 import static io.netty.channel.ChannelOption.SO_KEEPALIVE;
+import static java.util.concurrent.CompletableFuture.completedFuture;
 import static java.util.concurrent.TimeUnit.SECONDS;
 import static java.util.stream.Collectors.joining;
 import static lombok.AccessLevel.PRIVATE;
 
-import java.io.Closeable;
-import java.util.Map;
-import java.util.concurrent.CompletableFuture;
-import java.util.concurrent.ConcurrentHashMap;
-import java.util.concurrent.TimeUnit;
-
 import io.appulse.encon.java.RemoteNode;
 import io.appulse.encon.java.module.NodeInternalApi;
 import io.appulse.encon.java.module.connection.handshake.HandshakeClientInitializer;
-
 import io.netty.bootstrap.Bootstrap;
 import io.netty.channel.EventLoopGroup;
 import io.netty.channel.nio.NioEventLoopGroup;
 import io.netty.channel.socket.nio.NioSocketChannel;
 import io.netty.util.concurrent.DefaultThreadFactory;
+import java.io.Closeable;
+import java.util.Map;
+import java.util.concurrent.CompletableFuture;
+import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.TimeUnit;
 import lombok.NonNull;
 import lombok.SneakyThrows;
 import lombok.experimental.FieldDefaults;
@@ -95,8 +94,8 @@ public final class ConnectionModule implements ConnectionModuleApi, Closeable {
 
   public void addConnection (@NonNull CompletableFuture<Connection> future) {
     future.thenAccept(it -> {
-      log.debug("Connection to {} was added", it.getRemote());
-      cache.put(it.getRemote(), future);
+      log.debug("Connection was added for\n  {}", it.getRemote());
+      cache.put(it.getRemote(), completedFuture(it));
     });
   }
 
@@ -128,8 +127,10 @@ public final class ConnectionModule implements ConnectionModuleApi, Closeable {
   @SneakyThrows
   public void remove (@NonNull RemoteNode remoteNode) {
     val future = cache.remove(remoteNode);
-    log.debug("Clear connections cache for {} (existed: {})",
-              remoteNode, future != null);
+    log.debug("Clear connections cache for {} (existed: {}, completed: {})",
+              remoteNode, future != null, future == null
+                                          ? false
+                                          : future.isDone());
 
     if (log.isDebugEnabled() && future == null) {
       val keys = cache.keySet()
@@ -147,6 +148,7 @@ public final class ConnectionModule implements ConnectionModuleApi, Closeable {
   }
 
   private CompletableFuture<Connection> createConnection (@NonNull RemoteNode remote) {
+    log.debug("Creating new client's connection\nto {}", remote);
     CompletableFuture<Connection> future = new CompletableFuture<>();
 
     new Bootstrap()
@@ -162,13 +164,7 @@ public final class ConnectionModule implements ConnectionModuleApi, Closeable {
         )
         .connect(remote.getDescriptor().getAddress(), remote.getPort());
 
-    return future.whenComplete((connection, throwable) -> {
-      if (throwable == null) {
-        val result = CompletableFuture.completedFuture(connection);
-        cache.put(remote, result);
-      } else {
-        remove(remote);
-      }
-    });
+    addConnection(future);
+    return future;
   }
 }

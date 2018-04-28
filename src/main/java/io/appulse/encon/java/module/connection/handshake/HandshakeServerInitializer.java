@@ -17,21 +17,22 @@ package io.appulse.encon.java.module.connection.handshake;
 
 import static lombok.AccessLevel.PRIVATE;
 
-import java.util.concurrent.CompletableFuture;
-
 import io.appulse.encon.java.module.NodeInternalApi;
 import io.appulse.encon.java.module.connection.Connection;
-
 import io.netty.channel.ChannelInboundHandler;
 import io.netty.channel.socket.SocketChannel;
+import java.util.concurrent.CompletableFuture;
 import lombok.Builder;
 import lombok.NonNull;
 import lombok.experimental.FieldDefaults;
+import lombok.extern.slf4j.Slf4j;
+import lombok.val;
 
 /**
  *
  * @author alabazin
  */
+@Slf4j
 @FieldDefaults(level = PRIVATE)
 public final class HandshakeServerInitializer extends AbstractHandshakeChannelInitializer {
 
@@ -43,8 +44,6 @@ public final class HandshakeServerInitializer extends AbstractHandshakeChannelIn
 
   final NodeInternalApi internal;
 
-  CompletableFuture<Connection> future;
-
   @Builder
   public HandshakeServerInitializer (@NonNull NodeInternalApi internal) {
     super(DECODER);
@@ -53,13 +52,12 @@ public final class HandshakeServerInitializer extends AbstractHandshakeChannelIn
 
   @Override
   protected void initChannel (SocketChannel socketChannel) throws Exception {
-    this.future = new CompletableFuture<>();
-    super.initChannel(socketChannel);
-    internal.connections().addConnection(future);
-  }
+    log.debug("Initializing new server socket channel pipeline for {}",
+              socketChannel.remoteAddress());
 
-  @Override
-  protected AbstractHandshakeHandler createHandler () {
-    return new HandshakeHandlerServer(internal, future);
+    CompletableFuture<Connection> future = new CompletableFuture<>();
+    val handler = new HandshakeHandlerServer(internal, future);
+    initChannel(socketChannel, handler);
+    internal.connections().addConnection(future);
   }
 }

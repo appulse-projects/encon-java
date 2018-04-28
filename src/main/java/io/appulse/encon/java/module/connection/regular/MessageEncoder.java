@@ -21,7 +21,6 @@ import io.netty.channel.ChannelHandler.Sharable;
 import io.netty.channel.ChannelHandlerContext;
 import io.netty.handler.codec.MessageToByteEncoder;
 import lombok.extern.slf4j.Slf4j;
-import lombok.val;
 
 /**
  *
@@ -38,17 +37,15 @@ public class MessageEncoder extends MessageToByteEncoder<Message> {
 
   @Override
   public void exceptionCaught (ChannelHandlerContext context, Throwable cause) throws Exception {
-    val message = String.format("Error during channel connection with %s",
-                                context.channel().remoteAddress().toString());
+    log.error("Error during channel connection with {}",
+              context.channel().remoteAddress(), cause);
 
-    log.error(message, cause);
     context.fireExceptionCaught(cause);
     context.close();
   }
 
   @Override
   protected void encode (ChannelHandlerContext context, Message message, ByteBuf out) throws Exception {
-    log.debug("Encoding message {} for {}", message, context.channel().remoteAddress());
     try {
       out.writeByte(0x70);
       out.writeByte(0x83);
@@ -59,7 +56,8 @@ public class MessageEncoder extends MessageToByteEncoder<Message> {
       });
       log.debug("Message was sent");
     } catch (Exception ex) {
-      log.error("Error during encoding message {} for {}", message, context.channel().remoteAddress());
+      log.error("Error during encoding message for {}\n  {}\n",
+                context.channel().remoteAddress(), message, ex);
       throw ex;
     }
   }

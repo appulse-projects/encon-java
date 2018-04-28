@@ -16,6 +16,9 @@
 
 package io.appulse.encon.java.protocol.type;
 
+import static io.appulse.encon.java.protocol.Erlang.number;
+import static io.appulse.encon.java.protocol.Erlang.string;
+import static io.appulse.encon.java.protocol.Erlang.tuple;
 import static io.appulse.encon.java.protocol.TermType.LARGE_TUPLE;
 import static io.appulse.encon.java.protocol.TermType.SMALL_TUPLE;
 import static io.netty.buffer.Unpooled.wrappedBuffer;
@@ -29,6 +32,11 @@ import io.appulse.utils.Bytes;
 import io.appulse.utils.test.TestMethodNamePrinter;
 
 import erlang.OtpErlangAtom;
+import erlang.OtpErlangInt;
+import erlang.OtpErlangObject;
+import erlang.OtpErlangPid;
+import erlang.OtpErlangRef;
+import erlang.OtpErlangString;
 import erlang.OtpErlangTuple;
 import erlang.OtpOutputStream;
 import lombok.SneakyThrows;
@@ -117,6 +125,11 @@ public class ErlangTupleTest {
 
     assertThat(new ErlangTuple(atoms).toBytes())
         .isEqualTo(bytes(values));
+
+    val tuple1 = tupleEncon();
+    val tuple2 = tupleJinterface();
+    assertThat(tuple1.toBytes())
+        .isEqualTo(bytes(tuple2));
   }
 
   @SneakyThrows
@@ -131,5 +144,42 @@ public class ErlangTupleTest {
       output.trimToSize();
       return output.toByteArray();
     }
+  }
+
+  @SneakyThrows
+  private byte[] bytes (OtpErlangTuple tuple) {
+    try (OtpOutputStream output = new OtpOutputStream()) {
+      tuple.encode(output);
+      output.trimToSize();
+      return output.toByteArray();
+    }
+  }
+
+  private ErlangTuple tupleEncon () {
+    ErlangPid pid = ErlangPid.builder()
+        .node("popa@localhost")
+        .id(1)
+        .serial(27)
+        .creation(3)
+        .build();
+
+    ErlangReference ref = ErlangReference.builder()
+        .node("popa@localhost")
+        .id(3)
+        .creation(3)
+        .build();
+
+    return tuple(pid, tuple(number(42), string("Hello world"), ref));
+  }
+
+  private OtpErlangTuple tupleJinterface () {
+    return new OtpErlangTuple(new OtpErlangObject[] {
+      new OtpErlangPid("popa@localhost", 1, 27, 3),
+      new OtpErlangTuple(new OtpErlangObject[] {
+        new OtpErlangInt(42),
+        new OtpErlangString("Hello world"),
+        new OtpErlangRef("popa@localhost", 3, 3)
+      })
+    });
   }
 }

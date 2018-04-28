@@ -55,7 +55,7 @@ public abstract class ErlangTerm implements IntegerTerm,
                                             BooleanTerm,
                                             StringTerm,
                                             ContainerTerm,
-                                            SpecificTerm,
+                                            NodeContainerTerm,
                                             Serializable {
 
   private static final long serialVersionUID = 5430854281567501819L;

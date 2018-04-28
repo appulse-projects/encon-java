@@ -21,14 +21,6 @@ import static io.appulse.encon.java.module.connection.control.ControlMessageTag.
 import static lombok.AccessLevel.PACKAGE;
 import static lombok.AccessLevel.PRIVATE;
 
-import java.io.Closeable;
-import java.util.Set;
-import java.util.concurrent.CompletableFuture;
-import java.util.concurrent.ConcurrentHashMap;
-import java.util.concurrent.ExecutorService;
-import java.util.concurrent.TimeUnit;
-import java.util.concurrent.atomic.AtomicBoolean;
-
 import io.appulse.encon.java.Node;
 import io.appulse.encon.java.NodeDescriptor;
 import io.appulse.encon.java.RemoteNode;
@@ -44,7 +36,13 @@ import io.appulse.encon.java.module.mailbox.exception.ReceivedExitException;
 import io.appulse.encon.java.protocol.Erlang;
 import io.appulse.encon.java.protocol.term.ErlangTerm;
 import io.appulse.encon.java.protocol.type.ErlangPid;
-
+import java.io.Closeable;
+import java.util.Set;
+import java.util.concurrent.CompletableFuture;
+import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.TimeUnit;
+import java.util.concurrent.atomic.AtomicBoolean;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.EqualsAndHashCode;
@@ -146,9 +144,6 @@ public final class Mailbox implements Closeable {
   }
 
   public void send (@NonNull RemoteNode remote, @NonNull String mailbox, @NonNull ErlangTerm body) {
-    log.debug("Sending message\nTo node: {}\nMailbox: {}\nPayload: {}",
-              remote, mailbox, body);
-
     if (isLocal(remote)) {
       send(mailbox, body);
     } else {
@@ -156,7 +151,6 @@ public final class Mailbox implements Closeable {
           .connect(remote)
           .send(Message.sendToRegisteredProcess(pid, mailbox, body));
     }
-    log.debug("Message was sent");
   }
 
   public void link (@NonNull ErlangPid to) {
@@ -209,7 +203,7 @@ public final class Mailbox implements Closeable {
   }
 
   public void deliver (@NonNull Message message) {
-    log.debug("Deliver: {}", message);
+    log.debug("Delivered\n  {}\n", message.getHeader());
     executor.execute(() -> handle(message));
   }
 

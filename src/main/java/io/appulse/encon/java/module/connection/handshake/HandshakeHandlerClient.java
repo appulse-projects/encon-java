@@ -18,10 +18,6 @@ package io.appulse.encon.java.module.connection.handshake;
 
 import static lombok.AccessLevel.PRIVATE;
 
-import java.util.Arrays;
-import java.util.concurrent.CompletableFuture;
-import java.util.concurrent.ThreadLocalRandom;
-
 import io.appulse.encon.java.RemoteNode;
 import io.appulse.encon.java.module.NodeInternalApi;
 import io.appulse.encon.java.module.connection.Connection;
@@ -32,8 +28,10 @@ import io.appulse.encon.java.module.connection.handshake.message.ChallengeReplyM
 import io.appulse.encon.java.module.connection.handshake.message.Message;
 import io.appulse.encon.java.module.connection.handshake.message.NameMessage;
 import io.appulse.encon.java.module.connection.handshake.message.StatusMessage;
-
 import io.netty.channel.ChannelHandlerContext;
+import java.util.Arrays;
+import java.util.concurrent.CompletableFuture;
+import java.util.concurrent.ThreadLocalRandom;
 import lombok.Builder;
 import lombok.NonNull;
 import lombok.experimental.FieldDefaults;
@@ -64,10 +62,9 @@ class HandshakeHandlerClient extends AbstractHandshakeHandler {
 
   @Override
   public void exceptionCaught (ChannelHandlerContext context, Throwable cause) throws Exception {
-    val message = String.format("Error during channel connection with %s",
-                                context.channel().remoteAddress().toString());
+    log.error("Error during channel connection with {}",
+              context.channel().remoteAddress(), cause);
 
-    log.error(message, cause);
     context.fireExceptionCaught(cause);
     context.close();
   }
@@ -75,17 +72,21 @@ class HandshakeHandlerClient extends AbstractHandshakeHandler {
   @Override
   public void channelActive (ChannelHandlerContext context) throws Exception {
     super.channelActive(context);
-    context.writeAndFlush(NameMessage.builder()
+    val nameMessage = NameMessage.builder()
         .fullNodeName(internal.node().getDescriptor().getFullName())
         .distribution(HandshakeUtils.findHighestCommonVerion(internal.node(), remoteNode))
         .flags(internal.node().getMeta().getFlags())
-        .build());
+        .build();
+
+    log.debug("Sending name message\n  {}\n", nameMessage);
+    context.writeAndFlush(nameMessage);
   }
 
   @Override
   public void channelRead (ChannelHandlerContext context, Object obj) throws Exception {
     val message = (Message) obj;
-    log.debug("Received message: {}", message);
+    log.debug("Received message from {}\n  {}\n",
+              context.channel().remoteAddress(), message);
 
     switch (message.getType()) {
     case STATUS:
@@ -101,11 +102,6 @@ class HandshakeHandlerClient extends AbstractHandshakeHandler {
       log.error("Unexpected message type: {}", message.getType());
       throw new IllegalArgumentException("Unexpected message type: " + message.getType());
     }
-  }
-
-  @Override
-  public RemoteNode getRemoteNode () {
-    return remoteNode;
   }
 
   private void handle (StatusMessage message, ChannelHandlerContext context) {
@@ -127,10 +123,14 @@ class HandshakeHandlerClient extends AbstractHandshakeHandler {
     val remoteChallenge = message.getChallenge();
     val digest = HandshakeUtils.generateDigest(remoteChallenge, internal.node().getCookie());
     myChallenge = ThreadLocalRandom.current().nextInt();
-    context.writeAndFlush(ChallengeReplyMessage.builder()
+
+    val replyMessage = ChallengeReplyMessage.builder()
         .challenge(myChallenge)
         .digest(digest)
-        .build());
+        .build();
+
+    log.debug("Sending challenge reply message\n  {}\n", replyMessage);
+    context.writeAndFlush(replyMessage);
   }
 
   private void handle (ChallengeAcknowledgeMessage message, ChannelHandlerContext context) {
@@ -142,8 +142,8 @@ class HandshakeHandlerClient extends AbstractHandshakeHandler {
     }
     log.debug("Sucessfull handshake from {} to {}",
               internal.node().getDescriptor().getFullName(),
-              remoteNode.getDescriptor().getFullName());
+              remoteNode);
 
-    successHandshake(context);
+    successHandshake(context.channel());
   }
 }
