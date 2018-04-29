@@ -17,8 +17,7 @@
 package io.appulse.encon.java.module.connection.regular;
 
 import static io.appulse.encon.java.protocol.Erlang.atom;
-import static java.util.Optional.empty;
-import static java.util.Optional.of;
+import static java.util.Optional.ofNullable;
 
 import java.util.Optional;
 
@@ -55,7 +54,7 @@ public class Message {
                                                  @NonNull ErlangAtom mailbox,
                                                  @NonNull ErlangTerm body
   ) {
-    return new Message(new SendToRegisteredProcess(from, mailbox), of(body));
+    return new Message(new SendToRegisteredProcess(from, mailbox), body);
   }
 
   public static Message send (@NonNull String mailbox, @NonNull ErlangTerm body) {
@@ -63,19 +62,19 @@ public class Message {
   }
 
   public static Message send (@NonNull ErlangAtom mailbox, @NonNull ErlangTerm body) {
-    return new Message(new Send(mailbox), of(body));
+    return new Message(new Send(mailbox), body);
   }
 
   public static Message send (@NonNull ErlangPid pid, @NonNull ErlangTerm body) {
-    return new Message(new Send(pid), of(body));
+    return new Message(new Send(pid), body);
   }
 
   public static Message link (@NonNull ErlangPid from, @NonNull ErlangPid to) {
-    return new Message(new Link(from, to), empty());
+    return new Message(new Link(from, to), null);
   }
 
   public static Message unlink (@NonNull ErlangPid from, @NonNull ErlangPid to) {
-    return new Message(new Unlink(from, to), empty());
+    return new Message(new Unlink(from, to), null);
   }
 
   public static Message exit (@NonNull ErlangPid from, @NonNull ErlangPid to, @NonNull String reason) {
@@ -83,7 +82,7 @@ public class Message {
   }
 
   public static Message exit (@NonNull ErlangPid from, @NonNull ErlangPid to, @NonNull ErlangTerm reason) {
-    return new Message(new Exit(from, to, reason), empty());
+    return new Message(new Exit(from, to, reason), null);
   }
 
   public static Message exit2 (@NonNull ErlangPid from, @NonNull ErlangPid to, @NonNull String reason) {
@@ -91,12 +90,19 @@ public class Message {
   }
 
   public static Message exit2 (@NonNull ErlangPid from, @NonNull ErlangPid to, @NonNull ErlangTerm reason) {
-    return new Message(new Exit2(from, to, reason), empty());
+    return new Message(new Exit2(from, to, reason), null);
   }
 
   @NonNull
   ControlMessage header;
 
-  @NonNull
-  Optional<ErlangTerm> body;
+  ErlangTerm body;
+
+  public Optional<ErlangTerm> getBody () {
+    return ofNullable(body);
+  }
+
+  public ErlangTerm getBodyUnsafe () {
+    return body;
+  }
 }

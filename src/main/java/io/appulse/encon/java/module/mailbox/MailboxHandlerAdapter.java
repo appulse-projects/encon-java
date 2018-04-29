@@ -1,11 +1,11 @@
 /*
- * Copyright 2018 the original author or authors.
+ * Copyright 2018 Appulse.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
  *
- *     http://www.apache.org/licenses/LICENSE-2.0
+ *      http://www.apache.org/licenses/LICENSE-2.0
  *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
@@ -14,36 +14,27 @@
  * limitations under the License.
  */
 
-package io.appulse.encon.java.module.ping;
+package io.appulse.encon.java.module.mailbox;
 
-import static java.lang.Boolean.TRUE;
-import static lombok.AccessLevel.PRIVATE;
-
-import java.util.concurrent.CompletableFuture;
+import static java.util.Optional.ofNullable;
 
 import io.appulse.encon.java.module.connection.control.ControlMessage;
-import io.appulse.encon.java.module.mailbox.Mailbox;
-import io.appulse.encon.java.module.mailbox.MailboxHandler;
 import io.appulse.encon.java.protocol.term.ErlangTerm;
-
+import java.util.Optional;
 import lombok.NonNull;
-import lombok.RequiredArgsConstructor;
-import lombok.experimental.FieldDefaults;
+import lombok.val;
 
 /**
- *
- * @author Artem Labazin
- * @since 1.0.0
+ * @author Artem Labazin <xxlabaza@gmail.com>
+ * @since 29.04.2018
  */
-@RequiredArgsConstructor
-@FieldDefaults(level = PRIVATE, makeFinal = true)
-class PingReceiveHandler implements MailboxHandler {
-
-  CompletableFuture<Boolean> future;
+public abstract class MailboxHandlerAdapter implements MailboxHandler {
 
   @Override
   public void receive (@NonNull Mailbox self, @NonNull ControlMessage header, ErlangTerm body) {
-    future.complete(TRUE);
-    self.getNode().remove(self);
+    val optionalBody = ofNullable(body);
+    receive(self, header, optionalBody);
   }
+
+  public abstract void receive (Mailbox self, ControlMessage header, Optional<ErlangTerm> body);
 }

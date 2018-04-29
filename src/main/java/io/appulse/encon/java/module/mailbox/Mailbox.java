@@ -234,7 +234,7 @@ public final class Mailbox implements Closeable {
       }
       currentFuture = null;
     }
-    handler.receive(this, message.getHeader(), message.getBody());
+    handler.receive(this, message.getHeader(), message.getBodyUnsafe());
   }
 
   private Mailbox getMailbox (@NonNull String remoteName) {
@@ -250,10 +250,11 @@ public final class Mailbox implements Closeable {
   }
 
   private Connection getConnection (@NonNull ErlangPid remotePid) {
-    return internal.node()
-        .lookup(remotePid)
-        .map(it -> internal.connections().connect(it))
-        .orElseThrow(CouldntConnectException::new);
+    val remoteNode = internal.lookups().lookupUnsafe(remotePid);
+    if (remoteNode == null) {
+      throw new CouldntConnectException();
+    }
+    return internal.connections().connect(remoteNode);
   }
 
   private boolean isLocal (@NonNull ErlangPid remotePid) {

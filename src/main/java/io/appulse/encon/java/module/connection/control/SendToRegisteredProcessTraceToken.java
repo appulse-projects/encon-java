@@ -23,11 +23,11 @@ import io.appulse.encon.java.protocol.term.ErlangTerm;
 import io.appulse.encon.java.protocol.type.ErlangAtom;
 import io.appulse.encon.java.protocol.type.ErlangPid;
 import io.appulse.encon.java.protocol.type.ErlangTuple;
-
 import lombok.AllArgsConstructor;
 import lombok.EqualsAndHashCode;
 import lombok.NonNull;
 import lombok.Value;
+import lombok.val;
 
 /**
  *
@@ -50,19 +50,26 @@ public class SendToRegisteredProcessTraceToken extends ControlMessage {
 
   public SendToRegisteredProcessTraceToken (@NonNull ErlangTuple tuple) {
     super();
+    if (tuple.size() != 5) {
+      throw new ControlMessageParsingException();
+    }
 
-    from = tuple.get(1)
-        .filter(ErlangTerm::isPid)
-        .map(ErlangTerm::asPid)
-        .orElseThrow(ControlMessageParsingException::new);
+    val tuple1 = tuple.getUnsafe(1);
+    if (tuple1 == null || !tuple1.isPid()) {
+      throw new ControlMessageParsingException();
+    }
+    from = tuple1.asPid();
 
-    name = tuple.get(3)
-        .filter(ErlangTerm::isAtom)
-        .map(ErlangTerm::asAtom)
-        .orElseThrow(ControlMessageParsingException::new);
+    val tuple3 = tuple.getUnsafe(3);
+    if (tuple3 == null || !tuple3.isAtom()) {
+      throw new ControlMessageParsingException();
+    }
+    name = tuple3.asAtom();
 
-    traceToken = tuple.get(4)
-        .orElseThrow(ControlMessageParsingException::new);
+    traceToken = tuple.getUnsafe(4);
+    if (traceToken == null) {
+      throw new ControlMessageParsingException();
+    }
   }
 
   @Override

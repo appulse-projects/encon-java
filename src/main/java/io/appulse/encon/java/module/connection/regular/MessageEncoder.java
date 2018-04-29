@@ -21,6 +21,7 @@ import io.netty.channel.ChannelHandler.Sharable;
 import io.netty.channel.ChannelHandlerContext;
 import io.netty.handler.codec.MessageToByteEncoder;
 import lombok.extern.slf4j.Slf4j;
+import lombok.val;
 
 /**
  *
@@ -50,10 +51,12 @@ public class MessageEncoder extends MessageToByteEncoder<Message> {
       out.writeByte(0x70);
       out.writeByte(0x83);
       message.getHeader().writeTo(out);
-      message.getBody().ifPresent(it -> {
+
+      val body = message.getBodyUnsafe();
+      if (body != null) {
         out.writeByte(0x83);
-        it.writeTo(out);
-      });
+        body.writeTo(out);
+      }
       log.debug("Message was sent");
     } catch (Exception ex) {
       log.error("Error during encoding message for {}\n  {}\n",

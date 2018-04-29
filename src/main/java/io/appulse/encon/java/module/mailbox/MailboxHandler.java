@@ -16,8 +16,6 @@
 
 package io.appulse.encon.java.module.mailbox;
 
-import java.util.Optional;
-
 import io.appulse.encon.java.module.connection.control.ControlMessage;
 import io.appulse.encon.java.protocol.term.ErlangTerm;
 
@@ -28,5 +26,5 @@ import io.appulse.encon.java.protocol.term.ErlangTerm;
  */
 public interface MailboxHandler {
 
-  void receive (Mailbox self, ControlMessage header, Optional<ErlangTerm> body);
+  void receive (Mailbox self, ControlMessage header, ErlangTerm body);
 }

@@ -19,14 +19,10 @@ package io.appulse.encon.java.module.mailbox;
 import static io.appulse.encon.java.protocol.Erlang.atom;
 import static io.appulse.encon.java.protocol.Erlang.tuple;
 
-import java.util.Optional;
-
 import io.appulse.encon.java.module.connection.control.ControlMessage;
 import io.appulse.encon.java.protocol.term.ErlangTerm;
-
 import lombok.NonNull;
 import lombok.extern.slf4j.Slf4j;
-import lombok.val;
 
 /**
  *
@@ -37,25 +33,31 @@ import lombok.val;
 public class NetKernelMailboxHandler implements MailboxHandler {
 
   @Override
-  public void receive (@NonNull Mailbox self, @NonNull ControlMessage header, Optional<ErlangTerm> body) {
-    val payload = body.orElseThrow(() -> new IllegalArgumentException("Invalid net_kernel call, without body"));
+  public void receive (@NonNull Mailbox self, @NonNull ControlMessage header, ErlangTerm body) {
+    if (body == null) {
+      throw new IllegalArgumentException("Invalid net_kernel call, without body");
+    }
 
-    if (!payload.isTuple()) {
+    if (!body.isTuple()) {
       log.debug("Not a tuple");
       return;
     }
-    if (!payload.get(0).map(ErlangTerm::asText).orElse("").equals("$gen_call")) {
+    if (body.size() < 2) {
+      log.debug("Empty tuple");
+      return;
+    }
+    if (!body.getUnsafe(0).asText().equals("$gen_call")) {
       log.debug("Uh?");
       return;
     }
 
-    ErlangTerm tuple = payload.get(1).get();
+    ErlangTerm tuple = body.getUnsafe(1);
     self.request()
         .body(tuple(
-            tuple.get(1).get().asReference(),
+            tuple.getUnsafe(1).asReference(),
             atom("yes")
         ))
-        .send(tuple.get(0).get().asPid());
+        .send(tuple.getUnsafe(0).asPid());
 
     log.debug("Ping response was sent");
   }

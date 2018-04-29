@@ -24,8 +24,6 @@ import java.io.IOException;
 import java.io.OutputStream;
 import java.util.Random;
 
-import lombok.extern.slf4j.Slf4j;
-
 /**
  * Maintains a connection between a Java process and a remote Erlang, Java or C
  * node. The object maintains connection state and allows data to be sent to and
@@ -59,7 +57,6 @@ import lombok.extern.slf4j.Slf4j;
  * connections.
  * </p>
  */
-@Slf4j
 public abstract class AbstractConnection extends Thread {
     protected static final int headerLen = 2048; // more than enough
 
@@ -844,8 +841,6 @@ public abstract class AbstractConnection extends Thread {
 
             // group flush op in favour of possible ssh-tunneled stream
             OutputStream out = socket.getOutputStream();
-            log.info("Header:\n{}\n\n", header.toByteArray());
-            log.info("Payload:\n{}\n\n", payload.toByteArray());
             header.writeTo(out);
             payload.writeTo(out);
             out.flush();

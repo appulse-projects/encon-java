@@ -16,7 +16,7 @@
 
 package io.appulse.encon.java.module.mailbox;
 
-import java.util.Optional;
+import static java.util.Optional.ofNullable;
 
 import io.appulse.encon.java.module.connection.control.ControlMessage;
 import io.appulse.encon.java.module.connection.control.Exit;
@@ -25,7 +25,7 @@ import io.appulse.encon.java.module.connection.control.Link;
 import io.appulse.encon.java.module.connection.control.Unlink;
 import io.appulse.encon.java.protocol.term.ErlangTerm;
 import io.appulse.encon.java.protocol.type.ErlangPid;
-
+import java.util.Optional;
 import lombok.NonNull;
 import lombok.extern.slf4j.Slf4j;
 import lombok.val;
@@ -39,7 +39,7 @@ import lombok.val;
 public abstract class AbstractMailboxHandler implements MailboxHandler {
 
   @Override
-  public void receive (@NonNull Mailbox self, @NonNull ControlMessage header, @NonNull Optional<ErlangTerm> body) {
+  public void receive (@NonNull Mailbox self, @NonNull ControlMessage header, ErlangTerm body) {
     log.debug("Mailbox {} received:\n  header: {}\n  body:   {}",
               self, header, body);
 
@@ -60,7 +60,7 @@ public abstract class AbstractMailboxHandler implements MailboxHandler {
         handle(self, (ExitTraceToken) header);
         break;
       default:
-        handle(self, header, body);
+        handle(self, header, ofNullable(body));
       }
     } catch (Exception ex) {
       log.error("Exception during processing received message", ex);
@@ -73,7 +73,7 @@ public abstract class AbstractMailboxHandler implements MailboxHandler {
   /**
    * Handles link requests.
    *
-   * @param self reference to this mailbox
+   * @param self   reference to this mailbox
    *
    * @param header received Link control message
    */
@@ -85,7 +85,7 @@ public abstract class AbstractMailboxHandler implements MailboxHandler {
   /**
    * Handles unlink requests.
    *
-   * @param self reference to this mailbox
+   * @param self   reference to this mailbox
    *
    * @param header received Unlink control message
    */
@@ -97,7 +97,7 @@ public abstract class AbstractMailboxHandler implements MailboxHandler {
   /**
    * Handles exit requests.
    *
-   * @param self reference to this mailbox
+   * @param self   reference to this mailbox
    *
    * @param header received Exit control message
    */
@@ -108,7 +108,7 @@ public abstract class AbstractMailboxHandler implements MailboxHandler {
   /**
    * Handles exit trace token requests.
    *
-   * @param self reference to this mailbox
+   * @param self   reference to this mailbox
    *
    * @param header received ExitTraceToken control message
    */

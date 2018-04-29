@@ -17,22 +17,18 @@
 package io.appulse.encon.java.protocol.type;
 
 import static io.appulse.encon.java.protocol.TermType.MAP;
-import static java.util.Optional.ofNullable;
 import static java.util.stream.Collectors.toMap;
 import static lombok.AccessLevel.PRIVATE;
 
+import io.appulse.encon.java.protocol.TermType;
+import io.appulse.encon.java.protocol.term.ErlangTerm;
+import io.netty.buffer.ByteBuf;
 import java.util.Iterator;
 import java.util.LinkedHashMap;
 import java.util.Map;
-import java.util.Optional;
 import java.util.function.BinaryOperator;
 import java.util.function.IntFunction;
 import java.util.stream.IntStream;
-
-import io.appulse.encon.java.protocol.TermType;
-import io.appulse.encon.java.protocol.term.ErlangTerm;
-
-import io.netty.buffer.ByteBuf;
 import lombok.EqualsAndHashCode;
 import lombok.NonNull;
 import lombok.ToString;
@@ -84,18 +80,14 @@ public class ErlangMap extends ErlangTerm {
   }
 
   @Override
-  public Optional<ErlangTerm> get (ErlangTerm term) {
-    return ofNullable(map.get(term));
+  public ErlangTerm getUnsafe (ErlangTerm term) {
+    return map.get(term);
   }
 
   @Override
-  public Optional<ErlangTerm> get (int index) {
-    return get(new ErlangInteger(index));
-  }
-
-  @Override
-  public Optional<ErlangTerm> getByAtom (String fieldName) {
-    return get(new ErlangAtom(fieldName));
+  public ErlangTerm getUnsafe (int index) {
+    val term = new ErlangInteger(index);
+    return map.get(term);
   }
 
   @Override

@@ -85,7 +85,21 @@ public final class LookupModule implements LookupModuleApi {
   @Override
   public Optional<RemoteNode> lookup (@NonNull NodeDescriptor descriptor) {
     log.debug("Look up\n  {}\n", descriptor);
-    return ofNullable(cache.computeIfAbsent(descriptor, compute));
+    return ofNullable(lookupUnsafe(descriptor));
+  }
+
+  public RemoteNode lookupUnsafe (String node) {
+    val descriptor = NodeDescriptor.from(node);
+    return lookupUnsafe(descriptor);
+  }
+
+  public RemoteNode lookupUnsafe (ErlangPid pid) {
+    val descriptor = pid.getDescriptor();
+    return lookupUnsafe(descriptor);
+  }
+
+  public RemoteNode lookupUnsafe (NodeDescriptor descriptor) {
+    return cache.computeIfAbsent(descriptor, compute);
   }
 
   public void remove (@NonNull RemoteNode remoteNode) {

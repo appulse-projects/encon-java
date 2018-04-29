@@ -22,11 +22,11 @@ import io.appulse.encon.java.module.connection.control.exception.ControlMessageP
 import io.appulse.encon.java.protocol.term.ErlangTerm;
 import io.appulse.encon.java.protocol.type.ErlangPid;
 import io.appulse.encon.java.protocol.type.ErlangTuple;
-
 import lombok.AllArgsConstructor;
 import lombok.EqualsAndHashCode;
 import lombok.NonNull;
 import lombok.Value;
+import lombok.val;
 
 /**
  *
@@ -46,14 +46,20 @@ public class SendTraceToken extends ControlMessage {
 
   public SendTraceToken (@NonNull ErlangTuple tuple) {
     super();
+    if (tuple.size() != 4) {
+      throw new ControlMessageParsingException();
+    }
 
-    to = tuple.get(2)
-        .filter(ErlangTerm::isPid)
-        .map(ErlangTerm::asPid)
-        .orElseThrow(ControlMessageParsingException::new);
+    val tuple2 = tuple.getUnsafe(2);
+    if (tuple2 == null || !tuple2.isPid()) {
+      throw new ControlMessageParsingException();
+    }
+    to = tuple2.asPid();
 
-    traceToken = tuple.get(3)
-        .orElseThrow(ControlMessageParsingException::new);
+    traceToken = tuple.getUnsafe(3);
+    if (traceToken == null) {
+      throw new ControlMessageParsingException();
+    }
   }
 
   @Override

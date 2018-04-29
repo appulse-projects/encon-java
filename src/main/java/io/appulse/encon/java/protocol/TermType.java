@@ -16,8 +16,6 @@
 
 package io.appulse.encon.java.protocol;
 
-import java.util.stream.Stream;
-
 import io.appulse.encon.java.protocol.term.ErlangTerm;
 import io.appulse.encon.java.protocol.type.ErlangAtom;
 import io.appulse.encon.java.protocol.type.ErlangBinary;
@@ -36,6 +34,7 @@ import io.appulse.encon.java.protocol.type.ErlangString;
 import io.appulse.encon.java.protocol.type.ErlangTuple;
 
 import lombok.Getter;
+import lombok.val;
 
 /**
  *
@@ -881,9 +880,11 @@ public enum TermType {
   }
 
   public static TermType of (byte code) {
-    return Stream.of(values())
-        .filter(it -> it.getCode() == code)
-        .findAny()
-        .orElse(UNDEFINED);
+    for (val type : values()) {
+      if (type.getCode() == code) {
+        return type;
+      }
+    }
+    return UNDEFINED;
   }
 }

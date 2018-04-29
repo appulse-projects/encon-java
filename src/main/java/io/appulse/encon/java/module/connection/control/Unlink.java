@@ -22,11 +22,11 @@ import io.appulse.encon.java.module.connection.control.exception.ControlMessageP
 import io.appulse.encon.java.protocol.term.ErlangTerm;
 import io.appulse.encon.java.protocol.type.ErlangPid;
 import io.appulse.encon.java.protocol.type.ErlangTuple;
-
 import lombok.AllArgsConstructor;
 import lombok.EqualsAndHashCode;
 import lombok.NonNull;
 import lombok.Value;
+import lombok.val;
 
 /**
  *
@@ -46,16 +46,21 @@ public class Unlink extends ControlMessage {
 
   public Unlink (@NonNull ErlangTuple tuple) {
     super();
+    if (tuple.size() != 3) {
+      throw new ControlMessageParsingException();
+    }
 
-    from = tuple.get(1)
-        .filter(ErlangTerm::isPid)
-        .map(ErlangTerm::asPid)
-        .orElseThrow(ControlMessageParsingException::new);
+    val tuple1 = tuple.getUnsafe(1);
+    if (tuple1 == null || !tuple1.isPid()) {
+      throw new ControlMessageParsingException();
+    }
+    from = tuple1.asPid();
 
-    to = tuple.get(2)
-        .filter(ErlangTerm::isPid)
-        .map(ErlangTerm::asPid)
-        .orElseThrow(ControlMessageParsingException::new);
+    val tuple2 = tuple.getUnsafe(2);
+    if (tuple2 == null || !tuple2.isPid()) {
+      throw new ControlMessageParsingException();
+    }
+    to = tuple2.asPid();
   }
 
   @Override

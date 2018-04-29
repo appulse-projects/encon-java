@@ -17,6 +17,7 @@
 package io.appulse.encon.java.module.connection.control;
 
 import lombok.Getter;
+import lombok.val;
 
 /**
  *
@@ -50,5 +51,14 @@ public enum ControlMessageTag {
   ControlMessageTag (int code, Class<? extends ControlMessage> type) {
     this.code = code;
     this.type = type;
+  }
+
+  public static ControlMessageTag of (int code) {
+    for (val tag : values()) {
+      if (tag.getCode() == code) {
+        return tag;
+      }
+    }
+    return UNDEFINED;
   }
 }

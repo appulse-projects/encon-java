@@ -20,17 +20,15 @@ import static io.appulse.encon.java.module.mailbox.MailboxType.SINGLE;
 import static java.util.Optional.ofNullable;
 import static lombok.AccessLevel.PRIVATE;
 
+import io.appulse.encon.java.module.NodeInternalApi;
+import io.appulse.encon.java.protocol.type.ErlangPid;
+import io.appulse.utils.threads.AppulseExecutors;
+import io.appulse.utils.threads.AppulseThreadFactory;
 import java.io.Closeable;
 import java.util.Map;
 import java.util.Optional;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ExecutorService;
-
-import io.appulse.encon.java.module.NodeInternalApi;
-import io.appulse.encon.java.protocol.type.ErlangPid;
-import io.appulse.utils.threads.AppulseExecutors;
-import io.appulse.utils.threads.AppulseThreadFactory;
-
 import lombok.NoArgsConstructor;
 import lombok.NonNull;
 import lombok.RequiredArgsConstructor;
@@ -87,9 +85,17 @@ public final class MailboxModule implements MailboxModuleApi, Closeable {
     return ofNullable(names.get(name));
   }
 
+  public Mailbox mailboxUnsafe (String name) {
+    return names.get(name);
+  }
+
   @Override
   public Optional<Mailbox> mailbox (@NonNull ErlangPid pid) {
     return ofNullable(pids.get(pid));
+  }
+
+  public Mailbox mailboxUnsafe (ErlangPid pid) {
+    return pids.get(pid);
   }
 
   @Override
@@ -159,15 +165,15 @@ public final class MailboxModule implements MailboxModuleApi, Closeable {
       case SINGLE:
         executor = AppulseExecutors.newSingleThreadExecutor()
             .threadFactory(threadFactory)
-//            .enableClientTrace()
-//            .enableTimeLogging()
+            //            .enableClientTrace()
+            //            .enableTimeLogging()
             .build();
         break;
       case CACHED:
         executor = AppulseExecutors.newCachedThreadPool()
             .threadFactory(threadFactory)
-//            .enableClientTrace()
-//            .enableTimeLogging()
+            //            .enableClientTrace()
+            //            .enableTimeLogging()
             .build();
         break;
       default:
