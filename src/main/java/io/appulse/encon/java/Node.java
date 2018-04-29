@@ -18,8 +18,6 @@ package io.appulse.encon.java;
 
 import static lombok.AccessLevel.PRIVATE;
 
-import java.io.Closeable;
-
 import io.appulse.encon.java.config.NodeConfig;
 import io.appulse.encon.java.module.NodeInternalApi;
 import io.appulse.encon.java.module.connection.ConnectionModule;
@@ -40,7 +38,7 @@ import io.appulse.encon.java.module.ping.PingModuleApi;
 import io.appulse.encon.java.module.server.ServerModule;
 import io.appulse.epmd.java.client.EpmdClient;
 import io.appulse.epmd.java.core.model.request.Registration;
-
+import java.io.Closeable;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.NonNull;
@@ -111,6 +109,11 @@ public final class Node implements PingModuleApi, Closeable {
       @Override
       public MailboxModule mailboxes () {
         return node.mailboxModule;
+      }
+
+      @Override
+      public LookupModule lookups () {
+        return node.lookupModule;
       }
 
       @Override

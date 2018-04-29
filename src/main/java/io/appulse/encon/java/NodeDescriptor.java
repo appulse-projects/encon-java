@@ -25,7 +25,6 @@ import java.net.UnknownHostException;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.function.Function;
-
 import lombok.AllArgsConstructor;
 import lombok.EqualsAndHashCode;
 import lombok.NonNull;
@@ -47,41 +46,12 @@ public class NodeDescriptor implements Serializable {
 
   private static final long serialVersionUID = 7324588959922091097L;
 
-  private static final Map<String, InetAddress> INET_ADDRESS_CACHE;
-
   private static final Map<String, NodeDescriptor> NODE_DESCRIPTOR_CACHE;
-
-  private static final Function<String, InetAddress> COMPUTE_INET_ADDRESS;
 
   private static final Function<String, NodeDescriptor> COMPUTE_NODE_DESCRIPTOR;
 
   static {
-    InetAddress localhost;
-    InetAddress loopback;
-    try {
-      localhost = InetAddress.getLocalHost();
-      loopback = InetAddress.getLoopbackAddress();
-    } catch (UnknownHostException ex) {
-      throw new IllegalArgumentException("Couldn't determine localhost address", ex);
-    }
-
-    INET_ADDRESS_CACHE = new ConcurrentHashMap<>();
-    COMPUTE_INET_ADDRESS = key -> {
-      try {
-        return InetAddress.getByName(key);
-      } catch (UnknownHostException ex) {
-        try {
-          log.warn("Unknown host {}, trying to lookup {}.local", key, key);
-          return InetAddress.getByName(key + ".local");
-        } catch (UnknownHostException ex1) {
-          throw new RuntimeException("Wrapped", ex);
-        }
-      }
-    };
-
-    INET_ADDRESS_CACHE.put(localhost.getHostName(), localhost);
-    INET_ADDRESS_CACHE.put(loopback.getHostName(), loopback);
-
+    val loopback = InetAddress.getLoopbackAddress();
     NODE_DESCRIPTOR_CACHE = new ConcurrentHashMap<>();
     COMPUTE_NODE_DESCRIPTOR = str -> {
       val tokens = str.split("@", 2);
@@ -91,7 +61,7 @@ public class NodeDescriptor implements Serializable {
                      : shortName + '@' + loopback.getHostName();
 
       val address = tokens.length == 2
-                    ? getByName(tokens[1]) // INET_ADDRESS_CACHE.computeIfAbsent(tokens[1], COMPUTE_INET_ADDRESS)
+                    ? getByName(tokens[1])
                     : loopback;
 
       return new NodeDescriptor(shortName, fullName, address);

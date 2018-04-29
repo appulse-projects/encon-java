@@ -16,7 +16,6 @@
 
 package io.appulse.encon.java.module.connection.regular;
 
-import static java.util.Optional.empty;
 import static lombok.AccessLevel.PRIVATE;
 
 import io.appulse.encon.java.RemoteNode;
@@ -33,7 +32,6 @@ import io.netty.channel.Channel;
 import io.netty.channel.ChannelHandlerContext;
 import io.netty.channel.ChannelInboundHandlerAdapter;
 import java.io.Closeable;
-import java.util.Optional;
 import lombok.NonNull;
 import lombok.RequiredArgsConstructor;
 import lombok.experimental.FieldDefaults;
@@ -104,10 +102,9 @@ public final class ClientRegularHandler extends ChannelInboundHandlerAdapter imp
     log.debug("Received message\nfrom {}\n  {}\n", remote, message);
     ControlMessage header = message.getHeader();
 
-    val optional = findMailbox(header);
-    if (optional.isPresent()) {
-      optional.get()
-          .deliver(message);
+    val mailbox = findMailbox(header);
+    if (mailbox != null) {
+      mailbox.deliver(message);
     } else {
       log.warn("There is no mailbox for message\n  {}\n", message);
     }
@@ -125,7 +122,7 @@ public final class ClientRegularHandler extends ChannelInboundHandlerAdapter imp
     log.debug("Client handler for {} was closed", channel.remoteAddress());
   }
 
-  private Optional<Mailbox> findMailbox (@NonNull ControlMessage header) {
+  private Mailbox findMailbox (@NonNull ControlMessage header) {
     switch (header.getTag()) {
     case SEND:
       return handle((Send) header);
@@ -140,46 +137,46 @@ public final class ClientRegularHandler extends ChannelInboundHandlerAdapter imp
     case EXIT2:
       return handle((Exit2) header);
     default:
-      return empty();
+      return null;
     }
   }
 
-  private Optional<Mailbox> handle (@NonNull Send header) {
+  private Mailbox handle (@NonNull Send header) {
     val destination = header.getTo();
     val mailboxes = internal.mailboxes();
     return destination.isAtom()
-           ? mailboxes.mailbox(destination.asText())
-           : mailboxes.mailbox(destination.asPid());
+           ? mailboxes.mailboxUnsafe(destination.asText())
+           : mailboxes.mailboxUnsafe(destination.asPid());
   }
 
-  private Optional<Mailbox> handle (@NonNull SendToRegisteredProcess header) {
+  private Mailbox handle (@NonNull SendToRegisteredProcess header) {
     val toPid = header.getTo();
     val mailboxName = toPid.asText();
     return internal.mailboxes()
-        .mailbox(mailboxName);
+        .mailboxUnsafe(mailboxName);
   }
 
-  private Optional<Mailbox> handle (@NonNull Link header) {
+  private Mailbox handle (@NonNull Link header) {
     val toPid = header.getTo();
     return internal.mailboxes()
-        .mailbox(toPid);
+        .mailboxUnsafe(toPid);
   }
 
-  private Optional<Mailbox> handle (@NonNull Unlink header) {
+  private Mailbox handle (@NonNull Unlink header) {
     val toPid = header.getTo();
     return internal.mailboxes()
-        .mailbox(toPid);
+        .mailboxUnsafe(toPid);
   }
 
-  private Optional<Mailbox> handle (@NonNull Exit header) {
+  private Mailbox handle (@NonNull Exit header) {
     val toPid = header.getTo();
     return internal.mailboxes()
-        .mailbox(toPid);
+        .mailboxUnsafe(toPid);
   }
 
-  private Optional<Mailbox> handle (@NonNull Exit2 header) {
+  private Mailbox handle (@NonNull Exit2 header) {
     val toPid = header.getTo();
     return internal.mailboxes()
-        .mailbox(toPid);
+        .mailboxUnsafe(toPid);
   }
 }

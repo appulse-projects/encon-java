@@ -28,11 +28,6 @@ import static java.util.concurrent.TimeUnit.MILLISECONDS;
 import static java.util.concurrent.TimeUnit.SECONDS;
 import static org.assertj.core.api.Assertions.assertThat;
 
-import java.util.concurrent.CompletableFuture;
-import java.util.concurrent.CompletionStage;
-import java.util.concurrent.ExecutionException;
-import java.util.concurrent.ThreadLocalRandom;
-
 import io.appulse.encon.java.config.MailboxConfig;
 import io.appulse.encon.java.config.NodeConfig;
 import io.appulse.encon.java.config.ServerConfig;
@@ -43,7 +38,10 @@ import io.appulse.encon.java.protocol.term.ErlangTerm;
 import io.appulse.encon.java.protocol.type.ErlangAtom;
 import io.appulse.encon.java.protocol.type.ErlangString;
 import io.appulse.utils.test.TestMethodNamePrinter;
-
+import java.util.concurrent.CompletableFuture;
+import java.util.concurrent.CompletionStage;
+import java.util.concurrent.ExecutionException;
+import java.util.concurrent.ThreadLocalRandom;
 import lombok.val;
 import org.assertj.core.api.SoftAssertions;
 import org.junit.After;
@@ -115,8 +113,8 @@ public class NodeTest {
     val name1 = createFullName();
     val name2 = createFullName();
     node = Nodes.singleNode(name1, NodeConfig.builder()
-                           .cookie("secret")
-                           .build()
+                            .cookie("secret")
+                            .build()
     );
 
     assertThat(node.ping(ELIXIR_ECHO_SERVER).get(2, SECONDS))
@@ -135,8 +133,8 @@ public class NodeTest {
         .isFalse();
 
     try (val node2 = Nodes.singleNode(name2, NodeConfig.builder()
-                                     .cookie("secret")
-                                     .build())) {
+                                      .cookie("secret")
+                                      .build())) {
 
       assertThat(node.ping(name2).get(2, SECONDS))
           .isTrue();
@@ -150,13 +148,13 @@ public class NodeTest {
   public void instantiating () throws Exception {
     val name = createShortName();
     node = Nodes.singleNode(name, NodeConfig.builder()
-                           .mailbox(MailboxConfig.builder()
-                               .name("one")
-                               .build())
-                           .mailbox(MailboxConfig.builder()
-                               .name("two")
-                               .build())
-                           .build()
+                            .mailbox(MailboxConfig.builder()
+                                .name("one")
+                                .build())
+                            .mailbox(MailboxConfig.builder()
+                                .name("two")
+                                .build())
+                            .build()
     );
 
     assertThat(node.mailbox("one"))
@@ -179,7 +177,7 @@ public class NodeTest {
     CompletableFuture<String> future1 = new CompletableFuture<>();
     Mailbox mailbox1 = node.mailbox()
         .name("popa1")
-        .handler((self, header, body) -> future1.complete(body.get().asText()))
+        .handler((self, header, body) -> future1.complete(body.asText()))
         .build();
 
     try (val node2 = Nodes.singleNode(name2)) {
@@ -191,7 +189,7 @@ public class NodeTest {
       CompletableFuture<String> future2 = new CompletableFuture<>();
       Mailbox mailbox2 = node2.mailbox()
           .name("popa2")
-          .handler((self, header, body) -> future2.complete(body.get().asText()))
+          .handler((self, header, body) -> future2.complete(body.asText()))
           .build();
 
       mailbox2.request()
@@ -232,7 +230,7 @@ public class NodeTest {
       Mailbox mailbox2 = node2.mailbox().name("popka").build();
 
       CompletableFuture<ErlangTerm> future = mailbox2.receiveAsync()
-          .thenApplyAsync(message -> message.getBody().get().asTuple().get(1).get() );
+          .thenApplyAsync(message -> message.getBody().get().asTuple().get(1).get());
 
       val reference = node.generateReference();
       mailbox1.request()
@@ -258,32 +256,32 @@ public class NodeTest {
               .filter(ErlangTerm::isTextual)
               .map(ErlangTerm::asText)
               .map("hello, world"::equals)
-              .orElse(false)
-          , "Tuple(0)")
+              .orElse(false),
+               "Tuple(0)")
           .isCompletedWithValueMatching(it -> it.get(1)
               .filter(ErlangTerm::isAtom)
               .map(ErlangTerm::asText)
               .map("popa"::equals)
-              .orElse(false)
-          , "Tuple(1)")
+              .orElse(false),
+               "Tuple(1)")
           .isCompletedWithValueMatching(it -> it.get(2)
               .filter(ErlangTerm::isBoolean)
               .map(ErlangTerm::asBoolean)
               .map(FALSE::equals)
-              .orElse(false)
-          , "Tuple(2)")
+              .orElse(false),
+               "Tuple(2)")
           .isCompletedWithValueMatching(it -> it.get(3)
               .filter(ErlangTerm::isInt)
               .map(ErlangTerm::asInt)
               .map(value -> value == 42)
-              .orElse(false)
-          , "Tuple(3)")
+              .orElse(false),
+               "Tuple(3)")
           .isCompletedWithValueMatching(it -> it.get(4)
               .filter(ErlangTerm::isReference)
               .map(ErlangTerm::asReference)
               .map(reference::equals)
-              .orElse(false)
-          , "Tuple(4)");
+              .orElse(false),
+               "Tuple(4)");
     }
   }
 
@@ -291,15 +289,15 @@ public class NodeTest {
   public void send () throws Exception {
     val name = createShortName();
     node = Nodes.singleNode(name, NodeConfig.builder()
-                           .server(ServerConfig.builder().port(8500).build())
-                           .cookie("secret")
-                           .build()
+                            .server(ServerConfig.builder().port(8500).build())
+                            .cookie("secret")
+                            .build()
     );
 
     CompletableFuture<ErlangTerm> future = new CompletableFuture<>();
     Mailbox mailbox = node.mailbox()
         .handler((self, header, body) -> {
-          future.complete(body.get().asTuple().get(1).get());
+          future.complete(body.asTuple().get(1).get());
         })
         .build();
 
@@ -326,32 +324,32 @@ public class NodeTest {
             .filter(ErlangTerm::isTextual)
             .map(ErlangTerm::asText)
             .map("hello, world"::equals)
-            .orElse(false)
-        , "Tuple(0)")
+            .orElse(false),
+             "Tuple(0)")
         .isCompletedWithValueMatching(it -> it.get(1)
             .filter(ErlangTerm::isAtom)
             .map(ErlangTerm::asText)
             .map("popa"::equals)
-            .orElse(false)
-        , "Tuple(1)")
+            .orElse(false),
+             "Tuple(1)")
         .isCompletedWithValueMatching(it -> it.get(2)
             .filter(ErlangTerm::isBoolean)
             .map(ErlangTerm::asBoolean)
             .map(FALSE::equals)
-            .orElse(false)
-        , "Tuple(2)")
+            .orElse(false),
+             "Tuple(2)")
         .isCompletedWithValueMatching(it -> it.get(3)
             .filter(ErlangTerm::isInt)
             .map(ErlangTerm::asInt)
             .map(value -> value == 42)
-            .orElse(false)
-        , "Tuple(3)")
+            .orElse(false),
+             "Tuple(3)")
         .isCompletedWithValueMatching(it -> it.get(4)
             .filter(ErlangTerm::isReference)
             .map(ErlangTerm::asReference)
             .map(reference::equals)
-            .orElse(false)
-        , "Tuple(4)");
+            .orElse(false),
+             "Tuple(4)");
   }
 
   @Test

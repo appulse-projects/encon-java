@@ -21,15 +21,17 @@ import static io.appulse.encon.java.protocol.TermType.LIST;
 import static io.appulse.encon.java.protocol.TermType.MAP;
 import static io.appulse.encon.java.protocol.TermType.SMALL_TUPLE;
 import static java.util.Collections.emptyIterator;
-import static java.util.Optional.empty;
+import static java.util.Optional.ofNullable;
 
-import java.util.Iterator;
-import java.util.Map;
-import java.util.Optional;
-
+import io.appulse.encon.java.protocol.type.ErlangAtom;
 import io.appulse.encon.java.protocol.type.ErlangList;
 import io.appulse.encon.java.protocol.type.ErlangMap;
 import io.appulse.encon.java.protocol.type.ErlangTuple;
+import java.util.Iterator;
+import java.util.Map;
+import java.util.Optional;
+import lombok.NonNull;
+import lombok.val;
 
 /**
  *
@@ -108,7 +110,7 @@ public interface ContainerTerm extends ValueTerm, Iterable<ErlangTerm> {
    * and for all other terms 0.
    *
    * @return for non-container terms returns 0; for List/Tuple number of
-   *     contained elements, and for Map number of fields.
+   *         contained elements, and for Map number of fields.
    */
   default int size () {
     return 0;
@@ -133,7 +135,15 @@ public interface ContainerTerm extends ValueTerm, Iterable<ErlangTerm> {
    *         specified element. {@link Optional#empty} otherwise.
    */
   default Optional<ErlangTerm> get (int index) {
-    return empty();
+    if (index < 0 || index >= size()) {
+      throw new ArrayIndexOutOfBoundsException(index);
+    }
+    val result = getUnsafe(index);
+    return ofNullable(result);
+  }
+
+  default ErlangTerm getUnsafe (int index) {
+    return null;
   }
 
   /**
@@ -144,11 +154,12 @@ public interface ContainerTerm extends ValueTerm, Iterable<ErlangTerm> {
    * @param fieldName key term (as Atom) in map.
    *
    * @return Term that represent value of the specified key term,
-   *     if this term is an Map and has value for the specified
-   *     key term. {@link Optional#empty} otherwise.
+   *         if this term is an Map and has value for the specified
+   *         key term. {@link Optional#empty} otherwise.
    */
-  default Optional<ErlangTerm> getByAtom (String fieldName) {
-    return empty();
+  default Optional<ErlangTerm> getByAtom (@NonNull String fieldName) {
+    val term = new ErlangAtom(fieldName);
+    return get(term);
   }
 
   /**
@@ -159,11 +170,16 @@ public interface ContainerTerm extends ValueTerm, Iterable<ErlangTerm> {
    * @param term key term in map.
    *
    * @return Term that represent value of the specified key term,
-   *     if this term is an Map and has value for the specified
-   *     key term. {@link Optional#empty} otherwise.
+   *         if this term is an Map and has value for the specified
+   *         key term. {@link Optional#empty} otherwise.
    */
-  default Optional<ErlangTerm> get (ErlangTerm term) {
-    return empty();
+  default Optional<ErlangTerm> get (@NonNull ErlangTerm term) {
+    val result = getUnsafe(term);
+    return ofNullable(result);
+  }
+
+  default ErlangTerm getUnsafe (ErlangTerm term) {
+    return null;
   }
 
   /**
@@ -178,7 +194,7 @@ public interface ContainerTerm extends ValueTerm, Iterable<ErlangTerm> {
    * @param term key term.
    *
    * @return true, if this term is a Map term and has a property entry with specified term,
-   *     false otherwise.
+   *         false otherwise.
    */
   default boolean hasNonNil (ErlangTerm term) {
     return get(term)
@@ -198,7 +214,7 @@ public interface ContainerTerm extends ValueTerm, Iterable<ErlangTerm> {
    * @param fieldName field name atom to check.
    *
    * @return true, if this term is a Map term and has a property entry with specified field name atom,
-   *     false otherwise.
+   *         false otherwise.
    */
   default boolean hasNonNilByAtom (String fieldName) {
     return getByAtom(fieldName)
@@ -218,7 +234,7 @@ public interface ContainerTerm extends ValueTerm, Iterable<ErlangTerm> {
    * @param index index to check.
    *
    * @return true, if this term is a container term and has a property entry with specified index,
-   *     false otherwise.
+   *         false otherwise.
    */
   default boolean hasNonNil (int index) {
     return get(index)

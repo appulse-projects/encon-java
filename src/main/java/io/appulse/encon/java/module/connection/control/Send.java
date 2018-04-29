@@ -21,7 +21,6 @@ import static io.appulse.encon.java.module.connection.control.ControlMessageTag.
 import io.appulse.encon.java.module.connection.control.exception.ControlMessageParsingException;
 import io.appulse.encon.java.protocol.term.ErlangTerm;
 import io.appulse.encon.java.protocol.type.ErlangTuple;
-
 import lombok.AllArgsConstructor;
 import lombok.EqualsAndHashCode;
 import lombok.NonNull;
@@ -42,10 +41,14 @@ public class Send extends ControlMessage {
 
   public Send (@NonNull ErlangTuple tuple) {
     super();
+    if (tuple.size() != 3) {
+      throw new ControlMessageParsingException();
+    }
 
-    to = tuple.get(2)
-        .filter(it -> it.isAtom() || it.isPid())
-        .orElseThrow(ControlMessageParsingException::new);
+    to = tuple.getUnsafe(2);
+    if (to == null || !(to.isAtom() || to.isPid())) {
+      throw new ControlMessageParsingException();
+    }
   }
 
   @Override

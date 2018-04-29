@@ -16,6 +16,7 @@
 
 package io.appulse.encon.java.module.connection.control;
 
+import static io.appulse.encon.java.module.connection.control.ControlMessageTag.UNDEFINED;
 import static java.util.stream.Collectors.toCollection;
 
 import io.appulse.encon.java.module.connection.control.exception.ControlMessageParsingException;
@@ -48,15 +49,16 @@ public abstract class ControlMessage {
     }
     val tuple = term.asTuple();
 
-    val code = tuple.get(0)
-        .filter(ErlangTerm::isNumber)
-        .map(ErlangTerm::asInt)
-        .orElseThrow(() -> ControlMessageParsingException.fieldException(tuple, 0, Integer.class));
+    val first = tuple.getUnsafe(0);
+    if (!first.isNumber()) {
+      throw ControlMessageParsingException.fieldException(tuple, 0, Integer.class);
+    }
+    val code = first.asInt();
 
-    val tag = Stream.of(ControlMessageTag.values())
-        .filter(it -> it.getCode() == code)
-        .findFirst()
-        .orElseThrow(() -> new ControlMessageParsingException("Unknown tag code: " + code));
+    val tag = ControlMessageTag.of(code);
+    if (tag == UNDEFINED) {
+      throw new ControlMessageParsingException("Unknown tag code: " + code);
+    }
 
     Class<T> type = (Class<T>) tag.getType();
     Constructor<T> constructor = type.getConstructor(ErlangTuple.class);

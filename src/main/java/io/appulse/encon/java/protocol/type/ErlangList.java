@@ -17,15 +17,12 @@
 package io.appulse.encon.java.protocol.type;
 
 import static io.appulse.encon.java.protocol.TermType.LIST;
-import static java.util.Optional.empty;
-import static java.util.Optional.of;
 import static java.util.Optional.ofNullable;
 import static lombok.AccessLevel.PRIVATE;
 
 import java.util.Arrays;
 import java.util.Iterator;
 import java.util.List;
-import java.util.Optional;
 import java.util.stream.IntStream;
 import java.util.stream.Stream;
 
@@ -122,10 +119,8 @@ public class ErlangList extends ErlangTerm {
   }
 
   @Override
-  public Optional<ErlangTerm> get (int index) {
-    return index >= 0 && index < size()
-           ? of(elements[index])
-           : empty();
+  public ErlangTerm getUnsafe (int index) {
+    return elements[index];
   }
 
   @Override

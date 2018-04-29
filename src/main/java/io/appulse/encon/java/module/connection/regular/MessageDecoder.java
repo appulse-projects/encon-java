@@ -16,9 +16,6 @@
 
 package io.appulse.encon.java.module.connection.regular;
 
-import static java.util.Optional.empty;
-import static java.util.Optional.ofNullable;
-
 import io.appulse.encon.java.module.connection.control.ControlMessage;
 import io.appulse.encon.java.protocol.term.ErlangTerm;
 import io.netty.buffer.ByteBuf;
@@ -26,7 +23,6 @@ import io.netty.channel.ChannelHandler.Sharable;
 import io.netty.channel.ChannelHandlerContext;
 import io.netty.handler.codec.MessageToMessageDecoder;
 import java.util.List;
-import java.util.Optional;
 import lombok.extern.slf4j.Slf4j;
 import lombok.val;
 
@@ -57,13 +53,12 @@ public class MessageDecoder extends MessageToMessageDecoder<ByteBuf> {
     val header = readTerm(msg);
     val controlMessage = ControlMessage.parse(header);
 
-    Optional<ErlangTerm> optionalBody = empty();
+    ErlangTerm body = null;
     if (msg.readerIndex() < msg.capacity()) {
-      val body = readTerm(msg);
-      optionalBody = ofNullable(body);
+      body = readTerm(msg);
     }
 
-    out.add(new Message(controlMessage, optionalBody));
+    out.add(new Message(controlMessage, body));
   }
 
   private ErlangTerm readTerm (ByteBuf buffer) {

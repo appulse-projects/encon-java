@@ -23,11 +23,11 @@ import io.appulse.encon.java.protocol.term.ErlangTerm;
 import io.appulse.encon.java.protocol.type.ErlangPid;
 import io.appulse.encon.java.protocol.type.ErlangReference;
 import io.appulse.encon.java.protocol.type.ErlangTuple;
-
 import lombok.AllArgsConstructor;
 import lombok.EqualsAndHashCode;
 import lombok.NonNull;
 import lombok.Value;
+import lombok.val;
 
 /**
  *
@@ -53,23 +53,31 @@ public class MonitorProcessExit extends ControlMessage {
 
   public MonitorProcessExit (@NonNull ErlangTuple tuple) {
     super();
+    if (tuple.size() != 5) {
+      throw new ControlMessageParsingException();
+    }
 
-    from = tuple.get(1)
-        .filter(ErlangTerm::isPid)
-        .map(ErlangTerm::asPid)
-        .orElseThrow(ControlMessageParsingException::new);
+    val tuple1 = tuple.getUnsafe(1);
+    if (tuple1 == null || !tuple1.isPid()) {
+      throw new ControlMessageParsingException();
+    }
+    from = tuple1.asPid();
 
-    to = tuple.get(2)
-        .filter(it -> it.isPid() || it.isAtom())
-        .orElseThrow(ControlMessageParsingException::new);
+    to = tuple.getUnsafe(2);
+    if (to == null || !(to.isPid() || to.isAtom())) {
+      throw new ControlMessageParsingException();
+    }
 
-    reference = tuple.get(3)
-        .filter(ErlangTerm::isReference)
-        .map(ErlangTerm::asReference)
-        .orElseThrow(ControlMessageParsingException::new);
+    val tuple3 = tuple.getUnsafe(3);
+    if (tuple3 == null || !tuple3.isReference()) {
+      throw new ControlMessageParsingException();
+    }
+    reference = tuple3.asReference();
 
-    reason = tuple.get(4)
-        .orElseThrow(ControlMessageParsingException::new);
+    reason = tuple.getUnsafe(4);
+    if (reason == null) {
+      throw new ControlMessageParsingException();
+    }
   }
 
   @Override
