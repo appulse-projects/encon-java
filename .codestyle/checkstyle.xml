@@ -379,7 +379,7 @@ limitations under the License.
       <property name="caseIndent" value="0"/>
       <property name="throwsIndent" value="0"/>
       <property name="lineWrappingIndentation" value="4"/>
-      <property name="arrayInitIndent" value="4"/>
+      <property name="arrayInitIndent" value="2"/>
       <property name="forceStrictCondition" value="false"/>
     </module>
     <module name="OuterTypeFilename"/>

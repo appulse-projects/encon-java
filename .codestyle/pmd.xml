@@ -46,6 +46,7 @@ limitations under the License.
     <exclude name="AvoidCatchingGenericException" />
     <exclude name="AvoidRethrowingException" />
     <exclude name="AvoidThrowingNullPointerException" />
+    <exclude name="CyclomaticComplexity" />
     <exclude name="ExcessiveImports" />
     <exclude name="ExcessivePublicCount" />
     <exclude name="LawOfDemeter" />
