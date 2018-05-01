@@ -34,9 +34,9 @@ $> mvn clean compile
 [INFO] ------------------------------------------------------------------------
 [INFO] BUILD SUCCESS
 [INFO] ------------------------------------------------------------------------
-[INFO] Total time: 3.365 s
-[INFO] Finished at: 2018-02-02T00:15:57+03:00
-[INFO] Final Memory: 21M/248M
+[INFO] Total time: 20.719 s
+[INFO] Finished at: 2018-02-02T13:25:56+03:00
+[INFO] Final Memory: 41M/380M
 [INFO] ------------------------------------------------------------------------
 ```
 
@@ -54,7 +54,7 @@ $> mvn clean test
 [INFO]
 [INFO] Results:
 [INFO]
-[INFO] Tests run: 1, Failures: 0, Errors: 0, Skipped: 0
+[INFO] Tests run: 7, Failures: 0, Errors: 0, Skipped: 0
 [INFO]
 ...
 ```
