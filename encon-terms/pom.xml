@@ -17,7 +17,7 @@
   <dependencies>
     <dependency>
       <groupId>${project.groupId}</groupId>
-      <artifactId>encon-base</artifactId>
+      <artifactId>encon-common</artifactId>
       <version>${project.version}</version>
     </dependency>
 
