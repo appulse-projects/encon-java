@@ -34,9 +34,15 @@ deploy:
   api_key:
     secure: YL2RHLS+TRdlGdkOveqdKzfexAoWdl4kJscmQiR2upAs355F6oOpaNvqae3jMtjDwb4ES7iDJZ/36bBAaF4oAe3ArEvHi4gIRtzLX1EkS5SeA1s3wiAgctp5JFkyo4FyRUgpXWiIGO0XL+qxGSc36t9rLOOJEAtwgPtpEEGB2rIwoYTwMCENcfV+NebXa9Lo2RTS84BwX6BzpyJDO5ZXg4skHzXMrcNmQV/+raX7J1jaTY++AIk0MRKwIpkXRJ4ozHt+Gxl31NBWN53A8Tu0mC2IkZ/fmNbZEbd8pR6UVhy3z+TBljgLfSLfSOjN+1h+4WSAMvEYzwmaFUuH+cfhhJesvjiw11o35+5wq189PK1h+Dj/+o8cemhNOtL/88CDsj36AEQiXTukIPKLPScrln5Ux/Z9so0oA9RYsLPX/tZU1WHak4S4lIcUlC2R3fDJEdNL6cf/bZIQXc9ld30qtlembOcx4aXnpLm64TR7UotppYTx4crs1GSTftqArfs/xSG4lmOuf2qW+Eyb1pZmycNzWo+K/RKCbcY9ep5dYnPyFTeY11EKLJK0FLQd2V0Q5NHpM6KjILA7bS8OpHVGsc4N9TawUCE2aokThbXJsPQE1K8Ya/Kaj9FdnlkQQrm5JkxsEJi+LXebWqLNACCOMhH4nYxDuMyMBUy1/OA+IZo=
   file:
-    - "target/encon-java-$project_version.jar"
-    - "target/encon-java-$project_version-javadoc.jar"
-    - "target/encon-java-$project_version-sources.jar"
+    - "encon-common/target/core-$project_version.jar"
+    - "encon-common/target/core-$project_version-javadoc.jar"
+    - "encon-common/target/core-$project_version-sources.jar"
+    - "encon-terms/target/core-$project_version.jar"
+    - "encon-terms/target/core-$project_version-javadoc.jar"
+    - "encon-terms/target/core-$project_version-sources.jar"
+    - "encon/target/core-$project_version.jar"
+    - "encon/target/core-$project_version-javadoc.jar"
+    - "encon/target/core-$project_version-sources.jar"
   skip_cleanup: true
   on:
     tags: true
