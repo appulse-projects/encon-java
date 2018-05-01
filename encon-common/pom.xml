@@ -11,7 +11,7 @@
     <version>1.0.0</version>
   </parent>
 
-  <artifactId>encon-base</artifactId>
+  <artifactId>encon-common</artifactId>
   <packaging>jar</packaging>
 
   <dependencies>
