@@ -22,7 +22,7 @@ limitations under the License.
 
   <modelVersion>4.0.0</modelVersion>
 
-  <groupId>io.appulse.encon.java</groupId>
+  <groupId>io.appulse.encon</groupId>
   <artifactId>encon-parent</artifactId>
   <version>1.0.0</version>
   <packaging>pom</packaging>
@@ -42,6 +42,7 @@ limitations under the License.
     <module>encon-common</module>
     <module>encon-terms</module>
     <module>encon</module>
+    <module>encon-databind</module>
   </modules>
 
   <name>encon</name>
