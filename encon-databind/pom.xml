@@ -17,7 +17,7 @@
   <dependencies>
     <dependency>
       <groupId>${project.groupId}</groupId>
-      <artifactId>encon-terms</artifactId>
+      <artifactId>encon</artifactId>
       <version>${project.version}</version>
     </dependency>
 
@@ -28,6 +28,12 @@
     <dependency>
       <groupId>io.appulse</groupId>
       <artifactId>utils-java</artifactId>
+    </dependency>
+    
+    <dependency>
+      <groupId>io.netty</groupId>
+      <artifactId>netty-all</artifactId>
+      <scope>provided</scope>
     </dependency>
   </dependencies>
 

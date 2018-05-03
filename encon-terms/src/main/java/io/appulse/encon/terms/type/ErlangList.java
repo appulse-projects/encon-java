@@ -22,6 +22,7 @@ import static java.util.Optional.ofNullable;
 import static lombok.AccessLevel.PRIVATE;
 
 import java.util.Arrays;
+import java.util.Collection;
 import java.util.Iterator;
 import java.util.List;
 import java.util.stream.IntStream;
@@ -73,7 +74,7 @@ public class ErlangList extends ErlangTerm {
     this(Arrays.asList(elements));
   }
 
-  public ErlangList (@NonNull List<ErlangTerm> elements) {
+  public ErlangList (@NonNull Collection<ErlangTerm> elements) {
     super(LIST);
 
     this.elements = elements.toArray(new ErlangTerm[0]);

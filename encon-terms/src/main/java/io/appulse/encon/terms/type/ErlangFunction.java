@@ -36,6 +36,7 @@ import lombok.Getter;
 import lombok.NonNull;
 import lombok.ToString;
 import lombok.experimental.FieldDefaults;
+import lombok.experimental.NonFinal;
 
 /**
  *
@@ -60,10 +61,13 @@ public class ErlangFunction extends ErlangTerm {
 
   ErlangTerm[] variables;
 
+  @NonFinal
   int arity;
 
+  @NonFinal
   byte[] md5;
 
+  @NonFinal
   int oldIndex;
 
   public ErlangFunction (TermType type, @NonNull ByteBuf buffer) {
@@ -71,10 +75,6 @@ public class ErlangFunction extends ErlangTerm {
 
     int freeVariablesCount = 0;
     if (type == FUNCTION) {
-      arity = -1;
-      md5 = null;
-      oldIndex = -1;
-
       freeVariablesCount = buffer.readInt();
 
       pid = ErlangTerm.newInstance(buffer);

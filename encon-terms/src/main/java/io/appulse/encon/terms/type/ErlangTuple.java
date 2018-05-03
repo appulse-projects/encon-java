@@ -21,8 +21,8 @@ import static io.appulse.encon.terms.TermType.SMALL_TUPLE;
 import static lombok.AccessLevel.PRIVATE;
 
 import java.util.Arrays;
+import java.util.Collection;
 import java.util.Iterator;
-import java.util.List;
 import java.util.stream.IntStream;
 import java.util.stream.Stream;
 
@@ -79,7 +79,7 @@ public class ErlangTuple extends ErlangTerm {
   }
 
   @Builder
-  public ErlangTuple (@Singular List<ErlangTerm> adds) {
+  public ErlangTuple (@Singular Collection<ErlangTerm> adds) {
     super();
 
     if (adds.size() < MAX_SMALL_TUPLE_SIZE) {
