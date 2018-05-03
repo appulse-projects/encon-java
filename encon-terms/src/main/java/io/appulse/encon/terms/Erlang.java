@@ -17,6 +17,7 @@
 package io.appulse.encon.terms;
 
 import java.math.BigInteger;
+import java.util.Collection;
 import java.util.LinkedHashMap;
 import java.util.List;
 
@@ -100,7 +101,7 @@ public final class Erlang {
     return new ErlangTuple(elements);
   }
 
-  public static ErlangTuple tuple (@NonNull List<ErlangTerm> elements) {
+  public static ErlangTuple tuple (@NonNull Collection<ErlangTerm> elements) {
     return new ErlangTuple(elements);
   }
 
@@ -108,7 +109,7 @@ public final class Erlang {
     return new ErlangList(elements);
   }
 
-  public static ErlangList list (@NonNull List<ErlangTerm> elements) {
+  public static ErlangList list (@NonNull Collection<ErlangTerm> elements) {
     return new ErlangList(elements);
   }
 

@@ -113,9 +113,9 @@ public class ErlangInteger extends ErlangTerm {
       buffer.readBytes(bytes);
       reverse(bytes);
 
-      value = sign != 0
-              ? new BigInteger(bytes).negate()
-              : new BigInteger(bytes);
+      value = sign == 0
+              ? new BigInteger(bytes)
+              : new BigInteger(bytes).negate();
       break;
     default:
       throw new IllegalErlangTermTypeException(getClass(), type);
