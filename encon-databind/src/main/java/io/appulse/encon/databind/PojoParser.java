@@ -16,9 +16,15 @@
 
 package io.appulse.encon.databind;
 
+import static java.util.Comparator.comparing;
+import static java.util.stream.Collectors.toList;
+
 import java.util.List;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
+import java.util.stream.Stream;
+
+import io.appulse.encon.databind.annotation.IgnoreField;
 
 /**
  *
@@ -38,7 +44,11 @@ public final class PojoParser {
   }
 
   private static List<FieldDescriptor> createDescriptors (Class<?> type) {
-    return null;
+    return Stream.of(type.getDeclaredFields())
+        .filter(it -> !it.isAnnotationPresent(IgnoreField.class))
+        .map(FieldDescriptor::new)
+        .sorted(comparing(FieldDescriptor::getOrder))
+        .collect(toList());
   }
 
   private PojoParser () {

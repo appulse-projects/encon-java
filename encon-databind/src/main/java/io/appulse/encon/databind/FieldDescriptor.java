@@ -20,6 +20,7 @@ import java.lang.reflect.Field;
 import java.security.AccessController;
 import java.security.PrivilegedAction;
 
+import io.appulse.encon.databind.annotation.TermOrder;
 import io.appulse.encon.databind.deserializer.Deserializer;
 import io.appulse.encon.databind.serializer.Serializer;
 
@@ -49,8 +50,14 @@ public final class FieldDescriptor {
       return null;
     });
 
-    order = 1;
+    if (field.isAnnotationPresent(TermOrder.class)) {
+      order = field.getAnnotation(TermOrder.class).value();
+    } else {
+      order = 0;
+    }
+
     serializer = null;
+
     deserializer = null;
   }
 
