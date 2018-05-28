@@ -16,7 +16,6 @@
 
 package io.appulse.encon.module.mailbox;
 
-import static io.appulse.encon.module.mailbox.MailboxType.SINGLE;
 import static java.util.Optional.ofNullable;
 import static lombok.AccessLevel.PRIVATE;
 
@@ -24,7 +23,6 @@ import java.io.Closeable;
 import java.util.Map;
 import java.util.Optional;
 import java.util.concurrent.ConcurrentHashMap;
-import java.util.concurrent.ExecutorService;
 
 import io.appulse.encon.module.NodeInternalApi;
 import io.appulse.encon.terms.type.ErlangPid;
@@ -133,8 +131,6 @@ public final class MailboxModule implements MailboxModuleApi, Closeable {
     final Mailbox.MailboxBuilder builder = Mailbox.builder()
         .handler(new DefaultMailboxHandler());
 
-    MailboxType type = SINGLE;
-
     public NewMailboxBuilder name (String name) {
       builder.name(name);
       return this;
@@ -146,13 +142,16 @@ public final class MailboxModule implements MailboxModuleApi, Closeable {
     }
 
     @SneakyThrows
-    public NewMailboxBuilder handler (@NonNull Class<? extends MailboxHandler> handlerClass) {
-      return handler(handlerClass.newInstance());
-    }
+    @SuppressWarnings("unchecked")
+    public NewMailboxBuilder handler (Class<?> type) {
+      Class handlerType = ofNullable(type)
+          .map(it -> (Class) it)
+          .orElse(DefaultMailboxHandler.class);
 
-    public NewMailboxBuilder type (@NonNull MailboxType mailboxType) {
-      this.type = mailboxType;
-      return this;
+      if (handlerType.isAssignableFrom(MailboxHandler.class)) {
+        throw new IllegalArgumentException("");
+      }
+      return handler(((Class<? extends MailboxHandler>) handlerType).newInstance());
     }
 
     public Mailbox build () {
@@ -162,26 +161,9 @@ public final class MailboxModule implements MailboxModuleApi, Closeable {
           .daemon(false)
           .build();
 
-      ExecutorService executor;
-      switch (type) {
-      case SINGLE:
-        executor = AppulseExecutors.newSingleThreadExecutor()
-            .threadFactory(threadFactory)
-            //            .enableClientTrace()
-            //            .enableTimeLogging()
-            .build();
-        break;
-      case CACHED:
-        executor = AppulseExecutors.newCachedThreadPool()
-            .threadFactory(threadFactory)
-            //            .enableClientTrace()
-            //            .enableTimeLogging()
-            .build();
-        break;
-      default:
-        throw new UnsupportedOperationException("Unsupported type " + type);
-      }
-      builder.executor(executor);
+      builder.executor(AppulseExecutors.newSingleThreadExecutor()
+          .threadFactory(threadFactory)
+          .build());
 
       Mailbox mailbox = builder
           .internal(internal)

@@ -37,6 +37,10 @@ public interface IntegerTerm extends NumberTerm {
     }
   }
 
+  default boolean isByte () {
+    return false;
+  }
+
   /**
    * Method that can be used to check whether contained value
    * is a number represented as Java <code>short</code>.
@@ -78,6 +82,14 @@ public interface IntegerTerm extends NumberTerm {
 
   default boolean isBigInteger () {
     return false;
+  }
+
+  default byte asByte () {
+    return asByte((byte) 0);
+  }
+
+  default byte asByte (byte defaultValue) {
+    return defaultValue;
   }
 
   default short asShort () {

@@ -172,7 +172,6 @@ public final class Node implements PingModuleApi, Closeable {
       node.mailbox()
           .name(it.getName())
           .handler(it.getHandler())
-          .type(it.getReceiverType())
           .build();
     });
 

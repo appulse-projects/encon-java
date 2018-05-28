@@ -22,13 +22,15 @@ import static java.util.stream.Collectors.toList;
 import static java.util.stream.Collectors.toSet;
 import static lombok.AccessLevel.PRIVATE;
 
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
+
 import io.appulse.encon.common.DistributionFlag;
 import io.appulse.epmd.java.core.model.NodeType;
 import io.appulse.epmd.java.core.model.Protocol;
 import io.appulse.epmd.java.core.model.Version;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
+
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;

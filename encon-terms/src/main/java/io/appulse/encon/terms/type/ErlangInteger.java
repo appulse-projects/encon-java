@@ -157,6 +157,11 @@ public class ErlangInteger extends ErlangTerm {
   }
 
   @Override
+  public boolean isByte () {
+    return (value.bitLength() + 1) <= Byte.SIZE;
+  }
+
+  @Override
   public boolean isShort () {
     return (value.bitLength() + 1) <= Short.SIZE;
   }
@@ -194,6 +199,11 @@ public class ErlangInteger extends ErlangTerm {
   @Override
   public String asText (String defaultValue) {
     return value.toString();
+  }
+
+  @Override
+  public byte asByte (byte defaultValue) {
+    return value.byteValue();
   }
 
   @Override

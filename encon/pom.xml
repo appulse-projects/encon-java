@@ -8,7 +8,7 @@
   <parent>
     <groupId>io.appulse.encon</groupId>
     <artifactId>encon-parent</artifactId>
-    <version>1.0.0</version>
+    <version>1.1.0</version>
   </parent>
 
   <artifactId>encon</artifactId>
@@ -22,12 +22,17 @@
 
     <dependency>
       <groupId>${project.groupId}</groupId>
+      <artifactId>encon-common</artifactId>
+      <version>${project.version}</version>
+    </dependency>
+    <dependency>
+      <groupId>${project.groupId}</groupId>
       <artifactId>encon-terms</artifactId>
       <version>${project.version}</version>
     </dependency>
     <dependency>
       <groupId>${project.groupId}</groupId>
-      <artifactId>encon-common</artifactId>
+      <artifactId>encon-config</artifactId>
       <version>${project.version}</version>
     </dependency>
 

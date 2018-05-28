@@ -20,9 +20,10 @@ import static io.appulse.encon.terms.TermType.MAP;
 import static java.util.stream.Collectors.toMap;
 import static lombok.AccessLevel.PRIVATE;
 
+import java.util.AbstractMap.SimpleEntry;
 import java.util.Iterator;
 import java.util.LinkedHashMap;
-import java.util.Map;
+import java.util.Map.Entry;
 import java.util.function.BinaryOperator;
 import java.util.function.IntFunction;
 import java.util.stream.IntStream;
@@ -51,7 +52,7 @@ public class ErlangMap extends ErlangTerm {
 
   private static final long serialVersionUID = -4889715199209923662L;
 
-  LinkedHashMap<ErlangTerm, ErlangTerm> map;
+  LinkedHashMap<? extends ErlangTerm, ? extends ErlangTerm> map;
 
   public ErlangMap (TermType type, @NonNull ByteBuf buffer) {
     super(type);
@@ -71,7 +72,7 @@ public class ErlangMap extends ErlangTerm {
         .collect(toMap(it -> it[0], it -> it[1], mergeFunction, LinkedHashMap::new));
   }
 
-  public ErlangMap (@NonNull LinkedHashMap<ErlangTerm, ErlangTerm> map) {
+  public ErlangMap (@NonNull LinkedHashMap<? extends ErlangTerm, ? extends ErlangTerm> map) {
     super(MAP);
     this.map = map;
   }
@@ -83,17 +84,30 @@ public class ErlangMap extends ErlangTerm {
 
   @Override
   public Iterator<ErlangTerm> elements () {
-    return map.values().iterator();
+    return map.values()
+        .stream()
+        .map(it -> (ErlangTerm) it)
+        .iterator();
   }
 
   @Override
-  public Iterator<Map.Entry<ErlangTerm, ErlangTerm>> fields () {
-    return map.entrySet().iterator();
+  public Iterator<Entry<ErlangTerm, ErlangTerm>> fields () {
+    return map.entrySet()
+        .stream()
+        .map(it -> new SimpleEntry<>(
+            it.getKey(),
+            it.getValue()
+        ))
+        .map(it -> (Entry<ErlangTerm, ErlangTerm>) it)
+        .iterator();
   }
 
   @Override
   public Iterator<ErlangTerm> fieldNames () {
-    return map.keySet().iterator();
+    return map.keySet()
+        .stream()
+        .map(it -> (ErlangTerm) it)
+        .iterator();
   }
 
   @Override
