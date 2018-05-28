@@ -16,6 +16,7 @@
 
 package io.appulse.encon.terms;
 
+import java.math.BigDecimal;
 import java.math.BigInteger;
 import java.util.Collection;
 import java.util.LinkedHashMap;
@@ -82,6 +83,10 @@ public final class Erlang {
   }
 
   public static ErlangFloat number (double value) {
+    return new ErlangFloat(value);
+  }
+
+  public static ErlangFloat number (BigDecimal value) {
     return new ErlangFloat(value);
   }
 

@@ -19,8 +19,10 @@ package io.appulse.encon.config;
 import static java.util.Optional.ofNullable;
 import static lombok.AccessLevel.PRIVATE;
 
-import io.appulse.utils.SocketUtils;
 import java.util.Map;
+
+import io.appulse.utils.SocketUtils;
+
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;

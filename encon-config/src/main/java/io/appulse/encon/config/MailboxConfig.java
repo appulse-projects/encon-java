@@ -19,9 +19,10 @@ package io.appulse.encon.config;
 import static java.util.Optional.ofNullable;
 import static lombok.AccessLevel.PRIVATE;
 
-import io.appulse.encon.config.exception.NoSuchMailboxHandlerException;
-import io.appulse.encon.module.mailbox.MailboxHandler;
 import java.util.Map;
+
+import io.appulse.encon.config.exception.NoSuchMailboxHandlerException;
+
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
@@ -57,7 +58,6 @@ public class MailboxConfig {
             throw new NoSuchMailboxHandlerException(ex, it);
           }
         })
-        .map(it -> it.asSubclass(MailboxHandler.class))
         .ifPresent(builder::handler);
 
     return builder.build();
@@ -65,7 +65,7 @@ public class MailboxConfig {
 
   String name;
 
-  Class<? extends MailboxHandler> handler;
+  Class<?> handler;
 
   /**
    * Method for setting up default values.

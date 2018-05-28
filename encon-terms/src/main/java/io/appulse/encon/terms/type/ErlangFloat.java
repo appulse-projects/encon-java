@@ -77,6 +77,11 @@ public class ErlangFloat extends ErlangTerm {
     this.value = value;
   }
 
+  public ErlangFloat (BigDecimal value) {
+    super(NEW_FLOAT);
+    this.value = value.doubleValue();
+  }
+
   @Override
   public boolean isFloat () {
     return true;
