@@ -34,9 +34,18 @@ import lombok.Value;
 import lombok.val;
 
 /**
+ * Node identifier.
+ * <p>
+ * It includes basic elements:
+ * <p>
+ * <ul>
+ *   <li>short name</li>
+ *   <li>full name</li>
+ *   <li>inet address</li>
+ * </ul>
  *
- * @author Artem Labazin
  * @since 1.0.0
+ * @author Artem Labazin
  */
 @Value
 @EqualsAndHashCode(of = "fullName")
@@ -67,6 +76,17 @@ public class NodeDescriptor implements Serializable {
     };
   }
 
+  /**
+   * Parses node descriptor from string.
+   * <p>
+   * A string could be short like <b>popa_node</b> and full, like <b>popa_node@192.168.0.32</b>.
+   * <p>
+   * Node descriptors are caching.
+   *
+   * @param node node name
+   *
+   * @return parsed {@link NodeDescriptor} instance
+   */
   @SneakyThrows
   public static NodeDescriptor from (@NonNull String node) {
     val cached = NODE_DESCRIPTOR_CACHE.get(node);

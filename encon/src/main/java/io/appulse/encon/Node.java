@@ -37,7 +37,7 @@ import io.appulse.encon.module.lookup.LookupModule;
 import io.appulse.encon.module.lookup.LookupModuleApi;
 import io.appulse.encon.module.mailbox.MailboxModule;
 import io.appulse.encon.module.mailbox.MailboxModuleApi;
-import io.appulse.encon.module.mailbox.NetKernelMailboxHandler;
+import io.appulse.encon.module.mailbox.handler.NetKernelMailboxHandler;
 import io.appulse.encon.module.ping.PingModule;
 import io.appulse.encon.module.ping.PingModuleApi;
 import io.appulse.encon.module.server.ServerModule;

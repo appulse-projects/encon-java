@@ -16,6 +16,9 @@
 
 package io.appulse.encon.module.mailbox;
 
+import io.appulse.encon.module.mailbox.handler.MailboxHandler;
+import io.appulse.encon.module.mailbox.handler.DefaultMailboxHandler;
+
 import static java.util.Optional.ofNullable;
 import static lombok.AccessLevel.PRIVATE;
 

@@ -14,9 +14,7 @@
  * limitations under the License.
  */
 
-package io.appulse.encon.module.mailbox;
-
-import static java.util.Optional.ofNullable;
+package io.appulse.encon.module.mailbox.handler;
 
 import java.util.Optional;
 
@@ -25,6 +23,8 @@ import io.appulse.encon.module.connection.control.Exit;
 import io.appulse.encon.module.connection.control.ExitTraceToken;
 import io.appulse.encon.module.connection.control.Link;
 import io.appulse.encon.module.connection.control.Unlink;
+import io.appulse.encon.module.connection.regular.Message;
+import io.appulse.encon.module.mailbox.Mailbox;
 import io.appulse.encon.terms.ErlangTerm;
 import io.appulse.encon.terms.type.ErlangPid;
 
@@ -41,10 +41,11 @@ import lombok.val;
 public abstract class AbstractMailboxHandler implements MailboxHandler {
 
   @Override
-  public void receive (@NonNull Mailbox self, @NonNull ControlMessage header, ErlangTerm body) {
-    log.debug("Mailbox {} received:\n  header: {}\n  body:   {}",
-              self, header, body);
+  public void handle (@NonNull Mailbox self, @NonNull Message message) {
+    log.debug("Mailbox {} received:\n  {}",
+              self, message);
 
+    val header = message.getHeader();
     try {
       switch (header.getTag()) {
       case LINK:
@@ -62,7 +63,7 @@ public abstract class AbstractMailboxHandler implements MailboxHandler {
         handle(self, (ExitTraceToken) header);
         break;
       default:
-        handle(self, header, ofNullable(body));
+        handle(self, header, message.getBody());
       }
     } catch (Exception ex) {
       log.error("Exception during processing received message", ex);

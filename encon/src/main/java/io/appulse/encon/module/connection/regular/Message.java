@@ -41,6 +41,7 @@ import lombok.Value;
  * @since 1.0.0
  */
 @Value
+@SuppressWarnings("checkstyle:DesignForExtension")
 public class Message {
 
   public static Message sendToRegisteredProcess (@NonNull ErlangPid from,
@@ -98,11 +99,11 @@ public class Message {
 
   ErlangTerm body;
 
-  public final Optional<ErlangTerm> getBody () {
+  public Optional<ErlangTerm> getBody () {
     return ofNullable(body);
   }
 
-  public final ErlangTerm getBodyUnsafe () {
+  public ErlangTerm getBodyUnsafe () {
     return body;
   }
 }

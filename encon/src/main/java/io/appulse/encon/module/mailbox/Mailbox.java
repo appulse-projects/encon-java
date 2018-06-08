@@ -16,8 +16,8 @@
 
 package io.appulse.encon.module.mailbox;
 
-import static io.appulse.encon.module.connection.control.ControlMessageTag.EXIT;
-import static io.appulse.encon.module.connection.control.ControlMessageTag.EXIT2;
+import io.appulse.encon.module.mailbox.handler.MailboxHandler;
+
 import static lombok.AccessLevel.PACKAGE;
 import static lombok.AccessLevel.PRIVATE;
 
@@ -34,13 +34,11 @@ import io.appulse.encon.common.NodeDescriptor;
 import io.appulse.encon.common.RemoteNode;
 import io.appulse.encon.module.NodeInternalApi;
 import io.appulse.encon.module.connection.Connection;
-import io.appulse.encon.module.connection.control.Exit;
 import io.appulse.encon.module.connection.exception.CouldntConnectException;
 import io.appulse.encon.module.connection.regular.Message;
 import io.appulse.encon.module.lookup.exception.NoSuchRemoteNodeException;
 import io.appulse.encon.module.mailbox.exception.MailboxWithSuchNameDoesntExistException;
 import io.appulse.encon.module.mailbox.exception.MailboxWithSuchPidDoesntExistException;
-import io.appulse.encon.module.mailbox.exception.ReceivedExitException;
 import io.appulse.encon.terms.Erlang;
 import io.appulse.encon.terms.ErlangTerm;
 import io.appulse.encon.terms.type.ErlangPid;
@@ -52,7 +50,6 @@ import lombok.Getter;
 import lombok.NonNull;
 import lombok.Setter;
 import lombok.SneakyThrows;
-import lombok.Synchronized;
 import lombok.experimental.FieldDefaults;
 import lombok.experimental.NonFinal;
 import lombok.extern.slf4j.Slf4j;
@@ -91,9 +88,6 @@ public final class Mailbox implements Closeable {
   @Getter(PACKAGE)
   Set<ErlangPid> links = ConcurrentHashMap.newKeySet(10);
 
-  @NonFinal
-  CompletableFuture<Message> currentFuture;
-
   AtomicBoolean closed = new AtomicBoolean(false);
 
   public Node getNode () {
@@ -105,7 +99,10 @@ public final class Mailbox implements Closeable {
   }
 
   public CompletableFuture<Message> receiveAsync () {
-    return getCurrentFuture();
+    if (!(handler instanceof ManualMailboxHandler)) {
+      throw new UnsupportedOperationException("Mailbox.receive* methods work only with ManualMailboxHandler impleentations");
+    }
+    return ((ManualMailboxHandler) handler).receive();
   }
 
   @SneakyThrows
@@ -206,37 +203,12 @@ public final class Mailbox implements Closeable {
 
   public void deliver (@NonNull Message message) {
     log.debug("Delivered\n  {}\n", message.getHeader());
-    executor.execute(() -> handle(message));
+    executor.execute(() -> handler.handle(this, message));
   }
 
   @Override
   public void close () {
     exit("normal");
-  }
-
-  @Synchronized
-  private CompletableFuture<Message> getCurrentFuture () {
-    if (currentFuture == null) {
-      currentFuture = new CompletableFuture<>();
-    }
-    return currentFuture;
-  }
-
-  @Synchronized
-  @SuppressWarnings("PMD.NullAssignment")
-  private void handle (@NonNull Message message) {
-    if (currentFuture != null) {
-      if (message.getHeader().getTag() == EXIT || message.getHeader().getTag() == EXIT2) {
-        val exit = (Exit) message.getHeader();
-        val fromPid = exit.getFrom();
-        val reason = exit.getReason();
-        currentFuture.completeExceptionally(new ReceivedExitException(fromPid, reason));
-      } else {
-        currentFuture.complete(message);
-      }
-      currentFuture = null;
-    }
-    handler.receive(this, message.getHeader(), message.getBodyUnsafe());
   }
 
   private Mailbox getMailbox (@NonNull String remoteName) {

@@ -14,30 +14,18 @@
  * limitations under the License.
  */
 
-package io.appulse.encon.module.mailbox;
+package io.appulse.encon.module.mailbox.handler;
 
-import static java.util.Optional.ofNullable;
+import java.util.concurrent.CompletableFuture;
 
-import java.util.Optional;
-
-import io.appulse.encon.module.connection.control.ControlMessage;
-import io.appulse.encon.terms.ErlangTerm;
-
-import lombok.NonNull;
-import lombok.val;
+import io.appulse.encon.module.connection.regular.Message;
 
 /**
  *
  * @author Artem Labazin
  * @since 1.0.0
  */
-public abstract class MailboxHandlerAdapter implements MailboxHandler {
+public interface ReceiveMailboxHandler extends MailboxHandler {
 
-  @Override
-  public void receive (@NonNull Mailbox self, @NonNull ControlMessage header, ErlangTerm body) {
-    val optionalBody = ofNullable(body);
-    receive(self, header, optionalBody);
-  }
-
-  public abstract void receive (Mailbox self, ControlMessage header, Optional<ErlangTerm> body);
+  CompletableFuture<Message> receive ();
 }

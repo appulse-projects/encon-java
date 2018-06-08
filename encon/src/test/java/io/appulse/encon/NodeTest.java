@@ -36,10 +36,8 @@ import io.appulse.encon.module.mailbox.Mailbox;
 import io.appulse.encon.module.mailbox.exception.ReceivedExitException;
 import io.appulse.encon.terms.ErlangTerm;
 import io.appulse.encon.terms.type.ErlangAtom;
-import io.appulse.encon.terms.type.ErlangString;
 import io.appulse.utils.test.TestMethodNamePrinter;
 import java.util.concurrent.CompletableFuture;
-import java.util.concurrent.CompletionStage;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.ThreadLocalRandom;
 import lombok.val;
@@ -174,42 +172,41 @@ public class NodeTest {
 
     node = Nodes.singleNode(name1);
 
-    CompletableFuture<String> future1 = new CompletableFuture<>();
     Mailbox mailbox1 = node.mailbox()
         .name("popa1")
-        .handler((self, header, body) -> future1.complete(body.asText()))
         .build();
+
+    CompletableFuture<String> future11 = mailbox1.receiveAsync()
+        .thenApply(it -> it.getBodyUnsafe().asText());
+    CompletableFuture<String> future12 = mailbox1.receiveAsync()
+        .thenApply(it -> it.getBodyUnsafe().asText());
 
     try (val node2 = Nodes.singleNode(name2)) {
 
       String text1 = "Hello world 1";
       String text2 = "Hello world 2";
-      CompletionStage<Message> stage1 = mailbox1.receiveAsync();
 
-      CompletableFuture<String> future2 = new CompletableFuture<>();
       Mailbox mailbox2 = node2.mailbox()
           .name("popa2")
-          .handler((self, header, body) -> future2.complete(body.asText()))
           .build();
+
+      CompletableFuture<String> future2 = mailbox2.receiveAsync()
+          .thenApply(it -> it.getBodyUnsafe().asText());
 
       mailbox2.request()
           .body(string(text1))
           .send(name1, "popa1");
 
-      assertThat(future1.get(2, SECONDS))
+      assertThat(future11.get(2, SECONDS))
           .isEqualTo(text1);
-
-      assertThat(stage1)
-          .isCompleted()
-          .isCompletedWithValueMatching(it -> it.getBody().get().equals(new ErlangString(text1)));
-
-      CompletionStage<Message> stage2 = mailbox2.receiveAsync();
+      assertThat(future12.get(2, SECONDS))
+          .isEqualTo(text1);
 
       mailbox1.request()
           .body(string(text2))
           .send(name2, "popa2");
 
-      assertThat(stage2.toCompletableFuture().get(2, SECONDS))
+      assertThat(future2.get(2, SECONDS))
           .isNotNull();
     }
   }
@@ -257,31 +254,31 @@ public class NodeTest {
               .map(ErlangTerm::asText)
               .map("hello, world"::equals)
               .orElse(false),
-               "Tuple(0)")
+                                        "Tuple(0)")
           .isCompletedWithValueMatching(it -> it.get(1)
               .filter(ErlangTerm::isAtom)
               .map(ErlangTerm::asText)
               .map("popa"::equals)
               .orElse(false),
-               "Tuple(1)")
+                                        "Tuple(1)")
           .isCompletedWithValueMatching(it -> it.get(2)
               .filter(ErlangTerm::isBoolean)
               .map(ErlangTerm::asBoolean)
               .map(FALSE::equals)
               .orElse(false),
-               "Tuple(2)")
+                                        "Tuple(2)")
           .isCompletedWithValueMatching(it -> it.get(3)
               .filter(ErlangTerm::isInt)
               .map(ErlangTerm::asInt)
               .map(value -> value == 42)
               .orElse(false),
-               "Tuple(3)")
+                                        "Tuple(3)")
           .isCompletedWithValueMatching(it -> it.get(4)
               .filter(ErlangTerm::isReference)
               .map(ErlangTerm::asReference)
               .map(reference::equals)
               .orElse(false),
-               "Tuple(4)");
+                                        "Tuple(4)");
     }
   }
 
@@ -296,8 +293,8 @@ public class NodeTest {
 
     CompletableFuture<ErlangTerm> future = new CompletableFuture<>();
     Mailbox mailbox = node.mailbox()
-        .handler((self, header, body) -> {
-          future.complete(body.asTuple().get(1).get());
+        .handler((self, message) -> {
+          future.complete(message.getBodyUnsafe().asTuple().get(1).get());
         })
         .build();
 
@@ -325,31 +322,31 @@ public class NodeTest {
             .map(ErlangTerm::asText)
             .map("hello, world"::equals)
             .orElse(false),
-             "Tuple(0)")
+                                      "Tuple(0)")
         .isCompletedWithValueMatching(it -> it.get(1)
             .filter(ErlangTerm::isAtom)
             .map(ErlangTerm::asText)
             .map("popa"::equals)
             .orElse(false),
-             "Tuple(1)")
+                                      "Tuple(1)")
         .isCompletedWithValueMatching(it -> it.get(2)
             .filter(ErlangTerm::isBoolean)
             .map(ErlangTerm::asBoolean)
             .map(FALSE::equals)
             .orElse(false),
-             "Tuple(2)")
+                                      "Tuple(2)")
         .isCompletedWithValueMatching(it -> it.get(3)
             .filter(ErlangTerm::isInt)
             .map(ErlangTerm::asInt)
             .map(value -> value == 42)
             .orElse(false),
-             "Tuple(3)")
+                                      "Tuple(3)")
         .isCompletedWithValueMatching(it -> it.get(4)
             .filter(ErlangTerm::isReference)
             .map(ErlangTerm::asReference)
             .map(reference::equals)
             .orElse(false),
-             "Tuple(4)");
+                                      "Tuple(4)");
   }
 
   @Test
@@ -369,7 +366,7 @@ public class NodeTest {
     mailbox1.exit("popa");
 
     SECONDS.sleep(1);
-    assertThat(future.isDone())
+    assertThat(future.isCompletedExceptionally())
         .isFalse();
   }
 

@@ -442,4 +442,259 @@ public class ConfigTest {
           .isEqualTo(4);
     });
   }
+
+  @Test
+  public void manual () {
+    Config config = Config.builder()
+        .defaults(Defaults.builder()
+            .epmdPort(8888)
+            .type(R3_ERLANG)
+            .cookie("secret")
+            .protocol(UDP)
+            .low(R4)
+            .high(R6)
+            .distributionFlags(new HashSet<>(asList(
+            MAP_TAG,
+            BIG_CREATION
+            )))
+            .clientThreads(7)
+            .mailbox(MailboxConfig.builder()
+                .handler(MyMailboxHandler.class)
+                .build())
+            .server(ServerConfig.builder()
+                .bossThreads(2)
+                .workerThreads(4)
+                .build())
+            .build()
+        )
+        .node("node-1", NodeConfig.builder()
+            .epmdPort(7373)
+            .type(R3_HIDDEN)
+            .cookie("non-secret")
+            .protocol(SCTP)
+            .low(R5C)
+            .high(R6)
+            .distributionFlag(EXTENDED_REFERENCES)
+            .distributionFlag(EXTENDED_PIDS_PORTS)
+            .distributionFlag(BIT_BINARIES)
+            .distributionFlag(NEW_FLOATS)
+            .distributionFlag(FUN_TAGS)
+            .distributionFlag(NEW_FUN_TAGS)
+            .distributionFlag(UTF8_ATOMS)
+            .distributionFlag(MAP_TAG)
+            .distributionFlag(BIG_CREATION)
+            .mailbox(MailboxConfig.builder()
+                .name("net_kernel")
+                .build())
+            .mailbox(MailboxConfig.builder()
+                .handler(MyMailboxHandler.class)
+                .build())
+            .mailbox(MailboxConfig.builder()
+                .name("another")
+                .build())
+            .server(ServerConfig.builder()
+                .port(8971)
+                .bossThreads(1)
+                .workerThreads(2)
+                .build())
+            .build()
+        )
+        .node("node-2", NodeConfig.builder()
+            .cookie("popa")
+            .clientThreads(1)
+            .mailbox(MailboxConfig.builder()
+                .name("net_kernel")
+                .handler(MyMailboxHandler.class)
+                .build())
+            .build()
+        )
+        .build();
+
+
+    Defaults defaults = config.getDefaults();
+    assertThat(defaults)
+        .isNotNull();
+
+    SoftAssertions.assertSoftly(softly -> {
+        softly.assertThat(defaults.getEpmdPort())
+            .isEqualTo(8888);
+
+        softly.assertThat(defaults.getType())
+            .isEqualTo(R3_ERLANG);
+
+        softly.assertThat(defaults.getCookie())
+            .isEqualTo("secret");
+
+        softly.assertThat(defaults.getProtocol())
+            .isEqualTo(UDP);
+
+        softly.assertThat(defaults.getLow())
+            .isEqualTo(R4);
+
+        softly.assertThat(defaults.getHigh())
+            .isEqualTo(R6);
+
+        softly.assertThat(defaults.getClientThreads())
+            .isEqualTo(7);
+
+        softly.assertThat(defaults.getDistributionFlags())
+            .contains(MAP_TAG, BIG_CREATION);
+
+        softly.assertThat(defaults.getMailbox())
+            .isNotNull();
+
+        softly.assertThat(defaults.getMailbox().getHandler())
+            .isEqualTo(MyMailboxHandler.class);
+
+        softly.assertThat(defaults.getServer())
+            .isNotNull();
+
+        softly.assertThat(defaults.getServer().getPort())
+            .isNull();
+
+        softly.assertThat(defaults.getServer().getBossThreads())
+            .isEqualTo(2);
+
+        softly.assertThat(defaults.getServer().getWorkerThreads())
+            .isEqualTo(4);
+    });
+
+    Map<String, NodeConfig> nodes = config.getNodes();
+    assertThat(nodes).isNotNull();
+
+    NodeConfig node1 = nodes.get("node-1");
+    assertThat(node1).isNotNull();
+
+    SoftAssertions.assertSoftly(softly -> {
+        softly.assertThat(node1.getEpmdPort())
+            .isEqualTo(7373);
+
+        softly.assertThat(node1.getType())
+            .isEqualTo(R3_HIDDEN);
+
+        softly.assertThat(node1.getCookie())
+            .isEqualTo("non-secret");
+
+        softly.assertThat(node1.getProtocol())
+            .isEqualTo(SCTP);
+
+        softly.assertThat(node1.getLow())
+            .isEqualTo(R5C);
+
+        softly.assertThat(node1.getHigh())
+            .isEqualTo(R6);
+
+        softly.assertThat(node1.getClientThreads())
+            .isEqualTo(7);
+
+        softly.assertThat(node1.getDistributionFlags()).contains(
+            EXTENDED_REFERENCES,
+            EXTENDED_PIDS_PORTS,
+            BIT_BINARIES,
+            NEW_FLOATS,
+            FUN_TAGS,
+            NEW_FUN_TAGS,
+            UTF8_ATOMS,
+            MAP_TAG,
+            BIG_CREATION
+        );
+
+        softly.assertThat(node1.getMailboxes())
+            .isNotEmpty();
+
+        MailboxConfig mailbox1 = node1.getMailboxes()
+            .stream()
+            .filter(it -> "net_kernel".equals(it.getName()))
+            .findFirst()
+            .orElse(null);
+        assertThat(mailbox1).isNotNull();
+        softly.assertThat(mailbox1.getHandler())
+            .isEqualTo(MyMailboxHandler.class);
+
+        MailboxConfig mailbox2 = node1.getMailboxes()
+            .stream()
+            .filter(it -> it.getName() == null)
+            .findFirst()
+            .orElse(null);
+        assertThat(mailbox2).isNotNull();
+        softly.assertThat(mailbox2.getHandler())
+            .isEqualTo(MyMailboxHandler.class);
+
+        MailboxConfig mailbox3 = node1.getMailboxes()
+            .stream()
+            .filter(it -> "another".equals(it.getName()))
+            .findFirst()
+            .orElse(null);
+        assertThat(mailbox3).isNotNull();
+        softly.assertThat(mailbox3.getHandler())
+            .isEqualTo(MyMailboxHandler.class);
+
+        softly.assertThat(node1.getServer())
+            .isNotNull();
+
+        softly.assertThat(node1.getServer().getPort())
+            .isEqualTo(8971);
+
+        softly.assertThat(node1.getServer().getBossThreads())
+            .isEqualTo(1);
+
+        softly.assertThat(node1.getServer().getWorkerThreads())
+            .isEqualTo(2);
+    });
+
+    NodeConfig node2 = nodes.get("node-2");
+    assertThat(node2).isNotNull();
+
+    SoftAssertions.assertSoftly(softly -> {
+        softly.assertThat(node2.getEpmdPort())
+            .isEqualTo(8888);
+
+        softly.assertThat(node2.getType())
+            .isEqualTo(R3_ERLANG);
+
+        softly.assertThat(node2.getCookie())
+            .isEqualTo("popa");
+
+        softly.assertThat(node2.getProtocol())
+            .isEqualTo(UDP);
+
+        softly.assertThat(node2.getLow())
+            .isEqualTo(R4);
+
+        softly.assertThat(node2.getHigh())
+            .isEqualTo(R6);
+
+        softly.assertThat(node2.getClientThreads())
+            .isEqualTo(1);
+
+        softly.assertThat(node2.getDistributionFlags()).contains(
+            MAP_TAG,
+            BIG_CREATION
+        );
+
+        softly.assertThat(node2.getMailboxes())
+            .isNotEmpty();
+
+        MailboxConfig mailbox1 = node2.getMailboxes()
+            .stream()
+            .filter(it -> "net_kernel".equals(it.getName()))
+            .findFirst()
+            .orElse(null);
+        assertThat(mailbox1).isNotNull();
+        softly.assertThat(mailbox1.getHandler())
+            .isEqualTo(MyMailboxHandler.class);
+
+        softly.assertThat(node2.getServer())
+            .isNotNull();
+
+        softly.assertThat(node2.getServer().getPort())
+            .isNotNull();
+
+        softly.assertThat(node2.getServer().getBossThreads())
+            .isEqualTo(2);
+
+        softly.assertThat(node2.getServer().getWorkerThreads())
+            .isEqualTo(4);
+    });
+  }
 }

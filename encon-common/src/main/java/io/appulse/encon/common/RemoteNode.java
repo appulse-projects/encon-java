@@ -27,9 +27,10 @@ import lombok.ToString;
 import lombok.Value;
 
 /**
+ * Representation of remote Erlang node.
  *
- * @author Artem Labazin
  * @since 1.0.0
+ * @author Artem Labazin
  */
 @Value
 @Builder

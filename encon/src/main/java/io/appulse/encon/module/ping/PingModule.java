@@ -77,11 +77,16 @@ public final class PingModule implements PingModuleApi {
     }
     log.debug("Remote node {} is available", remote);
 
-    CompletableFuture<Boolean> future = new CompletableFuture<>();
     Mailbox mailbox = internal.node()
         .mailbox()
-        .handler(new PingReceiveHandler(future))
         .build();
+
+    CompletableFuture<Boolean> future = mailbox.receiveAsync()
+        .thenApply(it -> {
+          mailbox.getNode().remove(mailbox);
+          return TRUE;
+        })
+        .exceptionally(ex -> FALSE);
 
     mailbox.request()
         .body(tuple(
@@ -96,18 +101,6 @@ public final class PingModule implements PingModuleApi {
             )
         ))
         .send(remote, "net_kernel");
-
-    // mailbox.request().makeTuple()
-    //     .addAtom("$gen_call")
-    //     .addTuple(items()
-    //         .add(mailbox.getPid())
-    //         .add(internal.node().generateReference())
-    //     )
-    //     .addTuple(items()
-    //         .addAtom("is_auth")
-    //         .addAtom(internal.node().getDescriptor().getFullName())
-    //     )
-    //     .send(remote, "net_kernel");
 
     log.debug("Returning from ping method");
     return future;
