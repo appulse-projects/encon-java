@@ -16,8 +16,6 @@
 
 package io.appulse.encon.module.mailbox;
 
-import io.appulse.encon.module.mailbox.handler.MailboxHandler;
-
 import static lombok.AccessLevel.PACKAGE;
 import static lombok.AccessLevel.PRIVATE;
 
@@ -39,6 +37,8 @@ import io.appulse.encon.module.connection.regular.Message;
 import io.appulse.encon.module.lookup.exception.NoSuchRemoteNodeException;
 import io.appulse.encon.module.mailbox.exception.MailboxWithSuchNameDoesntExistException;
 import io.appulse.encon.module.mailbox.exception.MailboxWithSuchPidDoesntExistException;
+import io.appulse.encon.module.mailbox.handler.MailboxHandler;
+import io.appulse.encon.module.mailbox.handler.ReceiveMailboxHandler;
 import io.appulse.encon.terms.Erlang;
 import io.appulse.encon.terms.ErlangTerm;
 import io.appulse.encon.terms.type.ErlangPid;
@@ -85,7 +85,7 @@ public final class Mailbox implements Closeable {
   @NonNull
   ExecutorService executor;
 
-  @Getter(PACKAGE)
+  @Getter
   Set<ErlangPid> links = ConcurrentHashMap.newKeySet(10);
 
   AtomicBoolean closed = new AtomicBoolean(false);
@@ -99,10 +99,10 @@ public final class Mailbox implements Closeable {
   }
 
   public CompletableFuture<Message> receiveAsync () {
-    if (!(handler instanceof ManualMailboxHandler)) {
+    if (!(handler instanceof ReceiveMailboxHandler)) {
       throw new UnsupportedOperationException("Mailbox.receive* methods work only with ManualMailboxHandler impleentations");
     }
-    return ((ManualMailboxHandler) handler).receive();
+    return ((ReceiveMailboxHandler) handler).receive();
   }
 
   @SneakyThrows

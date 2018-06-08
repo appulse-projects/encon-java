@@ -16,9 +16,6 @@
 
 package io.appulse.encon.module.mailbox;
 
-import io.appulse.encon.module.mailbox.handler.MailboxHandler;
-import io.appulse.encon.module.mailbox.handler.DefaultMailboxHandler;
-
 import static java.util.Optional.ofNullable;
 import static lombok.AccessLevel.PRIVATE;
 
@@ -28,6 +25,8 @@ import java.util.Optional;
 import java.util.concurrent.ConcurrentHashMap;
 
 import io.appulse.encon.module.NodeInternalApi;
+import io.appulse.encon.module.mailbox.handler.DefaultMailboxHandler;
+import io.appulse.encon.module.mailbox.handler.MailboxHandler;
 import io.appulse.encon.terms.type.ErlangPid;
 import io.appulse.utils.threads.AppulseExecutors;
 import io.appulse.utils.threads.AppulseThreadFactory;
