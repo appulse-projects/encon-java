@@ -25,12 +25,10 @@ import java.util.concurrent.locks.ReentrantLock;
 
 import io.appulse.encon.module.connection.control.Exit;
 import io.appulse.encon.module.connection.regular.Message;
+import io.appulse.encon.module.mailbox.Mailbox;
 import io.appulse.encon.module.mailbox.exception.ReceivedExitException;
 
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
-
-import io.appulse.encon.module.mailbox.Mailbox;
-
 import lombok.experimental.FieldDefaults;
 import lombok.val;
 
@@ -41,7 +39,7 @@ import lombok.val;
  */
 @FieldDefaults(level = PRIVATE)
 @SuppressFBWarnings("RpC_REPEATED_CONDITIONAL_TEST")
-public class DefaultMailboxHandler implements ManualMailboxHandler {
+public class DefaultMailboxHandler implements ReceiveMailboxHandler {
 
   final ReentrantLock lock = new ReentrantLock();
 
@@ -49,7 +47,7 @@ public class DefaultMailboxHandler implements ManualMailboxHandler {
 
   CompletableFuture<Message> future = new CompletableFuture<>();
 
-  boolean flag = false;
+  boolean flag;
 
   @Override
   public void handle (Mailbox self, Message message) {
