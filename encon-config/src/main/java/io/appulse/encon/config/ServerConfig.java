@@ -31,9 +31,10 @@ import lombok.NonNull;
 import lombok.experimental.FieldDefaults;
 
 /**
+ * Server's configuration.
  *
- * @author Artem Labazin
  * @since 1.0.0
+ * @author Artem Labazin
  */
 @Data
 @Builder
@@ -70,7 +71,7 @@ public class ServerConfig {
   Integer workerThreads;
 
   /**
-   * Method for setting up default values.
+   * Method for setting up the default values.
    *
    * @param defaults ServerConfig with default values for server
    *

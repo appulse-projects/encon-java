@@ -14,10 +14,10 @@
  * limitations under the License.
  */
 
-package io.appulse.encon.module.mailbox;
+package io.appulse.encon.module.mailbox.handler;
 
-import io.appulse.encon.module.connection.control.ControlMessage;
-import io.appulse.encon.terms.ErlangTerm;
+import io.appulse.encon.module.connection.regular.Message;
+import io.appulse.encon.module.mailbox.Mailbox;
 
 /**
  *
@@ -26,5 +26,5 @@ import io.appulse.encon.terms.ErlangTerm;
  */
 public interface MailboxHandler {
 
-  void receive (Mailbox self, ControlMessage header, ErlangTerm body);
+  void handle (Mailbox self, Message message);
 }

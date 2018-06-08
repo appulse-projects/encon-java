@@ -59,9 +59,10 @@ import lombok.experimental.FieldDefaults;
 import lombok.val;
 
 /**
+ * Set of defaults for configuration settings.
  *
- * @author Artem Labazin
  * @since 1.0.0
+ * @author Artem Labazin
  */
 @Data
 @Builder
@@ -70,8 +71,16 @@ import lombok.val;
 @FieldDefaults(level = PRIVATE)
 public class Defaults {
 
+  /**
+   * Cached defaults instance.
+   */
   public static final Defaults INSTANCE = Defaults.builder().build();
 
+  /**
+   * Returns default cookie. It could be an empty string or content of ~/.erlang.cookie file.
+   *
+   * @return default cookie value
+   */
   public static String getDefaultCookie () {
     val cookieFile = Paths.get(getHomeDir(), ".erlang.cookie");
     if (!Files.exists(cookieFile)) {
@@ -90,6 +99,11 @@ public class Defaults {
     }
   }
 
+  /**
+   * Returns user's home directory.
+   *
+   * @return user's home directory
+   */
   public static String getHomeDir () {
     val home = System.getProperty("user.home");
     if (!System.getProperty("os.name").toLowerCase(ENGLISH).contains("windows")) {

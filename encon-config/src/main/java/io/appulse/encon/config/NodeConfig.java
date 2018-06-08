@@ -41,9 +41,10 @@ import lombok.experimental.FieldDefaults;
 import lombok.val;
 
 /**
+ * Node configuration settings.
  *
- * @author Artem Labazin
  * @since 1.0.0
+ * @author Artem Labazin
  */
 @Data
 @Builder
@@ -52,6 +53,9 @@ import lombok.val;
 @FieldDefaults(level = PRIVATE)
 public class NodeConfig {
 
+  /**
+   * Cached empty {@link NodeConfig} instance.
+   */
   public static final NodeConfig DEFAULT = NodeConfig.builder().build();
 
   @SuppressWarnings("unchecked")
@@ -151,7 +155,7 @@ public class NodeConfig {
   CompressionConfig compression;
 
   /**
-   * Method for setting up default values.
+   * Method for setting up the default values.
    *
    * @param defaults Defaults with default values for node
    *

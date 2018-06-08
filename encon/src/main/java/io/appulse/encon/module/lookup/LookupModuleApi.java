@@ -22,8 +22,6 @@ import io.appulse.encon.common.NodeDescriptor;
 import io.appulse.encon.common.RemoteNode;
 import io.appulse.encon.terms.type.ErlangPid;
 
-import lombok.NonNull;
-
 /**
  *
  * @author Artem Labazin
@@ -33,7 +31,7 @@ public interface LookupModuleApi {
 
   Optional<RemoteNode> lookup (String node);
 
-  Optional<RemoteNode> lookup (@NonNull ErlangPid pid);
+  Optional<RemoteNode> lookup (ErlangPid pid);
 
   Optional<RemoteNode> lookup (NodeDescriptor descriptor);
 }

@@ -12,7 +12,6 @@ defaults:
     - BIG_CREATION
   client-threads: 7
   mailbox:
-    type: SINGLE
     handler: io.appulse.encon.config.MyMailboxHandler
   server:
     boss-threads: 2
@@ -39,9 +38,7 @@ nodes:
       - BIG_CREATION
     mailboxes:
       - name: net_kernel
-        type: CACHED
-      - type: SINGLE
-        handler: io.appulse.encon.config.MyMailboxHandler
+      - handler: io.appulse.encon.config.MyMailboxHandler
       - name: another
     server:
       port: 8971
@@ -53,5 +50,4 @@ nodes:
     client-threads: 1
     mailboxes:
       - name: net_kernel
-        type: CACHED
         handler: io.appulse.encon.config.MyMailboxHandler

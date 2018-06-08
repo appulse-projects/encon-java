@@ -14,16 +14,18 @@
  * limitations under the License.
  */
 
-package io.appulse.encon.module.mailbox;
+package io.appulse.encon.module.mailbox.handler;
 
 import static io.appulse.encon.terms.Erlang.atom;
 import static io.appulse.encon.terms.Erlang.tuple;
 
-import io.appulse.encon.module.connection.control.ControlMessage;
+import io.appulse.encon.module.connection.regular.Message;
+import io.appulse.encon.module.mailbox.Mailbox;
 import io.appulse.encon.terms.ErlangTerm;
 
 import lombok.NonNull;
 import lombok.extern.slf4j.Slf4j;
+import lombok.val;
 
 /**
  *
@@ -34,7 +36,8 @@ import lombok.extern.slf4j.Slf4j;
 public class NetKernelMailboxHandler implements MailboxHandler {
 
   @Override
-  public void receive (@NonNull Mailbox self, @NonNull ControlMessage header, ErlangTerm body) {
+  public void handle (@NonNull Mailbox self, @NonNull Message message) {
+    val body = message.getBodyUnsafe();
     if (body == null) {
       throw new IllegalArgumentException("Invalid net_kernel call, without body");
     }

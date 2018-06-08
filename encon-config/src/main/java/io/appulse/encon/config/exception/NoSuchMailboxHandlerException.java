@@ -20,9 +20,10 @@ import lombok.EqualsAndHashCode;
 import lombok.Value;
 
 /**
+ * The exception indicates what mailbox handler class is unreachable.
  *
- * @author Artem Labazin
  * @since 1.0.0
+ * @author Artem Labazin
  */
 @Value
 @EqualsAndHashCode(callSuper = false)
@@ -32,6 +33,17 @@ public class NoSuchMailboxHandlerException extends RuntimeException {
 
   String classPath;
 
+  /**
+   * Constructs a new runtime exception with the specified cause and a detail message
+   * of (cause==null ? null : cause.toString()) (which typically contains the class and detail message of cause).
+   * <p>
+   * This constructor is useful for runtime exceptions that are little more than wrappers for other throwables.
+   *
+   * @param cause     the cause (which is saved for later retrieval by the Throwable.getCause() method).
+   *                  (A null value is permitted, and indicates that the cause is nonexistent or unknown.)
+   *
+   * @param classPath handler class path
+   */
   public NoSuchMailboxHandlerException (Throwable cause, String classPath) {
     super(cause);
     this.classPath = classPath;

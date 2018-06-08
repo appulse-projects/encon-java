@@ -31,9 +31,10 @@ import lombok.NonNull;
 import lombok.experimental.FieldDefaults;
 
 /**
+ * Set of mailbox settings.
  *
- * @author Artem Labazin
  * @since 1.0.0
+ * @author Artem Labazin
  */
 @Data
 @Builder
@@ -68,7 +69,7 @@ public class MailboxConfig {
   Class<?> handler;
 
   /**
-   * Method for setting up default values.
+   * Method for setting up the default values.
    *
    * @param defaults MailboxConfig with default values for node
    *

@@ -29,9 +29,10 @@ import lombok.NonNull;
 import lombok.experimental.FieldDefaults;
 
 /**
+ * Protocol compression settings.
  *
- * @author Artem Labazin
  * @since 1.0.0
+ * @author Artem Labazin
  */
 @Data
 @Builder
@@ -61,7 +62,7 @@ public class CompressionConfig {
   Integer level;
 
   /**
-   * Method for setting up default values.
+   * Method for setting up the default values.
    *
    * @param defaults CompressionConfig with default values for compression
    *

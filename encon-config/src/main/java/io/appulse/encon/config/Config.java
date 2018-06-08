@@ -37,25 +37,47 @@ import lombok.val;
 import org.yaml.snakeyaml.Yaml;
 
 /**
+ * Main nodes conigs aggregator.
  *
- * @author Artem Labazin
  * @since 1.0.0
+ * @author Artem Labazin
  */
 @Data
 @NoArgsConstructor
 @SuppressFBWarnings("UWF_FIELD_NOT_INITIALIZED_IN_CONSTRUCTOR")
 public final class Config {
 
+  /**
+   * Loads configuration YAML file byt its path.
+   *
+   * @param fileName configuration file path
+   *
+   * @return parsed {@link Config} instance
+   */
   public static Config load (@NonNull String fileName) {
     val file = new File(fileName);
     return load(file);
   }
 
+  /**
+   * Loads configuration YAML file byt its path.
+   *
+   * @param path configuration file path
+   *
+   * @return parsed {@link Config} instance
+   */
   public static Config load (@NonNull Path path) {
     val file = path.toFile();
     return load(file);
   }
 
+  /**
+   * Loads configuration YAML file.
+   *
+   * @param file configuration file
+   *
+   * @return parsed {@link Config} instance
+   */
   @SuppressWarnings("unchecked")
   public static Config load (@NonNull File file) {
     val map = parseYaml(file);
