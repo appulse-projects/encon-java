@@ -17,9 +17,10 @@
 package io.appulse.encon.terms.term;
 
 /**
+ * Boolean term API.
  *
- * @author Artem Labazin
  * @since 1.0.0
+ * @author Artem Labazin
  */
 public interface BooleanTerm extends ValueTerm {
 

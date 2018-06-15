@@ -27,14 +27,20 @@ import io.appulse.encon.terms.type.ErlangPort;
 import io.appulse.encon.terms.type.ErlangReference;
 
 /**
+ * Conteiner term API.
  *
- * @author Artem Labazin
  * @since 1.0.0
+ * @author Artem Labazin
  */
 public interface NodeContainerTerm extends ValueTerm {
 
+  /**
+   * Tells is this term a container or not.
+   *
+   * @return {@code true} if this object is a container.
+   */
   @SuppressWarnings("deprecation")
-  default boolean isSpecificTerm () {
+  default boolean isContainerTerm () {
     switch (getType()) {
     case REFERENCE:
     case NEW_REFERENCE:
@@ -53,6 +59,11 @@ public interface NodeContainerTerm extends ValueTerm {
     }
   }
 
+  /**
+   * Tells is this term a eralng reference type or not.
+   *
+   * @return {@code true} if this object is a eralng reference type.
+   */
   default boolean isReference () {
     switch (getType()) {
     case REFERENCE:
@@ -64,26 +75,65 @@ public interface NodeContainerTerm extends ValueTerm {
     }
   }
 
+  /**
+   * Method that will try to convert value of this term to a {@link ErlangReference} value.
+   * <p>
+   * If representation cannot be converted to a {@link ErlangReference} value,
+   * {@code null} will be returned; no exceptions are thrown.
+   *
+   * @return term's {@link ErlangReference} representation
+   */
   default ErlangReference asReference () {
     return null;
   }
 
+  /**
+   * Tells is this term a eralng reference type or not.
+   *
+   * @return {@code true} if this object is a eralng reference type.
+   */
   default boolean isPid () {
     return getType() == PID || getType() == NEW_PID;
   }
 
+  /**
+   * Method that will try to convert value of this term to a {@link ErlangPid} value.
+   * <p>
+   * If representation cannot be converted to a {@link ErlangPid} value,
+   * {@code null} will be returned; no exceptions are thrown.
+   *
+   * @return term's {@link ErlangPid} representation
+   */
   default ErlangPid asPid () {
     return null;
   }
 
+  /**
+   * Tells is this term a eralng port type or not.
+   *
+   * @return {@code true} if this object is a eralng port type.
+   */
   default boolean isPort () {
     return getType() == PORT || getType() == NEW_PORT;
   }
 
+  /**
+   * Method that will try to convert value of this term to a {@link ErlangPort} value.
+   * <p>
+   * If representation cannot be converted to a {@link ErlangPort} value,
+   * {@code null} will be returned; no exceptions are thrown.
+   *
+   * @return term's {@link ErlangPort} representation
+   */
   default ErlangPort asPort () {
     return null;
   }
 
+  /**
+   * Tells is this term a eralng atom type or not.
+   *
+   * @return {@code true} if this object is a eralng atom type.
+   */
   @SuppressWarnings("deprecation")
   default boolean isAtom () {
     switch (getType()) {
@@ -97,6 +147,14 @@ public interface NodeContainerTerm extends ValueTerm {
     }
   }
 
+  /**
+   * Method that will try to convert value of this term to a {@link ErlangAtom} value.
+   * <p>
+   * If representation cannot be converted to a {@link ErlangAtom} value,
+   * {@code null} will be returned; no exceptions are thrown.
+   *
+   * @return term's {@link ErlangAtom} representation
+   */
   default ErlangAtom asAtom () {
     return null;
   }

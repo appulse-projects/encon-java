@@ -22,14 +22,38 @@ import static io.appulse.encon.terms.TermType.NIL;
 import io.appulse.encon.terms.TermType;
 
 /**
+ * Basic term API.
  *
- * @author Artem Labazin
  * @since 1.0.0
+ * @author Artem Labazin
  */
 public interface ValueTerm {
 
+  /**
+   * Returns term's type.
+   *
+   * @return {@link TermType} instance
+   */
   TermType getType ();
 
+  /**
+   * Tells is this a single value container or not.
+   * <p>
+   * Value types which are <b>not</b> value containers:
+   * <p>
+   * <ul>
+   * <li>MAP</li>
+   * <li>LIST</li>
+   * <li>EXTERNAL_FUNCTION</li>
+   * <li>FUNCTION</li>
+   * <li>COMPRESSED</li>
+   * <li>SMALL_TUPLE</li>
+   * <li>NEW_FUNCTION</li>
+   * <li>LARGE_TUPLE</li>
+   * </ul>
+   *
+   * @return {@code true} if this object is a single value, {@code false} otherwise
+   */
   default boolean isValueTerm () {
     switch (getType()) {
     case MAP:
@@ -46,32 +70,42 @@ public interface ValueTerm {
     }
   }
 
+  /**
+   * Tells is this a {@link TermType#NIL} type or not.
+   *
+   * @return {@code true} if this object is a {@link TermType#NIL} type, {@code false} otherwise
+   */
   default boolean isNil () {
     return getType() == NIL;
   }
 
   /**
-   * Method that can be used to check if this term represents
-   * binary data.
+   * Method that can be used to check if this term represents binary data or not.
    *
-   * @return True if this term represents binary data
+   * @return {@code true} if this term represents binary data
    */
   default boolean isBinary () {
     return getType() == BINARY;
   }
 
   /**
-   * Method to use for accessing binary content of binary terms (terms
-   * for which {@link #isBinary} returns true);
+   * Method to use for accessing binary content of binary terms (terms for which {@link #isBinary} returns true).
    * For other types of nodes, returns empty byte array.
    *
-   * @return binary data this term contains, if it is a binary term;
-   *         empty array otherwise
+   * @return binary data this term contains, if it is a binary term, empty array otherwise
    */
   default byte[] asBinary () {
     return asBinary(new byte[0]);
   }
 
+  /**
+   * Method to use for accessing binary content of binary terms (terms for which {@link #isBinary} returns true) or
+   * {@code defaultValue} otherwise.
+   *
+   * @param defaultValue default value if real value is empty
+   *
+   * @return binary data this term contains, if it is a binary term, empty array otherwise
+   */
   default byte[] asBinary (byte[] defaultValue) {
     return defaultValue;
   }

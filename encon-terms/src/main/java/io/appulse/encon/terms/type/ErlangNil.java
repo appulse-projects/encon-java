@@ -24,15 +24,19 @@ import io.netty.buffer.ByteBuf;
 import lombok.ToString;
 
 /**
+ * The representation for an empty list, that is, the Erlang syntax {@code []}.
  *
- * @author Artem Labazin
  * @since 1.0.0
+ * @author Artem Labazin
  */
 @ToString
 public class ErlangNil extends ErlangTerm {
 
   private static final long serialVersionUID = 3124893467508024194L;
 
+  /**
+   * Default no-arguments constructor.
+   */
   public ErlangNil () {
     super(NIL);
   }

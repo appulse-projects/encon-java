@@ -24,9 +24,10 @@ import lombok.RequiredArgsConstructor;
 import lombok.experimental.FieldDefaults;
 
 /**
+ * Illegal argument exception of Erlang term object.
  *
- * @author Artem Labazin
  * @since 1.0.0
+ * @author Artem Labazin
  */
 @RequiredArgsConstructor
 @FieldDefaults(level = PRIVATE, makeFinal = true)

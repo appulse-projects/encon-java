@@ -30,9 +30,11 @@ import lombok.experimental.FieldDefaults;
 import lombok.val;
 
 /**
+ * Provides a Java representation of Erlang binaries. Anything that can be
+ * represented as a sequence of bytes can be made into an Erlang binary.
  *
- * @author Artem Labazin
  * @since 1.0.0
+ * @author Artem Labazin
  */
 @ToString
 @EqualsAndHashCode(callSuper = true)
@@ -43,6 +45,13 @@ public class ErlangBinary extends ErlangTerm {
 
   byte[] bytes;
 
+  /**
+   * Creates Erlang term object with specific {@link TermType} from {@link ByteBuf}.
+   *
+   * @param type object's type
+   *
+   * @param buffer byte buffer
+   */
   public ErlangBinary (TermType type, @NonNull ByteBuf buffer) {
     super(type);
 
@@ -51,6 +60,11 @@ public class ErlangBinary extends ErlangTerm {
     buffer.readBytes(bytes);
   }
 
+  /**
+   * Constructs Erlang's binary object.
+   *
+   * @param bytes object's binary value
+   */
   public ErlangBinary (@NonNull byte[] bytes) {
     super(BINARY);
 

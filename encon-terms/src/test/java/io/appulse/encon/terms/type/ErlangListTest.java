@@ -61,7 +61,7 @@ public class ErlangListTest {
     assertThat(list).isNotNull();
 
     SoftAssertions.assertSoftly(softly -> {
-      softly.assertThat(list.isContainerTerm())
+      softly.assertThat(list.isCollectionTerm())
           .isTrue();
 
       softly.assertThat(list.isList())

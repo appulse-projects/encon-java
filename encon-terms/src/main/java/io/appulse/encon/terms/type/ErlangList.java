@@ -42,9 +42,31 @@ import lombok.experimental.FieldDefaults;
 import lombok.val;
 
 /**
+ * A list is a compound data type with a variable number of terms.
+ * <p>
+ * Each term Term in the list is called an element.
+ * The number of elements is said to be the length of the list.
+ * <p>
+ * Formally, a list is either the empty list {@code []} or consists of a <b>head</b> (first element)
+ * and a <b>tail</b> (remainder of the list). The <b>tail</b> is also a list.
+ * The latter can be expressed as {@code [H|T]}. The notation {@code [Term1,...,TermN]} above
+ * is equivalent with the list {@code [Term1|[...|[TermN|[]]]]}.
+ * <p>
+ * Examples:
+ * <p>
+ * <ul>
+ * <li>{@code []} is a list, thus</li>
+ * <li>{@code [c|[]]} is a list, thus</li>
+ * <li>{@code [b|[c|[]]]} is a list, thus</li>
+ * <li>@{code [a|[b|[c|[]]]]} is a list, or in short {@code [a,b,c]}</li>
+ * </ul>
+ * <p>
+ * A list where the tail is a list is sometimes called a <b>proper list</b>.
+ * It is allowed to have a list where the tail is not a list, for example, {@code [a|b]}.
+ * However, this type of list is of little practical use.
  *
- * @author Artem Labazin
  * @since 1.0.0
+ * @author Artem Labazin
  */
 @ToString
 @EqualsAndHashCode(callSuper = true)
@@ -58,6 +80,13 @@ public class ErlangList extends ErlangTerm {
   @Getter
   ErlangTerm tail;
 
+  /**
+   * Creates Erlang term object with specific {@link TermType} from {@link ByteBuf}.
+   *
+   * @param type object's type
+   *
+   * @param buffer byte buffer
+   */
   public ErlangList (TermType type, @NonNull ByteBuf buffer) {
     super(type);
 
@@ -70,10 +99,20 @@ public class ErlangList extends ErlangTerm {
     tail = ErlangTerm.newInstance(buffer);
   }
 
+  /**
+   * Constructs Erlang's list object with specific values.
+   *
+   * @param elements list's {@link ErlangTerm} elements
+   */
   public ErlangList (ErlangTerm... elements) {
     this(Arrays.asList(elements));
   }
 
+  /**
+   * Constructs Erlang's list object with specific values.
+   *
+   * @param elements list's {@link ErlangTerm} elements
+   */
   public ErlangList (@NonNull Collection<ErlangTerm> elements) {
     super(LIST);
 
@@ -81,6 +120,14 @@ public class ErlangList extends ErlangTerm {
     tail = NIL;
   }
 
+  /**
+   * Constructs Erlang's list object with specific values and
+   * optional (maybe {@code null}) {@link ErlangTerm} tail.
+   *
+   * @param tail list's {@link ErlangTerm} tail
+   *
+   * @param elements list's {@link ErlangTerm} elements
+   */
   @Builder
   public ErlangList (ErlangTerm tail, @Singular List<ErlangTerm> elements) {
     super(LIST);

@@ -34,9 +34,20 @@ import lombok.experimental.FieldDefaults;
 import lombok.experimental.NonFinal;
 
 /**
+ * A port identifier identifies an Erlang port.
+ * <p>
+ * Ports provide the basic mechanism for communication with the external world,
+ * from Erlang's point of view. They provide a byte-oriented interface to an external program.
+ * When a port has been created, Erlang can communicate with it by sending and receiving lists of bytes,
+ * including binaries.
+ * <p>
+ * The Erlang process creating a port is said to be the <b>port owner</b>, or
+ * the <b>connected process</b> of the port. All communication to and from the port must go
+ * through the port owner. If the port owner terminates, so does the port (and the external program,
+ * if it is written correctly).
  *
- * @author Artem Labazin
  * @since 1.0.0
+ * @author Artem Labazin
  */
 @Getter
 @EqualsAndHashCode(callSuper = true)
@@ -54,6 +65,13 @@ public class ErlangPort extends ErlangTerm {
 
   int creation;
 
+  /**
+   * Creates Erlang term object with specific {@link TermType} from {@link ByteBuf}.
+   *
+   * @param type object's type
+   *
+   * @param buffer byte buffer
+   */
   public ErlangPort (TermType type, @NonNull ByteBuf buffer) {
     super(type);
 
@@ -107,6 +125,11 @@ public class ErlangPort extends ErlangTerm {
         .toString();
   }
 
+  /**
+   * Returns container's {@link NodeDescriptor} value.
+   *
+   * @return container's {@link NodeDescriptor} value
+   */
   public final NodeDescriptor getDescriptor () {
     if (descriptor == null) {
       descriptor = NodeDescriptor.from(node.asText());

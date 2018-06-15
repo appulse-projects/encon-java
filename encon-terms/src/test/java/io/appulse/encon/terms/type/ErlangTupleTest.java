@@ -83,7 +83,7 @@ public class ErlangTupleTest {
     assertThat(tuple).isNotNull();
 
     SoftAssertions.assertSoftly(softly -> {
-      softly.assertThat(tuple.isContainerTerm())
+      softly.assertThat(tuple.isCollectionTerm())
           .isTrue();
 
       softly.assertThat(tuple.isTuple())

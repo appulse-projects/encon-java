@@ -33,9 +33,10 @@ import lombok.experimental.FieldDefaults;
 import lombok.val;
 
 /**
+ * Provides a Java representation of Erlang external functions.
  *
- * @author Artem Labazin
  * @since 1.0.0
+ * @author Artem Labazin
  */
 @Getter
 @ToString
@@ -51,6 +52,13 @@ public class ErlangExternalFunction extends ErlangTerm {
 
   int arity;
 
+  /**
+   * Creates Erlang term object with specific {@link TermType} from {@link ByteBuf}.
+   *
+   * @param type object's type
+   *
+   * @param buffer byte buffer
+   */
   public ErlangExternalFunction (TermType type, @NonNull ByteBuf buffer) {
     super(type);
 
@@ -64,6 +72,15 @@ public class ErlangExternalFunction extends ErlangTerm {
     arity = numberArity.asInt();
   }
 
+  /**
+   * Constructs Erlang's external function object.
+   *
+   * @param module function's module name
+   *
+   * @param name function's name
+   *
+   * @param arity function's arguments count
+   */
   @Builder
   public ErlangExternalFunction (@NonNull String module, @NonNull String name, int arity) {
     super(EXTERNAL_FUNCTION);

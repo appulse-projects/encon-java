@@ -38,9 +38,13 @@ import lombok.experimental.NonFinal;
 import lombok.val;
 
 /**
+ * An atom is a literal, a constant with name. An atom is to be enclosed in
+ * single quotes (') if it does not begin with a lower-case letter or
+ * if it contains other characters than alphanumeric characters,
+ * underscore (_), or @.
  *
- * @author Artem Labazin
  * @since 1.0.0
+ * @author Artem Labazin
  */
 @ToString
 @EqualsAndHashCode(callSuper = true)
@@ -64,6 +68,13 @@ public class ErlangAtom extends ErlangTerm {
 
   transient Charset charset;
 
+  /**
+   * Creates Erlang term object with specific {@link TermType} from {@link ByteBuf}.
+   *
+   * @param type object's type
+   *
+   * @param buffer byte buffer
+   */
   @SuppressWarnings("deprecation")
   public ErlangAtom (TermType type, @NonNull ByteBuf buffer) {
     super(type);
@@ -80,6 +91,11 @@ public class ErlangAtom extends ErlangTerm {
     buffer.readBytes(bytes);
   }
 
+  /**
+   * Create Erlang's atom object with specific {@link String} value.
+   *
+   * @param value {@link String} atom's value
+   */
   public ErlangAtom (@NonNull String value) {
     super();
 
@@ -98,6 +114,11 @@ public class ErlangAtom extends ErlangTerm {
     }
   }
 
+  /**
+   * Create Erlang's atom object with specific {@code boolean} value.
+   *
+   * @param value {@code boolean} atom's value
+   */
   public ErlangAtom (boolean value) {
     super(SMALL_ATOM_UTF8);
     charset = UTF_8;

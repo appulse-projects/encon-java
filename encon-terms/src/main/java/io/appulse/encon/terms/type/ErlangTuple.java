@@ -39,9 +39,13 @@ import lombok.ToString;
 import lombok.experimental.FieldDefaults;
 
 /**
+ * A tuple is a compound data type with a fixed number of terms.
+ * <p>
+ * Each term Term in the tuple is called an element.
+ * The number of elements is said to be the size of the tuple.
  *
- * @author Artem Labazin
  * @since 1.0.0
+ * @author Artem Labazin
  */
 @ToString
 @EqualsAndHashCode(callSuper = true)
@@ -54,6 +58,13 @@ public class ErlangTuple extends ErlangTerm {
 
   ErlangTerm[] elements;
 
+  /**
+   * Creates Erlang term object with specific {@link TermType} from {@link ByteBuf}.
+   *
+   * @param type object's type
+   *
+   * @param buffer byte buffer
+   */
   public ErlangTuple (TermType type, @NonNull ByteBuf buffer) {
     super(type);
 
@@ -74,10 +85,20 @@ public class ErlangTuple extends ErlangTerm {
         .toArray(ErlangTerm[]::new);
   }
 
+  /**
+   * Constructs Erlang's tuple object with specific values.
+   *
+   * @param elements tuple's {@link ErlangTerm} elements
+   */
   public ErlangTuple (ErlangTerm... elements) {
     this(Arrays.asList(elements));
   }
 
+  /**
+   * Constructs Erlang's tuple object with specific values.
+   *
+   * @param adds tuple's {@link ErlangTerm} elements
+   */
   @Builder
   public ErlangTuple (@Singular Collection<ErlangTerm> adds) {
     super();

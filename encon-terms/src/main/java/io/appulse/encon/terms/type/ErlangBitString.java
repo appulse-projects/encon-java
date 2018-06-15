@@ -35,9 +35,12 @@ import lombok.experimental.FieldDefaults;
 import lombok.val;
 
 /**
+ * Provides a Java representation of Erlang bitstrs. An Erlang bitstr is an
+ * Erlang binary with a length not an integral number of bytes (8-bit). Anything
+ * can be represented as a sequence of bytes can be made into an Erlang bitstr.
  *
- * @author Artem Labazin
  * @since 1.0.0
+ * @author Artem Labazin
  */
 @Getter
 @ToString
@@ -51,6 +54,13 @@ public class ErlangBitString extends ErlangTerm {
 
   int pad;
 
+  /**
+   * Creates Erlang term object with specific {@link TermType} from {@link ByteBuf}.
+   *
+   * @param type object's type
+   *
+   * @param buffer byte buffer
+   */
   public ErlangBitString (TermType type, @NonNull ByteBuf buffer) {
     super(type);
 
@@ -70,6 +80,13 @@ public class ErlangBitString extends ErlangTerm {
     validate();
   }
 
+  /**
+   * Constructs Erlang's bit string object.
+   *
+   * @param bits object's binary value
+   *
+   * @param pad object's binary pad value
+   */
   @Builder
   public ErlangBitString (@NonNull byte[] bits, int pad) {
     super(BIT_BINNARY);
