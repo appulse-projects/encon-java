@@ -36,9 +36,10 @@ import lombok.experimental.FieldDefaults;
 import lombok.experimental.NonFinal;
 
 /**
+ * A reference is a term that is unique in an Erlang runtime system.
  *
- * @author Artem Labazin
  * @since 1.0.0
+ * @author Artem Labazin
  */
 @Getter
 @FieldDefaults(level = PRIVATE, makeFinal = true)
@@ -58,6 +59,13 @@ public class ErlangReference extends ErlangTerm {
 
   int creation;
 
+  /**
+   * Creates Erlang term object with specific {@link TermType} from {@link ByteBuf}.
+   *
+   * @param type object's type
+   *
+   * @param buffer byte buffer
+   */
   public ErlangReference (TermType type, @NonNull ByteBuf buffer) {
     super(type);
 
@@ -97,7 +105,7 @@ public class ErlangReference extends ErlangTerm {
   }
 
   @Builder
-  public ErlangReference (TermType type, @NonNull String node, long id, long[] ids, int creation) {
+  private ErlangReference (TermType type, @NonNull String node, long id, long[] ids, int creation) {
     super(ofNullable(type).orElse(NEW_REFERENCE));
 
     this.node = new ErlangAtom(node);
@@ -128,7 +136,7 @@ public class ErlangReference extends ErlangTerm {
   }
 
   /**
-   * Returns id.
+   * Returns single id element.
    *
    * @return id
    */
@@ -158,6 +166,11 @@ public class ErlangReference extends ErlangTerm {
         .toString();
   }
 
+  /**
+   * Returns container's {@link NodeDescriptor} value.
+   *
+   * @return container's {@link NodeDescriptor} value
+   */
   public final NodeDescriptor getDescriptor () {
     if (descriptor == null) {
       descriptor = NodeDescriptor.from(node.asText());

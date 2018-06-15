@@ -40,9 +40,14 @@ import lombok.experimental.FieldDefaults;
 import lombok.val;
 
 /**
+ * A map is a compound data type with a variable number of key-value associations.
+ * <p>
+ * Each key-value association in the map is called an <b>association pair</b>.
+ * The key and value parts of the pair are called <b>elements</b>.
+ * The number of association pairs is said to be the <b>size</b> of the map.
  *
- * @author Artem Labazin
  * @since 1.0.0
+ * @author Artem Labazin
  */
 @ToString
 @EqualsAndHashCode(callSuper = true)
@@ -54,6 +59,13 @@ public class ErlangMap extends ErlangTerm {
 
   LinkedHashMap<? extends ErlangTerm, ? extends ErlangTerm> map;
 
+  /**
+   * Constructs Erlang term object with specific {@link TermType} from {@link ByteBuf}.
+   *
+   * @param type object's type
+   *
+   * @param buffer byte buffer
+   */
   public ErlangMap (TermType type, @NonNull ByteBuf buffer) {
     super(type);
 
@@ -72,6 +84,11 @@ public class ErlangMap extends ErlangTerm {
         .collect(toMap(it -> it[0], it -> it[1], mergeFunction, LinkedHashMap::new));
   }
 
+  /**
+   * Constructs Erlang's map object with specific {@link LinkedHashMap} values.
+   *
+   * @param map its {@link LinkedHashMap} values
+   */
   public ErlangMap (@NonNull LinkedHashMap<? extends ErlangTerm, ? extends ErlangTerm> map) {
     super(MAP);
     this.map = map;

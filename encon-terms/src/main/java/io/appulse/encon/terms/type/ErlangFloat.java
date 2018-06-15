@@ -35,9 +35,10 @@ import lombok.experimental.FieldDefaults;
 import lombok.val;
 
 /**
+ * Erlang's floating point number representation.
  *
- * @author Artem Labazin
  * @since 1.0.0
+ * @author Artem Labazin
  */
 @ToString
 @EqualsAndHashCode(callSuper = true)
@@ -48,6 +49,13 @@ public class ErlangFloat extends ErlangTerm {
 
   double value;
 
+  /**
+   * Creates Erlang term object with specific {@link TermType} from {@link ByteBuf}.
+   *
+   * @param type object's type
+   *
+   * @param buffer byte buffer
+   */
   public ErlangFloat (TermType type, @NonNull ByteBuf buffer) {
     super(type);
 
@@ -67,16 +75,31 @@ public class ErlangFloat extends ErlangTerm {
     }
   }
 
+  /**
+   * Create Erlang's floating point number object with specific {@code double} value.
+   *
+   * @param value {@code double} number's value
+   */
   public ErlangFloat (double value) {
     super(NEW_FLOAT);
     this.value = value;
   }
 
+  /**
+   * Create Erlang's floating point number object with specific {@code float} value.
+   *
+   * @param value {@code float} number's value
+   */
   public ErlangFloat (float value) {
     super(NEW_FLOAT);
     this.value = value;
   }
 
+  /**
+   * Create Erlang's floating point number object with specific {@link BigDecimal} value.
+   *
+   * @param value {@link BigDecimal} number's value
+   */
   public ErlangFloat (BigDecimal value) {
     super(NEW_FLOAT);
     this.value = value.doubleValue();

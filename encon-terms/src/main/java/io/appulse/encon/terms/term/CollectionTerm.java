@@ -37,22 +37,28 @@ import lombok.NonNull;
 import lombok.val;
 
 /**
+ * Collection term API.
  *
- * @author Artem Labazin
  * @since 1.0.0
+ * @author Artem Labazin
  */
 public interface CollectionTerm extends ValueTerm, Iterable<ErlangTerm> {
 
   /**
-   * Returns true if this term is
-   * {@link io.appulse.encon.terms.TermType#MAP},
-   * {@link io.appulse.encon.terms.TermType#LIST},
-   * {@link io.appulse.encon.terms.TermType#SMALL_TUPLE} or
-   * {@link io.appulse.encon.terms.TermType#LARGE_TUPLE}.
+   * Tells is this term a collection or not.
+   * <p>
+   * Returns true if this term is one of:
+   * <p>
+   * <ul>
+   * <li>{@link io.appulse.encon.terms.TermType#MAP}</li>
+   * <li>{@link io.appulse.encon.terms.TermType#LIST}</li>
+   * <li>{@link io.appulse.encon.terms.TermType#SMALL_TUPLE}</li>
+   * <li>{@link io.appulse.encon.terms.TermType#LARGE_TUPLE}</li>
+   * </ul>
    *
-   * @return true, if this term is a list, tuple or map, false otherwise.
+   * @return {@code true}, if this term is a list, tuple or map, {@code false} otherwise.
    */
-  default boolean isContainerTerm () {
+  default boolean isCollectionTerm () {
     switch (getType()) {
     case MAP:
     case LIST:
@@ -74,6 +80,14 @@ public interface CollectionTerm extends ValueTerm, Iterable<ErlangTerm> {
     return getType() == LIST;
   }
 
+  /**
+   * Method that will try to convert value of this term to a {@link ErlangList} value.
+   * <p>
+   * If representation cannot be converted to a {@link ErlangList} value,
+   * {@code null} will be returned; no exceptions are thrown.
+   *
+   * @return term's {@link ErlangList} representation
+   */
   default ErlangList asList () {
     return null;
   }
@@ -88,6 +102,14 @@ public interface CollectionTerm extends ValueTerm, Iterable<ErlangTerm> {
     return getType() == SMALL_TUPLE || getType() == LARGE_TUPLE;
   }
 
+  /**
+   * Method that will try to convert value of this term to a {@link ErlangTuple} value.
+   * <p>
+   * If representation cannot be converted to a {@link ErlangTuple} value,
+   * {@code null} will be returned; no exceptions are thrown.
+   *
+   * @return term's {@link ErlangTuple} representation
+   */
   default ErlangTuple asTuple () {
     return null;
   }
@@ -102,6 +124,14 @@ public interface CollectionTerm extends ValueTerm, Iterable<ErlangTerm> {
     return getType() == MAP;
   }
 
+  /**
+   * Method that will try to convert value of this term to a {@link ErlangMap} value.
+   * <p>
+   * If representation cannot be converted to a {@link ErlangMap} value,
+   * {@code null} will be returned; no exceptions are thrown.
+   *
+   * @return term's {@link ErlangMap} representation
+   */
   default ErlangMap asMap () {
     return null;
   }
@@ -135,7 +165,7 @@ public interface CollectionTerm extends ValueTerm, Iterable<ErlangTerm> {
    * @param index index in Container.
    *
    * @return Term that represent value of the specified element, if this term is an List, Tuple or Map and has
-   *         specified element. {@link Optional#empty} otherwise.
+   *         specified element, {@link Optional#empty} otherwise.
    */
   default Optional<ErlangTerm> get (int index) {
     if (index < 0 || index >= size()) {
@@ -145,6 +175,24 @@ public interface CollectionTerm extends ValueTerm, Iterable<ErlangTerm> {
     return ofNullable(result);
   }
 
+  /**
+   * Method for <b>unsafe</b> accessing value of the specified element of an List, Tuple or Map term.
+   * For other nodes, {@code null} is always returned.
+   * <p>
+   * For List/Tuple terms, index specifies exact location within container and allows for efficient iteration
+   * over child elements (underlying storage is guaranteed to be efficiently indexable, i.e. has random-access to
+   * elements).
+   * <p>
+   * For Map terms, index specifies IntegralNumber field key.
+   * <p>
+   * If index is less than 0, or equal-or-greater than <code>term.size()</code>, {@code null} is returned.
+   * No exception is thrown for any index.
+   *
+   * @param index index in this container.
+   *
+   * @return Term that represent value of the specified element, if this term is an List, Tuple or Map and has
+   *         specified element, {@code null} otherwise.
+   */
   default ErlangTerm getUnsafe (int index) {
     return null;
   }
@@ -181,6 +229,17 @@ public interface CollectionTerm extends ValueTerm, Iterable<ErlangTerm> {
     return ofNullable(result);
   }
 
+  /**
+   * Method for <b>unsafe</b> accessing value of the specified field of an Map term.
+   * If this term is not an Map (or it does not have a value for specified term), or
+   * if there is no field with such term, {@code null} is returned.
+   *
+   * @param term key term in map.
+   *
+   * @return Term that represent value of the specified key term,
+   *         if this term is an Map and has value for the specified
+   *         key term. {@code null} otherwise.
+   */
   default ErlangTerm getUnsafe (ErlangTerm term) {
     return null;
   }

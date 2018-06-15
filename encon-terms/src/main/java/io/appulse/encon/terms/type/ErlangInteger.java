@@ -41,9 +41,10 @@ import lombok.experimental.FieldDefaults;
 import lombok.val;
 
 /**
+ * Erlang's integer number representation.
  *
- * @author Artem Labazin
  * @since 1.0.0
+ * @author Artem Labazin
  */
 @ToString
 @EqualsAndHashCode(callSuper = true)
@@ -83,6 +84,13 @@ public class ErlangInteger extends ErlangTerm {
         .toArray(ErlangInteger[]::new);
   }
 
+  /**
+   * Creates cached {@link ErlangInteger} value.
+   *
+   * @param number integer value
+   *
+   * @return new or cached {@link ErlangInteger} object
+   */
   public static ErlangInteger from (int number) {
     return number > MAX_CACHE || number < MIN_CACHE
            ? new ErlangInteger(number)
@@ -91,6 +99,13 @@ public class ErlangInteger extends ErlangTerm {
 
   BigInteger value;
 
+  /**
+   * Creates Erlang term object with specific {@link TermType} from {@link ByteBuf}.
+   *
+   * @param type object's type
+   *
+   * @param buffer byte buffer
+   */
   public ErlangInteger (TermType type, @NonNull ByteBuf buffer) {
     super(type);
 
@@ -122,28 +137,58 @@ public class ErlangInteger extends ErlangTerm {
     }
   }
 
+  /**
+   * Create Erlang's integer number object with specific {@code char} value.
+   *
+   * @param value {@code char} number's value
+   */
   public ErlangInteger (char value) {
     this((long) value);
   }
 
+  /**
+   * Create Erlang's integer number object with specific {@code byte} value.
+   *
+   * @param value {@code byte} number's value
+   */
   public ErlangInteger (byte value) {
     this((long) (value & 0xFFL));
   }
 
+  /**
+   * Create Erlang's integer number object with specific {@code short} value.
+   *
+   * @param value {@code short} number's value
+   */
   public ErlangInteger (short value) {
     this((long) value);
   }
 
+  /**
+   * Create Erlang's integer number object with specific {@code int} value.
+   *
+   * @param value {@code int} number's value
+   */
   public ErlangInteger (int value) {
     this((long) value);
   }
 
+  /**
+   * Create Erlang's integer number object with specific {@code long} value.
+   *
+   * @param value {@code long} number's value
+   */
   public ErlangInteger (long value) {
     super();
     this.value = BigInteger.valueOf(value);
     setupType(value);
   }
 
+  /**
+   * Create Erlang's integer number object with specific {@link BigInteger} value.
+   *
+   * @param value {@link BigInteger} number's value
+   */
   public ErlangInteger (@NonNull BigInteger value) {
     super();
     this.value = value;

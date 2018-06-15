@@ -17,15 +17,15 @@
 package io.appulse.encon.terms.term;
 
 /**
+ * String term API.
  *
- * @author Artem Labazin
  * @since 1.0.0
+ * @author Artem Labazin
  */
 public interface StringTerm extends ValueTerm {
 
   /**
-   * Method that checks whether this node represents basic JSON String
-   * value.
+   * Method that checks whether this node represents {@link String} value.
    *
    * @return could the term be represented as text or not
    */

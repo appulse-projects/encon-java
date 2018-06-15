@@ -17,12 +17,18 @@
 package io.appulse.encon.terms.term;
 
 /**
+ * Common number term API.
  *
- * @author Artem Labazin
  * @since 1.0.0
+ * @author Artem Labazin
  */
 public interface NumberTerm extends ValueTerm {
 
+  /**
+   * Tells is this term a number or not.
+   *
+   * @return {@code true} if this object is a number.
+   */
   default boolean isNumber () {
     switch (getType()) {
     case INTEGER:
@@ -38,17 +44,22 @@ public interface NumberTerm extends ValueTerm {
   }
 
   /**
-   * Returns numeric value for this node, <b>if and only if</b>
-   * this node is numeric ({@link #isNumber} returns true); otherwise
-   * returns null
+   * Method that will try to convert value of this term to a {@link Number} value.
+   * <p>
+   * If representation cannot be converted to a {@link Number} value,
+   * {@code null} will be returned; no exceptions are thrown.
    *
-   * @return Number value this node contains, if any (null for non-number
-   *     nodes).
+   * @return term's {@link Number} representation
    */
   default Number asNumber () {
     return null;
   }
 
+  /**
+   * Tells is this term a signed number or not.
+   *
+   * @return {@code true} if this object is a signed number.
+   */
   default boolean isSigned () {
     return false;
   }

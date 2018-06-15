@@ -33,9 +33,12 @@ import lombok.experimental.FieldDefaults;
 import lombok.val;
 
 /**
+ * Strings are enclosed in double quotes ("), but is not a data type in Erlang.
+ * Instead, a string {@code "hello"} is shorthand for the list {@code [$h,$e,$l,$l,$o]},
+ * that is, {@code [104,101,108,108,111]}.
  *
- * @author Artem Labazin
  * @since 1.0.0
+ * @author Artem Labazin
  */
 @ToString
 @EqualsAndHashCode(callSuper = true)
@@ -46,6 +49,13 @@ public class ErlangString extends ErlangTerm {
 
   String value;
 
+  /**
+   * Creates Erlang term object with specific {@link TermType} from {@link ByteBuf}.
+   *
+   * @param type object's type
+   *
+   * @param buffer byte buffer
+   */
   public ErlangString (TermType type, @NonNull ByteBuf buffer) {
     super(type);
 
@@ -53,6 +63,12 @@ public class ErlangString extends ErlangTerm {
     value = buffer.readCharSequence(length, ISO_8859_1).toString();
   }
 
+
+  /**
+   * Constructs Erlang's string object.
+   *
+   * @param value object's {@link String} value
+   */
   public ErlangString (String value) {
     super();
 

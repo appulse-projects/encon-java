@@ -34,9 +34,10 @@ import lombok.experimental.FieldDefaults;
 import lombok.experimental.NonFinal;
 
 /**
+ * A process identifier, pid, identifies a process.
  *
- * @author Artem Labazin
  * @since 1.0.0
+ * @author Artem Labazin
  */
 @Getter
 @EqualsAndHashCode(callSuper = true)
@@ -56,6 +57,13 @@ public class ErlangPid extends ErlangTerm {
 
   int creation;
 
+  /**
+   * Creates Erlang term object with specific {@link TermType} from {@link ByteBuf}.
+   *
+   * @param type object's type
+   *
+   * @param buffer byte buffer
+   */
   public ErlangPid (TermType type, @NonNull ByteBuf buffer) {
     super(type);
 
@@ -114,6 +122,11 @@ public class ErlangPid extends ErlangTerm {
         .toString();
   }
 
+  /**
+   * Returns container's {@link NodeDescriptor} value.
+   *
+   * @return container's {@link NodeDescriptor} value
+   */
   public final NodeDescriptor getDescriptor () {
     if (descriptor == null) {
       descriptor = NodeDescriptor.from(node.asText());

@@ -17,7 +17,7 @@
 package io.appulse.encon.terms;
 
 import static io.appulse.encon.terms.Erlang.NIL;
-import static io.appulse.encon.terms.TermType.UNDEFINED;
+import static io.appulse.encon.terms.TermType.UNKNOWN;
 import static lombok.AccessLevel.PRIVATE;
 import static lombok.AccessLevel.PROTECTED;
 
@@ -56,9 +56,10 @@ import lombok.experimental.FieldDefaults;
 import lombok.val;
 
 /**
+ * Abstract class for aggregation term interfaces and several common methods with state.
  *
- * @author Artem Labazin
  * @since 1.0.0
+ * @author Artem Labazin
  */
 @Getter
 @EqualsAndHashCode
@@ -73,6 +74,17 @@ public abstract class ErlangTerm implements IntegerTerm,
 
   private static final long serialVersionUID = 5430854281567501819L;
 
+  /**
+   * Creates new {@link ErlangTerm} instance from {@link ByteBuf} content.
+   *
+   * @param <T> type of return instance, which should extends {@link ErlangTerm}
+   *
+   * @param buffer byte buffer for reading from
+   *
+   * @return new parsed instance of {@link ErlangTerm}
+   *
+   * @throws ErlangTermDecodeException in case of decoding problems
+   */
   @SuppressWarnings("unchecked")
   public static <T extends ErlangTerm> T newInstance (@NonNull ByteBuf buffer) {
     val type = TermType.of(buffer.readByte());
@@ -122,17 +134,27 @@ public abstract class ErlangTerm implements IntegerTerm,
     case SMALL_ATOM:
       return (T) new ErlangAtom(type, buffer);
     default:
-      throw new ErlangTermDecodeException();
+      throw new ErlangTermDecodeException("Unknown term type " + type);
     }
   }
 
   @Setter(PROTECTED)
   TermType type;
 
+  /**
+   * No arguments constructor with default {@link TermType} instance - {@link TermType#UNKNOWN}.
+   */
   protected ErlangTerm () {
-    type = UNDEFINED;
+    type = UNKNOWN;
   }
 
+  /**
+   * Constructor with specified {@link TermType}.
+   *
+   * @param type term's type
+   *
+   * @throws IllegalErlangTermTypeException in case of illegal {@link TermType}
+   */
   protected ErlangTerm (@NonNull TermType type) {
     if (!getClass().equals(type.getType())) {
       throw new IllegalErlangTermTypeException(getClass(), type);
@@ -140,7 +162,12 @@ public abstract class ErlangTerm implements IntegerTerm,
     this.type = type;
   }
 
-  public final byte[] toBytes () {
+  /**
+   * Converts the object into byte array.
+   *
+   * @return byte array representation of this object
+   */
+  public byte[] toBytes () {
     val buffer = Unpooled.buffer();
     writeTo(buffer);
     val bytes = new byte[buffer.readableBytes()];
@@ -148,10 +175,20 @@ public abstract class ErlangTerm implements IntegerTerm,
     return bytes;
   }
 
-  public final void writeTo (@NonNull ByteBuf buffer) {
+  /**
+   * Writes the object into {@link ByteBuf}.
+   *
+   * @param buffer buffer for writing object
+   */
+  public void writeTo (@NonNull ByteBuf buffer) {
     buffer.writeByte(type.getCode());
     serialize(buffer);
   }
 
+  /**
+   * Writes specific state of the implementation, without {@link TermType} information.
+   *
+   * @param buffer buffer for writing object
+   */
   protected abstract void serialize (ByteBuf buffer);
 }

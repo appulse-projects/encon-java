@@ -22,6 +22,7 @@ import java.util.Collection;
 import java.util.LinkedHashMap;
 import java.util.List;
 
+import io.appulse.encon.terms.exception.ErlangTermValidationException;
 import io.appulse.encon.terms.type.ErlangAtom;
 import io.appulse.encon.terms.type.ErlangBinary;
 import io.appulse.encon.terms.type.ErlangBitString;
@@ -36,95 +37,249 @@ import io.appulse.encon.terms.type.ErlangTuple;
 import lombok.NonNull;
 
 /**
+ * Utility class with different static methods for simple constructing terms.
  *
- * @author Artem Labazin
  * @since 1.0.0
+ * @author Artem Labazin
  */
 public final class Erlang {
 
+  /**
+   * Cached {@link ErlangNil} instance.
+   */
   public static final ErlangNil NIL = new ErlangNil();
 
+  /**
+   * Cached enpty (0-size string) {@link ErlangAtom} instance.
+   */
   public static final ErlangAtom EMPTY_ATOM = new ErlangAtom("");
 
+  /**
+   * Creates new {@link ErlangAtom} instance from {@code boolean} (true/false value) .
+   *
+   * @param value atom's value
+   *
+   * @return {@link ErlangAtom} new instance
+   */
   public static ErlangAtom atom (boolean value) {
     return new ErlangAtom(value);
   }
 
+  /**
+   * Creates new {@link ErlangAtom} instance from {@link String}.
+   *
+   * @param value atom's value
+   *
+   * @return {@link ErlangAtom} new instance
+   */
   public static ErlangAtom atom (@NonNull String value) {
     return new ErlangAtom(value);
   }
 
+  /**
+   * Creates new {@link ErlangInteger} instance from {@code char} value.
+   *
+   * @param value {@code char} value
+   *
+   * @return {@link ErlangInteger} new instance
+   */
   public static ErlangInteger number (char value) {
     return new ErlangInteger(value);
   }
 
+  /**
+   * Creates new {@link ErlangInteger} instance from {@code byte} value.
+   *
+   * @param value {@code byte} value
+   *
+   * @return {@link ErlangInteger} new instance
+   */
   public static ErlangInteger number (byte value) {
     return new ErlangInteger(value);
   }
 
+  /**
+   * Creates new {@link ErlangInteger} instance from {@code short} value.
+   *
+   * @param value {@code short} value
+   *
+   * @return {@link ErlangInteger} new instance
+   */
   public static ErlangInteger number (short value) {
     return new ErlangInteger(value);
   }
 
+  /**
+   * Creates new {@link ErlangInteger} instance from {@code int} value.
+   *
+   * @param value {@code int} value
+   *
+   * @return {@link ErlangInteger} new instance
+   */
   public static ErlangInteger number (int value) {
     return new ErlangInteger(value);
   }
 
+  /**
+   * Creates new {@link ErlangInteger} instance from {@code long} value.
+   *
+   * @param value {@code long} value
+   *
+   * @return {@link ErlangInteger} new instance
+   */
   public static ErlangInteger number (long value) {
     return new ErlangInteger(value);
   }
 
+  /**
+   * Creates new {@link ErlangInteger} instance from {@link BigInteger} value.
+   *
+   * @param value {@link BigInteger} value
+   *
+   * @return {@link ErlangInteger} new instance
+   */
   public static ErlangInteger number (@NonNull BigInteger value) {
     return new ErlangInteger(value);
   }
 
+  /**
+   * Creates new {@link ErlangFloat} instance from {@code float} value.
+   *
+   * @param value {@code float} value
+   *
+   * @return {@link ErlangFloat} new instance
+   */
   public static ErlangFloat number (float value) {
     return new ErlangFloat(value);
   }
 
+  /**
+   * Creates new {@link ErlangFloat} instance from {@code double} value.
+   *
+   * @param value {@code double} value
+   *
+   * @return {@link ErlangFloat} new instance
+   */
   public static ErlangFloat number (double value) {
     return new ErlangFloat(value);
   }
 
+  /**
+   * Creates new {@link ErlangFloat} instance from {@link BigDecimal} value.
+   *
+   * @param value {@link BigDecimal} value
+   *
+   * @return {@link ErlangFloat} new instance
+   */
   public static ErlangFloat number (BigDecimal value) {
     return new ErlangFloat(value);
   }
 
+  /**
+   * Creates new {@link ErlangBinary} instance from byte array value.
+   *
+   * @param value byte array value
+   *
+   * @return {@link ErlangBinary} new instance
+   */
   public static ErlangBinary binary (@NonNull byte[] value) {
     return new ErlangBinary(value);
   }
 
+  /**
+   * Creates new {@link ErlangBitString} instance.
+   *
+   * @param bits bitstring's bits
+   *
+   * @param pad bitstring's pad
+   *
+   * @return {@link ErlangBitString} new instance
+   */
   public static ErlangBitString bitstr (@NonNull byte[] bits, int pad) {
     return new ErlangBitString(bits, pad);
   }
 
+  /**
+   * Creates new {@link ErlangString} instance.
+   *
+   * @param value string's value
+   *
+   * @return {@link ErlangString} new instance
+   */
   public static ErlangString string (@NonNull String value) {
-    return new ErlangString(value); // List/BitString?
+    // TO-DO: how to determine is it ErlangString, ErlangList or ErlangBitString?
+    return new ErlangString(value);
   }
 
+  /**
+   * Creates new {@link ErlangTuple} instance.
+   *
+   * @param elements {@link ErlangTerm} tuple's elements
+   *
+   * @return {@link ErlangTuple} new instance
+   */
   public static ErlangTuple tuple (@NonNull ErlangTerm... elements) {
     return new ErlangTuple(elements);
   }
 
+  /**
+   * Creates new {@link ErlangTuple} instance.
+   *
+   * @param elements {@link ErlangTerm} tuple's elements
+   *
+   * @return {@link ErlangTuple} new instance
+   */
   public static ErlangTuple tuple (@NonNull Collection<ErlangTerm> elements) {
     return new ErlangTuple(elements);
   }
 
+  /**
+   * Creates new {@link ErlangList} instance.
+   *
+   * @param elements {@link ErlangTerm} list's elements
+   *
+   * @return {@link ErlangList} new instance
+   */
   public static ErlangList list (@NonNull ErlangTerm... elements) {
     return new ErlangList(elements);
   }
 
+  /**
+   * Creates new {@link ErlangList} instance.
+   *
+   * @param elements {@link ErlangTerm} list's elements
+   *
+   * @return {@link ErlangList} new instance
+   */
   public static ErlangList list (@NonNull Collection<ErlangTerm> elements) {
     return new ErlangList(elements);
   }
 
+  /**
+   * Creates new {@link ErlangList} instance.
+   *
+   * @param tail {@link ErlangTerm} list's tail
+   *
+   * @param elements {@link ErlangTerm} list's elements
+   *
+   * @return {@link ErlangList} new instance
+   */
   public static ErlangList list (@NonNull ErlangTerm tail, @NonNull List<ErlangTerm> elements) {
     return new ErlangList(tail, elements);
   }
 
+  /**
+   * Creates new {@link ErlangMap} instance from {@link ErlangTerm} array value.
+   *
+   * @param keysAndValues {@link ErlangTerm} array of key/value elements. Like: [key1, value1, key2, value2, ...]
+   *
+   * @return {@link ErlangMap} new instance
+   *
+   * @throws ErlangTermValidationException in case of not even {@code keysAndValues} length
+   */
   public static ErlangMap map (@NonNull ErlangTerm... keysAndValues) {
     if (keysAndValues.length % 2 != 0) {
-      throw new IllegalArgumentException("Keys and Values array must be even");
+      throw new ErlangTermValidationException("Keys and Values array must be even");
     }
 
     LinkedHashMap<ErlangTerm, ErlangTerm> map = new LinkedHashMap<>(keysAndValues.length / 2);

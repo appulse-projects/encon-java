@@ -39,9 +39,10 @@ import lombok.experimental.FieldDefaults;
 import lombok.experimental.NonFinal;
 
 /**
+ * Provides a Java representation of Erlang internal functions.
  *
- * @author Artem Labazin
  * @since 1.0.0
+ * @author Artem Labazin
  */
 @Getter
 @ToString
@@ -70,6 +71,13 @@ public class ErlangFunction extends ErlangTerm {
   @NonFinal
   int oldIndex;
 
+  /**
+   * Creates Erlang term object with specific {@link TermType} from {@link ByteBuf}.
+   *
+   * @param type object's type
+   *
+   * @param buffer byte buffer
+   */
   public ErlangFunction (TermType type, @NonNull ByteBuf buffer) {
     super(type);
 

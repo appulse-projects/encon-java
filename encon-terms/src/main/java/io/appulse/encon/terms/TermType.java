@@ -16,6 +16,8 @@
 
 package io.appulse.encon.terms;
 
+import static lombok.AccessLevel.PRIVATE;
+
 import io.appulse.encon.terms.type.ErlangAtom;
 import io.appulse.encon.terms.type.ErlangBinary;
 import io.appulse.encon.terms.type.ErlangBitString;
@@ -33,13 +35,16 @@ import io.appulse.encon.terms.type.ErlangString;
 import io.appulse.encon.terms.type.ErlangTuple;
 
 import lombok.Getter;
+import lombok.experimental.FieldDefaults;
 import lombok.val;
 
 /**
+ * Enumeration of all available term types.
  *
- * @author Artem Labazin
  * @since 1.0.0
+ * @author Artem Labazin
  */
+@FieldDefaults(level = PRIVATE, makeFinal = true)
 public enum TermType {
 
   /**
@@ -276,6 +281,31 @@ public enum TermType {
    * @see TermType#REFERENCE
    */
   NEW_REFERENCE(114, ErlangReference.class),
+
+  /**
+   * The tag used for new style reference. The same as {@link TermType#NEW_REFERENCE}, but newer (use bigger {@code creation} length).
+   * <p>
+   * Structure:
+   * <p>
+   * <table border="1">
+   * <tr>
+   * <th>1</th>
+   * <th>2</th>
+   * <th>N</th>
+   * <th>4</th>
+   * <th>N'</th>
+   * </tr>
+   * <tr>
+   * <td>90</td>
+   * <td>Len</td>
+   * <td>Node</td>
+   * <td>Creation</td>
+   * <td>ID ...</td>
+   * </tr>
+   * </table>
+   * <p>
+   * @see TermType#NEW_REFERENCE
+   */
   NEWER_REFERENCE(90, ErlangReference.class),
 
   /**
@@ -305,6 +335,29 @@ public enum TermType {
    * @see TermType#REFERENCE
    */
   PORT(102, ErlangPort.class),
+
+  /**
+   * The tag used for port. The same as {@link TermType#PORT}, but newer (use bigger {@code creation} length).
+   * <p>
+   * Structure:
+   * <p>
+   * <table border="1">
+   * <tr>
+   * <th>1</th>
+   * <th>N</th>
+   * <th>4</th>
+   * <th>4</th>
+   * </tr>
+   * <tr>
+   * <td>89</td>
+   * <td>Node</td>
+   * <td>ID</td>
+   * <td>Creation</td>
+   * </tr>
+   * </table>
+   * <p>
+   * @see TermType#PORT
+   */
   NEW_PORT(89, ErlangPort.class),
 
   /**
@@ -336,6 +389,31 @@ public enum TermType {
    * @see TermType#REFERENCE
    */
   PID(103, ErlangPid.class),
+
+  /**
+   * The tag used for pid. The same as {@link TermType#PID}, but newer (use bigger {@code creation} length).
+   * <p>
+   * Structure:
+   * <p>
+   * <table border="1">
+   * <tr>
+   * <th>1</th>
+   * <th>N</th>
+   * <th>4</th>
+   * <th>4</th>
+   * <th>4</th>
+   * </tr>
+   * <tr>
+   * <td>88</td>
+   * <td>Node</td>
+   * <td>ID</td>
+   * <td>Serial</td>
+   * <td>Creation</td>
+   * </tr>
+   * </table>
+   * <p>
+   * @see TermType#PID
+   */
   NEW_PID(88, ErlangPid.class),
 
   /**
@@ -822,7 +900,7 @@ public enum TermType {
    * An atom is stored with a 2 byte unsigned length in big-endian order, followed by Len numbers of 8-bit Latin-1
    * characters that forms the AtomName. The maximum allowed value for Len is 255.
    * <p>
-   * @deprecated
+   * @deprecated use UTF-8 atoms instead
    */
   ATOM(100, ErlangAtom.class),
 
@@ -852,7 +930,7 @@ public enum TermType {
    * <a href="http://erlang.org/doc/apps/erts/erl_dist_protocol.html#distribution_handshake">distribution
    * handshake</a>.
    * <p>
-   * @deprecated
+   * @deprecated use UTF-8 atoms instead
    */
   SMALL_ATOM(115, ErlangAtom.class),
 
@@ -861,13 +939,16 @@ public enum TermType {
    */
   COMPRESSED(80),
 
-  UNDEFINED(-1);
+  /**
+   * Unknown term type.
+   */
+  UNKNOWN(-1);
 
   @Getter
-  private final byte code;
+  byte code;
 
   @Getter
-  private final Class<? extends ErlangTerm> type;
+  Class<? extends ErlangTerm> type;
 
   TermType (int code) {
     this(code, null);
@@ -878,12 +959,19 @@ public enum TermType {
     this.type = type;
   }
 
+  /**
+   * Parsing term type from {@code byte} number.
+   *
+   * @param code {@code byte} representation of type
+   *
+   * @return parsed {@link TermType} instance
+   */
   public static TermType of (byte code) {
     for (val type : values()) {
       if (type.getCode() == code) {
         return type;
       }
     }
-    return UNDEFINED;
+    return UNKNOWN;
   }
 }
