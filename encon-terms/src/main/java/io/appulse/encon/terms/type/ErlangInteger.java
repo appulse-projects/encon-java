@@ -100,9 +100,9 @@ public class ErlangInteger extends ErlangTerm {
   BigInteger value;
 
   /**
-   * Creates Erlang term object with specific {@link TermType} from {@link ByteBuf}.
+   * Constructs Erlang's term object with specific {@link TermType} from {@link ByteBuf}.
    *
-   * @param type object's type
+   * @param type   object's type
    *
    * @param buffer byte buffer
    */
@@ -138,7 +138,7 @@ public class ErlangInteger extends ErlangTerm {
   }
 
   /**
-   * Create Erlang's integer number object with specific {@code char} value.
+   * Constructs Erlang's integer number object with specific {@code char} value.
    *
    * @param value {@code char} number's value
    */
@@ -147,7 +147,7 @@ public class ErlangInteger extends ErlangTerm {
   }
 
   /**
-   * Create Erlang's integer number object with specific {@code byte} value.
+   * Constructs Erlang's integer number object with specific {@code byte} value.
    *
    * @param value {@code byte} number's value
    */
@@ -156,7 +156,7 @@ public class ErlangInteger extends ErlangTerm {
   }
 
   /**
-   * Create Erlang's integer number object with specific {@code short} value.
+   * Constructs Erlang's integer number object with specific {@code short} value.
    *
    * @param value {@code short} number's value
    */
@@ -165,7 +165,7 @@ public class ErlangInteger extends ErlangTerm {
   }
 
   /**
-   * Create Erlang's integer number object with specific {@code int} value.
+   * Constructs Erlang's integer number object with specific {@code int} value.
    *
    * @param value {@code int} number's value
    */
@@ -174,7 +174,7 @@ public class ErlangInteger extends ErlangTerm {
   }
 
   /**
-   * Create Erlang's integer number object with specific {@code long} value.
+   * Constructs Erlang's integer number object with specific {@code long} value.
    *
    * @param value {@code long} number's value
    */
@@ -185,7 +185,7 @@ public class ErlangInteger extends ErlangTerm {
   }
 
   /**
-   * Create Erlang's integer number object with specific {@link BigInteger} value.
+   * Constructs Erlang's integer number object with specific {@link BigInteger} value.
    *
    * @param value {@link BigInteger} number's value
    */

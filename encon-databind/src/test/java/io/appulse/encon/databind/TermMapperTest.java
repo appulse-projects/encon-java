@@ -46,8 +46,6 @@ import org.junit.Test;
 @FieldDefaults(level = PRIVATE, makeFinal = true)
 public class TermMapperTest {
 
-  TermMapper mapper = new TermMapper();
-
   @Test
   public void simple () {
     val pojo = new Pojo(
@@ -62,7 +60,7 @@ public class TermMapperTest {
         new Boolean[] { true, false, true }
     );
 
-    val erlangTerm = mapper.serialize(pojo);
+    val erlangTerm = TermMapper.serialize(pojo);
     assertThat(erlangTerm.getType())
         .isEqualTo(LIST);
 
@@ -93,7 +91,7 @@ public class TermMapperTest {
     assertThat(erlangTerm.getUnsafe(7).getType())
         .isEqualTo(LIST);
 
-    val result = mapper.deserialize(erlangTerm, Pojo.class);
+    val result = TermMapper.deserialize(erlangTerm, Pojo.class);
     assertThat(pojo == result)
         .isFalse();
     assertThat(result)

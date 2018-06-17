@@ -77,7 +77,7 @@ public abstract class ErlangTerm implements IntegerTerm,
   /**
    * Creates new {@link ErlangTerm} instance from {@link ByteBuf} content.
    *
-   * @param <T> type of return instance, which should extends {@link ErlangTerm}
+   * @param <T>    type of return instance, which should extends {@link ErlangTerm}
    *
    * @param buffer byte buffer for reading from
    *

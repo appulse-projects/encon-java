@@ -62,7 +62,7 @@ public class ErlangMap extends ErlangTerm {
   /**
    * Constructs Erlang term object with specific {@link TermType} from {@link ByteBuf}.
    *
-   * @param type object's type
+   * @param type   object's type
    *
    * @param buffer byte buffer
    */
@@ -70,8 +70,8 @@ public class ErlangMap extends ErlangTerm {
     super(type);
 
     IntFunction<ErlangTerm[]> mapFunction = it -> new ErlangTerm[] {
-        ErlangTerm.newInstance(buffer),
-        ErlangTerm.newInstance(buffer)
+      ErlangTerm.newInstance(buffer),
+      ErlangTerm.newInstance(buffer)
     };
 
     BinaryOperator<ErlangTerm> mergeFunction = (left, right) -> {

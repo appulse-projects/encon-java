@@ -81,9 +81,9 @@ public class ErlangList extends ErlangTerm {
   ErlangTerm tail;
 
   /**
-   * Creates Erlang term object with specific {@link TermType} from {@link ByteBuf}.
+   * Constructs Erlang's term object with specific {@link TermType} from {@link ByteBuf}.
    *
-   * @param type object's type
+   * @param type   object's type
    *
    * @param buffer byte buffer
    */
@@ -124,7 +124,7 @@ public class ErlangList extends ErlangTerm {
    * Constructs Erlang's list object with specific values and
    * optional (maybe {@code null}) {@link ErlangTerm} tail.
    *
-   * @param tail list's {@link ErlangTerm} tail
+   * @param tail     list's {@link ErlangTerm} tail
    *
    * @param elements list's {@link ErlangTerm} elements
    */

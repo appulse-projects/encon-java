@@ -55,9 +55,9 @@ public class ErlangBitString extends ErlangTerm {
   int pad;
 
   /**
-   * Creates Erlang term object with specific {@link TermType} from {@link ByteBuf}.
+   * Constructs Erlang's term object with specific {@link TermType} from {@link ByteBuf}.
    *
-   * @param type object's type
+   * @param type   object's type
    *
    * @param buffer byte buffer
    */
@@ -85,7 +85,7 @@ public class ErlangBitString extends ErlangTerm {
    *
    * @param bits object's binary value
    *
-   * @param pad object's binary pad value
+   * @param pad  object's binary pad value
    */
   @Builder
   public ErlangBitString (@NonNull byte[] bits, int pad) {

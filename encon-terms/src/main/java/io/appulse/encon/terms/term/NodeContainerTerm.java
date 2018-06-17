@@ -35,12 +35,15 @@ import io.appulse.encon.terms.type.ErlangReference;
 public interface NodeContainerTerm extends ValueTerm {
 
   /**
-   * Tells is this term a container or not.
+   * Tells is this term a node container or not.
+   * The term "node container" is used as a group name
+   * for the Erlang data types that contain a reference
+   * to a node, i.e. pids, ports, and references.
    *
    * @return {@code true} if this object is a container.
    */
   @SuppressWarnings("deprecation")
-  default boolean isContainerTerm () {
+  default boolean isNodeContainerTerm () {
     switch (getType()) {
     case REFERENCE:
     case NEW_REFERENCE:

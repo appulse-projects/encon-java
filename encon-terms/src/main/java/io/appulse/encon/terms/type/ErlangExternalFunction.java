@@ -53,9 +53,9 @@ public class ErlangExternalFunction extends ErlangTerm {
   int arity;
 
   /**
-   * Creates Erlang term object with specific {@link TermType} from {@link ByteBuf}.
+   * Constructs Erlang's term object with specific {@link TermType} from {@link ByteBuf}.
    *
-   * @param type object's type
+   * @param type   object's type
    *
    * @param buffer byte buffer
    */
@@ -77,9 +77,9 @@ public class ErlangExternalFunction extends ErlangTerm {
    *
    * @param module function's module name
    *
-   * @param name function's name
+   * @param name   function's name
    *
-   * @param arity function's arguments count
+   * @param arity  function's arguments count
    */
   @Builder
   public ErlangExternalFunction (@NonNull String module, @NonNull String name, int arity) {

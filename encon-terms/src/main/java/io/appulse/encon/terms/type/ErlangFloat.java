@@ -50,9 +50,9 @@ public class ErlangFloat extends ErlangTerm {
   double value;
 
   /**
-   * Creates Erlang term object with specific {@link TermType} from {@link ByteBuf}.
+   * Constructs Erlang's term object with specific {@link TermType} from {@link ByteBuf}.
    *
-   * @param type object's type
+   * @param type   object's type
    *
    * @param buffer byte buffer
    */
@@ -76,7 +76,7 @@ public class ErlangFloat extends ErlangTerm {
   }
 
   /**
-   * Create Erlang's floating point number object with specific {@code double} value.
+   * Constructs Erlang's floating point number object with specific {@code double} value.
    *
    * @param value {@code double} number's value
    */
@@ -86,7 +86,7 @@ public class ErlangFloat extends ErlangTerm {
   }
 
   /**
-   * Create Erlang's floating point number object with specific {@code float} value.
+   * Constructs Erlang's floating point number object with specific {@code float} value.
    *
    * @param value {@code float} number's value
    */
@@ -96,7 +96,7 @@ public class ErlangFloat extends ErlangTerm {
   }
 
   /**
-   * Create Erlang's floating point number object with specific {@link BigDecimal} value.
+   * Constructs Erlang's floating point number object with specific {@link BigDecimal} value.
    *
    * @param value {@link BigDecimal} number's value
    */
