@@ -191,7 +191,7 @@ public final class Erlang {
    *
    * @param bits bitstring's bits
    *
-   * @param pad bitstring's pad
+   * @param pad  bitstring's pad
    *
    * @return {@link ErlangBitString} new instance
    */
@@ -258,7 +258,7 @@ public final class Erlang {
   /**
    * Creates new {@link ErlangList} instance.
    *
-   * @param tail {@link ErlangTerm} list's tail
+   * @param tail     {@link ErlangTerm} list's tail
    *
    * @param elements {@link ErlangTerm} list's elements
    *

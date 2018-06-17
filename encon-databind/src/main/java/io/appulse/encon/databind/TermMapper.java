@@ -16,8 +16,6 @@
 
 package io.appulse.encon.databind;
 
-import static lombok.AccessLevel.PRIVATE;
-
 import io.appulse.encon.databind.parser.PojoParser;
 import io.appulse.encon.databind.deserializer.Deserializer;
 import io.appulse.encon.databind.parser.PojoDescriptor;
@@ -25,19 +23,30 @@ import io.appulse.encon.databind.serializer.Serializer;
 import io.appulse.encon.terms.ErlangTerm;
 
 import lombok.NonNull;
-import lombok.experimental.FieldDefaults;
 import lombok.val;
 
 /**
+ * TermMapper provides functionality for serializing and deserializing
+ * Erlang terms, either to and from basic POJOs (Plain Old Java Objects).
  *
- * @author Artem Labazin
  * @since 1.0.0
+ * @author Artem Labazin
  */
-@FieldDefaults(level = PRIVATE, makeFinal = true)
 public final class TermMapper {
 
+  /**
+   * Method to deserialize {@link ErlangTerm} content into given Java type.
+   *
+   * @param container term for deserialization
+   *
+   * @param type      user's POJO class
+   *
+   * @param <T>       type of return instance
+   *
+   * @return deserialized object
+   */
   @SuppressWarnings("unchecked")
-  public <T> T deserialize (@NonNull ErlangTerm container, @NonNull Class<T> type) {
+  public static <T> T deserialize (@NonNull ErlangTerm container, @NonNull Class<T> type) {
     if (ErlangTerm.class.isAssignableFrom(type)) {
       return (T) container;
     }
@@ -46,7 +55,14 @@ public final class TermMapper {
     return (T) deserializer.deserialize(container);
   }
 
-  public ErlangTerm serialize (@NonNull Object object) {
+  /**
+   * Method to serialize given Java object into {@link ErlangTerm}.
+   *
+   * @param object user's POJO for serialization
+   *
+   * @return serialized {@link ErlangTerm} instance
+   */
+  public static ErlangTerm serialize (@NonNull Object object) {
     if (object instanceof ErlangTerm) {
       return (ErlangTerm) object;
     }
@@ -54,5 +70,8 @@ public final class TermMapper {
     PojoDescriptor descriptor = PojoParser.parse(type);
     Serializer<?> serializer = descriptor.getSerializer();
     return serializer.serializeUntyped(object);
+  }
+
+  private TermMapper () {
   }
 }

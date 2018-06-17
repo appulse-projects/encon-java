@@ -50,9 +50,9 @@ public class ErlangString extends ErlangTerm {
   String value;
 
   /**
-   * Creates Erlang term object with specific {@link TermType} from {@link ByteBuf}.
+   * Constructs Erlang's term object with specific {@link TermType} from {@link ByteBuf}.
    *
-   * @param type object's type
+   * @param type   object's type
    *
    * @param buffer byte buffer
    */
@@ -62,7 +62,6 @@ public class ErlangString extends ErlangTerm {
     val length = buffer.readShort();
     value = buffer.readCharSequence(length, ISO_8859_1).toString();
   }
-
 
   /**
    * Constructs Erlang's string object.

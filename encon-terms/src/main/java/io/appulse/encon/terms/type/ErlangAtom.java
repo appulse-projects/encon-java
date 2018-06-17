@@ -69,9 +69,9 @@ public class ErlangAtom extends ErlangTerm {
   transient Charset charset;
 
   /**
-   * Creates Erlang term object with specific {@link TermType} from {@link ByteBuf}.
+   * Constructs Erlang's term object with specific {@link TermType} from {@link ByteBuf}.
    *
-   * @param type object's type
+   * @param type   object's type
    *
    * @param buffer byte buffer
    */
@@ -92,7 +92,7 @@ public class ErlangAtom extends ErlangTerm {
   }
 
   /**
-   * Create Erlang's atom object with specific {@link String} value.
+   * Constructs Erlang's atom object with specific {@link String} value.
    *
    * @param value {@link String} atom's value
    */
@@ -115,7 +115,7 @@ public class ErlangAtom extends ErlangTerm {
   }
 
   /**
-   * Create Erlang's atom object with specific {@code boolean} value.
+   * Constructs Erlang's atom object with specific {@code boolean} value.
    *
    * @param value {@code boolean} atom's value
    */

@@ -39,55 +39,53 @@ import org.junit.Test;
 @FieldDefaults(level = PRIVATE, makeFinal = true)
 public class TermMapperDifferentWrappersTest {
 
-  TermMapper mapper = new TermMapper();
-
   @Test
   public void defaultWrapper () {
-    val erlangTerm = mapper.serialize(new DefaultWrapper());
+    val erlangTerm = TermMapper.serialize(new DefaultWrapper());
     assertThat(erlangTerm.getType())
         .isEqualTo(SMALL_TUPLE);
 
-    assertThat(mapper.deserialize(erlangTerm, DefaultWrapper.class))
+    assertThat(TermMapper.deserialize(erlangTerm, DefaultWrapper.class))
         .isNotNull();
   }
 
   @Test
   public void listWrapper () {
-    val erlangTerm = mapper.serialize(new ListWrapper());
+    val erlangTerm = TermMapper.serialize(new ListWrapper());
     assertThat(erlangTerm.getType())
         .isEqualTo(LIST);
 
-    assertThat(mapper.deserialize(erlangTerm, ListWrapper.class))
+    assertThat(TermMapper.deserialize(erlangTerm, ListWrapper.class))
         .isNotNull();
   }
 
   @Test
   public void tupleWrapper () {
-    val erlangTerm = mapper.serialize(new TupleWrapper());
+    val erlangTerm = TermMapper.serialize(new TupleWrapper());
     assertThat(erlangTerm.getType())
         .isEqualTo(SMALL_TUPLE);
 
-    assertThat(mapper.deserialize(erlangTerm, TupleWrapper.class))
+    assertThat(TermMapper.deserialize(erlangTerm, TupleWrapper.class))
         .isNotNull();
   }
 
   @Test
   public void mapWrapper () {
-    val erlangTerm = mapper.serialize(new MapWrapper());
+    val erlangTerm = TermMapper.serialize(new MapWrapper());
     assertThat(erlangTerm.getType())
         .isEqualTo(MAP);
 
-    assertThat(mapper.deserialize(erlangTerm, MapWrapper.class))
+    assertThat(TermMapper.deserialize(erlangTerm, MapWrapper.class))
         .isNotNull();
   }
 
   @Test
   public void binaryWrapper () {
-    val erlangTerm = mapper.serialize(new BinaryWrapper());
+    val erlangTerm = TermMapper.serialize(new BinaryWrapper());
     assertThat(erlangTerm.getType())
         .isEqualTo(BINARY);
 
-    assertThat(mapper.deserialize(erlangTerm, BinaryWrapper.class))
+    assertThat(TermMapper.deserialize(erlangTerm, BinaryWrapper.class))
         .isNotNull();
   }
 

@@ -39,9 +39,9 @@ import lombok.val;
  * It includes basic elements:
  * <p>
  * <ul>
- *   <li>short name</li>
- *   <li>full name</li>
- *   <li>inet address</li>
+ * <li>short name</li>
+ * <li>full name</li>
+ * <li>inet address</li>
  * </ul>
  *
  * @since 1.0.0

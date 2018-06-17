@@ -283,7 +283,8 @@ public enum TermType {
   NEW_REFERENCE(114, ErlangReference.class),
 
   /**
-   * The tag used for new style reference. The same as {@link TermType#NEW_REFERENCE}, but newer (use bigger {@code creation} length).
+   * The tag used for new style reference. The same as {@link TermType#NEW_REFERENCE}, but newer (use bigger
+   * {@code creation} length).
    * <p>
    * Structure:
    * <p>
