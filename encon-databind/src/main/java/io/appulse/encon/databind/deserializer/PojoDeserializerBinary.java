@@ -14,19 +14,24 @@
  * limitations under the License.
  */
 
-package io.appulse.encon.databind.serializer;
+package io.appulse.encon.databind.deserializer;
 
 import io.appulse.encon.terms.ErlangTerm;
+import io.appulse.utils.SerializationUtils;
+
+import lombok.NonNull;
 
 /**
+ * Eralng's term binary deserializer to specified type.
  *
  * @since 1.1.0
- * @author Artem Labazin
+ * @author alabazin
  */
-public class AtomTermSerializer extends TermSerializer<String> {
+public class PojoDeserializerBinary implements Deserializer<Object> {
 
   @Override
-  public ErlangTerm serialize (String object) {
-    return Serializer.ATOM_SERIALIZER.serialize(object);
+  public Object deserialize (@NonNull ErlangTerm binary) {
+    byte[] byteArray = binary.asBinary();
+    return SerializationUtils.deserialize(byteArray);
   }
 }

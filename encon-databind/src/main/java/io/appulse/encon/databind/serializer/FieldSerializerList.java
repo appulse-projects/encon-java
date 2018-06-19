@@ -31,16 +31,22 @@ import lombok.experimental.FieldDefaults;
 import lombok.val;
 
 /**
+ * Field serializer for lists Erlang terms.
  *
  * @since 1.1.0
  * @author Artem Labazin
  */
 @FieldDefaults(level = PRIVATE, makeFinal = true)
-public class ListSerializer implements Serializer<Object> {
+public class FieldSerializerList implements Serializer<Object> {
 
   Serializer<?> elementDeserializer;
 
-  public ListSerializer (@NonNull Class<?> elementClass) {
+  /**
+   * Construct list serializer.
+   *
+   * @param elementClass collection's element type
+   */
+  public FieldSerializerList (@NonNull Class<?> elementClass) {
     elementDeserializer = findInPredefined(elementClass);
   }
 

@@ -24,8 +24,8 @@ import java.lang.annotation.Documented;
 import java.lang.annotation.Retention;
 import java.lang.annotation.Target;
 
-import io.appulse.encon.databind.deserializer.BinaryDeserializer;
-import io.appulse.encon.databind.serializer.BinarySerializer;
+import io.appulse.encon.databind.deserializer.PojoDeserializerBinary;
+import io.appulse.encon.databind.serializer.PojoSerializerBinary;
 
 /**
  * Marker annotation for fields and types, which should be serialized/deserialized
@@ -37,8 +37,8 @@ import io.appulse.encon.databind.serializer.BinarySerializer;
 @Documented
 @Target({ TYPE, FIELD })
 @Retention(RUNTIME)
-@TermSerialize(BinarySerializer.class)
-@TermDeserialize(BinaryDeserializer.class)
+@TermSerialize(PojoSerializerBinary.class)
+@TermDeserialize(PojoDeserializerBinary.class)
 public @interface AsErlangBinary {
 
 }

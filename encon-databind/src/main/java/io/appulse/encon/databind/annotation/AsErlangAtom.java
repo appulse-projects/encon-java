@@ -16,6 +16,8 @@
 
 package io.appulse.encon.databind.annotation;
 
+import static io.appulse.encon.databind.deserializer.Deserializer.STRING_DESERIALIZER;
+import static io.appulse.encon.databind.serializer.Serializer.ATOM_SERIALIZER;
 import static java.lang.annotation.ElementType.FIELD;
 import static java.lang.annotation.RetentionPolicy.RUNTIME;
 
@@ -23,8 +25,11 @@ import java.lang.annotation.Documented;
 import java.lang.annotation.Retention;
 import java.lang.annotation.Target;
 
-import io.appulse.encon.databind.deserializer.AtomTermDeserializer;
-import io.appulse.encon.databind.serializer.AtomTermSerializer;
+import io.appulse.encon.databind.annotation.AsErlangAtom.AtomTermDeserializer;
+import io.appulse.encon.databind.annotation.AsErlangAtom.AtomTermSerializer;
+import io.appulse.encon.databind.deserializer.Deserializer;
+import io.appulse.encon.databind.serializer.Serializer;
+import io.appulse.encon.terms.ErlangTerm;
 
 /**
  * Marker annotation for fields, which should be serialized/deserialized
@@ -40,4 +45,25 @@ import io.appulse.encon.databind.serializer.AtomTermSerializer;
 @TermDeserialize(AtomTermDeserializer.class)
 public @interface AsErlangAtom {
 
+  /**
+   * String atom serializer.
+   */
+  class AtomTermSerializer implements Serializer<String> {
+
+    @Override
+    public ErlangTerm serialize (String object) {
+      return ATOM_SERIALIZER.serialize(object);
+    }
+  }
+
+  /**
+   * String atom deserializer.
+   */
+  class AtomTermDeserializer implements Deserializer<String> {
+
+    @Override
+    public String deserialize (ErlangTerm term) {
+      return STRING_DESERIALIZER.deserialize(term);
+    }
+  }
 }

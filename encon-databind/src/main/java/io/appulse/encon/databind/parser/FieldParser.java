@@ -38,13 +38,13 @@ import io.appulse.encon.databind.annotation.TermDeserialize;
 import io.appulse.encon.databind.annotation.TermOrder;
 import io.appulse.encon.databind.annotation.TermSerialize;
 import io.appulse.encon.databind.deserializer.Deserializer;
-import io.appulse.encon.databind.deserializer.ListAndTupleDeserializer;
-import io.appulse.encon.databind.deserializer.MapDeserializer;
-import io.appulse.encon.databind.deserializer.SetDeserializer;
-import io.appulse.encon.databind.serializer.ListSerializer;
-import io.appulse.encon.databind.serializer.MapSerializer;
+import io.appulse.encon.databind.deserializer.FieldDeserializerListOrTuple;
+import io.appulse.encon.databind.deserializer.FieldDeserializerMap;
+import io.appulse.encon.databind.deserializer.FieldDeserializerSet;
+import io.appulse.encon.databind.serializer.FieldSerializerList;
+import io.appulse.encon.databind.serializer.FieldSerializerMap;
+import io.appulse.encon.databind.serializer.FieldSerializerTuple;
 import io.appulse.encon.databind.serializer.Serializer;
-import io.appulse.encon.databind.serializer.TupleSerializer;
 import io.appulse.utils.AnnotationUtils;
 
 import lombok.NonNull;
@@ -88,8 +88,8 @@ public final class FieldParser {
         genericType = getGenericType(field, 0);
       }
 
-      serializer = new ListSerializer(genericType);
-      deserializer = new ListAndTupleDeserializer(genericType, field.getType());
+      serializer = new FieldSerializerList(genericType);
+      deserializer = new FieldDeserializerListOrTuple(genericType, field.getType());
     } else if (field.isAnnotationPresent(AsErlangTuple.class)) {
       Class<?> genericType;
       if (field.getType().isArray()) {
@@ -100,8 +100,8 @@ public final class FieldParser {
         genericType = getGenericType(field, 0);
       }
 
-      serializer = new TupleSerializer(genericType);
-      deserializer = new ListAndTupleDeserializer(genericType, field.getType());
+      serializer = new FieldSerializerTuple(genericType);
+      deserializer = new FieldDeserializerListOrTuple(genericType, field.getType());
     } else {
       serializer = parseSerializer(field);
       deserializer = parseDeserializer(field);
@@ -132,9 +132,9 @@ public final class FieldParser {
 
     if (Collection.class.isAssignableFrom(type)) {
       Class<?> genericType = getGenericType(field, 0);
-      return new ListSerializer(genericType);
+      return new FieldSerializerList(genericType);
     } else if (Map.class.isAssignableFrom(type)) {
-      return MapSerializer.builder()
+      return FieldSerializerMap.builder()
           .keyClass(getGenericType(field, 0))
           .valueClass(getGenericType(field, 1))
           .build();
@@ -159,12 +159,12 @@ public final class FieldParser {
 
     if (List.class.isAssignableFrom(type)) {
       Class<?> genericType = getGenericType(field, 0);
-      return new ListAndTupleDeserializer(genericType, field.getType());
+      return new FieldDeserializerListOrTuple(genericType, field.getType());
     } else if (Set.class.isAssignableFrom(type)) {
       Class<?> genericType = getGenericType(field, 0);
-      return new SetDeserializer(genericType);
+      return new FieldDeserializerSet(genericType);
     } else if (Map.class.isAssignableFrom(type)) {
-      return MapDeserializer.builder()
+      return FieldDeserializerMap.builder()
           .keyClass(getGenericType(field, 0))
           .valueClass(getGenericType(field, 1))
           .build();

@@ -36,14 +36,14 @@ import io.appulse.encon.databind.annotation.AsErlangMap;
 import io.appulse.encon.databind.annotation.IgnoreField;
 import io.appulse.encon.databind.annotation.TermDeserialize;
 import io.appulse.encon.databind.annotation.TermSerialize;
-import io.appulse.encon.databind.deserializer.BinaryDeserializer;
-import io.appulse.encon.databind.deserializer.CollectionWrapperDeserializer;
-import io.appulse.encon.databind.deserializer.MapWrapperDeserializer;
+import io.appulse.encon.databind.deserializer.PojoDeserializerBinary;
+import io.appulse.encon.databind.deserializer.PojoDeserializerCollection;
+import io.appulse.encon.databind.deserializer.PojoDeserializerMap;
 import io.appulse.encon.databind.parser.PojoDescriptor.PojoDescriptorBuilder;
-import io.appulse.encon.databind.serializer.BinarySerializer;
-import io.appulse.encon.databind.serializer.ListWrapperSerializer;
-import io.appulse.encon.databind.serializer.MapWrapperSerializer;
-import io.appulse.encon.databind.serializer.TupleWrapperSerializer;
+import io.appulse.encon.databind.serializer.PojoSerializerBinary;
+import io.appulse.encon.databind.serializer.PojoSerializerList;
+import io.appulse.encon.databind.serializer.PojoSerializerMap;
+import io.appulse.encon.databind.serializer.PojoSerializerTuple;
 
 import lombok.NonNull;
 import lombok.val;
@@ -106,23 +106,23 @@ public final class PojoParser {
 
     if (findAnnotation(type, AsErlangMap.class).isPresent()) {
       return builder
-          .serializer(new MapWrapperSerializer(fields))
-          .deserializer(new MapWrapperDeserializer(type, fields));
+          .serializer(new PojoSerializerMap(fields))
+          .deserializer(new PojoDeserializerMap(type, fields));
     }
     if (findAnnotation(type, AsErlangList.class).isPresent()) {
       return builder
-          .serializer(new ListWrapperSerializer(fields))
-          .deserializer(new CollectionWrapperDeserializer<>(type, fields));
+          .serializer(new PojoSerializerList(fields))
+          .deserializer(new PojoDeserializerCollection<>(type, fields));
     }
     if (findAnnotation(type, AsErlangBinary.class).isPresent()) {
       return builder
-          .serializer(new BinarySerializer())
-          .deserializer(new BinaryDeserializer());
+          .serializer(SERIALIZERS.computeIfAbsent(PojoSerializerBinary.class, NEW_SERIALIZER))
+          .deserializer(DESERIALIZERS.computeIfAbsent(PojoDeserializerBinary.class, NEW_DESERIALIZER));
     }
     // default is tuple
     return builder
-        .serializer(new TupleWrapperSerializer(fields))
-        .deserializer(new CollectionWrapperDeserializer<>(type, fields));
+        .serializer(new PojoSerializerTuple(fields))
+        .deserializer(new PojoDeserializerCollection<>(type, fields));
   }
 
   private PojoParser () {

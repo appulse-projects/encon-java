@@ -29,13 +29,14 @@ import lombok.experimental.FieldDefaults;
 import lombok.val;
 
 /**
+ * POJO's serializer into Erlang's list.
  *
  * @since 1.1.0
  * @author Artem Labazin
  */
 @RequiredArgsConstructor
 @FieldDefaults(level = PRIVATE, makeFinal = true)
-public class ListWrapperSerializer extends TermSerializer<Object> {
+public class PojoSerializerList extends PojoSerializerAbstractCollection<Object> {
 
   List<FieldDescriptor> fields;
 

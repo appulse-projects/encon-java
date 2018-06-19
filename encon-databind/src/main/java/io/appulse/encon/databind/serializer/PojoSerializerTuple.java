@@ -16,24 +16,36 @@
 
 package io.appulse.encon.databind.serializer;
 
+import static io.appulse.encon.terms.Erlang.tuple;
+import static lombok.AccessLevel.PRIVATE;
+
+import java.util.List;
+
 import io.appulse.encon.databind.parser.FieldDescriptor;
 import io.appulse.encon.terms.ErlangTerm;
 
-import lombok.SneakyThrows;
+import lombok.RequiredArgsConstructor;
+import lombok.experimental.FieldDefaults;
 import lombok.val;
 
 /**
+ * POJO's serializer into Erlang's tuple.
  *
  * @since 1.1.0
  * @author Artem Labazin
  */
-public abstract class TermSerializer<T> implements Serializer<T> {
+@RequiredArgsConstructor
+@FieldDefaults(level = PRIVATE, makeFinal = true)
+public class PojoSerializerTuple extends PojoSerializerAbstractCollection<Object> {
 
-  @SneakyThrows
-  protected final ErlangTerm serialize (FieldDescriptor descriptor, Object object) {
-    val serializer = descriptor.getSerializer();
-    val field = descriptor.getField();
-    val value = field.get(object);
-    return serializer.serializeUntyped(value);
+  List<FieldDescriptor> fields;
+
+  @Override
+  public ErlangTerm serialize (Object object) {
+    val elements = fields.stream()
+        .map(it -> serialize(it, object))
+        .toArray(ErlangTerm[]::new);
+
+    return tuple(elements);
   }
 }

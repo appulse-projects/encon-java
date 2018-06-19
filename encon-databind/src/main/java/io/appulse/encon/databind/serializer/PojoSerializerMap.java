@@ -33,15 +33,16 @@ import lombok.experimental.FieldDefaults;
 import lombok.val;
 
 /**
+ * POJO's serializer into Erlang's map.
  *
  * @since 1.1.0
  * @author Artem Labazin
  */
 @RequiredArgsConstructor
 @FieldDefaults(level = PRIVATE, makeFinal = true)
-public class MapWrapperSerializer extends TermSerializer<Object> {
+public class PojoSerializerMap extends PojoSerializerAbstractCollection<Object> {
 
-  static <T> BinaryOperator<T> throwingMerger () {
+  private static <T> BinaryOperator<T> throwingMerger () {
     return (oldValue, newValue) -> {
       throw new IllegalStateException(String.format("Duplicate key %s", newValue));
     };

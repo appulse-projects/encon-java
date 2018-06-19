@@ -16,6 +16,7 @@
 
 package io.appulse.encon.databind.deserializer;
 
+import static io.appulse.encon.terms.Erlang.atom;
 import static lombok.AccessLevel.PRIVATE;
 
 import java.util.List;
@@ -26,15 +27,19 @@ import io.appulse.encon.terms.ErlangTerm;
 import lombok.RequiredArgsConstructor;
 import lombok.SneakyThrows;
 import lombok.experimental.FieldDefaults;
+import lombok.val;
 
 /**
+ * Eralng's term map deserializer to specified type.
+ *
+ * @param <T> the type of deserialization result
  *
  * @since 1.1.0
  * @author Artem Labazin
  */
 @RequiredArgsConstructor
 @FieldDefaults(level = PRIVATE, makeFinal = true)
-public class CollectionWrapperDeserializer<T> implements Deserializer<T> {
+public class PojoDeserializerMap<T> implements Deserializer<T> {
 
   Class<T> type;
 
@@ -42,11 +47,10 @@ public class CollectionWrapperDeserializer<T> implements Deserializer<T> {
 
   @Override
   @SneakyThrows
-  public T deserialize (ErlangTerm tuple) {
+  public T deserialize (ErlangTerm map) {
     T result = type.newInstance();
-    for (int i = 0; i < fields.size(); i++) {
-      FieldDescriptor descriptor = fields.get(i);
-      ErlangTerm term = tuple.getUnsafe(i);
+    for (val descriptor : fields) {
+      ErlangTerm term = map.getUnsafe(atom(descriptor.getName()));
       Object value = descriptor.getDeserializer().deserialize(term);
       descriptor.getField().set(result, value);
     }
