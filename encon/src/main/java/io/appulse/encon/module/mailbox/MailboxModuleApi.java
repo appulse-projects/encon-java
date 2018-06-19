@@ -23,27 +23,82 @@ import io.appulse.encon.module.mailbox.MailboxModule.NewMailboxBuilder;
 import io.appulse.encon.terms.type.ErlangPid;
 
 /**
+ * Mailbox management API.
  *
- * @author Artem Labazin
  * @since 1.0.0
+ * @author Artem Labazin
  */
 public interface MailboxModuleApi {
 
+  /**
+   * A new mailbox builder.
+   *
+   * @return mailbox builder
+   */
   NewMailboxBuilder mailbox ();
 
+  /**
+   * Searches local mailbox by its name.
+   *
+   * @param name the name of searching mailbox
+   *
+   * @return optional {@link Mailbox} instance
+   */
   Optional<Mailbox> mailbox (String name);
 
+  /**
+   * Searches local mailbox by its pid.
+   *
+   * @param pid the pid of searching mailbox
+   *
+   * @return optional {@link Mailbox} instance
+   */
   Optional<Mailbox> mailbox (ErlangPid pid);
 
+  /**
+   * Registers already created mailbox with specific name.
+   *
+   * @param mailbox mailbox instance for registration
+   *
+   * @param name    mailbox's registration name
+   *
+   * @return {@code true} if it was registered successfully, {@code false} otherwise
+   */
   boolean register (Mailbox mailbox, String name);
 
+  /**
+   * Deregisters a mailbox by its name.
+   * The mailbox keeps running, but it becomes not available by name anymore.
+   *
+   * @param name mailbox's registration name
+   */
   void deregister (String name);
 
+  /**
+   * Removes a mailbox and cleanup its resources.
+   *
+   * @param mailbox the mailbox for removing
+   */
   void remove (Mailbox mailbox);
 
+  /**
+   * Removes a mailbox and cleanup its resources by its name.
+   *
+   * @param name mailbox's registration name
+   */
   void remove (String name);
 
+  /**
+   * Removes a mailbox and cleanup its resources by its pid.
+   *
+   * @param pid the pid of searching mailbox
+   */
   void remove (ErlangPid pid);
 
+  /**
+   * Returns a map of all available node's mailboxes.
+   *
+   * @return a map of all available node's mailboxes
+   */
   Map<ErlangPid, Mailbox> mailboxes ();
 }

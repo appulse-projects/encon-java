@@ -22,17 +22,50 @@ import java.util.concurrent.TimeUnit;
 import io.appulse.encon.common.RemoteNode;
 
 /**
+ * Connection module API.
  *
- * @author Artem Labazin
  * @since 1.0.0
+ * @author Artem Labazin
  */
 public interface ConnectionModuleApi {
 
+  /**
+   * Asynchronous connection method to {@link RemoteNode}.
+   *
+   * @param remote remote node descriptor
+   *
+   * @return connection future container
+   */
   CompletableFuture<Connection> connectAsync (RemoteNode remote);
 
+  /**
+   * Synchronous connection method to {@link RemoteNode}.
+   *
+   * @param remote remote node descriptor
+   *
+   * @return new or cached connection
+   */
   Connection connect (RemoteNode remote);
 
+  /**
+   * Synchronous connection method to {@link RemoteNode}.
+   *
+   * @param remote  remote node descriptor
+   *
+   * @param timeout amount of units which need to wait of connection
+   *
+   * @param unit    timeout unit, like {@link TimeUnit#SECONDS}
+   *
+   * @return new or cached connection
+   */
   Connection connect (RemoteNode remote, long timeout, TimeUnit unit);
 
+  /**
+   * Checks if a remote node is available or not.
+   *
+   * @param remote remote node descriptor
+   *
+   * @return {@code true} if node is accessable and {@code false} otherwise
+   */
   boolean isAvailable (RemoteNode remote);
 }

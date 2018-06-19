@@ -19,11 +19,17 @@ package io.appulse.encon.module.generator.port;
 import io.appulse.encon.terms.type.ErlangPort;
 
 /**
+ * Internal {@link ErlangPort} generator.
  *
- * @author Artem Labazin
  * @since 1.0.0
+ * @author Artem Labazin
  */
 public interface PortGeneratorModuleApi {
 
+  /**
+   * Generates a new {@link ErlangPort} instance.
+   *
+   * @return a new {@link ErlangPort} instance.
+   */
   ErlangPort generatePort ();
 }

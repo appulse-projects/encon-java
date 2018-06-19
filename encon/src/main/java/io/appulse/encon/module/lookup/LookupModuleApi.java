@@ -23,15 +23,37 @@ import io.appulse.encon.common.RemoteNode;
 import io.appulse.encon.terms.type.ErlangPid;
 
 /**
+ * Module for looking up remote node API.
  *
- * @author Artem Labazin
  * @since 1.0.0
+ * @author Artem Labazin
  */
 public interface LookupModuleApi {
 
-  Optional<RemoteNode> lookup (String node);
+  /**
+   * Searches remote node (locally or on remote machine) by its name.
+   *
+   * @param name short (like 'node-name') or full (like 'node-name@example.com') remote node's name
+   *
+   * @return optional {@link RemoteNode} instance
+   */
+  Optional<RemoteNode> lookup (String name);
 
+  /**
+   * Searches remote node (locally or on remote machine) by its {@link ErlangPid}.
+   *
+   * @param pid remote's node pid
+   *
+   * @return optional {@link RemoteNode} instance
+   */
   Optional<RemoteNode> lookup (ErlangPid pid);
 
+  /**
+   * Searches remote node (locally or on remote machine) by its identifier.
+   *
+   * @param descriptor identifier of the remote node
+   *
+   * @return optional {@link RemoteNode} instance
+   */
   Optional<RemoteNode> lookup (NodeDescriptor descriptor);
 }

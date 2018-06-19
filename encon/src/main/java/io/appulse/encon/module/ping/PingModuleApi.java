@@ -22,22 +22,37 @@ import io.appulse.encon.common.NodeDescriptor;
 import io.appulse.encon.common.RemoteNode;
 
 /**
+ * Ping functionality API.
  *
- * @author Artem Labazin
  * @since 1.0.0
+ * @author Artem Labazin
  */
 public interface PingModuleApi {
 
   /**
-   * Ping some.
+   * Pings remote node by its name.
    *
-   * @param node node
+   * @param name short (like 'node-name') or full (like 'node-name@example.com') remote node's name
    *
-   * @return future
+   * @return future container with successful/unsuccessful result
    */
-  CompletableFuture<Boolean> ping (String node);
+  CompletableFuture<Boolean> ping (String name);
 
-  CompletableFuture<Boolean> ping (NodeDescriptor remoteDescriptor);
+  /**
+   * Pings remote node by its identifier.
+   *
+   * @param descriptor identifier of the remote node
+   *
+   * @return future container with successful/unsuccessful result
+   */
+  CompletableFuture<Boolean> ping (NodeDescriptor descriptor);
 
+  /**
+   * Pings remote node by its remote node descriptor.
+   *
+   * @param remote remote node descriptor
+   *
+   * @return future container with successful/unsuccessful result
+   */
   CompletableFuture<Boolean> ping (RemoteNode remote);
 }

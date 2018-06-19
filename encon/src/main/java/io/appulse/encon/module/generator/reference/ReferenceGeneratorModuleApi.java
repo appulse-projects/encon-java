@@ -19,11 +19,17 @@ package io.appulse.encon.module.generator.reference;
 import io.appulse.encon.terms.type.ErlangReference;
 
 /**
+ * Internal {@link ErlangReference} generator.
  *
- * @author Artem Labazin
  * @since 1.0.0
+ * @author Artem Labazin
  */
 public interface ReferenceGeneratorModuleApi {
 
+  /**
+   * Generates a new {@link ErlangReference} instance.
+   *
+   * @return a new {@link ErlangReference} instance.
+   */
   ErlangReference generateReference ();
 }
