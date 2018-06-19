@@ -23,6 +23,7 @@ import lombok.Builder;
 import lombok.Value;
 
 /**
+ * The class describes user's POJO.
  *
  * @since 1.1.0
  * @author Artem Labazin
@@ -37,6 +38,11 @@ public final class PojoDescriptor {
 
   Deserializer<?> deserializer;
 
+  /**
+   * Returns POJO's type name.
+   *
+   * @return POJO's type name
+   */
   public String getName () {
     return type.getSimpleName();
   }

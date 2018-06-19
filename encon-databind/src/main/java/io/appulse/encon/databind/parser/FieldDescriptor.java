@@ -25,6 +25,7 @@ import lombok.Builder;
 import lombok.Value;
 
 /**
+ * Value type for describing user's fields.
  *
  * @since 1.1.0
  * @author Artem Labazin
@@ -41,6 +42,11 @@ public final class FieldDescriptor {
 
   Deserializer<?> deserializer;
 
+  /**
+   * Returns field's name.
+   *
+   * @return field's name
+   */
   public String getName () {
     return field.getName();
   }

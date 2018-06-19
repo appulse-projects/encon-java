@@ -24,6 +24,8 @@ import java.lang.annotation.Retention;
 import java.lang.annotation.Target;
 
 /**
+ * Marker annotation for fields, which should be ignored in
+ * serialization/deserialization.
  *
  * @since 1.1.0
  * @author Artem Labazin

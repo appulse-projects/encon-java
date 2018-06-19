@@ -45,9 +45,11 @@ import io.appulse.encon.databind.serializer.ListWrapperSerializer;
 import io.appulse.encon.databind.serializer.MapWrapperSerializer;
 import io.appulse.encon.databind.serializer.TupleWrapperSerializer;
 
+import lombok.NonNull;
 import lombok.val;
 
 /**
+ * Utility class for parsing user's POJO types to {@link PojoDescriptor}.
  *
  * @since 1.1.0
  * @author Artem Labazin
@@ -60,7 +62,14 @@ public final class PojoParser {
     CACHE = new ConcurrentHashMap<>(5);
   }
 
-  public static PojoDescriptor parse (Class<?> type) {
+  /**
+   * Parses user's types to {@link PojoDescriptor} instance.
+   *
+   * @param type user's custom data type
+   *
+   * @return cached {@link PojoDescriptor} instance
+   */
+  public static PojoDescriptor parse (@NonNull Class<?> type) {
     return CACHE.computeIfAbsent(type, PojoParser::createNewDescriptor);
   }
 

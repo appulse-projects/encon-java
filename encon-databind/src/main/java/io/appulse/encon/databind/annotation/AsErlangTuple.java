@@ -25,12 +25,14 @@ import java.lang.annotation.Retention;
 import java.lang.annotation.Target;
 
 /**
+ * Marker annotation for fields and types, which should be serialized/deserialized
+ * as {@link io.appulse.encon.terms.type.ErlangTuple}.
  *
  * @since 1.1.0
  * @author Artem Labazin
  */
 @Documented
-@Target({FIELD, TYPE})
+@Target({ TYPE, FIELD })
 @Retention(RUNTIME)
 public @interface AsErlangTuple {
 
