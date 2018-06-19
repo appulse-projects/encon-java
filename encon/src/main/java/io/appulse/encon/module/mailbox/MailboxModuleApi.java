@@ -68,7 +68,7 @@ public interface MailboxModuleApi {
 
   /**
    * Deregisters a mailbox by its name.
-   * The mailbox keeps running, but it becomes not available by name anymore.
+   * The mailbox keeps running, but it becomes unavailable by name anymore.
    *
    * @param name mailbox's registration name
    */
