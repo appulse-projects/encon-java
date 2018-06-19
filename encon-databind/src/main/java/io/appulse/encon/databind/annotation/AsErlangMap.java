@@ -25,8 +25,8 @@ import java.lang.annotation.Target;
 
 /**
  *
+ * @since 1.1.0
  * @author Artem Labazin
- * @since 1.0.0
  */
 @Documented
 @Target(TYPE)

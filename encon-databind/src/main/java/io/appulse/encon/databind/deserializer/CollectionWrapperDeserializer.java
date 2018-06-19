@@ -29,6 +29,7 @@ import lombok.experimental.FieldDefaults;
 
 /**
  *
+ * @since 1.1.0
  * @author Artem Labazin
  */
 @RequiredArgsConstructor

@@ -29,8 +29,8 @@ import io.appulse.encon.databind.serializer.BinarySerializer;
 
 /**
  *
+ * @since 1.1.0
  * @author Artem Labazin
- * @since 1.0.0
  */
 @Documented
 @Target({ FIELD, TYPE })

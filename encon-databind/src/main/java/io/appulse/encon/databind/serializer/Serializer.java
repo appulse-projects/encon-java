@@ -27,8 +27,8 @@ import io.appulse.encon.terms.ErlangTerm;
 
 /**
  *
+ * @since 1.1.0
  * @author Artem Labazin
- * @since 1.0.0
  */
 public interface Serializer<T> {
 
