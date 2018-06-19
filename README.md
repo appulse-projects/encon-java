@@ -8,8 +8,8 @@ Java implementation of Erlang node connector (distribution protocol).
 Sub-modules descriptions:
 
 - [Encon common](./encon-common/README.md)
-- [Encon config](./encon-config/README.md)
 - [Encon terms](./encon-terms/README.md)
+- [Encon config](./encon-config/README.md)
 - [Encon](./encon/README.md)
 - [Encon databind](./encon-databind/README.md)
 
