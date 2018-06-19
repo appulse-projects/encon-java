@@ -26,7 +26,7 @@ import io.appulse.encon.terms.ErlangTerm;
 
 /**
  *
- * @since 1.0.0
+ * @since 1.1.0
  * @author Artem Labazin
  */
 public interface Deserializer<T> {

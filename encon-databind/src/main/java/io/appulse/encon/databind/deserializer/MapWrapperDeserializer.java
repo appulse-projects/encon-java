@@ -31,6 +31,7 @@ import lombok.val;
 
 /**
  *
+ * @since 1.1.0
  * @author Artem Labazin
  */
 @RequiredArgsConstructor

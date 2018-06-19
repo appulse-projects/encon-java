@@ -32,8 +32,8 @@ import lombok.val;
 
 /**
  *
+ * @since 1.1.0
  * @author Artem Labazin
- * @since 1.0.0
  */
 @FieldDefaults(level = PRIVATE, makeFinal = true)
 public class ListSerializer implements Serializer<Object> {

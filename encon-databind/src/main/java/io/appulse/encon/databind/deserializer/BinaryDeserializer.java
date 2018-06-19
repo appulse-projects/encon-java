@@ -21,6 +21,7 @@ import io.appulse.utils.SerializationUtils;
 
 /**
  *
+ * @since 1.1.0
  * @author Artem Labazin
  */
 public class BinaryDeserializer implements Deserializer<Object> {

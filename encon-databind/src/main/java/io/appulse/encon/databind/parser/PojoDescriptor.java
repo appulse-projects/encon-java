@@ -24,8 +24,7 @@ import lombok.Value;
 
 /**
  *
- *
- * @since 08.05.2018
+ * @since 1.1.0
  * @author Artem Labazin
  */
 @Value

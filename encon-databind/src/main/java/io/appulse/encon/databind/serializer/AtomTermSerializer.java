@@ -20,6 +20,7 @@ import io.appulse.encon.terms.ErlangTerm;
 
 /**
  *
+ * @since 1.1.0
  * @author Artem Labazin
  */
 public class AtomTermSerializer extends TermSerializer<String> {

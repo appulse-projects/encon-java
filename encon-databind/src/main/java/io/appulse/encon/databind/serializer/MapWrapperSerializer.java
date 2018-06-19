@@ -33,8 +33,9 @@ import lombok.experimental.FieldDefaults;
 import lombok.val;
 
 /**
+ *
+ * @since 1.1.0
  * @author Artem Labazin
- * @since 08.05.2018
  */
 @RequiredArgsConstructor
 @FieldDefaults(level = PRIVATE, makeFinal = true)

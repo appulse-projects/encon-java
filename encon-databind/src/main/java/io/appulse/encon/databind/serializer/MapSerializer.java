@@ -34,8 +34,8 @@ import lombok.experimental.FieldDefaults;
 
 /**
  *
+ * @since 1.1.0
  * @author Artem Labazin
- * @since 1.0.0
  */
 @FieldDefaults(level = PRIVATE, makeFinal = true)
 public class MapSerializer implements Serializer<Map<Object, Object>> {

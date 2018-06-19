@@ -19,7 +19,7 @@ package io.appulse.encon.databind.exception;
 /**
  * Common deserialization exception.
  *
- * @since 1.0.0
+ * @since 1.1.0
  * @author Artem Labazin
  */
 public class DeserializationException extends RuntimeException {

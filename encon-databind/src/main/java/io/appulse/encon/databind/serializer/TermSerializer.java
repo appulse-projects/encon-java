@@ -23,8 +23,9 @@ import lombok.SneakyThrows;
 import lombok.val;
 
 /**
+ *
+ * @since 1.1.0
  * @author Artem Labazin
- * @since 08.05.2018
  */
 public abstract class TermSerializer<T> implements Serializer<T> {
 
