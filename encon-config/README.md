@@ -4,6 +4,28 @@ Encon's configuration classes.
 
 ## Usage
 
+First of all, add config's dependency:
+
+**Maven**:
+
+```xml
+<dependencies>
+    ...
+    <dependency>
+        <groupId>io.appulse.encon</groupId>
+        <artifactId>encon-config</artifactId>
+        <version>1.1.0</version>
+    </dependency>
+    ...
+</dependencies>
+```
+
+**Gradle**:
+
+```groovy
+compile 'io.appulse.encon.java:encon-config:1.1.0'
+```
+
 ### File based configuration
 
 The most likely way to configure your encon instance is loading all settings from file.
