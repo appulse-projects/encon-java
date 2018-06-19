@@ -19,16 +19,18 @@ package io.appulse.encon.databind.deserializer;
 import static io.appulse.encon.databind.deserializer.Deserializer.findInPredefined;
 import static lombok.AccessLevel.PRIVATE;
 
-import io.appulse.encon.terms.ErlangTerm;
 import java.util.HashSet;
 import java.util.Set;
+
+import io.appulse.encon.terms.ErlangTerm;
+
 import lombok.NonNull;
 import lombok.experimental.FieldDefaults;
 
 /**
  *
- * @author Artem Labazin
  * @since 1.0.0
+ * @author Artem Labazin
  */
 @FieldDefaults(level = PRIVATE, makeFinal = true)
 public class SetDeserializer implements Deserializer<Set<?>> {

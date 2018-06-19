@@ -20,12 +20,14 @@ import static io.appulse.encon.databind.serializer.Serializer.findInPredefined;
 import static java.util.stream.Collectors.toMap;
 import static lombok.AccessLevel.PRIVATE;
 
-import io.appulse.encon.terms.ErlangTerm;
-import io.appulse.encon.terms.type.ErlangMap;
 import java.util.AbstractMap.SimpleEntry;
 import java.util.LinkedHashMap;
 import java.util.Map;
 import java.util.Map.Entry;
+
+import io.appulse.encon.terms.ErlangTerm;
+import io.appulse.encon.terms.type.ErlangMap;
+
 import lombok.Builder;
 import lombok.NonNull;
 import lombok.experimental.FieldDefaults;

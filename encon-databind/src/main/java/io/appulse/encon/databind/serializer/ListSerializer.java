@@ -19,13 +19,12 @@ package io.appulse.encon.databind.serializer;
 import static io.appulse.encon.databind.serializer.Serializer.findInPredefined;
 import static lombok.AccessLevel.PRIVATE;
 
+import java.util.Collection;
+import java.util.stream.Stream;
+
 import io.appulse.encon.terms.Erlang;
 import io.appulse.encon.terms.ErlangTerm;
-
-import java.util.Collection;
-
 import io.appulse.encon.terms.type.ErlangList;
-import java.util.stream.Stream;
 
 import lombok.NonNull;
 import lombok.experimental.FieldDefaults;
@@ -57,6 +56,13 @@ public class ListSerializer implements Serializer<Object> {
     throw new UnsupportedOperationException("Not object type " + object.getClass());
   }
 
+  /**
+   * Serializes <b>array</b> of Java objects to list Erlang term.
+   *
+   * @param array Java POJOs
+   *
+   * @return serialized {@link ErlangTerm} instance
+   */
   public ErlangTerm serialize (Object[] array) {
     if (array.length == 0) {
       return new ErlangList();
@@ -69,11 +75,25 @@ public class ListSerializer implements Serializer<Object> {
     return Erlang.list(elements);
   }
 
+  /**
+   * Serializes <b>{@link Collection}</b> of Java objects to list Erlang term.
+   *
+   * @param collection Java POJOs
+   *
+   * @return serialized {@link ErlangTerm} instance
+   */
   public ErlangTerm serialize (Collection<Object> collection) {
     val array = collection.toArray(new Object[0]);
     return serialize(array);
   }
 
+  /**
+   * Serializes {@link String} to list Erlang term.
+   *
+   * @param string Java string
+   *
+   * @return serialized {@link ErlangTerm} instance
+   */
   public ErlangTerm serialize (String string) {
     val array = string.codePoints()
         .boxed()

@@ -16,7 +16,6 @@
 
 package io.appulse.encon.databind.parser;
 
-
 import java.lang.reflect.Field;
 
 import io.appulse.encon.databind.deserializer.Deserializer;
@@ -27,8 +26,8 @@ import lombok.Value;
 
 /**
  *
- * @author Artem Labazin
  * @since 1.0.0
+ * @author Artem Labazin
  */
 @Value
 @Builder

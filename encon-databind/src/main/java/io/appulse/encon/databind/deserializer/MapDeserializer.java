@@ -19,18 +19,20 @@ package io.appulse.encon.databind.deserializer;
 import static io.appulse.encon.databind.deserializer.Deserializer.findInPredefined;
 import static lombok.AccessLevel.PRIVATE;
 
-import io.appulse.encon.terms.ErlangTerm;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.Map;
+
+import io.appulse.encon.terms.ErlangTerm;
+
 import lombok.Builder;
 import lombok.NonNull;
 import lombok.experimental.FieldDefaults;
 
 /**
  *
- * @author Artem Labazin
  * @since 1.0.0
+ * @author Artem Labazin
  */
 @FieldDefaults(level = PRIVATE, makeFinal = true)
 public class MapDeserializer implements Deserializer<Map<?, ?>> {

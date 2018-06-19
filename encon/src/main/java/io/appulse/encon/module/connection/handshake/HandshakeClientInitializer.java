@@ -33,7 +33,7 @@ import lombok.val;
 
 /**
  *
- * @author alabazin
+ * @author Artem Labazin
  */
 @FieldDefaults(level = PRIVATE, makeFinal = true)
 public final class HandshakeClientInitializer extends AbstractHandshakeChannelInitializer {
