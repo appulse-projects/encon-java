@@ -55,9 +55,10 @@ import lombok.extern.slf4j.Slf4j;
 import lombok.val;
 
 /**
+ * Node's state holder and provider of all needed functions.
  *
- * @author Artem Labazin
  * @since 1.0.0
+ * @author Artem Labazin
  */
 @Slf4j
 @Setter(PRIVATE)
@@ -71,7 +72,11 @@ import lombok.val;
 @NoArgsConstructor(access = PRIVATE)
 public final class Node implements PingModuleApi, Closeable {
 
-  @SuppressWarnings({ "checkstyle:MethodLength", "checkstyle:AnonInnerLength", "PMD.ExcessiveMethodLength" })
+  @SuppressWarnings({
+      "checkstyle:MethodLength",
+      "checkstyle:AnonInnerLength",
+      "PMD.ExcessiveMethodLength"
+  })
   static Node newInstance (@NonNull String name, @NonNull NodeConfig config) {
     val node = new Node();
 

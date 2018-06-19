@@ -19,11 +19,17 @@ package io.appulse.encon.module.generator.pid;
 import io.appulse.encon.terms.type.ErlangPid;
 
 /**
+ * Internal {@link ErlangPid} generator.
  *
- * @author Artem Labazin
  * @since 1.0.0
+ * @author Artem Labazin
  */
 public interface PidGeneratorModuleApi {
 
+  /**
+   * Generates a new {@link ErlangPid} instance.
+   *
+   * @return a new {@link ErlangPid} instance.
+   */
   ErlangPid generatePid ();
 }
