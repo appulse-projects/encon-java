@@ -28,12 +28,14 @@ import io.appulse.encon.databind.deserializer.BinaryDeserializer;
 import io.appulse.encon.databind.serializer.BinarySerializer;
 
 /**
+ * Marker annotation for fields and types, which should be serialized/deserialized
+ * as {@link io.appulse.encon.terms.type.ErlangBinary}.
  *
  * @since 1.1.0
  * @author Artem Labazin
  */
 @Documented
-@Target({ FIELD, TYPE })
+@Target({ TYPE, FIELD })
 @Retention(RUNTIME)
 @TermSerialize(BinarySerializer.class)
 @TermDeserialize(BinaryDeserializer.class)

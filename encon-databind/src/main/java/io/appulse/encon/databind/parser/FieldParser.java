@@ -47,16 +47,25 @@ import io.appulse.encon.databind.serializer.Serializer;
 import io.appulse.encon.databind.serializer.TupleSerializer;
 import io.appulse.utils.AnnotationUtils;
 
+import lombok.NonNull;
 import lombok.val;
 
 /**
+ * Utility class for parsing POJO's fields to {@link FieldDescriptor}.
  *
  * @since 1.1.0
  * @author Artem Labazin
  */
 public final class FieldParser {
 
-  public static FieldDescriptor parse (Field field) {
+  /**
+   * Parses a POJO's field to {@link PojoDescriptor} instance.
+   *
+   * @param field a POJO's field
+   *
+   * @return {@link PojoDescriptor} instance
+   */
+  public static FieldDescriptor parse (@NonNull Field field) {
     AccessController.doPrivileged((PrivilegedAction<?>) () -> {
       field.setAccessible(true);
       return null;

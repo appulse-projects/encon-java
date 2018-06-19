@@ -16,6 +16,8 @@
 
 package io.appulse.encon.databind.annotation;
 
+import static java.lang.annotation.ElementType.ANNOTATION_TYPE;
+import static java.lang.annotation.ElementType.FIELD;
 import static java.lang.annotation.ElementType.TYPE;
 import static java.lang.annotation.RetentionPolicy.RUNTIME;
 
@@ -26,14 +28,21 @@ import java.lang.annotation.Target;
 import io.appulse.encon.databind.deserializer.Deserializer;
 
 /**
+ * Annotation for specifying custom {@link Deserializer} for field or type.
  *
  * @since 1.1.0
  * @author Artem Labazin
  */
 @Documented
-@Target(TYPE)
+@Target({ ANNOTATION_TYPE, FIELD, TYPE })
 @Retention(RUNTIME)
 public @interface TermDeserialize {
 
+  /**
+   * Custom Erlang term deserializer class for type or field.
+   * It should extends {@link Deserializer} interface.
+   *
+   * @return custom term deserializer
+   */
   Class<? extends Deserializer<?>> value ();
 }

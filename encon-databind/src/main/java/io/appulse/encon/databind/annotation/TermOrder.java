@@ -24,6 +24,7 @@ import java.lang.annotation.Retention;
 import java.lang.annotation.Target;
 
 /**
+ * Annotation for specifying custom serializing/deserializing field order.
  *
  * @since 1.1.0
  * @author Artem Labazin
@@ -33,5 +34,10 @@ import java.lang.annotation.Target;
 @Retention(RUNTIME)
 public @interface TermOrder {
 
+  /**
+   * Sets field's serialization/deserialization order.
+   *
+   * @return field's order value
+   */
   int value ();
 }

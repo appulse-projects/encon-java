@@ -25,7 +25,8 @@ import java.lang.annotation.Retention;
 import java.lang.annotation.Target;
 
 /**
- * For Collection<?> and String and arrays
+ * Marker annotation for fields and types, which should be serialized/deserialized
+ * as {@link io.appulse.encon.terms.type.ErlangList}.
  *
  * @since 1.1.0
  * @author Artem Labazin

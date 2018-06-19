@@ -24,6 +24,8 @@ import java.lang.annotation.Retention;
 import java.lang.annotation.Target;
 
 /**
+ * Marker annotation for types, which should be serialized/deserialized
+ * as {@link io.appulse.encon.terms.type.ErlangMap}.
  *
  * @since 1.1.0
  * @author Artem Labazin

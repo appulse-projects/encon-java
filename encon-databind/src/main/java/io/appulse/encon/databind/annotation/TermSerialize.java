@@ -17,6 +17,7 @@
 package io.appulse.encon.databind.annotation;
 
 import static java.lang.annotation.ElementType.ANNOTATION_TYPE;
+import static java.lang.annotation.ElementType.FIELD;
 import static java.lang.annotation.ElementType.TYPE;
 import static java.lang.annotation.RetentionPolicy.RUNTIME;
 
@@ -27,14 +28,21 @@ import java.lang.annotation.Target;
 import io.appulse.encon.databind.serializer.Serializer;
 
 /**
+ * Annotation for specifying custom {@link Serializer} for field or type.
  *
  * @since 1.1.0
  * @author Artem Labazin
  */
 @Documented
-@Target({ TYPE, ANNOTATION_TYPE })
+@Target({ ANNOTATION_TYPE, FIELD, TYPE })
 @Retention(RUNTIME)
 public @interface TermSerialize {
 
+  /**
+   * Custom Erlang term serializer class for type or field.
+   * It should extends {@link Serializer} interface.
+   *
+   * @return custom term serializer
+   */
   Class<? extends Serializer<?>> value ();
 }

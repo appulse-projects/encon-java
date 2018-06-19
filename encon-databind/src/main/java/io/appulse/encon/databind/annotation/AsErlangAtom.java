@@ -27,6 +27,8 @@ import io.appulse.encon.databind.deserializer.AtomTermDeserializer;
 import io.appulse.encon.databind.serializer.AtomTermSerializer;
 
 /**
+ * Marker annotation for fields, which should be serialized/deserialized
+ * as {@link io.appulse.encon.terms.type.ErlangAtom}.
  *
  * @since 1.1.0
  * @author Artem Labazin
