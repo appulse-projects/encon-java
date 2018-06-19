@@ -16,26 +16,23 @@
 
 package io.appulse.encon.databind.serializer;
 
+import static io.appulse.encon.databind.serializer.Serializer.BYTE_ARRAY_SERIALIZER;
 import static java.util.Optional.ofNullable;
-import static lombok.AccessLevel.PRIVATE;
 
 import java.io.Serializable;
 
 import io.appulse.encon.terms.ErlangTerm;
 import io.appulse.utils.SerializationUtils;
 
-import lombok.RequiredArgsConstructor;
-import lombok.experimental.FieldDefaults;
 import lombok.val;
 
 /**
+ * POJO's serializer into Erlang's binary.
  *
  * @since 1.1.0
- * @author Artem Labazin
+ * @author alabazin
  */
-@RequiredArgsConstructor
-@FieldDefaults(level = PRIVATE, makeFinal = true)
-public class BinarySerializer extends TermSerializer<Object> {
+public class PojoSerializerBinary implements Serializer<Object> {
 
   @Override
   public ErlangTerm serialize (Object object) {
@@ -48,6 +45,6 @@ public class BinarySerializer extends TermSerializer<Object> {
             .map(SerializationUtils::serialize)
             .orElse(new byte[0]));
 
-    return Serializer.BYTE_ARRAY_SERIALIZER.serialize(byteArray);
+    return BYTE_ARRAY_SERIALIZER.serialize(byteArray);
   }
 }

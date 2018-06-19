@@ -14,43 +14,36 @@
  * limitations under the License.
  */
 
-package io.appulse.encon.databind.deserializer;
-
-import static io.appulse.encon.terms.Erlang.atom;
-import static lombok.AccessLevel.PRIVATE;
-
-import java.util.List;
+package io.appulse.encon.databind.serializer;
 
 import io.appulse.encon.databind.parser.FieldDescriptor;
 import io.appulse.encon.terms.ErlangTerm;
 
-import lombok.RequiredArgsConstructor;
 import lombok.SneakyThrows;
-import lombok.experimental.FieldDefaults;
 import lombok.val;
 
 /**
+ * Abstract collection serializer.
  *
  * @since 1.1.0
- * @author Artem Labazin
+ * @author alabazin
  */
-@RequiredArgsConstructor
-@FieldDefaults(level = PRIVATE, makeFinal = true)
-public class MapWrapperDeserializer<T> implements Deserializer<T> {
+abstract class PojoSerializerAbstractCollection<T> implements Serializer<T> {
 
-  Class<T> type;
-
-  List<FieldDescriptor> fields;
-
-  @Override
+  /**
+   * Serializes field into {@link ErlangTerm} instance by its {@link FieldDescriptor}.
+   *
+   * @param descriptor field's descriptor
+   *
+   * @param object     field's concrete value
+   *
+   * @return serialized {@link ErlangTerm} instance
+   */
   @SneakyThrows
-  public T deserialize (ErlangTerm map) {
-    T result = type.newInstance();
-    for (val descriptor : fields) {
-      ErlangTerm term = map.getUnsafe(atom(descriptor.getName()));
-      Object value = descriptor.getDeserializer().deserialize(term);
-      descriptor.getField().set(result, value);
-    }
-    return result;
+  protected final ErlangTerm serialize (FieldDescriptor descriptor, Object object) {
+    val serializer = descriptor.getSerializer();
+    val field = descriptor.getField();
+    val value = field.get(object);
+    return serializer.serializeUntyped(value);
   }
 }

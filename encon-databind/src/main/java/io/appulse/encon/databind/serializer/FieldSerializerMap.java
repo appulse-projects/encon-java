@@ -33,19 +33,27 @@ import lombok.NonNull;
 import lombok.experimental.FieldDefaults;
 
 /**
+ * Field serializer for map Erlang terms.
  *
  * @since 1.1.0
  * @author Artem Labazin
  */
 @FieldDefaults(level = PRIVATE, makeFinal = true)
-public class MapSerializer implements Serializer<Map<Object, Object>> {
+public class FieldSerializerMap implements Serializer<Map<Object, Object>> {
 
   Serializer keySerializer;
 
   Serializer valueSerializer;
 
+  /**
+   * Construct map serializer.
+   *
+   * @param keyClass   map's key type
+   *
+   * @param valueClass map's value type
+   */
   @Builder
-  public MapSerializer (@NonNull Class<?> keyClass, @NonNull Class<?> valueClass) {
+  public FieldSerializerMap (@NonNull Class<?> keyClass, @NonNull Class<?> valueClass) {
     keySerializer = findInPredefined(keyClass);
     valueSerializer = findInPredefined(valueClass);
   }

@@ -19,50 +19,41 @@ package io.appulse.encon.databind.deserializer;
 import static io.appulse.encon.databind.deserializer.Deserializer.findInPredefined;
 import static lombok.AccessLevel.PRIVATE;
 
-import java.util.HashMap;
-import java.util.Iterator;
-import java.util.Map;
+import java.util.HashSet;
+import java.util.Set;
 
 import io.appulse.encon.terms.ErlangTerm;
 
-import lombok.Builder;
 import lombok.NonNull;
 import lombok.experimental.FieldDefaults;
 
 /**
+ * Field deserializer for set Erlang terms.
  *
  * @since 1.1.0
  * @author Artem Labazin
  */
 @FieldDefaults(level = PRIVATE, makeFinal = true)
-public class MapDeserializer implements Deserializer<Map<?, ?>> {
+public class FieldDeserializerSet implements Deserializer<Set<?>> {
 
-  Deserializer<?> keyDeserializer;
+  Deserializer<?> elementDeserializer;
 
-  Deserializer<?> valueDeserializer;
-
-  @Builder
-  public MapDeserializer (@NonNull Class<?> keyClass, @NonNull Class<?> valueClass) {
-    keyDeserializer = findInPredefined(keyClass);
-    valueDeserializer = findInPredefined(valueClass);
+  /**
+   * Construct set deserializer.
+   *
+   * @param elementClass set's element type
+   */
+  public FieldDeserializerSet (@NonNull Class<?> elementClass) {
+    elementDeserializer = findInPredefined(elementClass);
   }
 
   @Override
-  public Map<?, ?> deserialize (@NonNull ErlangTerm term) {
-    Map<Object, Object> result = new HashMap<>(term.size());
-
-    Iterator<Map.Entry<ErlangTerm, ErlangTerm>> iterator = term.fields();
-    while (iterator.hasNext()) {
-      Map.Entry<ErlangTerm, ErlangTerm> entry = iterator.next();
-
-      ErlangTerm keyTerm = entry.getKey();
-      Object key = keyDeserializer.deserialize(keyTerm);
-
-      ErlangTerm valueTerm = entry.getValue();
-      Object value = valueDeserializer.deserialize(valueTerm);
-
-      result.put(key, value);
-    }
+  public Set<?> deserialize (@NonNull ErlangTerm term) {
+    Set<Object> result = new HashSet<>(term.size());
+    term.forEach(it -> {
+      Object element = elementDeserializer.deserialize(it);
+      result.add(element);
+    });
     return result;
   }
 }

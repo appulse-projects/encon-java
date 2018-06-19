@@ -31,16 +31,22 @@ import lombok.experimental.FieldDefaults;
 import lombok.val;
 
 /**
+ * Field serializer for tuples Erlang terms.
  *
  * @since 1.1.0
  * @author Artem Labazin
  */
 @FieldDefaults(level = PRIVATE, makeFinal = true)
-public class TupleSerializer implements Serializer<Object> {
+public class FieldSerializerTuple implements Serializer<Object> {
 
   Serializer<?> elementDeserializer;
 
-  public TupleSerializer (@NonNull Class<?> elementClass) {
+  /**
+   * Construct tuple serializer.
+   *
+   * @param elementClass collection's element type
+   */
+  public FieldSerializerTuple (@NonNull Class<?> elementClass) {
     elementDeserializer = findInPredefined(elementClass);
   }
 

@@ -16,38 +16,44 @@
 
 package io.appulse.encon.databind.deserializer;
 
-import static io.appulse.encon.databind.deserializer.Deserializer.findInPredefined;
 import static lombok.AccessLevel.PRIVATE;
 
-import java.util.HashSet;
-import java.util.Set;
+import java.util.List;
 
+import io.appulse.encon.databind.parser.FieldDescriptor;
 import io.appulse.encon.terms.ErlangTerm;
 
 import lombok.NonNull;
+import lombok.RequiredArgsConstructor;
+import lombok.SneakyThrows;
 import lombok.experimental.FieldDefaults;
 
 /**
+ * Common collection POJO's deserializer from tuple or list.
+ *
+ * @param <T> the type of deserialization result
  *
  * @since 1.1.0
  * @author Artem Labazin
  */
+@RequiredArgsConstructor
 @FieldDefaults(level = PRIVATE, makeFinal = true)
-public class SetDeserializer implements Deserializer<Set<?>> {
+public class PojoDeserializerCollection<T> implements Deserializer<T> {
 
-  Deserializer<?> elementDeserializer;
+  Class<T> type;
 
-  public SetDeserializer (@NonNull Class<?> elementClass) {
-    elementDeserializer = findInPredefined(elementClass);
-  }
+  List<FieldDescriptor> fields;
 
   @Override
-  public Set<?> deserialize (@NonNull ErlangTerm term) {
-    Set<Object> result = new HashSet<>(term.size());
-    term.forEach(it -> {
-      Object element = elementDeserializer.deserialize(it);
-      result.add(element);
-    });
+  @SneakyThrows
+  public T deserialize (@NonNull ErlangTerm tuple) {
+    T result = type.newInstance();
+    for (int i = 0; i < fields.size(); i++) {
+      FieldDescriptor descriptor = fields.get(i);
+      ErlangTerm term = tuple.getUnsafe(i);
+      Object value = descriptor.getDeserializer().deserialize(term);
+      descriptor.getField().set(result, value);
+    }
     return result;
   }
 }

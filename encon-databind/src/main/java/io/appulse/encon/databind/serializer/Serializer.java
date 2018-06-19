@@ -26,42 +26,95 @@ import io.appulse.encon.terms.Erlang;
 import io.appulse.encon.terms.ErlangTerm;
 
 /**
+ * Serializer interface for converting from user's POJO to {@link ErlangTerm} instance.
+ *
+ * @param <T> user's type for serialization
  *
  * @since 1.1.0
  * @author Artem Labazin
  */
 public interface Serializer<T> {
 
-  Serializer<Object> NOPE_SERIALIZER = new NoOpSerializer();
+  /**
+   * No operation serializer. What for? Because I can!
+   */
+  Serializer<Object> NOPE_SERIALIZER = object -> {
+    throw new UnsupportedOperationException("No operation serializer");
+  };
 
+  /**
+   * {@link Byte} number serializer.
+   */
   Serializer<Byte> BYTE_SERIALIZER = Erlang::number;
 
+  /**
+   * {@link Short} number serializer.
+   */
   Serializer<Short> SHORT_SERIALIZER = Erlang::number;
 
+  /**
+   * {@link Integer} number serializer.
+   */
   Serializer<Integer> INTEGER_SERIALIZER = Erlang::number;
 
+  /**
+   * {@link Long} number serializer.
+   */
   Serializer<Long> LONG_SERIALIZER = Erlang::number;
 
+  /**
+   * {@link BigInteger} number serializer.
+   */
   Serializer<BigInteger> BIG_INTEGER_SERIALIZER = Erlang::number;
 
+  /**
+   * {@link Float} number serializer.
+   */
   Serializer<Float> FLOAT_SERIALIZER = Erlang::number;
 
+  /**
+   * {@link Double} number serializer.
+   */
   Serializer<Double> DOUBLE_SERIALIZER = Erlang::number;
 
+  /**
+   * {@link BigDecimal} number serializer.
+   */
   Serializer<BigDecimal> BIG_DECIMAL_SERIALIZER = Erlang::number;
 
+  /**
+   * {@link Boolean} serializer.
+   */
   Serializer<Boolean> BOOLEAN_SERIALIZER = Erlang::atom;
 
+  /**
+   * Atom serializer.
+   */
   Serializer<String> ATOM_SERIALIZER = Erlang::atom;
 
+  /**
+   * {@link String} serializer.
+   */
   Serializer<String> STRING_SERIALIZER = Erlang::string;
 
+  /**
+   * {@code byte[]} serializer.
+   */
   Serializer<byte[]> BYTE_ARRAY_SERIALIZER = Erlang::binary;
 
+  /**
+   * {@link ErlangTerm} serializer.
+   */
   Serializer<ErlangTerm> ERLANG_TERM_SERIALIZER = it -> it;
 
+  /**
+   * Dictionary of cached {@link Serializer} instances by its types.
+   */
   Map<Class<? extends Serializer<?>>, Serializer<?>> SERIALIZERS = new ConcurrentHashMap<>(5);
 
+  /**
+   * Exception free new serializer instantiation.
+   */
   Function<Class<? extends Serializer<?>>, Serializer<?>> NEW_SERIALIZER = type -> {
     try {
       return type.newInstance();
@@ -70,6 +123,13 @@ public interface Serializer<T> {
     }
   };
 
+  /**
+   * Returns well-known predefined {@link Serializer} instance by its type or {@code null}.
+   *
+   * @param type class for search
+   *
+   * @return {@link Serializer} instance or {@code null}
+   */
   static Serializer<?> findInPredefined (Class<?> type) {
     if (ErlangTerm.class.isAssignableFrom(type)) {
       return ERLANG_TERM_SERIALIZER;
@@ -100,11 +160,37 @@ public interface Serializer<T> {
     }
   }
 
+  /**
+   * Serializes user's POJO into {@link ErlangTerm} instance.
+   *
+   * @param object user's POJO for serialization
+   *
+   * @return {@link ErlangTerm} instance
+   */
   ErlangTerm serialize (T object);
 
-  @SuppressWarnings("unchecked")
+  /**
+   * Serializes raw Java object into {@link ErlangTerm} instance with casting to T type inside.
+   *
+   * @param object Java object
+   *
+   * @return {@link ErlangTerm} instance
+   */
+  @SuppressWarnings({
+      "unchecked",
+      "PMD.AvoidThrowingNewInstanceOfSameException",
+      "PMD.PreserveStackTrace"
+  })
   default ErlangTerm serializeUntyped (Object object) {
-    T casted = (T) object;
-    return serialize(casted);
+    try {
+      T casted = (T) object;
+      return serialize(casted);
+    } catch (ClassCastException ex) {
+      String message = String.format("Serializer '%s' couldn't cast value of type '%s' into needed type",
+          this.getClass().getSimpleName(),
+          object.getClass().getSimpleName()
+      );
+      throw new ClassCastException(message);
+    }
   }
 }

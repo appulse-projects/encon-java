@@ -28,17 +28,19 @@ import java.util.stream.Stream;
 
 import io.appulse.encon.terms.ErlangTerm;
 
+import lombok.Builder;
 import lombok.NonNull;
 import lombok.experimental.FieldDefaults;
 import lombok.val;
 
 /**
+ * Field deserializer for lists and tuples Erlang terms.
  *
  * @since 1.1.0
  * @author Artem Labazin
  */
 @FieldDefaults(level = PRIVATE, makeFinal = true)
-public class ListAndTupleDeserializer implements Deserializer<Object> {
+public class FieldDeserializerListOrTuple implements Deserializer<Object> {
 
   Deserializer<?> elementDeserializer;
 
@@ -46,7 +48,15 @@ public class ListAndTupleDeserializer implements Deserializer<Object> {
 
   Class<?> resultType;
 
-  public ListAndTupleDeserializer (@NonNull Class<?> elementClass, @NonNull Class<?> resultType) {
+  /**
+   * Construct list/tuple deserializer.
+   *
+   * @param elementClass collection's element type
+   *
+   * @param resultType   expected result type
+   */
+  @Builder
+  public FieldDeserializerListOrTuple (@NonNull Class<?> elementClass, @NonNull Class<?> resultType) {
     elementDeserializer = findInPredefined(elementClass);
     this.elementClass = elementClass;
     this.resultType = resultType;
