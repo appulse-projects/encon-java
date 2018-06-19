@@ -1,9 +1,17 @@
 # Overview
 
 [![build_status](https://travis-ci.org/appulse-projects/encon-java.svg?branch=master)](https://travis-ci.org/appulse-projects/encon-java)
-[![maven_central](https://maven-badges.herokuapp.com/maven-central/io.appulse/encon-java/badge.svg)](https://maven-badges.herokuapp.com/maven-central/io.appulse/encon-java)
+[![maven_central](https://maven-badges.herokuapp.com/maven-central/io.appulse.encon/encon/badge.svg)](https://maven-badges.herokuapp.com/maven-central/io.appulse.encon/encon)
 
 Java implementation of Erlang node connector (distribution protocol).
+
+Sub-modules descriptions:
+
+- [Encon common](./encon-common/README.md)
+- [Encon terms](./encon-terms/README.md)
+- [Encon config](./encon-config/README.md)
+- [Encon](./encon/README.md)
+- [Encon databind](./encon-databind/README.md)
 
 ## Development
 
