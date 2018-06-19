@@ -16,9 +16,9 @@
 
 package io.appulse.encon.databind;
 
-import io.appulse.encon.databind.parser.PojoParser;
 import io.appulse.encon.databind.deserializer.Deserializer;
 import io.appulse.encon.databind.parser.PojoDescriptor;
+import io.appulse.encon.databind.parser.PojoParser;
 import io.appulse.encon.databind.serializer.Serializer;
 import io.appulse.encon.terms.ErlangTerm;
 

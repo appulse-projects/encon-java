@@ -35,13 +35,13 @@ import lombok.Value;
 @Value
 @Builder
 @ToString(of = {
-  "descriptor",
-  "port"
+    "descriptor",
+    "port"
 })
 @EqualsAndHashCode(of = {
-  "descriptor",
-  "protocol",
-  "port"
+    "descriptor",
+    "protocol",
+    "port"
 })
 public class RemoteNode {
 

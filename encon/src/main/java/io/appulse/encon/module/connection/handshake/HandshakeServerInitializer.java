@@ -33,7 +33,7 @@ import lombok.val;
 
 /**
  *
- * @author alabazin
+ * @author Artem Labazin
  */
 @Slf4j
 @FieldDefaults(level = PRIVATE)

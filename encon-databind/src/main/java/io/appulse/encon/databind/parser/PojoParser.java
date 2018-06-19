@@ -25,36 +25,32 @@ import static java.util.Comparator.comparing;
 import static java.util.Optional.ofNullable;
 import static java.util.stream.Collectors.toList;
 
-import java.lang.reflect.Field;
 import java.util.Map;
 import java.util.Objects;
 import java.util.concurrent.ConcurrentHashMap;
+import java.util.stream.Stream;
 
+import io.appulse.encon.databind.annotation.AsErlangBinary;
+import io.appulse.encon.databind.annotation.AsErlangList;
+import io.appulse.encon.databind.annotation.AsErlangMap;
 import io.appulse.encon.databind.annotation.IgnoreField;
 import io.appulse.encon.databind.annotation.TermDeserialize;
 import io.appulse.encon.databind.annotation.TermSerialize;
+import io.appulse.encon.databind.deserializer.BinaryDeserializer;
+import io.appulse.encon.databind.deserializer.CollectionWrapperDeserializer;
+import io.appulse.encon.databind.deserializer.MapWrapperDeserializer;
+import io.appulse.encon.databind.parser.PojoDescriptor.PojoDescriptorBuilder;
 import io.appulse.encon.databind.serializer.BinarySerializer;
 import io.appulse.encon.databind.serializer.ListWrapperSerializer;
 import io.appulse.encon.databind.serializer.MapWrapperSerializer;
 import io.appulse.encon.databind.serializer.TupleWrapperSerializer;
 
-import java.util.stream.Stream;
-
 import lombok.val;
-
-import io.appulse.encon.databind.annotation.AsErlangList;
-import io.appulse.encon.databind.annotation.AsErlangBinary;
-import io.appulse.encon.databind.annotation.AsErlangMap;
-import io.appulse.encon.databind.deserializer.BinaryDeserializer;
-import io.appulse.encon.databind.deserializer.CollectionWrapperDeserializer;
-import io.appulse.encon.databind.deserializer.MapWrapperDeserializer;
-import io.appulse.encon.databind.parser.PojoDescriptor.PojoDescriptorBuilder;
-import io.appulse.utils.AnnotationUtils;
 
 /**
  *
- * @author Artem Labazin
  * @since 1.0.0
+ * @author Artem Labazin
  */
 public final class PojoParser {
 

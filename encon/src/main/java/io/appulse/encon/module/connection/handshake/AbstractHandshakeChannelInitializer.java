@@ -39,7 +39,7 @@ import lombok.extern.slf4j.Slf4j;
 
 /**
  *
- * @author alabazin
+ * @author Artem Labazin
  */
 @Slf4j
 @RequiredArgsConstructor(access = PROTECTED)

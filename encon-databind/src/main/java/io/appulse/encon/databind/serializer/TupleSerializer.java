@@ -1,11 +1,11 @@
 /*
- * Copyright 2018 Appulse.
+ * Copyright 2018 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
  *
- *      http://www.apache.org/licenses/LICENSE-2.0
+ *     http://www.apache.org/licenses/LICENSE-2.0
  *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
@@ -19,17 +19,19 @@ package io.appulse.encon.databind.serializer;
 import static io.appulse.encon.databind.serializer.Serializer.findInPredefined;
 import static lombok.AccessLevel.PRIVATE;
 
-import io.appulse.encon.terms.Erlang;
-import io.appulse.encon.terms.ErlangTerm;
-import io.appulse.encon.terms.type.ErlangList;
 import java.util.Collection;
 import java.util.stream.Stream;
+
+import io.appulse.encon.terms.Erlang;
+import io.appulse.encon.terms.ErlangTerm;
+import io.appulse.encon.terms.type.ErlangTuple;
+
 import lombok.NonNull;
 import lombok.experimental.FieldDefaults;
 import lombok.val;
 
 /**
- * @author Artem Labazin <xxlabaza@gmail.com>
+ * @author Artem Labazin
  * @since 26.05.2018
  */
 @FieldDefaults(level = PRIVATE, makeFinal = true)
@@ -51,18 +53,32 @@ public class TupleSerializer implements Serializer<Object> {
     throw new UnsupportedOperationException("Not object type " + object.getClass());
   }
 
+  /**
+   * Serializes <b>array</b> of Java objects to tuple Erlang term.
+   *
+   * @param array Java POJOs
+   *
+   * @return serialized {@link ErlangTerm} instance
+   */
   public ErlangTerm serialize (Object[] array) {
     if (array.length == 0) {
-      return new ErlangList();
+      return new ErlangTuple();
     }
 
     val elements = Stream.of(array)
         .map(elementDeserializer::serializeUntyped)
         .toArray(ErlangTerm[]::new);
 
-    return Erlang.list(elements);
+    return Erlang.tuple(elements);
   }
 
+  /**
+   * Serializes <b>{@link Collection}</b> of Java objects to tuple Erlang term.
+   *
+   * @param collection Java POJOs
+   *
+   * @return serialized {@link ErlangTerm} instance
+   */
   public ErlangTerm serialize (Collection<Object> collection) {
     val array = collection.toArray(new Object[0]);
     return serialize(array);

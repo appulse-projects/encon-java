@@ -21,19 +21,21 @@ import static java.util.stream.Collectors.toList;
 import static java.util.stream.Collectors.toSet;
 import static lombok.AccessLevel.PRIVATE;
 
-import io.appulse.encon.terms.ErlangTerm;
 import java.lang.reflect.Array;
 import java.util.List;
 import java.util.Set;
 import java.util.stream.Stream;
+
+import io.appulse.encon.terms.ErlangTerm;
+
 import lombok.NonNull;
 import lombok.experimental.FieldDefaults;
 import lombok.val;
 
 /**
  *
- * @author Artem Labazin
  * @since 1.0.0
+ * @author Artem Labazin
  */
 @FieldDefaults(level = PRIVATE, makeFinal = true)
 public class ListAndTupleDeserializer implements Deserializer<Object> {

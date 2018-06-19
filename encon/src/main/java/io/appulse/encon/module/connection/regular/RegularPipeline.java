@@ -34,7 +34,7 @@ import lombok.val;
 
 /**
  *
- * @author alabazin
+ * @author Artem Labazin
  */
 public final class RegularPipeline {
 

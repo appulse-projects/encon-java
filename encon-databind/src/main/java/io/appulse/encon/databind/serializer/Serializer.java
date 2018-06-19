@@ -16,14 +16,14 @@
 
 package io.appulse.encon.databind.serializer;
 
-import io.appulse.encon.terms.Erlang;
-import java.util.concurrent.ConcurrentHashMap;
-import java.util.function.Function;
-
-import io.appulse.encon.terms.ErlangTerm;
 import java.math.BigDecimal;
 import java.math.BigInteger;
 import java.util.Map;
+import java.util.concurrent.ConcurrentHashMap;
+import java.util.function.Function;
+
+import io.appulse.encon.terms.Erlang;
+import io.appulse.encon.terms.ErlangTerm;
 
 /**
  *
