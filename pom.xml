@@ -44,6 +44,7 @@ limitations under the License.
     <module>encon-config</module>
     <module>encon-databind</module>
     <module>encon</module>
+    <!-- <module>encon-spring</module> -->
   </modules>
 
   <name>encon</name>
