@@ -40,6 +40,7 @@ import lombok.extern.slf4j.Slf4j;
 
 /**
  *
+ * @since 1.0.0
  * @author Artem Labazin
  */
 @Slf4j

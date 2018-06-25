@@ -26,8 +26,8 @@ import lombok.EqualsAndHashCode;
 
 /**
  *
- * @author Artem Labazin
  * @since 1.0.0
+ * @author Artem Labazin
  */
 @EqualsAndHashCode(callSuper = true)
 public class Exit2TraceToken extends ExitTraceToken {

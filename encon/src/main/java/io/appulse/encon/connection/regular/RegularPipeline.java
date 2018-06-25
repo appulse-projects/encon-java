@@ -34,11 +34,10 @@ import lombok.val;
 
 /**
  *
+ * @since 1.0.0
  * @author Artem Labazin
  */
 public final class RegularPipeline {
-
-  public static final ChannelDuplexHandler METRICS_HANDLER;
 
   private static final ChannelDuplexHandler LOGGING_HANDLER;
 
@@ -51,7 +50,6 @@ public final class RegularPipeline {
   private static final ChannelInboundHandler MESSAGE_DECODER;
 
   static {
-    METRICS_HANDLER = new MetricsHandler();
     LOGGING_HANDLER = new LoggingHandler(DEBUG);
     LENGTH_FIELD_PREPENDER = new LengthFieldPrepender(4, false);
     TICK_TOCK_HANDLER = new TickTockHandler();
@@ -66,8 +64,7 @@ public final class RegularPipeline {
     val handler = new ConnectionHandler(node, remoteNode);
 
     pipeline
-        //        .addLast(LOGGING_HANDLER)
-        //        .addLast(METRICS_HANDLER)
+        .addLast(LOGGING_HANDLER)
         .addLast(LENGTH_FIELD_PREPENDER)
         .addLast(new LengthFieldBasedFrameDecoder(MAX_VALUE, 0, 4))
         .addLast(TICK_TOCK_HANDLER)

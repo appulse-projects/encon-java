@@ -19,11 +19,11 @@ package io.appulse.encon.connection.handshake;
 import static io.appulse.encon.connection.handshake.message.StatusMessage.Status.OK;
 import static lombok.AccessLevel.PRIVATE;
 
-import io.appulse.encon.Node;
 import java.util.Arrays;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.ThreadLocalRandom;
 
+import io.appulse.encon.Node;
 import io.appulse.encon.connection.Connection;
 import io.appulse.encon.connection.handshake.exception.HandshakeException;
 import io.appulse.encon.connection.handshake.message.ChallengeAcknowledgeMessage;
@@ -43,8 +43,8 @@ import lombok.val;
 
 /**
  *
- * @author Artem Labazin
  * @since 1.0.0
+ * @author Artem Labazin
  */
 @Slf4j
 @FieldDefaults(level = PRIVATE, makeFinal = true)

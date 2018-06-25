@@ -21,8 +21,8 @@ import lombok.Value;
 
 /**
  *
- * @author Artem Labazin
  * @since 1.0.0
+ * @author Artem Labazin
  */
 @Value
 @EqualsAndHashCode(callSuper = false)

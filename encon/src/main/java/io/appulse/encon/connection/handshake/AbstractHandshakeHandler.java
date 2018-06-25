@@ -18,9 +18,9 @@ package io.appulse.encon.connection.handshake;
 
 import static lombok.AccessLevel.PROTECTED;
 
-import io.appulse.encon.Node;
 import java.util.concurrent.CompletableFuture;
 
+import io.appulse.encon.Node;
 import io.appulse.encon.common.RemoteNode;
 import io.appulse.encon.connection.Connection;
 import io.appulse.encon.connection.regular.RegularPipeline;
@@ -37,8 +37,8 @@ import lombok.val;
 
 /**
  *
- * @author Artem Labazin
  * @since 1.0.0
+ * @author Artem Labazin
  */
 @Slf4j
 @RequiredArgsConstructor(access = PROTECTED)

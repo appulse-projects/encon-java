@@ -18,8 +18,8 @@ package io.appulse.encon.connection.handshake.exception;
 
 /**
  *
- * @author Artem Labazin
  * @since 1.0.0
+ * @author Artem Labazin
  */
 public class HandshakeException extends RuntimeException {
 

@@ -1,11 +1,11 @@
 /*
- * Copyright 2018 Appulse.
+ * Copyright 2018 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
  *
- *      http://www.apache.org/licenses/LICENSE-2.0
+ *     http://www.apache.org/licenses/LICENSE-2.0
  *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
@@ -25,22 +25,25 @@ import static io.netty.channel.ChannelOption.WRITE_BUFFER_WATER_MARK;
 import static io.netty.handler.logging.LogLevel.DEBUG;
 import static lombok.AccessLevel.PRIVATE;
 
+import java.io.Closeable;
+
 import io.appulse.encon.common.RemoteNode;
 import io.appulse.encon.connection.handshake.HandshakeServerInitializer;
 import io.appulse.encon.connection.regular.ConnectionHandler;
+
 import io.netty.bootstrap.ServerBootstrap;
 import io.netty.buffer.PooledByteBufAllocator;
 import io.netty.channel.WriteBufferWaterMark;
 import io.netty.handler.logging.LoggingHandler;
-import java.io.Closeable;
 import lombok.NonNull;
 import lombok.SneakyThrows;
 import lombok.experimental.FieldDefaults;
 import lombok.extern.slf4j.Slf4j;
 
 /**
- * @author Artem Labazin <xxlabaza@gmail.com>
- * @since 23.06.2018
+ *
+ * @since 1.2.0
+ * @author Artem Labazin
  */
 @Slf4j
 @FieldDefaults(level = PRIVATE, makeFinal = true)

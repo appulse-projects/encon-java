@@ -18,13 +18,13 @@ package io.appulse.encon.connection.handshake;
 
 import static lombok.AccessLevel.PRIVATE;
 
-import io.appulse.encon.Node;
 import java.util.concurrent.CompletableFuture;
 
+import io.appulse.encon.Node;
 import io.appulse.encon.common.RemoteNode;
 import io.appulse.encon.connection.Connection;
-import io.netty.channel.ChannelFutureListener;
 
+import io.netty.channel.ChannelFutureListener;
 import io.netty.channel.ChannelInboundHandler;
 import io.netty.channel.socket.SocketChannel;
 import lombok.Builder;
@@ -34,6 +34,7 @@ import lombok.val;
 
 /**
  *
+ * @since 1.0.0
  * @author Artem Labazin
  */
 @FieldDefaults(level = PRIVATE, makeFinal = true)

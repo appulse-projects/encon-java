@@ -17,9 +17,6 @@
 package io.appulse.encon.connection.regular;
 
 import static io.appulse.encon.terms.Erlang.atom;
-import static java.util.Optional.ofNullable;
-
-import java.util.Optional;
 
 import io.appulse.encon.connection.control.ControlMessage;
 import io.appulse.encon.connection.control.Exit;
@@ -37,8 +34,8 @@ import lombok.Value;
 
 /**
  *
- * @author Artem Labazin
  * @since 1.0.0
+ * @author Artem Labazin
  */
 @Value
 @SuppressWarnings("checkstyle:DesignForExtension")
