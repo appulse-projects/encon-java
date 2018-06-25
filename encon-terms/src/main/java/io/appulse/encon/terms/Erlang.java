@@ -18,6 +18,7 @@ package io.appulse.encon.terms;
 
 import java.math.BigDecimal;
 import java.math.BigInteger;
+import java.nio.charset.Charset;
 import java.util.Collection;
 import java.util.LinkedHashMap;
 import java.util.List;
@@ -209,6 +210,50 @@ public final class Erlang {
   public static ErlangString string (@NonNull String value) {
     // TO-DO: how to determine is it ErlangString, ErlangList or ErlangBitString?
     return new ErlangString(value);
+  }
+
+  /**
+   * Creates new {@link ErlangBinary} from string with default charset.
+   *
+   * @param value represent string
+   *
+   * @return {@link ErlangBinary} new instance
+   *
+   * @since 1.20
+   */
+  public static ErlangBinary bstring (String value) {
+    return bstring(value, Charset.defaultCharset());
+  }
+
+  /**
+   * Creates new {@link ErlangBinary} from string with given charset.
+   *
+   * @param value   represent string
+   *
+   * @param charset charset
+   *
+   * @return {@link ErlangBinary} new instance
+   *
+   * @since 1.20
+   */
+  public static ErlangBinary bstring (String value, @NonNull String charset) {
+    return bstring(value, Charset.forName(charset));
+  }
+
+  /**
+   * Creates new {@link ErlangBinary} from string with given charset.
+   *
+   * @param value   represent string
+   *
+   * @param charset charset
+   *
+   * @return {@link ErlangBinary} new instance
+   *
+   * @since 1.20
+   */
+  public static ErlangBinary bstring (@NonNull String value, @NonNull Charset charset) {
+    byte[] bytes = value.getBytes(charset);
+    return binary(bytes);
   }
 
   /**
