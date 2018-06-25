@@ -65,7 +65,7 @@ class ModuleClient implements Closeable {
   }
 
   Connection connect (@NonNull RemoteNode remote) {
-    return connect(remote, 10, SECONDS);
+    return connect(remote, 60, SECONDS);
   }
 
   @SneakyThrows
