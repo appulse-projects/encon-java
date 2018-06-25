@@ -22,8 +22,8 @@ import lombok.Getter;
 
 /**
  *
- * @author Artem Labazin
  * @since 1.0.0
+ * @author Artem Labazin
  */
 @Getter
 public enum MessageType {

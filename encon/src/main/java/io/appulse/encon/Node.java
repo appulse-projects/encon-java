@@ -19,6 +19,9 @@ package io.appulse.encon;
 import static lombok.AccessLevel.PACKAGE;
 
 import java.io.Closeable;
+import java.util.Map;
+import java.util.concurrent.CompletableFuture;
+import java.util.concurrent.TimeUnit;
 
 import io.appulse.encon.common.Meta;
 import io.appulse.encon.common.NodeDescriptor;
@@ -31,11 +34,8 @@ import io.appulse.encon.terms.type.ErlangPid;
 import io.appulse.encon.terms.type.ErlangReference;
 import io.appulse.epmd.java.client.EpmdClient;
 import io.appulse.epmd.java.core.model.request.Registration;
-import java.util.Map;
-import java.util.concurrent.CompletableFuture;
-import java.util.concurrent.TimeUnit;
-import lombok.Builder;
 
+import lombok.Builder;
 import lombok.Getter;
 import lombok.NonNull;
 import lombok.ToString;
@@ -51,19 +51,19 @@ import lombok.val;
  */
 @Slf4j
 @ToString(of = {
-  "descriptor",
-  "cookie",
-  "port",
-  "meta"
+    "descriptor",
+    "cookie",
+    "port",
+    "meta"
 })
 @FieldDefaults(level = PACKAGE, makeFinal = true)
 public final class Node implements Closeable {
 
-  @SuppressWarnings({
-    "checkstyle:MethodLength",
-    "checkstyle:AnonInnerLength",
-    "PMD.ExcessiveMethodLength"
-  })
+  // @SuppressWarnings({
+  //   "checkstyle:MethodLength",
+  //   "checkstyle:AnonInnerLength",
+  //   "PMD.ExcessiveMethodLength"
+  // })
   static Node newInstance (@NonNull String name, @NonNull NodeConfig config) {
 
     val descriptor = NodeDescriptor.from(name);
@@ -194,12 +194,12 @@ public final class Node implements Closeable {
   /**
    * Searches remote node (locally or on remote machine) by its identifier.
    *
-   * @param descriptor identifier of the remote node
+   * @param nodeDescriptor identifier of the remote node
    *
    * @return {@link RemoteNode} instance
    */
-  public RemoteNode lookup (NodeDescriptor descriptor) {
-    return moduleLookup.lookup(descriptor);
+  public RemoteNode lookup (NodeDescriptor nodeDescriptor) {
+    return moduleLookup.lookup(nodeDescriptor);
   }
 
   /**
@@ -216,12 +216,12 @@ public final class Node implements Closeable {
   /**
    * Pings remote node by its identifier.
    *
-   * @param descriptor identifier of the remote node
+   * @param nodeDescriptor identifier of the remote node
    *
    * @return future container with successful/unsuccessful result
    */
-  public boolean ping (NodeDescriptor descriptor) {
-    return modulePing.ping(descriptor);
+  public boolean ping (NodeDescriptor nodeDescriptor) {
+    return modulePing.ping(nodeDescriptor);
   }
 
   /**

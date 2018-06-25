@@ -55,15 +55,16 @@ import lombok.extern.slf4j.Slf4j;
 import lombok.val;
 
 /**
+ * Mailbox abstraction for receiving and sending Erlang's messages.
  *
- * @author Artem Labazin
  * @since 1.0.0
+ * @author Artem Labazin
  */
 @Slf4j
 @Builder
 @ToString(of = {
-  "name",
-  "pid"
+    "name",
+    "pid"
 })
 @EqualsAndHashCode
 @AllArgsConstructor
@@ -92,6 +93,9 @@ public class Mailbox implements Closeable {
   AtomicBoolean closed = new AtomicBoolean(false);
 
   /**
+   * Returns a new mailbox message.
+   *
+   * @return a new {@link Message}
    *
    * @throws ReceivedExitException someone exits
    */
@@ -116,8 +120,8 @@ public class Mailbox implements Closeable {
       break;
     case EXIT_TT:
     case EXIT2_TT:
-      ExitTraceToken exitTT = (ExitTraceToken) header;
-      exit(exitTT.getFrom(), exitTT.getReason());
+      ExitTraceToken exitTrace = (ExitTraceToken) header;
+      exit(exitTrace.getFrom(), exitTrace.getReason());
       break;
     default:
       return message;
@@ -125,10 +129,31 @@ public class Mailbox implements Closeable {
     return receive();
   }
 
+  /**
+   * Retuns mailbox's queue size.
+   *
+   * @return queue size
+   */
   public int size () {
     return queue.size();
   }
 
+  /**
+   * Returns a mailbox queue type.
+   *
+   * @return a mailbox queue type
+   */
+  public MailboxQueueType getQueueType () {
+    return queue.type();
+  }
+
+  /**
+   * Sends a message to local or remote mailbox.
+   *
+   * @param to local or remot mailbox's PID
+   *
+   * @param body message payload
+   */
   public void send (@NonNull ErlangPid to, @NonNull ErlangTerm body) {
     val message = Message.send(to, body);
     if (isLocal(to)) {
@@ -138,16 +163,41 @@ public class Mailbox implements Closeable {
     }
   }
 
+  /**
+   * Sends a message to local mailbox.
+   *
+   * @param mailbox mailbox name
+   *
+   * @param body message payload
+   */
   public void send (@NonNull String mailbox, @NonNull ErlangTerm body) {
     val message = Message.send(mailbox, body);
     getMailbox(mailbox).deliver(message);
   }
 
-  public void send (@NonNull String node, @NonNull String mailbox, @NonNull ErlangTerm body) {
-    val descriptor = NodeDescriptor.from(node);
+  /**
+   * Sends a message to remote node.
+   *
+   * @param remoteNodeName remote node name
+   *
+   * @param mailbox mailbox name
+   *
+   * @param body message payload
+   */
+  public void send (@NonNull String remoteNodeName, @NonNull String mailbox, @NonNull ErlangTerm body) {
+    val descriptor = NodeDescriptor.from(remoteNodeName);
     send(descriptor, mailbox, body);
   }
 
+  /**
+   * Sends a message to remote node.
+   *
+   * @param descriptor remote node descriptor
+   *
+   * @param mailbox mailbox name
+   *
+   * @param body message payload
+   */
   public void send (@NonNull NodeDescriptor descriptor, @NonNull String mailbox, @NonNull ErlangTerm body) {
     RemoteNode remote = node.lookup(descriptor);
     if (remote == null) {
@@ -157,6 +207,15 @@ public class Mailbox implements Closeable {
     send(remote, mailbox, body);
   }
 
+  /**
+   * Sends a message to remote node.
+   *
+   * @param remote remote node descriptor
+   *
+   * @param mailbox mailbox name
+   *
+   * @param body message payload
+   */
   public void send (@NonNull RemoteNode remote, @NonNull String mailbox, @NonNull ErlangTerm body) {
     if (isLocal(remote)) {
       send(mailbox, body);
@@ -166,6 +225,11 @@ public class Mailbox implements Closeable {
     }
   }
 
+  /**
+   * Links the mailbox.
+   *
+   * @param to remote mailbox PID
+   */
   public void link (@NonNull ErlangPid to) {
     val message = Message.link(pid, to);
     if (isLocal(to)) {
@@ -176,6 +240,11 @@ public class Mailbox implements Closeable {
     links.add(to);
   }
 
+  /**
+   * Unlinks the mailbox.
+   *
+   * @param to remote mailbox PID
+   */
   public void unlink (@NonNull ErlangPid to) {
     links.remove(to);
 
@@ -187,6 +256,11 @@ public class Mailbox implements Closeable {
     }
   }
 
+  /**
+   * Exits this mailbox.
+   *
+   * @param reason the exit's reason
+   */
   public void exit (@NonNull ErlangTerm reason) {
     if (closed.get()) {
       return;
@@ -208,28 +282,22 @@ public class Mailbox implements Closeable {
     node.remove(this);
   }
 
+  /**
+   * Exits this mailbox.
+   *
+   * @param reason the exit's reason
+   */
   public void exit (@NonNull String reason) {
     exit(Erlang.atom(reason));
   }
 
-  private void exit (ErlangPid from, ErlangTerm reason) {
-    links.remove(from);
-
-    if (reason.isAtom()) {
-      val test = reason.asText();
-      if ("normal".equals(test)) {
-        // ignore 'normal' exit
-        return;
-      } else if ("kill".equals(test)) {
-        close();
-        return;
-      }
-    }
-
-    exit(reason);
-    throw new ReceivedExitException(from, reason);
-  }
-
+  /**
+   * Delivers a new message to mailbox.
+   *
+   * @param message a new message
+   *
+   * @throws NullPointerException in case of {@code message} is null
+   */
   public void deliver (@NonNull Message message) {
     log.debug("{}:{} got message\n{}\n", pid, name, message);
     queue.add(message);
@@ -270,5 +338,23 @@ public class Mailbox implements Closeable {
 
   private boolean isLocal (@NonNull RemoteNode remote) {
     return node.getDescriptor().equals(remote.getDescriptor());
+  }
+
+  private void exit (ErlangPid from, ErlangTerm reason) {
+    links.remove(from);
+
+    if (reason.isAtom()) {
+      val test = reason.asText();
+      if ("normal".equals(test)) {
+        // ignore 'normal' exit
+        return;
+      } else if ("kill".equals(test)) {
+        close();
+        return;
+      }
+    }
+
+    exit(reason);
+    throw new ReceivedExitException(from, reason);
   }
 }

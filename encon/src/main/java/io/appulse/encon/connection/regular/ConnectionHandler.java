@@ -18,9 +18,9 @@ package io.appulse.encon.connection.regular;
 
 import static lombok.AccessLevel.PRIVATE;
 
-import io.appulse.encon.Node;
 import java.io.Closeable;
 
+import io.appulse.encon.Node;
 import io.appulse.encon.common.RemoteNode;
 import io.appulse.encon.connection.control.ControlMessage;
 import io.appulse.encon.connection.control.Exit;
@@ -44,8 +44,8 @@ import lombok.val;
 
 /**
  *
- * @author Artem Labazin
  * @since 1.0.0
+ * @author Artem Labazin
  */
 @Slf4j
 @RequiredArgsConstructor

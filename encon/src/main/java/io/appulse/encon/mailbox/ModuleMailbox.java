@@ -19,15 +19,15 @@ package io.appulse.encon.mailbox;
 import static java.util.Optional.ofNullable;
 import static lombok.AccessLevel.PRIVATE;
 
-import io.appulse.encon.Node;
 import java.io.Closeable;
 import java.util.Map;
 import java.util.Queue;
 import java.util.concurrent.ConcurrentHashMap;
+import java.util.function.Supplier;
 
+import io.appulse.encon.Node;
 import io.appulse.encon.connection.regular.Message;
 import io.appulse.encon.terms.type.ErlangPid;
-import java.util.function.Supplier;
 
 import lombok.NoArgsConstructor;
 import lombok.NonNull;
@@ -37,8 +37,8 @@ import lombok.extern.slf4j.Slf4j;
 
 /**
  *
- * @author Artem Labazin
  * @since 1.0.0
+ * @author Artem Labazin
  */
 @Slf4j
 @RequiredArgsConstructor
@@ -140,18 +140,18 @@ public final class ModuleMailbox implements Closeable {
 
     Queue<Message> queue;
 
-    public NewMailboxBuilder name (String name) {
-      this.name = name;
+    public NewMailboxBuilder name (String mailboxName) {
+      this.name = mailboxName;
       return this;
     }
 
-    public NewMailboxBuilder type (MailboxQueueType type) {
-      this.type = type;
+    public NewMailboxBuilder type (MailboxQueueType mailboxType) {
+      this.type = mailboxType;
       return this;
     }
 
-    public NewMailboxBuilder queue (Queue<Message> queue) {
-      this.queue = queue;
+    public NewMailboxBuilder queue (Queue<Message> mailboxQueue) {
+      this.queue = mailboxQueue;
       return this;
     }
 

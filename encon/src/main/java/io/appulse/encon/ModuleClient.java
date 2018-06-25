@@ -1,11 +1,11 @@
 /*
- * Copyright 2018 Appulse.
+ * Copyright 2018 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
  *
- *      http://www.apache.org/licenses/LICENSE-2.0
+ *     http://www.apache.org/licenses/LICENSE-2.0
  *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
@@ -21,14 +21,16 @@ import static io.netty.channel.ChannelOption.SO_KEEPALIVE;
 import static java.util.concurrent.TimeUnit.SECONDS;
 import static lombok.AccessLevel.PRIVATE;
 
+import java.io.Closeable;
+import java.util.concurrent.CompletableFuture;
+import java.util.concurrent.TimeUnit;
+
 import io.appulse.encon.common.RemoteNode;
 import io.appulse.encon.connection.Connection;
 import io.appulse.encon.connection.handshake.HandshakeClientInitializer;
 import io.appulse.encon.connection.regular.ConnectionHandler;
+
 import io.netty.bootstrap.Bootstrap;
-import java.io.Closeable;
-import java.util.concurrent.CompletableFuture;
-import java.util.concurrent.TimeUnit;
 import lombok.NonNull;
 import lombok.RequiredArgsConstructor;
 import lombok.SneakyThrows;
@@ -36,8 +38,9 @@ import lombok.experimental.FieldDefaults;
 import lombok.extern.slf4j.Slf4j;
 
 /**
- * @author Artem Labazin <xxlabaza@gmail.com>
- * @since 24.06.2018
+ *
+ * @since 1.2.0
+ * @author Artem Labazin
  */
 @Slf4j
 @RequiredArgsConstructor

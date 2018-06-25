@@ -1,11 +1,11 @@
 /*
- * Copyright 2018 Appulse.
+ * Copyright 2018 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
  *
- *      http://www.apache.org/licenses/LICENSE-2.0
+ *     http://www.apache.org/licenses/LICENSE-2.0
  *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
@@ -18,16 +18,18 @@ package io.appulse.encon;
 
 import static lombok.AccessLevel.PRIVATE;
 
-import io.appulse.encon.terms.type.ErlangReference;
 import java.util.concurrent.atomic.AtomicInteger;
+
+import io.appulse.encon.terms.type.ErlangReference;
+
 import lombok.RequiredArgsConstructor;
 import lombok.experimental.FieldDefaults;
 import lombok.val;
 
 /**
  *
+ * @since 1.2.0
  * @author Artem Labazin
- * @since 1.0.0
  */
 @RequiredArgsConstructor
 @FieldDefaults(level = PRIVATE, makeFinal = true)
