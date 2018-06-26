@@ -64,10 +64,10 @@ class ModulePing {
     Connection connection = null;
     try {
       connection = node.connect(remote);
-    } catch (TimeoutException ex) {
-      log.error("Remote node timeout exception");
+    } catch (Exception ex) {
+      log.error("Error during node {} connection", remote, ex);
     }
-    if (node.connect(remote) == null) {
+    if (connection == null) {
       log.debug("Remote node {} is not available", remote);
       return false;
     }
