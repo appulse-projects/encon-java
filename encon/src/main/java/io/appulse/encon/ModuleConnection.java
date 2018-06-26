@@ -80,8 +80,8 @@ class ModuleConnection implements Closeable {
   ModuleConnection (int bossThreads, int workerThreads) {
     cache = new ConcurrentHashMap<>();
 
-    val bossThreadFactory = new DefaultThreadFactory("boss-group");
-    val workerThreadFactory = new DefaultThreadFactory("worker-group");
+    val bossThreadFactory = new DefaultThreadFactory("nbg");
+    val workerThreadFactory = new DefaultThreadFactory("nwg");
 
     if (Epoll.isAvailable()) {
       bossGroup = new EpollEventLoopGroup(bossThreads, bossThreadFactory);
