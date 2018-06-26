@@ -105,8 +105,8 @@ public class NodeTest {
     val name1 = createFullName();
     val name2 = createFullName();
     node = Nodes.singleNode(name1, NodeConfig.builder()
-                            .cookie("secret")
-                            .build()
+        .cookie("secret")
+        .build()
     );
 
     assertThat(node.ping(ELIXIR_ECHO_SERVER))

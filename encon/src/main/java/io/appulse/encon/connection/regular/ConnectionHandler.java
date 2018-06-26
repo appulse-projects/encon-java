@@ -19,6 +19,7 @@ package io.appulse.encon.connection.regular;
 import static lombok.AccessLevel.PRIVATE;
 
 import java.io.Closeable;
+import java.util.function.Consumer;
 
 import io.appulse.encon.Node;
 import io.appulse.encon.common.RemoteNode;
@@ -58,6 +59,9 @@ public final class ConnectionHandler extends ChannelInboundHandlerAdapter implem
   @Getter
   @NonNull
   RemoteNode remote;
+
+  @NonNull
+  Consumer<RemoteNode> channelCloseAction;
 
   @NonFinal
   Channel channel;
@@ -122,6 +126,8 @@ public final class ConnectionHandler extends ChannelInboundHandlerAdapter implem
     if (channel.isOpen()) {
       channel.close();
     }
+    channelCloseAction.accept(remote);
+
     log.debug("Client handler for {} was closed", channel.remoteAddress());
   }
 

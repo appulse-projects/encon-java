@@ -28,7 +28,6 @@ import java.util.concurrent.TimeUnit;
 import io.appulse.encon.common.RemoteNode;
 import io.appulse.encon.connection.Connection;
 import io.appulse.encon.connection.handshake.HandshakeClientInitializer;
-import io.appulse.encon.connection.regular.ConnectionHandler;
 
 import io.netty.bootstrap.Bootstrap;
 import lombok.NonNull;
@@ -94,17 +93,7 @@ class ModuleClient implements Closeable {
             .node(node)
             .future(future)
             .remote(remote)
-            .channelCloseListener(f -> {
-              log.debug("Running close listener");
-              ConnectionHandler connectionHandler = f.channel()
-                  .pipeline()
-                  .get(ConnectionHandler.class);
-
-              if (connectionHandler == null) {
-                return;
-              }
-
-              RemoteNode remoteNode = connectionHandler.getRemote();
+            .channelCloseAction(remoteNode -> {
               node.moduleLookup.remove(remoteNode);
               node.moduleConnection.remove(remoteNode);
             })

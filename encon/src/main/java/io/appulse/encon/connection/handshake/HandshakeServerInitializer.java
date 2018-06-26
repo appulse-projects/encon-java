@@ -22,9 +22,9 @@ import java.util.concurrent.CompletableFuture;
 import java.util.function.Consumer;
 
 import io.appulse.encon.Node;
+import io.appulse.encon.common.RemoteNode;
 import io.appulse.encon.connection.Connection;
 
-import io.netty.channel.ChannelFutureListener;
 import io.netty.channel.ChannelInboundHandler;
 import io.netty.channel.socket.SocketChannel;
 import lombok.Builder;
@@ -52,14 +52,17 @@ public final class HandshakeServerInitializer extends AbstractHandshakeChannelIn
 
   Consumer<CompletableFuture<Connection>> consumer;
 
+  Consumer<RemoteNode> channelCloseAction;
+
   @Builder
   public HandshakeServerInitializer (@NonNull Node node,
                                      @NonNull Consumer<CompletableFuture<Connection>> consumer,
-                                     ChannelFutureListener channelCloseListener
+                                     @NonNull Consumer<RemoteNode> channelCloseAction
   ) {
-    super(DECODER, channelCloseListener);
+    super(DECODER);
     this.node = node;
     this.consumer = consumer;
+    this.channelCloseAction = channelCloseAction;
   }
 
   @Override
@@ -68,7 +71,7 @@ public final class HandshakeServerInitializer extends AbstractHandshakeChannelIn
               socketChannel.remoteAddress());
 
     CompletableFuture<Connection> future = new CompletableFuture<>();
-    val handler = new HandshakeHandlerServer(node, future);
+    val handler = new HandshakeHandlerServer(node, future, channelCloseAction);
     initChannel(socketChannel, handler);
     consumer.accept(future);
   }
