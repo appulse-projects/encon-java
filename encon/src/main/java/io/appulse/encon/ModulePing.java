@@ -22,6 +22,7 @@ import static lombok.AccessLevel.PRIVATE;
 
 import io.appulse.encon.common.NodeDescriptor;
 import io.appulse.encon.common.RemoteNode;
+import io.appulse.encon.connection.Connection;
 import io.appulse.encon.mailbox.Mailbox;
 
 import lombok.NonNull;
