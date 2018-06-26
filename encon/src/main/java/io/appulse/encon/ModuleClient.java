@@ -65,7 +65,7 @@ class ModuleClient implements Closeable {
   }
 
   Connection connect (@NonNull RemoteNode remote) {
-    return connect(remote, 60, SECONDS);
+    return connect(remote, 5, SECONDS);
   }
 
   @SneakyThrows
@@ -95,6 +95,7 @@ class ModuleClient implements Closeable {
             .future(future)
             .remote(remote)
             .channelCloseListener(f -> {
+              log.debug("Running close listener");
               ConnectionHandler connectionHandler = f.channel()
                   .pipeline()
                   .get(ConnectionHandler.class);

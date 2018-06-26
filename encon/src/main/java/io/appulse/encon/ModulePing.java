@@ -60,6 +60,12 @@ class ModulePing {
 
   boolean ping (@NonNull RemoteNode remote) {
     log.debug("Ping remote node: {}", remote);
+    Connection connection = null;
+    try {
+      connection = node.connect(remote);
+    } catch (TimeoutException ex) {
+      log.error("Remote node timeout exception");
+    }
     if (node.connect(remote) == null) {
       log.debug("Remote node {} is not available", remote);
       return false;

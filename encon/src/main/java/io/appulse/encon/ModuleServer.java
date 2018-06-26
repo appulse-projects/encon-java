@@ -82,6 +82,7 @@ class ModuleServer implements Closeable {
             .node(node)
             .consumer(moduleConnection::add)
             .channelCloseListener(future -> {
+              log.debug("Running close listener");
               ConnectionHandler connectionHandler = future.channel()
                   .pipeline()
                   .get(ConnectionHandler.class);
