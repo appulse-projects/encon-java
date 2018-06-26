@@ -80,6 +80,7 @@ class ModuleServer implements Closeable {
             .node(node)
             .consumer(moduleConnection::add)
             .channelCloseAction(remote -> {
+              log.debug("Closing connection to {}", remote);
               node.moduleLookup.remove(remote);
               node.moduleConnection.remove(remote);
             })

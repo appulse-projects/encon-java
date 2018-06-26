@@ -18,6 +18,7 @@ package io.appulse.encon;
 
 import static io.netty.channel.ChannelOption.CONNECT_TIMEOUT_MILLIS;
 import static io.netty.channel.ChannelOption.SO_KEEPALIVE;
+import static io.netty.channel.ChannelOption.TCP_NODELAY;
 import static java.util.concurrent.TimeUnit.SECONDS;
 import static lombok.AccessLevel.PRIVATE;
 
@@ -88,12 +89,14 @@ class ModuleClient implements Closeable {
         .group(moduleConnection.getWorkerGroup())
         .channel(moduleConnection.getClientChannelClass())
         .option(SO_KEEPALIVE, true)
+        .option(TCP_NODELAY, true)
         .option(CONNECT_TIMEOUT_MILLIS, 5000)
         .handler(HandshakeClientInitializer.builder()
             .node(node)
             .future(future)
             .remote(remote)
             .channelCloseAction(remoteNode -> {
+              log.debug("Closing connection to {}", remoteNode);
               node.moduleLookup.remove(remoteNode);
               node.moduleConnection.remove(remoteNode);
             })
