@@ -82,7 +82,7 @@ abstract class AbstractHandshakeChannelInitializer extends ChannelInitializer<So
   protected void initChannel (SocketChannel socketChannel, AbstractHandshakeHandler handler) {
     socketChannel.pipeline()
         .addLast("LOGGING", LOGGING_HANDLER)
-        .addLast("READ_TIMEOUT", new ReadTimeoutHandler(10))
+        .addLast("READ_TIMEOUT", new ReadTimeoutHandler(5))
         .addLast("LENGTH_PREPENDER", LENGTH_FIELD_PREPENDER)
         .addLast("LENGTH_DECODER", new LengthFieldBasedFrameDecoder(MAX_VALUE, 0, 2))
         .addLast("DECODER", decoder)

@@ -77,11 +77,11 @@ class ModuleConnection implements Closeable {
 
   Map<RemoteNode, CompletableFuture<Connection>> cache;
 
-  ModuleConnection (int bossThreads, int workerThreads) {
+  ModuleConnection (@NonNull String prefix, int bossThreads, int workerThreads) {
     cache = new ConcurrentHashMap<>();
 
-    val bossThreadFactory = new DefaultThreadFactory("nbg");
-    val workerThreadFactory = new DefaultThreadFactory("nwg");
+    val bossThreadFactory = new DefaultThreadFactory(prefix + "-nbg");
+    val workerThreadFactory = new DefaultThreadFactory(prefix + "-nwg");
 
     if (Epoll.isAvailable()) {
       bossGroup = new EpollEventLoopGroup(bossThreads, bossThreadFactory);
@@ -120,10 +120,14 @@ class ModuleConnection implements Closeable {
 
   CompletableFuture<Connection> compute (@NonNull RemoteNode remote,
                                          @NonNull Function<RemoteNode, CompletableFuture<Connection>> function) {
+    if (log.isDebugEnabled()) {
+      log.debug("Remote node {} exists: {}", remote, cache.containsKey(remote));
+    }
     return cache.computeIfAbsent(remote, function);
   }
 
   void remove (@NonNull RemoteNode remote) {
+    log.debug("Removing connection to {}", remote);
     CompletableFuture<Connection> future = cache.remove(remote);
     if (future == null) {
       return;

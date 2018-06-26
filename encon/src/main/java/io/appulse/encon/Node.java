@@ -161,6 +161,7 @@ public final class Node implements Closeable {
     modulePing = new ModulePing(this);
     moduleLookup = new ModuleLookup(epmd);
     moduleConnection = new ModuleConnection(
+        descriptor.getShortName(),
         config.getServer().getBossThreads(),
         config.getServer().getWorkerThreads()
     );

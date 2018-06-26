@@ -90,7 +90,7 @@ class ModulePing {
 
     try {
       mailbox.receive();
-      mailbox.getNode().remove(mailbox);
+      mailbox.close();
       log.debug("Returning from ping method");
       return true;
     } catch (Exception ex) {
