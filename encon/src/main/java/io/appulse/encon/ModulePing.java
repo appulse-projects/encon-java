@@ -77,16 +77,16 @@ class ModulePing {
         .build();
 
     mailbox.send(remote, "net_kernel", tuple(
-                 atom("$gen_call"),
-                 tuple(
-                     mailbox.getPid(),
-                     node.newReference()
-                 ),
-                 tuple(
-                     atom("is_auth"),
-                     atom(node.getDescriptor().getFullName())
-                 )
-             ));
+        atom("$gen_call"),
+        tuple(
+            mailbox.getPid(),
+            node.newReference()
+        ),
+        tuple(
+            atom("is_auth"),
+            atom(node.getDescriptor().getFullName())
+        )
+    ));
 
     try {
       mailbox.receive();
