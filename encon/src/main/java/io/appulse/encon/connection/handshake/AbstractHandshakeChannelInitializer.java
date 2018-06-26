@@ -22,7 +22,6 @@ import static lombok.AccessLevel.PRIVATE;
 import static lombok.AccessLevel.PROTECTED;
 
 import io.netty.channel.ChannelDuplexHandler;
-import io.netty.channel.ChannelFutureListener;
 import io.netty.channel.ChannelInboundHandler;
 import io.netty.channel.ChannelInitializer;
 import io.netty.channel.ChannelOutboundHandler;
@@ -32,7 +31,6 @@ import io.netty.handler.codec.LengthFieldBasedFrameDecoder;
 import io.netty.handler.codec.LengthFieldPrepender;
 import io.netty.handler.logging.LoggingHandler;
 import io.netty.handler.timeout.ReadTimeoutHandler;
-
 import lombok.NonNull;
 import lombok.RequiredArgsConstructor;
 import lombok.experimental.FieldDefaults;
@@ -76,9 +74,6 @@ abstract class AbstractHandshakeChannelInitializer extends ChannelInitializer<So
   @NonNull
   ChannelInboundHandler decoder;
 
-  @NonNull
-  ChannelFutureListener channelCloseListener;
-
   @Override
   protected void initChannel (SocketChannel socketChannel) throws Exception {
     throw new UnsupportedOperationException();
@@ -93,8 +88,6 @@ abstract class AbstractHandshakeChannelInitializer extends ChannelInitializer<So
         .addLast("DECODER", decoder)
         .addLast("ENCODER", ENCODER)
         .addLast("HANDLER", handler);
-
-    socketChannel.closeFuture().addListener(channelCloseListener);
 
     log.debug("Handshake pipeline for {} was initialized",
               socketChannel.remoteAddress());

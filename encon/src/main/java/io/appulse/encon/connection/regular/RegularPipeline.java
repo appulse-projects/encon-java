@@ -19,6 +19,8 @@ package io.appulse.encon.connection.regular;
 import static io.netty.handler.logging.LogLevel.DEBUG;
 import static java.lang.Integer.MAX_VALUE;
 
+import java.util.function.Consumer;
+
 import io.appulse.encon.Node;
 import io.appulse.encon.common.RemoteNode;
 
@@ -59,9 +61,10 @@ public final class RegularPipeline {
 
   public static ConnectionHandler setup (@NonNull ChannelPipeline pipeline,
                                          @NonNull Node node,
-                                         @NonNull RemoteNode remoteNode
+                                         @NonNull RemoteNode remoteNode,
+                                         @NonNull Consumer<RemoteNode> channelCloseAction
   ) {
-    val handler = new ConnectionHandler(node, remoteNode);
+    val handler = new ConnectionHandler(node, remoteNode, channelCloseAction);
 
     pipeline
         .addLast(LOGGING_HANDLER)

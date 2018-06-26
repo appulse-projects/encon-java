@@ -27,9 +27,7 @@ import static lombok.AccessLevel.PRIVATE;
 
 import java.io.Closeable;
 
-import io.appulse.encon.common.RemoteNode;
 import io.appulse.encon.connection.handshake.HandshakeServerInitializer;
-import io.appulse.encon.connection.regular.ConnectionHandler;
 
 import io.netty.bootstrap.ServerBootstrap;
 import io.netty.buffer.PooledByteBufAllocator;
@@ -81,17 +79,7 @@ class ModuleServer implements Closeable {
         .childHandler(HandshakeServerInitializer.builder()
             .node(node)
             .consumer(moduleConnection::add)
-            .channelCloseListener(future -> {
-              log.debug("Running close listener");
-              ConnectionHandler connectionHandler = future.channel()
-                  .pipeline()
-                  .get(ConnectionHandler.class);
-
-              if (connectionHandler == null) {
-                return;
-              }
-
-              RemoteNode remote = connectionHandler.getRemote();
+            .channelCloseAction(remote -> {
               node.moduleLookup.remove(remote);
               node.moduleConnection.remove(remote);
             })

@@ -19,6 +19,7 @@ package io.appulse.encon.connection.handshake;
 import static lombok.AccessLevel.PROTECTED;
 
 import java.util.concurrent.CompletableFuture;
+import java.util.function.Consumer;
 
 import io.appulse.encon.Node;
 import io.appulse.encon.common.RemoteNode;
@@ -51,6 +52,9 @@ abstract class AbstractHandshakeHandler extends ChannelInboundHandlerAdapter {
   @NonNull
   CompletableFuture<Connection> future;
 
+  @NonNull
+  Consumer<RemoteNode> channelCloseAction;
+
   @NonFinal
   RemoteNode remote;
 
@@ -74,7 +78,7 @@ abstract class AbstractHandshakeHandler extends ChannelInboundHandlerAdapter {
     log.debug("Replacing pipline to regular for {}", channel.remoteAddress());
 
     AbstractHandshakeChannelInitializer.cleanup(pipeline);
-    val handler = RegularPipeline.setup(pipeline, node, remote);
+    val handler = RegularPipeline.setup(pipeline, node, remote, channelCloseAction);
 
     future.complete(new Connection(remote, handler));
 

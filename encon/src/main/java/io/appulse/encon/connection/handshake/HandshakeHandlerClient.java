@@ -21,6 +21,7 @@ import static lombok.AccessLevel.PRIVATE;
 import java.util.Arrays;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.ThreadLocalRandom;
+import java.util.function.Consumer;
 
 import io.appulse.encon.Node;
 import io.appulse.encon.common.RemoteNode;
@@ -54,8 +55,12 @@ class HandshakeHandlerClient extends AbstractHandshakeHandler {
   int myChallenge;
 
   @Builder
-  HandshakeHandlerClient (Node node, CompletableFuture<Connection> future, @NonNull RemoteNode remote) {
-    super(node, future);
+  HandshakeHandlerClient (Node node,
+                          CompletableFuture<Connection> future,
+                          @NonNull RemoteNode remote,
+                          Consumer<RemoteNode> channelCloseAction
+  ) {
+    super(node, future, channelCloseAction);
     this.remote = remote;
   }
 
