@@ -56,7 +56,6 @@ defaults:
   distribution-flags:
     - MAP_TAG
     - BIG_CREATION
-  client-threads: 7
   mailbox:
     handler: io.appulse.encon.config.MyMailboxHandler
   server:
@@ -96,7 +95,6 @@ nodes:
 
   node-2:
     cookie: popa
-    client-threads: 1
     mailboxes:
       - name: net_kernel
         handler: io.appulse.encon.config.MyMailboxHandler
@@ -120,7 +118,6 @@ Config config = Config.builder()
           MAP_TAG,
           BIG_CREATION
         )))
-        .clientThreads(7)
         .mailbox(MailboxConfig.builder()
             .handler(MyMailboxHandler.class)
             .build())
@@ -164,7 +161,6 @@ Config config = Config.builder()
     )
     .node("node-2", NodeConfig.builder()
         .cookie("popa")
-        .clientThreads(1)
         .mailbox(MailboxConfig.builder()
             .name("net_kernel")
             .handler(MyMailboxHandler.class)
