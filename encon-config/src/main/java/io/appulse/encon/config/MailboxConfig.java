@@ -60,6 +60,11 @@ public class MailboxConfig {
 
   Boolean blocking;
 
+  public MailboxConfig (MailboxConfig mailboxConfig) {
+    name = mailboxConfig.getName();
+    blocking = mailboxConfig.getBlocking();
+  }
+
   /**
    * Method for setting up the default values.
    *

@@ -38,6 +38,7 @@ limitations under the License.
     <exclude name="LongVariable" />
     <exclude name="MethodArgumentCouldBeFinal" />
     <exclude name="OnlyOneReturn" />
+    <exclude name="PrematureDeclaration" />
     <exclude name="ShortClassName" />
     <exclude name="ShortMethodName" />
     <exclude name="ShortVariable" />

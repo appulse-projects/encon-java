@@ -22,6 +22,7 @@ import static java.util.stream.Collectors.toList;
 import static java.util.stream.Collectors.toSet;
 import static lombok.AccessLevel.PRIVATE;
 
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -153,6 +154,28 @@ public class NodeConfig {
   ServerConfig server;
 
   CompressionConfig compression;
+
+  public NodeConfig (NodeConfig nodeConfig) {
+    epmdPort = nodeConfig.getEpmdPort();
+    type = nodeConfig.getType();
+    shortNamed = nodeConfig.getShortNamed();
+    cookie = nodeConfig.getCookie();
+    protocol = nodeConfig.getProtocol();
+    low = nodeConfig.getLow();
+    high = nodeConfig.getHigh();
+    distributionFlags = ofNullable(nodeConfig.getDistributionFlags())
+        .map(HashSet::new)
+        .orElse(null);
+    mailboxes = ofNullable(nodeConfig.getMailboxes())
+        .map(it -> it.stream()
+            .map(MailboxConfig::new)
+            .collect(toList())
+        )
+        .orElse(null);
+    compression = ofNullable(nodeConfig.getCompression())
+        .map(CompressionConfig::new)
+        .orElse(null);
+  }
 
   /**
    * Method for setting up the default values.
