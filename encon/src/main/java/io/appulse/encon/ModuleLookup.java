@@ -54,7 +54,7 @@ class ModuleLookup {
     cache = new ConcurrentHashMap<>();
     compute = descriptor -> {
       return this.epmd
-          .lookup(descriptor.getShortName(), descriptor.getAddress())
+          .lookup(descriptor.getNodeName(), descriptor.getAddress())
           .filter(NodeInfo::isOk)
           .map(it -> RemoteNode.builder()
               .descriptor(descriptor)

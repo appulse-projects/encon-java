@@ -79,7 +79,7 @@ public final class Node implements Closeable {
 
     val epmd = new EpmdClient(config.getEpmdPort());
     val creation = epmd.register(Registration.builder()
-        .name(descriptor.getShortName())
+        .name(descriptor.getNodeName())
         .port(config.getServer().getPort())
         .type(meta.getType())
         .protocol(meta.getProtocol())
@@ -161,7 +161,7 @@ public final class Node implements Closeable {
     modulePing = new ModulePing(this);
     moduleLookup = new ModuleLookup(epmd);
     moduleConnection = new ModuleConnection(
-        descriptor.getShortName(),
+        descriptor.getNodeName(),
         config.getServer().getBossThreads(),
         config.getServer().getWorkerThreads()
     );
@@ -397,7 +397,7 @@ public final class Node implements Closeable {
       moduleClient.close();
     }
     if (epmd != null) {
-      epmd.stop(descriptor.getShortName());
+      epmd.stop(descriptor.getNodeName());
       epmd.close();
       log.debug("Node '{}' was deregistered from EPMD", descriptor.getFullName());
     }
