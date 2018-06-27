@@ -10,13 +10,13 @@ First of all, add databind's dependency:
 
 ```xml
 <dependencies>
-    ...
-    <dependency>
-        <groupId>io.appulse.encon</groupId>
-        <artifactId>encon-databind</artifactId>
-        <version>1.3.0</version>
-    </dependency>
-    ...
+  ...
+  <dependency>
+    <groupId>io.appulse.encon</groupId>
+    <artifactId>encon-databind</artifactId>
+    <version>1.3.0</version>
+  </dependency>
+  ...
 </dependencies>
 ```
 
