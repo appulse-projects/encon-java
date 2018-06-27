@@ -29,6 +29,7 @@ import static io.appulse.epmd.java.core.model.NodeType.R6_ERLANG;
 import static io.appulse.epmd.java.core.model.Protocol.TCP;
 import static io.appulse.epmd.java.core.model.Version.R6;
 import static java.lang.Boolean.FALSE;
+import static java.lang.Boolean.TRUE;
 import static java.util.Arrays.asList;
 import static java.util.Locale.ENGLISH;
 import static java.util.Optional.ofNullable;
@@ -131,6 +132,11 @@ public class Defaults {
         .map(NodeType::valueOf)
         .ifPresent(builder::type);
 
+    ofNullable(map.get("short-name"))
+        .map(Object::toString)
+        .map(Boolean::valueOf)
+        .ifPresent(builder::shortNamed);
+
     ofNullable(map.get("cookie"))
         .map(Object::toString)
         .ifPresent(builder::cookie);
@@ -188,6 +194,9 @@ public class Defaults {
   NodeType type = R6_ERLANG;
 
   @Builder.Default
+  Boolean shortNamed = FALSE;
+
+  @Builder.Default
   String cookie = getDefaultCookie();
 
   @Builder.Default
@@ -214,6 +223,7 @@ public class Defaults {
 
   @Builder.Default
   MailboxConfig mailbox = MailboxConfig.builder()
+      .blocking(TRUE)
       .build();
 
   @Builder.Default

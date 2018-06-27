@@ -39,7 +39,7 @@ interface MailboxQueue {
 
     if (type == null) {
       return queue instanceof BlockingQueue
-             ? new BlockingMailboxQueue((BlockingQueue) queue)
+             ? new BlockingMailboxQueue((BlockingQueue<Message>) queue)
              : new NonBlockingMailboxQueue(queue);
     }
 

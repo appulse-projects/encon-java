@@ -16,6 +16,8 @@
 
 package io.appulse.encon;
 
+import static io.appulse.encon.mailbox.MailboxQueueType.BLOCKING;
+import static io.appulse.encon.mailbox.MailboxQueueType.NON_BLOCKING;
 import static lombok.AccessLevel.PACKAGE;
 
 import java.io.Closeable;
@@ -59,11 +61,6 @@ import lombok.val;
 @FieldDefaults(level = PACKAGE, makeFinal = true)
 public final class Node implements Closeable {
 
-  // @SuppressWarnings({
-  //   "checkstyle:MethodLength",
-  //   "checkstyle:AnonInnerLength",
-  //   "PMD.ExcessiveMethodLength"
-  // })
   static Node newInstance (@NonNull String name, @NonNull NodeConfig config) {
 
     val descriptor = NodeDescriptor.from(name);
@@ -102,6 +99,9 @@ public final class Node implements Closeable {
     config.getMailboxes().forEach(it -> {
       node.mailbox()
           .name(it.getName())
+          .type(it.getBlocking()
+                ? BLOCKING
+                : NON_BLOCKING)
           .build();
     });
 
@@ -144,8 +144,10 @@ public final class Node implements Closeable {
 
   @Builder
   private Node (@NonNull NodeDescriptor descriptor,
-                @NonNull Meta meta, @NonNull EpmdClient epmd,
-                int creation, @NonNull NodeConfig config
+                @NonNull Meta meta,
+                @NonNull EpmdClient epmd,
+                int creation,
+                @NonNull NodeConfig config
   ) {
     this.descriptor = descriptor;
     this.meta = meta;
@@ -166,7 +168,7 @@ public final class Node implements Closeable {
         config.getServer().getWorkerThreads()
     );
     moduleServer = new ModuleServer(this, moduleConnection, port);
-    moduleClient = new ModuleClient(this, moduleConnection);
+    moduleClient = new ModuleClient(this, moduleConnection, config.getShortNamed());
     moduleMailbox = new ModuleMailbox(this, () -> generatorPid.generate());
   }
 

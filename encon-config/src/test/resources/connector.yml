@@ -2,6 +2,7 @@
 defaults:
   epmd-port: 8888
   type: R3_ERLANG
+  short-name: true
   cookie: secret
   protocol: UDP
   version:
@@ -11,7 +12,7 @@ defaults:
     - MAP_TAG
     - BIG_CREATION
   mailbox:
-    handler: io.appulse.encon.config.MyMailboxHandler
+    blocking: false
   server:
     boss-threads: 2
     worker-threads: 4
@@ -37,15 +38,18 @@ nodes:
       - BIG_CREATION
     mailboxes:
       - name: net_kernel
-      - handler: io.appulse.encon.config.MyMailboxHandler
+        blocking: false
       - name: another
+        blocking: true
+      - name: another_one
     server:
       port: 8971
       boss-threads: 1
       worker-threads: 2
 
   node-2:
+    short-name: false
     cookie: popa
     mailboxes:
       - name: net_kernel
-        handler: io.appulse.encon.config.MyMailboxHandler
+        blocking: false
