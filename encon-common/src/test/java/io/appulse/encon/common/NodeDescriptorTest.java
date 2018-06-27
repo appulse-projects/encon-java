@@ -40,8 +40,10 @@ public class NodeDescriptorTest {
   @Test
   public void fullShortName () throws Exception {
     InetAddress address = InetAddress.getByName("localhost");
+    String fullName = "popa@localhost";
+    NodeDescriptor.removeFromCache(fullName);
 
-    NodeDescriptor descriptor = NodeDescriptor.from("popa@localhost");
+    NodeDescriptor descriptor = NodeDescriptor.from(fullName, true);
     assertThat(descriptor).isNotNull();
 
     SoftAssertions.assertSoftly(softly -> {
@@ -55,7 +57,7 @@ public class NodeDescriptorTest {
 
       softly.assertThat(descriptor.getFullName())
           .isNotNull()
-          .isEqualTo("popa@localhost");
+          .isEqualTo(fullName);
 
       softly.assertThat(descriptor.getAddress())
           .isNotNull()
@@ -73,15 +75,21 @@ public class NodeDescriptorTest {
   public void shortName () throws Exception {
     InetAddress address = InetAddress.getLoopbackAddress();
     String tmp = InetAddress.getLocalHost().getHostName();
-    String hostName = tmp.substring(tmp.indexOf('.'));
+    int dotIndex = tmp.indexOf('.');
+    String hostName = dotIndex > 0
+                      ? tmp.substring(dotIndex)
+                      : tmp;
 
-    NodeDescriptor descriptor = NodeDescriptor.from("popa");
+    String node = "popa";
+    NodeDescriptor.removeFromCache(node);
+
+    NodeDescriptor descriptor = NodeDescriptor.from(node);
     assertThat(descriptor).isNotNull();
 
     SoftAssertions.assertSoftly(softly -> {
       softly.assertThat(descriptor.getNodeName())
           .isNotNull()
-          .isEqualTo("popa");
+          .isEqualTo(node);
 
       softly.assertThat(descriptor.getHostName())
           .isNotNull()
@@ -89,7 +97,7 @@ public class NodeDescriptorTest {
 
       softly.assertThat(descriptor.getFullName())
           .isNotNull()
-          .isEqualTo("popa@" + hostName);
+          .isEqualTo(node + "@" + hostName);
 
       softly.assertThat(descriptor.getAddress())
           .isNotNull()
@@ -105,10 +113,11 @@ public class NodeDescriptorTest {
 
   @Test
   public void fullLongName () throws Exception {
-    InetAddress address = InetAddress.getLocalHost();
-    String hostName = address.getHostName();
+    InetAddress address = InetAddress.getByName("localhost");
+    String fullName = "popa@localhost";
+    NodeDescriptor.removeFromCache(fullName);
 
-    NodeDescriptor descriptor = NodeDescriptor.from("popa@" + hostName, false);
+    NodeDescriptor descriptor = NodeDescriptor.from(fullName, false);
     assertThat(descriptor).isNotNull();
 
     SoftAssertions.assertSoftly(softly -> {
@@ -118,11 +127,11 @@ public class NodeDescriptorTest {
 
       softly.assertThat(descriptor.getHostName())
           .isNotNull()
-          .isEqualTo(hostName);
+          .isEqualTo("localhost");
 
       softly.assertThat(descriptor.getFullName())
           .isNotNull()
-          .isEqualTo("popa@" + hostName);
+          .isEqualTo(fullName);
 
       softly.assertThat(descriptor.getAddress())
           .isNotNull()
