@@ -68,9 +68,9 @@ public final class RegularPipeline {
 
     pipeline
         .addLast(LOGGING_HANDLER)
+        .addLast(TICK_TOCK_HANDLER)
         .addLast(LENGTH_FIELD_PREPENDER)
         .addLast(new LengthFieldBasedFrameDecoder(MAX_VALUE, 0, 4))
-        .addLast(TICK_TOCK_HANDLER)
         .addLast(MESSAGE_ENCODER)
         .addLast(MESSAGE_DECODER)
         .addLast(handler);

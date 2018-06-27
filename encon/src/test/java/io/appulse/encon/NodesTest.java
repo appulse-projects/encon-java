@@ -44,7 +44,6 @@ public class NodesTest {
   public void instantiating () {
     val config = Config.builder()
         .defaults(Defaults.builder()
-            .clientThreads(1)
             .cookie("kojima-secret")
             .server(ServerConfig.builder()
                 .bossThreads(1)

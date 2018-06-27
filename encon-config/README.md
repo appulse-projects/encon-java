@@ -10,20 +10,20 @@ First of all, add config's dependency:
 
 ```xml
 <dependencies>
-    ...
-    <dependency>
-        <groupId>io.appulse.encon</groupId>
-        <artifactId>encon-config</artifactId>
-        <version>1.2.0</version>
-    </dependency>
-    ...
+  ...
+  <dependency>
+    <groupId>io.appulse.encon</groupId>
+    <artifactId>encon-config</artifactId>
+    <version>1.3.0</version>
+  </dependency>
+  ...
 </dependencies>
 ```
 
 **Gradle**:
 
 ```groovy
-compile 'io.appulse.encon.java:encon-config:1.2.0'
+compile 'io.appulse.encon.java:encon-config:1.3.0'
 ```
 
 ### File based configuration
@@ -48,6 +48,7 @@ Config config = Config.load("connector.yml");
 defaults:
   epmd-port: 8888  # default EPMD port is 4369, but here we can override it
   type: R3_ERLANG
+  short-name: true
   cookie: secret
   protocol: UDP
   version:
@@ -56,9 +57,8 @@ defaults:
   distribution-flags:
     - MAP_TAG
     - BIG_CREATION
-  client-threads: 7
   mailbox:
-    handler: io.appulse.encon.config.MyMailboxHandler
+    blocking: false
   server:
     boss-threads: 2
     worker-threads: 4
@@ -87,19 +87,21 @@ nodes:
       - BIG_CREATION
     mailboxes:
       - name: net_kernel
-      - handler: io.appulse.encon.config.MyMailboxHandler
+        blocking: false
       - name: another
+        blocking: true
+      - name: another_one
     server:
       port: 8971
       boss-threads: 1
       worker-threads: 2
 
   node-2:
+    short-name: false
     cookie: popa
-    client-threads: 1
     mailboxes:
       - name: net_kernel
-        handler: io.appulse.encon.config.MyMailboxHandler
+        blocking: false
 
 ```
 
@@ -112,17 +114,17 @@ Config config = Config.builder()
     .defaults(Defaults.builder()
         .epmdPort(8888)
         .type(R3_ERLANG)
+        .shortNamed(true)
         .cookie(secret)
         .protocol(UDP)
         .low(R4)
         .high(R6)
         .distributionFlags(new HashSet<>(asList(
-          MAP_TAG,
-          BIG_CREATION
+            MAP_TAG,
+            BIG_CREATION
         )))
-        .clientThreads(7)
         .mailbox(MailboxConfig.builder()
-            .handler(MyMailboxHandler.class)
+            .blocking(false)
             .build())
         .server(ServerConfig.builder()
             .bossThreads(2)
@@ -148,9 +150,11 @@ Config config = Config.builder()
         .distributionFlag(BIG_CREATION)
         .mailbox(MailboxConfig.builder()
             .name("net_kernel")
+            .blocking(false)
             .build())
         .mailbox(MailboxConfig.builder()
-            .handler(MyMailboxHandler.class)
+            .name("another")
+            .blocking(true)
             .build())
         .mailbox(MailboxConfig.builder()
             .name("another")
@@ -163,11 +167,11 @@ Config config = Config.builder()
         .build()
     )
     .node("node-2", NodeConfig.builder()
+        .shortNamed(false)
         .cookie("popa")
-        .clientThreads(1)
         .mailbox(MailboxConfig.builder()
             .name("net_kernel")
-            .handler(MyMailboxHandler.class)
+            .blocking(false)
             .build())
         .build()
     )

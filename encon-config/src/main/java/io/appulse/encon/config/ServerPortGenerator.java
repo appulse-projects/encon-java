@@ -16,6 +16,31 @@
 
 package io.appulse.encon.config;
 
-public class MyMailboxHandler {
+import java.util.concurrent.atomic.AtomicInteger;
 
+import io.appulse.utils.SocketUtils;
+
+import lombok.val;
+
+/**
+ *
+ * @since 1.0.0
+ * @author Artem Labazin
+ */
+final class ServerPortGenerator {
+
+  private static final AtomicInteger UPPER_BOUND = new AtomicInteger(65535);
+
+  static int nextPort () {
+    while (true) {
+      val currentValue = UPPER_BOUND.get();
+      val port = SocketUtils.findFreePort(1024, currentValue - 1).get();
+      if (UPPER_BOUND.compareAndSet(currentValue, port)) {
+        return port;
+      }
+    }
+  }
+
+  private ServerPortGenerator () {
+  }
 }

@@ -29,6 +29,7 @@ import static io.appulse.epmd.java.core.model.NodeType.R6_ERLANG;
 import static io.appulse.epmd.java.core.model.Protocol.TCP;
 import static io.appulse.epmd.java.core.model.Version.R6;
 import static java.lang.Boolean.FALSE;
+import static java.lang.Boolean.TRUE;
 import static java.util.Arrays.asList;
 import static java.util.Locale.ENGLISH;
 import static java.util.Optional.ofNullable;
@@ -131,6 +132,11 @@ public class Defaults {
         .map(NodeType::valueOf)
         .ifPresent(builder::type);
 
+    ofNullable(map.get("short-name"))
+        .map(Object::toString)
+        .map(Boolean::valueOf)
+        .ifPresent(builder::shortNamed);
+
     ofNullable(map.get("cookie"))
         .map(Object::toString)
         .ifPresent(builder::cookie);
@@ -153,11 +159,6 @@ public class Defaults {
           .map(Version::valueOf)
           .ifPresent(builder::high);
     }
-
-    ofNullable(map.get("client-threads"))
-        .map(Object::toString)
-        .map(Integer::parseInt)
-        .ifPresent(builder::clientThreads);
 
     ofNullable(map.get("distribution-flags"))
         .filter(it -> it instanceof List)
@@ -193,6 +194,9 @@ public class Defaults {
   NodeType type = R6_ERLANG;
 
   @Builder.Default
+  Boolean shortNamed = FALSE;
+
+  @Builder.Default
   String cookie = getDefaultCookie();
 
   @Builder.Default
@@ -203,9 +207,6 @@ public class Defaults {
 
   @Builder.Default
   Version high = R6;
-
-  @Builder.Default
-  int clientThreads = 2;
 
   @Builder.Default
   Set<DistributionFlag> distributionFlags = new HashSet<>(asList(
@@ -222,6 +223,7 @@ public class Defaults {
 
   @Builder.Default
   MailboxConfig mailbox = MailboxConfig.builder()
+      .blocking(TRUE)
       .build();
 
   @Builder.Default
@@ -235,4 +237,26 @@ public class Defaults {
       .enabled(FALSE)
       .level(-1)
       .build();
+
+  public Defaults (Defaults defaults) {
+    epmdPort = defaults.getEpmdPort();
+    type = defaults.getType();
+    shortNamed = defaults.getShortNamed();
+    cookie = defaults.getCookie();
+    protocol = defaults.getProtocol();
+    low = defaults.getLow();
+    high = defaults.getHigh();
+    distributionFlags = ofNullable(defaults.getDistributionFlags())
+        .map(HashSet::new)
+        .orElse(null);
+    mailbox = ofNullable(defaults.getMailbox())
+        .map(MailboxConfig::new)
+        .orElse(null);
+    server = ofNullable(defaults.getServer())
+        .map(ServerConfig::new)
+        .orElse(null);
+    compression = ofNullable(defaults.getCompression())
+        .map(CompressionConfig::new)
+        .orElse(null);
+  }
 }
