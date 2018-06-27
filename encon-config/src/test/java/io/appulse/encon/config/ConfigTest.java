@@ -126,7 +126,6 @@ public class ConfigTest {
     Protocol protocol = UDP;
     Version low = R3;
     Version high = R5C;
-    int clientThreads = 8;
     Set<DistributionFlag> distributionFlags = new HashSet<>(asList(
         UTF8_ATOMS
     ));
@@ -141,7 +140,6 @@ public class ConfigTest {
             .protocol(protocol)
             .low(low)
             .high(high)
-            .clientThreads(clientThreads)
             .distributionFlags(distributionFlags)
             .mailbox(MailboxConfig.builder()
                 .handler(handler)
@@ -174,9 +172,6 @@ public class ConfigTest {
 
       softly.assertThat(defaults.getHigh())
           .isEqualTo(high);
-
-      softly.assertThat(defaults.getClientThreads())
-          .isEqualTo(clientThreads);
 
       softly.assertThat(defaults.getDistributionFlags())
           .isEqualTo(distributionFlags);
@@ -457,7 +452,6 @@ public class ConfigTest {
             MAP_TAG,
             BIG_CREATION
             )))
-            .clientThreads(7)
             .mailbox(MailboxConfig.builder()
                 .handler(MyMailboxHandler.class)
                 .build())
@@ -501,7 +495,6 @@ public class ConfigTest {
         )
         .node("node-2", NodeConfig.builder()
             .cookie("popa")
-            .clientThreads(1)
             .mailbox(MailboxConfig.builder()
                 .name("net_kernel")
                 .handler(MyMailboxHandler.class)

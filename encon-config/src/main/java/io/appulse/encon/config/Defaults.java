@@ -154,11 +154,6 @@ public class Defaults {
           .ifPresent(builder::high);
     }
 
-    ofNullable(map.get("client-threads"))
-        .map(Object::toString)
-        .map(Integer::parseInt)
-        .ifPresent(builder::clientThreads);
-
     ofNullable(map.get("distribution-flags"))
         .filter(it -> it instanceof List)
         .map(it -> (List<String>) it)
@@ -203,9 +198,6 @@ public class Defaults {
 
   @Builder.Default
   Version high = R6;
-
-  @Builder.Default
-  int clientThreads = 2;
 
   @Builder.Default
   Set<DistributionFlag> distributionFlags = new HashSet<>(asList(

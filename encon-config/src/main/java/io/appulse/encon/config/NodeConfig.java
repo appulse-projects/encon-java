@@ -95,11 +95,6 @@ public class NodeConfig {
           .ifPresent(builder::high);
     }
 
-    ofNullable(map.get("client-threads"))
-        .map(Object::toString)
-        .map(Integer::parseInt)
-        .ifPresent(builder::clientThreads);
-
     ofNullable(map.get("distribution-flags"))
         .filter(it -> it instanceof List)
         .map(it -> (List<String>) it)
@@ -142,8 +137,6 @@ public class NodeConfig {
 
   Version high;
 
-  Integer clientThreads;
-
   @Singular
   Set<DistributionFlag> distributionFlags;
 
@@ -179,9 +172,6 @@ public class NodeConfig {
 
     high = ofNullable(high)
         .orElse(defaults.getHigh());
-
-    clientThreads = ofNullable(clientThreads)
-        .orElse(defaults.getClientThreads());
 
     distributionFlags = ofNullable(distributionFlags)
         .filter(it -> !it.isEmpty())
