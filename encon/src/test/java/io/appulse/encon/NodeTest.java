@@ -105,9 +105,9 @@ public class NodeTest {
     val name1 = createName();
     val name2 = createName();
     node = Nodes.singleNode(name1, NodeConfig.builder()
-        .shortNamed(true)
-        .cookie("secret")
-        .build()
+                            .shortNamed(true)
+                            .cookie("secret")
+                            .build()
     );
 
     assertThat(node.ping(ELIXIR_ECHO_SERVER))
@@ -142,14 +142,14 @@ public class NodeTest {
   public void instantiating () throws Exception {
     val name = createName();
     node = Nodes.singleNode(name, NodeConfig.builder()
-        .shortNamed(true)
-        .mailbox(MailboxConfig.builder()
-            .name("one")
-            .build())
-        .mailbox(MailboxConfig.builder()
-            .name("two")
-            .build())
-        .build()
+                            .shortNamed(true)
+                            .mailbox(MailboxConfig.builder()
+                                .name("one")
+                                .build())
+                            .mailbox(MailboxConfig.builder()
+                                .name("two")
+                                .build())
+                            .build()
     );
 
     assertThat(node.mailbox("one")).isNotNull();
@@ -189,11 +189,15 @@ public class NodeTest {
     }
   }
 
-//   @Test
+  @Test
   public void sendWithRedirect () throws Exception {
     val config = NodeConfig.builder()
         .shortNamed(true)
         .cookie("secret")
+        .server(ServerConfig.builder()
+            .bossThreads(1)
+            .workerThreads(2)
+            .build())
         .build();
 
     val name1 = createName();
@@ -205,22 +209,28 @@ public class NodeTest {
     try (Node node2 = Nodes.singleNode(name2, config)) {
       log.info("Node #2 was created: {}", name2);
 
-      Mailbox mailbox1 = node.mailbox().build();
-      Mailbox mailbox2 = node2.mailbox().name("popka").build();
+      Mailbox mailbox1 = node.mailbox()
+          .name("mail1")
+          .build();
+
+      Mailbox mailbox2 = node2.mailbox()
+          .name("mail2")
+          .build();
 
       val reference = node.newReference();
       log.info("Sending message from {} to {}", name1, ELIXIR_ECHO_SERVER);
-      mailbox1.send(ELIXIR_ECHO_SERVER, "echo_server", tuple(
-                    mailbox1.getPid(),
-                    mailbox2.getPid(),
+      mailbox1.send(ELIXIR_ECHO_SERVER, "echo_server",
                     tuple(
-                        string("hello, world"),
-                        atom("popa"),
-                        atom(false),
-                        number(42),
-                        reference
-                    )
-                ));
+                        mailbox1.getPid(),
+                        mailbox2.getPid(),
+                        tuple(
+                            string("hello, world"),
+                            atom("popa"),
+                            atom(false),
+                            number(42),
+                            reference
+                        )
+                    ));
 
       log.info("Waiting message on {}", node2);
       ErlangTerm tuple = mailbox2.receive()
@@ -242,13 +252,13 @@ public class NodeTest {
   public void send () throws Exception {
     val name = createName();
     node = Nodes.singleNode(name, NodeConfig.builder()
-        .shortNamed(true)
-        .cookie("secret")
-        .server(ServerConfig.builder()
-            .port(8500)
-            .build()
-        )
-        .build()
+                            .shortNamed(true)
+                            .cookie("secret")
+                            .server(ServerConfig.builder()
+                                .port(8500)
+                                .build()
+                            )
+                            .build()
     );
 
     Mailbox mailbox = node.mailbox()
@@ -298,10 +308,10 @@ public class NodeTest {
       mailbox2.receive();
     } catch (ReceivedExitException ex) {
       assertThat(ex.getFrom())
-        .isEqualTo(mailbox1.getPid());
+          .isEqualTo(mailbox1.getPid());
 
       assertThat(ex.getReason())
-        .isEqualTo(new ErlangAtom("popa"));
+          .isEqualTo(new ErlangAtom("popa"));
 
       return;
     }

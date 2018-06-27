@@ -66,10 +66,11 @@ public final class Nodes implements Closeable {
    * @return a new {@link Nodes} instance
    */
   public static Nodes start (@NonNull Config config) {
-    log.debug("Creating ERTS instance with config {}", config);
+    val copy = new Config(config);
+    log.debug("Creating ERTS instance with config {}", copy);
 
-    val erts = new Nodes(config.getDefaults(), new ConcurrentHashMap<>());
-    config.getNodes()
+    val erts = new Nodes(copy.getDefaults(), new ConcurrentHashMap<>());
+    copy.getNodes()
         .entrySet()
         .forEach(it -> erts.newNode(it.getKey(), it.getValue()));
 
@@ -98,22 +99,23 @@ public final class Nodes implements Closeable {
    */
   public static Node singleNode (@NonNull String name, boolean isShortNamed) {
     return singleNode(name, NodeConfig.builder()
-        .shortNamed(isShortNamed)
-        .build());
+                      .shortNamed(isShortNamed)
+                      .build());
   }
 
   /**
    * Creates single {@link Node} instance with specific name and config.
    *
-   * @param name      short (like 'node-name') or full (like 'node-name@example.com') node's name
+   * @param name       short (like 'node-name') or full (like 'node-name@example.com') node's name
    *
    * @param nodeConfig new node's config
    *
    * @return new {@link Node} instance
    */
   public static Node singleNode (@NonNull String name, @NonNull NodeConfig nodeConfig) {
-    nodeConfig.withDefaultsFrom(Defaults.INSTANCE);
-    return Node.newInstance(name, nodeConfig);
+    val copy = new NodeConfig(nodeConfig);
+    copy.withDefaultsFrom(Defaults.INSTANCE);
+    return Node.newInstance(name, copy);
   }
 
   Defaults defaults;
@@ -152,15 +154,16 @@ public final class Nodes implements Closeable {
    * Creates a new node with short (like 'node-name') or full (like 'node-name@example.com') name
    * and its config.
    *
-   * @param name short (like 'node-name') or full (like 'node-name@example.com') node's name
+   * @param name       short (like 'node-name') or full (like 'node-name@example.com') node's name
    *
    * @param nodeConfig new node's config
    *
    * @return new {@link Node} instance
    */
   public Node newNode (@NonNull String name, @NonNull NodeConfig nodeConfig) {
-    nodeConfig.withDefaultsFrom(defaults);
-    val node = Node.newInstance(name, nodeConfig);
+    val copy = new NodeConfig(nodeConfig);
+    copy.withDefaultsFrom(defaults);
+    val node = Node.newInstance(name, copy);
     nodes.put(node.getDescriptor(), node);
     return node;
   }

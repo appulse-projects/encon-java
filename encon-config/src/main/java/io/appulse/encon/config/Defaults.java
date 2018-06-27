@@ -237,4 +237,26 @@ public class Defaults {
       .enabled(FALSE)
       .level(-1)
       .build();
+
+  public Defaults (Defaults defaults) {
+    epmdPort = defaults.getEpmdPort();
+    type = defaults.getType();
+    shortNamed = defaults.getShortNamed();
+    cookie = defaults.getCookie();
+    protocol = defaults.getProtocol();
+    low = defaults.getLow();
+    high = defaults.getHigh();
+    distributionFlags = ofNullable(defaults.getDistributionFlags())
+        .map(HashSet::new)
+        .orElse(null);
+    mailbox = ofNullable(defaults.getMailbox())
+        .map(MailboxConfig::new)
+        .orElse(null);
+    server = ofNullable(defaults.getServer())
+        .map(ServerConfig::new)
+        .orElse(null);
+    compression = ofNullable(defaults.getCompression())
+        .map(CompressionConfig::new)
+        .orElse(null);
+  }
 }

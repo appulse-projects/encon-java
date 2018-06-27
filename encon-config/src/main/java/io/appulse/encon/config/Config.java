@@ -22,6 +22,7 @@ import static java.util.stream.Collectors.toMap;
 import java.io.File;
 import java.nio.file.Files;
 import java.nio.file.Path;
+import java.util.AbstractMap.SimpleEntry;
 import java.util.Map;
 import java.util.Map.Entry;
 import java.util.Objects;
@@ -115,6 +116,19 @@ public final class Config {
   Defaults defaults;
 
   Map<String, NodeConfig> nodes;
+
+  public Config (Config config) {
+    defaults = ofNullable(config.getDefaults())
+        .map(Defaults::new)
+        .orElse(null);
+    nodes = ofNullable(config.getNodes())
+        .map(it -> it.entrySet()
+            .stream()
+            .map(entry -> new SimpleEntry<>(entry.getKey(), new NodeConfig(entry.getValue())))
+            .collect(toMap(Entry::getKey, Entry::getValue))
+        )
+        .orElse(null);
+  }
 
   @Builder
   private Config (Defaults defaults, @Singular Map<String, NodeConfig> nodes) {
