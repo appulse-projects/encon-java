@@ -36,6 +36,7 @@ import lombok.RequiredArgsConstructor;
 import lombok.SneakyThrows;
 import lombok.experimental.FieldDefaults;
 import lombok.extern.slf4j.Slf4j;
+import lombok.val;
 
 /**
  *
@@ -53,6 +54,8 @@ class ModuleClient implements Closeable {
   @NonNull
   ModuleConnection moduleConnection;
 
+  boolean shortNamedNode;
+
   @Override
   public void close () {
     log.debug("Closing sever module");
@@ -61,6 +64,21 @@ class ModuleClient implements Closeable {
   }
 
   CompletableFuture<Connection> connectAsync (@NonNull RemoteNode remote) {
+    if (shortNamedNode) {
+      if (remote.getDescriptor().isLongName()) {
+        val msg = String.format("Short-named node '%s' couldn't be connected to long-named node '%s'",
+                                node.getDescriptor().getFullName(),
+                                remote.getDescriptor().getFullName());
+
+        throw new IllegalArgumentException(msg);
+      }
+    } else if (remote.getDescriptor().isShortName()) {
+      val msg = String.format("Long-named node '%s' couldn't be connected to short-named node '%s'",
+                              node.getDescriptor().getFullName(),
+                              remote.getDescriptor().getFullName());
+
+      throw new IllegalArgumentException(msg);
+    }
     return moduleConnection.compute(remote, this::createConnection);
   }
 

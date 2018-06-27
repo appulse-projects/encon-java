@@ -72,6 +72,11 @@ public class NodeConfig {
         .map(NodeType::valueOf)
         .ifPresent(builder::type);
 
+    ofNullable(map.get("short-name"))
+        .map(Object::toString)
+        .map(Boolean::valueOf)
+        .ifPresent(builder::shortNamed);
+
     ofNullable(map.get("cookie"))
         .map(Object::toString)
         .ifPresent(builder::cookie);
@@ -129,6 +134,8 @@ public class NodeConfig {
 
   NodeType type;
 
+  Boolean shortNamed;
+
   String cookie;
 
   Protocol protocol;
@@ -160,6 +167,9 @@ public class NodeConfig {
 
     type = ofNullable(type)
         .orElse(defaults.getType());
+
+    shortNamed = ofNullable(shortNamed)
+        .orElse(defaults.getShortNamed());
 
     cookie = ofNullable(cookie)
         .orElse(defaults.getCookie());

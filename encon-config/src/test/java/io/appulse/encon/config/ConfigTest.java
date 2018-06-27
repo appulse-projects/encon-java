@@ -84,6 +84,9 @@ public class ConfigTest {
       softly.assertThat(defaults.getType())
           .isEqualTo(R6_ERLANG);
 
+      softly.assertThat(defaults.getShortNamed())
+          .isFalse();
+
       softly.assertThat(defaults.getProtocol())
           .isEqualTo(TCP);
 
@@ -93,17 +96,14 @@ public class ConfigTest {
       softly.assertThat(defaults.getHigh())
           .isEqualTo(R6);
 
-      softly.assertThat(defaults.getClientThreads())
-          .isEqualTo(2);
-
       softly.assertThat(defaults.getDistributionFlags())
           .isNotEmpty();
 
       softly.assertThat(defaults.getMailbox())
           .isNotNull();
 
-      softly.assertThat(defaults.getMailbox().getHandler())
-          .isNull();
+      softly.assertThat(defaults.getMailbox().getBlocking())
+          .isTrue();
 
       softly.assertThat(defaults.getServer())
           .isNotNull();
@@ -129,7 +129,6 @@ public class ConfigTest {
     Set<DistributionFlag> distributionFlags = new HashSet<>(asList(
         UTF8_ATOMS
     ));
-    Class<?> handler = null;
     int bossThreads = 7;
     int workerThreads = 14;
 
@@ -142,7 +141,7 @@ public class ConfigTest {
             .high(high)
             .distributionFlags(distributionFlags)
             .mailbox(MailboxConfig.builder()
-                .handler(handler)
+                .blocking(false)
                 .build())
             .server(ServerConfig.builder()
                 .bossThreads(bossThreads)
@@ -164,6 +163,9 @@ public class ConfigTest {
       softly.assertThat(defaults.getType())
           .isEqualTo(type);
 
+      softly.assertThat(defaults.getShortNamed())
+          .isFalse();
+
       softly.assertThat(defaults.getProtocol())
           .isEqualTo(protocol);
 
@@ -179,8 +181,8 @@ public class ConfigTest {
       softly.assertThat(defaults.getMailbox())
           .isNotNull();
 
-      softly.assertThat(defaults.getMailbox().getHandler())
-          .isEqualTo(handler);
+      softly.assertThat(defaults.getMailbox().getBlocking())
+          .isFalse();
 
       softly.assertThat(defaults.getServer())
           .isNotNull();
@@ -212,6 +214,9 @@ public class ConfigTest {
       softly.assertThat(nodeConfig.getType())
           .isEqualTo(R6_ERLANG);
 
+      softly.assertThat(nodeConfig.getShortNamed())
+          .isFalse();
+
       softly.assertThat(nodeConfig.getProtocol())
           .isEqualTo(TCP);
 
@@ -220,9 +225,6 @@ public class ConfigTest {
 
       softly.assertThat(nodeConfig.getHigh())
           .isEqualTo(R6);
-
-      softly.assertThat(nodeConfig.getClientThreads())
-          .isEqualTo(2);
 
       softly.assertThat(nodeConfig.getDistributionFlags())
           .isNotEmpty();
@@ -262,6 +264,9 @@ public class ConfigTest {
       softly.assertThat(defaults.getType())
           .isEqualTo(R3_ERLANG);
 
+      softly.assertThat(defaults.getShortNamed())
+          .isTrue();
+
       softly.assertThat(defaults.getCookie())
           .isEqualTo("secret");
 
@@ -274,17 +279,14 @@ public class ConfigTest {
       softly.assertThat(defaults.getHigh())
           .isEqualTo(R6);
 
-      softly.assertThat(defaults.getClientThreads())
-          .isEqualTo(7);
-
       softly.assertThat(defaults.getDistributionFlags())
           .contains(MAP_TAG, BIG_CREATION);
 
       softly.assertThat(defaults.getMailbox())
           .isNotNull();
 
-      softly.assertThat(defaults.getMailbox().getHandler())
-          .isEqualTo(MyMailboxHandler.class);
+      softly.assertThat(defaults.getMailbox().getBlocking())
+          .isFalse();
 
       softly.assertThat(defaults.getServer())
           .isNotNull();
@@ -312,6 +314,9 @@ public class ConfigTest {
       softly.assertThat(node1.getType())
           .isEqualTo(R3_HIDDEN);
 
+      softly.assertThat(node1.getShortNamed())
+          .isTrue();
+
       softly.assertThat(node1.getCookie())
           .isEqualTo("non-secret");
 
@@ -323,9 +328,6 @@ public class ConfigTest {
 
       softly.assertThat(node1.getHigh())
           .isEqualTo(R6);
-
-      softly.assertThat(node1.getClientThreads())
-          .isEqualTo(7);
 
       softly.assertThat(node1.getDistributionFlags()).contains(
           EXTENDED_REFERENCES,
@@ -348,26 +350,26 @@ public class ConfigTest {
           .findFirst()
           .orElse(null);
       assertThat(mailbox1).isNotNull();
-      softly.assertThat(mailbox1.getHandler())
-          .isEqualTo(MyMailboxHandler.class);
+      softly.assertThat(mailbox1.getBlocking())
+          .isFalse();
 
       MailboxConfig mailbox2 = node1.getMailboxes()
-          .stream()
-          .filter(it -> it.getName() == null)
-          .findFirst()
-          .orElse(null);
-      assertThat(mailbox2).isNotNull();
-      softly.assertThat(mailbox2.getHandler())
-          .isEqualTo(MyMailboxHandler.class);
-
-      MailboxConfig mailbox3 = node1.getMailboxes()
           .stream()
           .filter(it -> "another".equals(it.getName()))
           .findFirst()
           .orElse(null);
+      assertThat(mailbox2).isNotNull();
+      softly.assertThat(mailbox2.getBlocking())
+          .isTrue();
+
+      MailboxConfig mailbox3 = node1.getMailboxes()
+          .stream()
+          .filter(it -> "another_one".equals(it.getName()))
+          .findFirst()
+          .orElse(null);
       assertThat(mailbox3).isNotNull();
-      softly.assertThat(mailbox3.getHandler())
-          .isEqualTo(MyMailboxHandler.class);
+      softly.assertThat(mailbox3.getBlocking())
+          .isFalse();
 
       softly.assertThat(node1.getServer())
           .isNotNull();
@@ -392,6 +394,9 @@ public class ConfigTest {
       softly.assertThat(node2.getType())
           .isEqualTo(R3_ERLANG);
 
+      softly.assertThat(node2.getShortNamed())
+          .isFalse();
+
       softly.assertThat(node2.getCookie())
           .isEqualTo("popa");
 
@@ -403,9 +408,6 @@ public class ConfigTest {
 
       softly.assertThat(node2.getHigh())
           .isEqualTo(R6);
-
-      softly.assertThat(node2.getClientThreads())
-          .isEqualTo(1);
 
       softly.assertThat(node2.getDistributionFlags()).contains(
           MAP_TAG,
@@ -421,8 +423,8 @@ public class ConfigTest {
           .findFirst()
           .orElse(null);
       assertThat(mailbox1).isNotNull();
-      softly.assertThat(mailbox1.getHandler())
-          .isEqualTo(MyMailboxHandler.class);
+      softly.assertThat(mailbox1.getBlocking())
+          .isFalse();
 
       softly.assertThat(node2.getServer())
           .isNotNull();
@@ -444,16 +446,17 @@ public class ConfigTest {
         .defaults(Defaults.builder()
             .epmdPort(8888)
             .type(R3_ERLANG)
+            .shortNamed(true)
             .cookie("secret")
             .protocol(UDP)
             .low(R4)
             .high(R6)
             .distributionFlags(new HashSet<>(asList(
-            MAP_TAG,
-            BIG_CREATION
+                MAP_TAG,
+                BIG_CREATION
             )))
             .mailbox(MailboxConfig.builder()
-                .handler(MyMailboxHandler.class)
+                .blocking(false)
                 .build())
             .server(ServerConfig.builder()
                 .bossThreads(2)
@@ -464,6 +467,7 @@ public class ConfigTest {
         .node("node-1", NodeConfig.builder()
             .epmdPort(7373)
             .type(R3_HIDDEN)
+            .shortNamed(false)
             .cookie("non-secret")
             .protocol(SCTP)
             .low(R5C)
@@ -481,10 +485,11 @@ public class ConfigTest {
                 .name("net_kernel")
                 .build())
             .mailbox(MailboxConfig.builder()
-                .handler(MyMailboxHandler.class)
+                .blocking(true)
                 .build())
             .mailbox(MailboxConfig.builder()
                 .name("another")
+                .blocking(false)
                 .build())
             .server(ServerConfig.builder()
                 .port(8971)
@@ -497,7 +502,7 @@ public class ConfigTest {
             .cookie("popa")
             .mailbox(MailboxConfig.builder()
                 .name("net_kernel")
-                .handler(MyMailboxHandler.class)
+                .blocking(false)
                 .build())
             .build()
         )
@@ -515,6 +520,9 @@ public class ConfigTest {
         softly.assertThat(defaults.getType())
             .isEqualTo(R3_ERLANG);
 
+        softly.assertThat(defaults.getShortNamed())
+            .isTrue();
+
         softly.assertThat(defaults.getCookie())
             .isEqualTo("secret");
 
@@ -527,17 +535,14 @@ public class ConfigTest {
         softly.assertThat(defaults.getHigh())
             .isEqualTo(R6);
 
-        softly.assertThat(defaults.getClientThreads())
-            .isEqualTo(7);
-
         softly.assertThat(defaults.getDistributionFlags())
             .contains(MAP_TAG, BIG_CREATION);
 
         softly.assertThat(defaults.getMailbox())
             .isNotNull();
 
-        softly.assertThat(defaults.getMailbox().getHandler())
-            .isEqualTo(MyMailboxHandler.class);
+        softly.assertThat(defaults.getMailbox().getBlocking())
+            .isFalse();
 
         softly.assertThat(defaults.getServer())
             .isNotNull();
@@ -565,6 +570,9 @@ public class ConfigTest {
         softly.assertThat(node1.getType())
             .isEqualTo(R3_HIDDEN);
 
+        softly.assertThat(node1.getShortNamed())
+            .isFalse();
+
         softly.assertThat(node1.getCookie())
             .isEqualTo("non-secret");
 
@@ -576,9 +584,6 @@ public class ConfigTest {
 
         softly.assertThat(node1.getHigh())
             .isEqualTo(R6);
-
-        softly.assertThat(node1.getClientThreads())
-            .isEqualTo(7);
 
         softly.assertThat(node1.getDistributionFlags()).contains(
             EXTENDED_REFERENCES,
@@ -601,8 +606,8 @@ public class ConfigTest {
             .findFirst()
             .orElse(null);
         assertThat(mailbox1).isNotNull();
-        softly.assertThat(mailbox1.getHandler())
-            .isEqualTo(MyMailboxHandler.class);
+        softly.assertThat(mailbox1.getBlocking())
+            .isFalse();
 
         MailboxConfig mailbox2 = node1.getMailboxes()
             .stream()
@@ -610,8 +615,8 @@ public class ConfigTest {
             .findFirst()
             .orElse(null);
         assertThat(mailbox2).isNotNull();
-        softly.assertThat(mailbox2.getHandler())
-            .isEqualTo(MyMailboxHandler.class);
+        softly.assertThat(mailbox2.getBlocking())
+            .isTrue();
 
         MailboxConfig mailbox3 = node1.getMailboxes()
             .stream()
@@ -619,8 +624,8 @@ public class ConfigTest {
             .findFirst()
             .orElse(null);
         assertThat(mailbox3).isNotNull();
-        softly.assertThat(mailbox3.getHandler())
-            .isEqualTo(MyMailboxHandler.class);
+        softly.assertThat(mailbox3.getBlocking())
+            .isFalse();
 
         softly.assertThat(node1.getServer())
             .isNotNull();
@@ -645,6 +650,9 @@ public class ConfigTest {
         softly.assertThat(node2.getType())
             .isEqualTo(R3_ERLANG);
 
+        softly.assertThat(node2.getShortNamed())
+            .isTrue();
+
         softly.assertThat(node2.getCookie())
             .isEqualTo("popa");
 
@@ -656,9 +664,6 @@ public class ConfigTest {
 
         softly.assertThat(node2.getHigh())
             .isEqualTo(R6);
-
-        softly.assertThat(node2.getClientThreads())
-            .isEqualTo(1);
 
         softly.assertThat(node2.getDistributionFlags()).contains(
             MAP_TAG,
@@ -674,8 +679,8 @@ public class ConfigTest {
             .findFirst()
             .orElse(null);
         assertThat(mailbox1).isNotNull();
-        softly.assertThat(mailbox1.getHandler())
-            .isEqualTo(MyMailboxHandler.class);
+        softly.assertThat(mailbox1.getBlocking())
+            .isFalse();
 
         softly.assertThat(node2.getServer())
             .isNotNull();

@@ -88,6 +88,21 @@ public final class Nodes implements Closeable {
   }
 
   /**
+   * Creates single {@link Node} instance with specific name.
+   *
+   * @param name         short (like 'node-name') or full (like 'node-name@example.com') node's name
+   *
+   * @param isShortNamed indicates is this node with short name or not
+   *
+   * @return new {@link Node} instance
+   */
+  public static Node singleNode (@NonNull String name, boolean isShortNamed) {
+    return singleNode(name, NodeConfig.builder()
+        .shortNamed(isShortNamed)
+        .build());
+  }
+
+  /**
    * Creates single {@link Node} instance with specific name and config.
    *
    * @param name      short (like 'node-name') or full (like 'node-name@example.com') node's name
@@ -114,6 +129,22 @@ public final class Nodes implements Closeable {
    */
   public Node newNode (@NonNull String name) {
     val nodeConfig = NodeConfig.builder().build();
+    return newNode(name, nodeConfig);
+  }
+
+  /**
+   * Creates a new node with short (like 'node-name') or full (like 'node-name@example.com') name.
+   *
+   * @param name         short (like 'node-name') or full (like 'node-name@example.com') node's name
+   *
+   * @param isShortNamed indicates is this node with short name or not
+   *
+   * @return new {@link Node} instance
+   */
+  public Node newNode (@NonNull String name, boolean isShortNamed) {
+    val nodeConfig = NodeConfig.builder()
+        .shortNamed(isShortNamed)
+        .build();
     return newNode(name, nodeConfig);
   }
 

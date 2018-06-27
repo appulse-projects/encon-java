@@ -21,8 +21,6 @@ import static lombok.AccessLevel.PRIVATE;
 
 import java.util.Map;
 
-import io.appulse.encon.config.exception.NoSuchMailboxHandlerException;
-
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
@@ -50,23 +48,17 @@ public class MailboxConfig {
         .map(Object::toString)
         .ifPresent(builder::name);
 
-    ofNullable(map.get("handler"))
+    ofNullable(map.get("blocking"))
         .map(Object::toString)
-        .map(it -> {
-          try {
-            return Class.forName(it);
-          } catch (ClassNotFoundException ex) {
-            throw new NoSuchMailboxHandlerException(ex, it);
-          }
-        })
-        .ifPresent(builder::handler);
+        .map(Boolean::valueOf)
+        .ifPresent(builder::blocking);
 
     return builder.build();
   }
 
   String name;
 
-  Class<?> handler;
+  Boolean blocking;
 
   /**
    * Method for setting up the default values.
@@ -76,9 +68,9 @@ public class MailboxConfig {
    * @return reference to this object (for chain calls)
    */
   public MailboxConfig withDefaultsFrom (@NonNull MailboxConfig defaults) {
-    if (handler == null) {
-      handler = defaults.getHandler();
-    }
+    blocking = ofNullable(blocking)
+        .orElse(defaults.getBlocking());
+
     return this;
   }
 }
