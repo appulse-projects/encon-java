@@ -108,7 +108,7 @@ public class NodeDescriptorTest {
     InetAddress address = InetAddress.getLocalHost();
     String hostName = address.getHostName();
 
-    NodeDescriptor descriptor = NodeDescriptor.from("popa@" + hostName);
+    NodeDescriptor descriptor = NodeDescriptor.from("popa@" + hostName, false);
     assertThat(descriptor).isNotNull();
 
     SoftAssertions.assertSoftly(softly -> {
