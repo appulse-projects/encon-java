@@ -66,7 +66,6 @@ public class ErlangPid extends ErlangTerm {
    */
   public ErlangPid (TermType type, @NonNull ByteBuf buffer) {
     super(type);
-
     node = ErlangTerm.newInstance(buffer);
 
     switch (type) {

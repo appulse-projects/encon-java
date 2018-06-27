@@ -21,8 +21,6 @@ import static lombok.AccessLevel.PRIVATE;
 
 import java.util.Map;
 
-import io.appulse.utils.SocketUtils;
-
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
@@ -70,6 +68,12 @@ public class ServerConfig {
 
   Integer workerThreads;
 
+  public ServerConfig (ServerConfig serverConfig) {
+    port = serverConfig.getPort();
+    bossThreads = serverConfig.getBossThreads();
+    workerThreads = serverConfig.getWorkerThreads();
+  }
+
   /**
    * Method for setting up the default values.
    *
@@ -79,7 +83,7 @@ public class ServerConfig {
    */
   ServerConfig withDefaultsFrom (@NonNull ServerConfig defaults) {
     port = ofNullable(port)
-        .orElse(SocketUtils.findFreePort().get());
+        .orElse(ServerPortGenerator.nextPort());
 
     bossThreads = ofNullable(bossThreads)
         .orElse(defaults.getBossThreads());

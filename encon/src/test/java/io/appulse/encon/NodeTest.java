@@ -39,8 +39,8 @@ import io.appulse.utils.test.TestMethodNamePrinter;
 
 import java.util.concurrent.ThreadLocalRandom;
 
-import lombok.extern.slf4j.Slf4j;
 import lombok.val;
+import lombok.extern.slf4j.Slf4j;
 import org.assertj.core.api.SoftAssertions;
 import org.junit.After;
 import org.junit.Rule;
@@ -73,8 +73,8 @@ public class NodeTest {
 
   @Test
   public void register () {
-    val name = createShortName();
-    node = Nodes.singleNode(name);
+    val name = createName();
+    node = Nodes.singleNode(name, true);
 
     assertThat(node.newReference())
         .isNotNull();
@@ -102,11 +102,12 @@ public class NodeTest {
 
   @Test
   public void ping () throws Exception {
-    val name1 = createFullName();
-    val name2 = createFullName();
+    val name1 = createName();
+    val name2 = createName();
     node = Nodes.singleNode(name1, NodeConfig.builder()
-        .cookie("secret")
-        .build()
+                            .shortNamed(true)
+                            .cookie("secret")
+                            .build()
     );
 
     assertThat(node.ping(ELIXIR_ECHO_SERVER))
@@ -125,6 +126,7 @@ public class NodeTest {
         .isFalse();
 
     try (val node2 = Nodes.singleNode(name2, NodeConfig.builder()
+                                      .shortNamed(true)
                                       .cookie("secret")
                                       .build())) {
 
@@ -138,8 +140,9 @@ public class NodeTest {
 
   @Test
   public void instantiating () throws Exception {
-    val name = createShortName();
+    val name = createName();
     node = Nodes.singleNode(name, NodeConfig.builder()
+                            .shortNamed(true)
                             .mailbox(MailboxConfig.builder()
                                 .name("one")
                                 .build())
@@ -156,16 +159,16 @@ public class NodeTest {
 
   @Test
   public void sendFromOneToAnotherNode () throws Exception {
-    val name1 = createFullName();
-    val name2 = createFullName();
+    val name1 = createName();
+    val name2 = createName();
 
-    node = Nodes.singleNode(name1);
+    node = Nodes.singleNode(name1, true);
 
     Mailbox mailbox1 = node.mailbox()
         .name("popa1")
         .build();
 
-    try (val node2 = Nodes.singleNode(name2)) {
+    try (val node2 = Nodes.singleNode(name2, true)) {
 
       String text1 = "Hello world 1";
       String text2 = "Hello world 2";
@@ -186,34 +189,50 @@ public class NodeTest {
     }
   }
 
-//  @Test
+  @Test
   public void sendWithRedirect () throws Exception {
     val config = NodeConfig.builder()
+        .shortNamed(true)
         .cookie("secret")
+        .server(ServerConfig.builder()
+            .bossThreads(1)
+            .workerThreads(2)
+            .build())
         .build();
 
-    val name1 = createShortName();
-    val name2 = createShortName();
+    val name1 = createName();
+    val name2 = createName();
 
     node = Nodes.singleNode(name1, config);
+    log.info("Node #1 was created: {}", name1);
 
     try (Node node2 = Nodes.singleNode(name2, config)) {
-      Mailbox mailbox1 = node.mailbox().build();
-      Mailbox mailbox2 = node2.mailbox().name("popka").build();
+      log.info("Node #2 was created: {}", name2);
+
+      Mailbox mailbox1 = node.mailbox()
+          .name("mail1")
+          .build();
+
+      Mailbox mailbox2 = node2.mailbox()
+          .name("mail2")
+          .build();
 
       val reference = node.newReference();
-      mailbox1.send(ELIXIR_ECHO_SERVER, "echo_server", tuple(
-                    mailbox1.getPid(),
-                    mailbox2.getPid(),
+      log.info("Sending message from {} to {}", name1, ELIXIR_ECHO_SERVER);
+      mailbox1.send(ELIXIR_ECHO_SERVER, "echo_server",
                     tuple(
-                        string("hello, world"),
-                        atom("popa"),
-                        atom(false),
-                        number(42),
-                        reference
-                    )
-                ));
+                        mailbox1.getPid(),
+                        mailbox2.getPid(),
+                        tuple(
+                            string("hello, world"),
+                            atom("popa"),
+                            atom(false),
+                            number(42),
+                            reference
+                        )
+                    ));
 
+      log.info("Waiting message on {}", node2);
       ErlangTerm tuple = mailbox2.receive()
           .getBody()
           .asTuple()
@@ -231,10 +250,14 @@ public class NodeTest {
 
   @Test
   public void send () throws Exception {
-    val name = createShortName();
+    val name = createName();
     node = Nodes.singleNode(name, NodeConfig.builder()
-                            .server(ServerConfig.builder().port(8500).build())
+                            .shortNamed(true)
                             .cookie("secret")
+                            .server(ServerConfig.builder()
+                                .port(8500)
+                                .build()
+                            )
                             .build()
     );
 
@@ -269,8 +292,8 @@ public class NodeTest {
 
   @Test
   public void link () throws Exception {
-    val name = createFullName();
-    node = Nodes.singleNode(name);
+    val name = createName();
+    node = Nodes.singleNode(name, true);
 
     Mailbox mailbox1 = node.mailbox().build();
     Mailbox mailbox2 = node.mailbox().build();
@@ -285,10 +308,10 @@ public class NodeTest {
       mailbox2.receive();
     } catch (ReceivedExitException ex) {
       assertThat(ex.getFrom())
-        .isEqualTo(mailbox1.getPid());
+          .isEqualTo(mailbox1.getPid());
 
       assertThat(ex.getReason())
-        .isEqualTo(new ErlangAtom("popa"));
+          .isEqualTo(new ErlangAtom("popa"));
 
       return;
     }
@@ -297,8 +320,8 @@ public class NodeTest {
 
   @Test
   public void exit () throws Exception {
-    val name = createFullName();
-    node = Nodes.singleNode(name);
+    val name = createName();
+    node = Nodes.singleNode(name, true);
 
     Mailbox mailbox1 = node.mailbox().build();
     Mailbox mailbox2 = node.mailbox().build();
@@ -322,14 +345,7 @@ public class NodeTest {
     assertThat(false).isTrue();
   }
 
-  private String createShortName () {
-    return new StringBuilder()
-        .append("node_")
-        .append(ThreadLocalRandom.current().nextInt(1000))
-        .toString();
-  }
-
-  private String createFullName () {
+  private String createName () {
     return new StringBuilder()
         .append("node_")
         .append(ThreadLocalRandom.current().nextInt(1000))

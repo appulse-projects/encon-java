@@ -21,6 +21,7 @@ import io.netty.channel.ChannelHandler.Sharable;
 import io.netty.channel.ChannelHandlerContext;
 import io.netty.channel.ChannelInboundHandlerAdapter;
 import lombok.extern.slf4j.Slf4j;
+import lombok.val;
 
 /**
  *
@@ -30,8 +31,6 @@ import lombok.extern.slf4j.Slf4j;
 @Slf4j
 @Sharable
 public class TickTockHandler extends ChannelInboundHandlerAdapter {
-
-  private static final byte[] TICK_TOCK_RESPONSE = new byte[0];
 
   @Override
   public void exceptionCaught (ChannelHandlerContext context, Throwable cause) throws Exception {
@@ -43,12 +42,13 @@ public class TickTockHandler extends ChannelInboundHandlerAdapter {
   }
 
   @Override
-  public void channelRead (ChannelHandlerContext context, Object msg) throws Exception {
-    ByteBuf buffer = (ByteBuf) msg;
-    if (buffer.getInt(0) == 0) {
-      context.writeAndFlush(TICK_TOCK_RESPONSE);
+  public void channelRead (ChannelHandlerContext context, Object message) throws Exception {
+    val buffer = (ByteBuf) message;
+    val index = buffer.readerIndex();
+    if (buffer.readableBytes() == 4 && buffer.getInt(0) == 0) {
+      context.writeAndFlush(buffer);
       return;
     }
-    context.fireChannelRead(msg);
+    context.fireChannelRead(buffer.readerIndex(index));
   }
 }

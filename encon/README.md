@@ -10,20 +10,20 @@ First of all, add encon's dependency:
 
 ```xml
 <dependencies>
-    ...
-    <dependency>
-        <groupId>io.appulse.encon</groupId>
-        <artifactId>encon</artifactId>
-        <version>1.2.0</version>
-    </dependency>
-    ...
+  ...
+  <dependency>
+    <groupId>io.appulse.encon</groupId>
+    <artifactId>encon</artifactId>
+    <version>1.3.0</version>
+  </dependency>
+  ...
 </dependencies>
 ```
 
 **Gradle**:
 
 ```groovy
-compile 'io.appulse.encon.java:encon:1.2.0'
+compile 'io.appulse.encon.java:encon:1.3.0'
 ```
 
 Let's create a new `Erlang` node:
@@ -38,10 +38,11 @@ import io.appulse.encon.java.Nodes;
 // Creating node's config.
 // For more details - see encon-config project
 NodeConfig config = NodeConfig.builder()
+    .shortNamed(true) // true - for local nodes, false (default) - for remote accessable
     .cookie("secret")
     .build();
 
-// Creates, registers and starts a new Erlang node
+// Creates, registers in EPMD and starts a new Erlang node
 Node node = Nodes.singleNode("echo-node", config);
 
 ```
