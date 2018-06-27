@@ -217,14 +217,16 @@ public class NodeDescriptor implements Serializable {
         throw new IllegalArgumentException(message);
       }
       address = InetAddress.getByName(hostName);
-    } else {
-      hostName = isShortName
-                 ? HOST_NAME.substring(HOST_NAME.indexOf('.'))
-                 : HOST_NAME;
+    } else if (isShortName) {
+      val dotIndex = HOST_NAME.indexOf('.');
+      hostName = dotIndex > 0
+                  ? HOST_NAME.substring(dotIndex)
+                  : HOST_NAME;
 
-      address = isShortName
-                ? LOOPBACK
-                : LOCALHOST;
+      address = LOOPBACK;
+    } else {
+      hostName = HOST_NAME;
+      address = LOCALHOST;
     }
 
     val fullName = nodeName + '@' + hostName;
