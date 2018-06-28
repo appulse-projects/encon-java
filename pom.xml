@@ -24,7 +24,7 @@ limitations under the License.
 
   <groupId>io.appulse.encon</groupId>
   <artifactId>encon-parent</artifactId>
-  <version>1.1.0</version>
+  <version>1.3.0</version>
   <packaging>pom</packaging>
 
   <properties>
@@ -71,7 +71,7 @@ limitations under the License.
     <url>https://github.com/appulse-projects/encon-java</url>
     <connection>scm:git:https://github.com/appulse-projects/encon-java.git</connection>
     <developerConnection>scm:git:https://github.com/appulse-projects/encon-java.git</developerConnection>
-    <tag>1.1.0</tag>
+    <tag>1.3.0</tag>
   </scm>
 
   <distributionManagement>
@@ -100,6 +100,11 @@ limitations under the License.
       <id>xxlabaza</id>
       <name>Artem Labazin</name>
       <email>xxlabaza@gmail.com</email>
+    </developer>
+    <developer>
+      <id>ambivalence42</id>
+      <name>Sokol Andrey</name>
+      <email>sokolandrey1993@mail.ru</email>
     </developer>
   </developers>
 
@@ -156,8 +161,33 @@ limitations under the License.
 
       <dependency>
         <groupId>io.netty</groupId>
-        <artifactId>netty-all</artifactId>
+        <artifactId>netty-buffer</artifactId>
         <version>4.1.25.Final</version>
+      </dependency>
+      <dependency>
+        <groupId>io.netty</groupId>
+        <artifactId>netty-handler</artifactId>
+        <version>4.1.25.Final</version>
+      </dependency>
+      <dependency>
+        <groupId>io.netty</groupId>
+        <artifactId>netty-transport-native-epoll</artifactId>
+        <version>4.1.25.Final</version>
+        <classifier>linux-x86_64</classifier>
+        <exclusions>
+          <exclusion>
+            <groupId>io.netty</groupId>
+            <artifactId>netty-common</artifactId>
+          </exclusion>
+          <exclusion>
+            <groupId>io.netty</groupId>
+            <artifactId>netty-handler</artifactId>
+          </exclusion>
+          <exclusion>
+            <groupId>io.netty</groupId>
+            <artifactId>netty-transport</artifactId>
+          </exclusion>
+        </exclusions>
       </dependency>
 
       <dependency>

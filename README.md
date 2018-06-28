@@ -97,6 +97,8 @@ We use [SemVer](http://semver.org/) for versioning. For the versions available, 
 
 * **[Artem Labazin](https://github.com/xxlabaza)** - creator and the main developer
 
+* **[Sokol Andrey](https://github.com/SokolAndrey)** - texts corrector and mastermind
+
 ## License
 
 This project is licensed under the Apache License 2.0 License - see the [license](./LICENSE) file for details

@@ -61,6 +61,11 @@ public class CompressionConfig {
 
   Integer level;
 
+  public CompressionConfig (CompressionConfig compressionConfig) {
+    enabled = compressionConfig.getEnabled();
+    level = compressionConfig.getLevel();
+  }
+
   /**
    * Method for setting up the default values.
    *
