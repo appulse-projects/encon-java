@@ -16,6 +16,15 @@ and this project adheres to [Semantic Versioning](http://semver.org/spec/v2.0.0.
 - Add tests.
 - Rething caches in terms and modules.
 - Add lazy deserialization for terms.
+- Add `UDP`/`SCTP` protocols support.
+- Rethink handshake implementation design.
+- Add handshake error handling (exceptions? error logs?).
+- Turn on checkstyle JavaDocs module.
+- Add updates to the protocol, like new `ControlMessage`.
+
+## [1.3.1](https://github.com/appulse-projects/encon-java/releases/tag/1.3.1) - 2018-06-28
+
+Fix short node name host detection.
 
 ## [1.3.0](https://github.com/appulse-projects/encon-java/releases/tag/1.3.0) - 2018-06-28
 
