@@ -10,20 +10,20 @@ First of all, add databind's dependency:
 
 ```xml
 <dependencies>
-    ...
-    <dependency>
-        <groupId>io.appulse.encon</groupId>
-        <artifactId>encon-databind</artifactId>
-        <version>1.1.0</version>
-    </dependency>
-    ...
+  ...
+  <dependency>
+    <groupId>io.appulse.encon</groupId>
+    <artifactId>encon-databind</artifactId>
+    <version>1.3.0</version>
+  </dependency>
+  ...
 </dependencies>
 ```
 
 **Gradle**:
 
 ```groovy
-compile 'io.appulse.encon.java:encon-databind:1.1.0'
+compile 'io.appulse.encon.java:encon-databind:1.3.0'
 ```
 
 Let's imagine, you have POJO like this:

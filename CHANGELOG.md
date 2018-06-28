@@ -9,15 +9,39 @@ and this project adheres to [Semantic Versioning](http://semver.org/spec/v2.0.0.
 
 ## [Unreleased]
 
-- Refactoring external and internal APIs.
 - Speed-up serialization/deserialization.
 - Provide more custom exceptions.
 - Review debug logs.
 - Add `monitor` functionality.
 - Add tests.
-- Split `protocol`, `module` and `config` on separate sub-projects.
-- Rething caches in terms ans modules.
+- Rething caches in terms and modules.
 - Add lazy deserialization for terms.
+- Add `UDP`/`SCTP` protocols support.
+- Rethink handshake implementation design.
+- Add handshake error handling (exceptions? error logs?).
+- Turn on checkstyle JavaDocs module.
+
+## [1.3.0](https://github.com/appulse-projects/encon-java/releases/tag/1.3.0) - 2018-06-28
+
+Add correct node naming.
+
+### Changed
+
+- Configs from `encon-config` are now cloneable via constructor.
+- `NodeDescriptor` works as in Erlang's docs said.
+- Several minor fixes.
+
+## [1.2.0](https://github.com/appulse-projects/encon-java/releases/tag/1.2.0) - 2018-06-25
+
+Refactoring and cleaning.
+
+### Added
+
+- `bstring` methods to `Erlang` term helper class.
+
+### Changed
+
+- Refactored external and internal APIs.
 
 ## [1.1.0](https://github.com/appulse-projects/encon-java/releases/tag/1.1.0) - 2018-06-19
 

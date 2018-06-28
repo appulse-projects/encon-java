@@ -63,7 +63,7 @@ public class ErlangPidTest {
     assertThat(pid).isNotNull();
 
     SoftAssertions.assertSoftly(softly -> {
-      softly.assertThat(pid.getDescriptor().getShortName())
+      softly.assertThat(pid.getDescriptor().getNodeName())
           .isEqualTo(node);
 
       softly.assertThat(pid.getId())
