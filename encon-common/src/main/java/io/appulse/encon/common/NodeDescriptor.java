@@ -65,7 +65,9 @@ public class NodeDescriptor implements Serializable {
 
   private static final InetAddress LOOPBACK;
 
-  private static final String HOST_NAME;
+  private static final String LONG_HOST_NAME;
+
+  private static final String SHORT_HOST_NAME;
 
   static {
     try {
@@ -74,7 +76,11 @@ public class NodeDescriptor implements Serializable {
       throw new RuntimeException(ex);
     }
     LOOPBACK = InetAddress.getLoopbackAddress();
-    HOST_NAME = LOCALHOST.getHostName();
+    LONG_HOST_NAME = LOCALHOST.getHostName();
+    val dotIndex = LONG_HOST_NAME.indexOf('.');
+    SHORT_HOST_NAME = dotIndex > 0
+                      ? LONG_HOST_NAME.substring(dotIndex)
+                      : LONG_HOST_NAME;
     NODE_DESCRIPTOR_CACHE = new ConcurrentHashMap<>();
   }
 
@@ -216,16 +222,14 @@ public class NodeDescriptor implements Serializable {
                                     hostName);
         throw new IllegalArgumentException(message);
       }
-      address = InetAddress.getByName(hostName);
+      address = isShortName
+                ? LOOPBACK
+                : InetAddress.getByName(hostName);
     } else if (isShortName) {
-      val dotIndex = HOST_NAME.indexOf('.');
-      hostName = dotIndex > 0
-                  ? HOST_NAME.substring(dotIndex)
-                  : HOST_NAME;
-
+      hostName = SHORT_HOST_NAME;
       address = LOOPBACK;
     } else {
-      hostName = HOST_NAME;
+      hostName = LONG_HOST_NAME;
       address = LOCALHOST;
     }
 
