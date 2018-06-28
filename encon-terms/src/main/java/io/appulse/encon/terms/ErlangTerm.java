@@ -87,7 +87,8 @@ public abstract class ErlangTerm implements IntegerTerm,
    */
   @SuppressWarnings("unchecked")
   public static <T extends ErlangTerm> T newInstance (@NonNull ByteBuf buffer) {
-    val type = TermType.of(buffer.readByte());
+    val typeByte = buffer.readByte();
+    val type = TermType.of(typeByte);
 
     switch (type) {
     case SMALL_INTEGER:
@@ -134,7 +135,8 @@ public abstract class ErlangTerm implements IntegerTerm,
     case SMALL_ATOM:
       return (T) new ErlangAtom(type, buffer);
     default:
-      throw new ErlangTermDecodeException("Unknown term type " + type);
+      val message = String.format("Unknown term type %s (%d)", type.name(), typeByte);
+      throw new ErlangTermDecodeException(message);
     }
   }
 
