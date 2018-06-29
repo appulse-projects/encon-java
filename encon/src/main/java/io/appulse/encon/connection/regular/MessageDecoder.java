@@ -16,6 +16,9 @@
 
 package io.appulse.encon.connection.regular;
 
+import static io.appulse.encon.connection.regular.Message.PASS_THROUGH_TAG;
+import static io.appulse.encon.connection.regular.Message.VERSION_TAG;
+
 import java.util.List;
 
 import io.appulse.encon.connection.control.ControlMessage;
@@ -48,9 +51,14 @@ public class MessageDecoder extends MessageToMessageDecoder<ByteBuf> {
 
   @Override
   protected void decode (ChannelHandlerContext context, ByteBuf msg, List<Object> out) throws Exception {
-    log.debug("Decoding a new message");
-    msg.readInt(); // skip size
-    msg.readByte(); // skip pass through
+    log.debug("decoding");
+
+    msg.skipBytes(Integer.BYTES); // skip size
+
+    val passThrough = msg.readByte();
+    if (passThrough != PASS_THROUGH_TAG) {
+      throw new IllegalArgumentException("Wrong pass through marker. Expected 0x70 (112), but was: " + passThrough);
+    }
 
     val header = readTerm(msg);
     val controlMessage = ControlMessage.parse(header);
@@ -64,7 +72,10 @@ public class MessageDecoder extends MessageToMessageDecoder<ByteBuf> {
   }
 
   private ErlangTerm readTerm (ByteBuf buffer) {
-    buffer.readUnsignedByte(); // skip version byte;
+    val versionByte = buffer.readUnsignedByte();
+    if (versionByte != VERSION_TAG) {
+      throw new IllegalArgumentException("Wrong version byte. Expected 0x83 (131), but was: " + versionByte);
+    }
     return ErlangTerm.newInstance(buffer);
   }
 }

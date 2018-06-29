@@ -17,6 +17,7 @@
 package io.appulse.encon.connection.regular;
 
 import io.netty.buffer.ByteBuf;
+import io.netty.buffer.Unpooled;
 import io.netty.channel.ChannelHandler.Sharable;
 import io.netty.channel.ChannelHandlerContext;
 import io.netty.channel.ChannelInboundHandlerAdapter;
@@ -32,6 +33,8 @@ import lombok.val;
 @Sharable
 public class TickTockHandler extends ChannelInboundHandlerAdapter {
 
+  private static final ByteBuf TICK_TOCK = Unpooled.wrappedBuffer(new byte[] { 0, 0, 0, 0 });
+
   @Override
   public void exceptionCaught (ChannelHandlerContext context, Throwable cause) throws Exception {
     log.error("Error during channel connection with {}",
@@ -44,11 +47,18 @@ public class TickTockHandler extends ChannelInboundHandlerAdapter {
   @Override
   public void channelRead (ChannelHandlerContext context, Object message) throws Exception {
     val buffer = (ByteBuf) message;
-    val index = buffer.readerIndex();
-    if (buffer.readableBytes() == 4 && buffer.getInt(0) == 0) {
-      context.writeAndFlush(buffer);
-      return;
+
+    if (buffer.readableBytes() >= TICK_TOCK.maxCapacity() && buffer.getInt(0) == 0) {
+      log.debug("TICK-TOCK message detected, sending response");
+      TICK_TOCK.retain();
+      context.writeAndFlush(TICK_TOCK.duplicate());
+      if (buffer.readableBytes() == TICK_TOCK.maxCapacity()) {
+        log.debug("There is no more bytes in message, stop pipelining");
+        return;
+      }
+      buffer.readerIndex(TICK_TOCK.maxCapacity());
     }
-    context.fireChannelRead(buffer.readerIndex(index));
+
+    context.fireChannelRead(buffer);
   }
 }

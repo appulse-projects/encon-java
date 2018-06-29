@@ -41,6 +41,10 @@ import lombok.Value;
 @SuppressWarnings("checkstyle:DesignForExtension")
 public class Message {
 
+  public static final int PASS_THROUGH_TAG = 0x70;
+
+  public static final int VERSION_TAG = 0x83;
+
   public static Message sendToRegisteredProcess (@NonNull ErlangPid from,
                                                  @NonNull String mailbox,
                                                  @NonNull ErlangTerm body
