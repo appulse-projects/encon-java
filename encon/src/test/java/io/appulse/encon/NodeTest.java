@@ -22,8 +22,10 @@ import static io.appulse.encon.terms.Erlang.string;
 import static io.appulse.encon.terms.Erlang.tuple;
 import static io.appulse.epmd.java.core.model.NodeType.R6_ERLANG;
 import static io.appulse.epmd.java.core.model.Protocol.TCP;
+import static io.appulse.epmd.java.core.model.Protocol.UDP;
 import static io.appulse.epmd.java.core.model.Version.R6;
 import static java.lang.Boolean.FALSE;
+import static java.lang.Boolean.TRUE;
 import static java.util.concurrent.TimeUnit.MILLISECONDS;
 import static java.util.concurrent.TimeUnit.SECONDS;
 import static org.assertj.core.api.Assertions.assertThat;
@@ -169,6 +171,43 @@ public class NodeTest {
         .build();
 
     try (val node2 = Nodes.singleNode(name2, true)) {
+
+      String text1 = "Hello world 1";
+      String text2 = "Hello world 2";
+
+      Mailbox mailbox2 = node2.mailbox()
+          .name("popa2")
+          .build();
+
+      mailbox2.send(name1, "popa1", string(text1));
+
+      assertThat(mailbox1.receive().getBody().asText())
+          .isEqualTo(text1);
+
+      mailbox1.send(name2, "popa2", string(text2));
+
+      assertThat(mailbox2.receive().getBody().asText())
+          .isEqualTo(text2);
+    }
+  }
+
+  @Test
+  public void sendFromOneToAnotherNodeByUdp () throws Exception {
+    val config = NodeConfig.builder()
+        .shortNamed(TRUE)
+        .protocol(UDP)
+        .build();
+
+    val name1 = createName();
+    val name2 = createName();
+
+    node = Nodes.singleNode(name1, config);
+
+    Mailbox mailbox1 = node.mailbox()
+        .name("popa1")
+        .build();
+
+    try (val node2 = Nodes.singleNode(name2, config)) {
 
       String text1 = "Hello world 1";
       String text2 = "Hello world 2";

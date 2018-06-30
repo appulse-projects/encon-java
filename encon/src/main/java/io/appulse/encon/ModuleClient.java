@@ -17,6 +17,7 @@
 package io.appulse.encon;
 
 import static io.netty.channel.ChannelOption.CONNECT_TIMEOUT_MILLIS;
+import static io.netty.channel.ChannelOption.SO_BROADCAST;
 import static io.netty.channel.ChannelOption.SO_KEEPALIVE;
 import static io.netty.channel.ChannelOption.TCP_NODELAY;
 import static java.util.concurrent.TimeUnit.SECONDS;
@@ -28,7 +29,6 @@ import java.util.concurrent.TimeUnit;
 import java.util.function.UnaryOperator;
 
 import io.appulse.encon.common.RemoteNode;
-import io.appulse.encon.config.NodeConfig;
 import io.appulse.encon.connection.Connection;
 import io.appulse.encon.connection.handshake.HandshakeClientInitializer;
 import io.appulse.epmd.java.core.model.Protocol;
@@ -66,14 +66,11 @@ class ModuleClient implements Closeable {
   UnaryOperator<Bootstrap> settingUpBootstrap;
 
   @Builder
-  ModuleClient (@NonNull Node node,
-                @NonNull ModuleConnection moduleConnection,
-                @NonNull NodeConfig nodeConfig
-  ) {
+  ModuleClient (@NonNull Node node, @NonNull ModuleConnection moduleConnection) {
     this.node = node;
     this.moduleConnection = moduleConnection;
-    this.shortNamedNode = nodeConfig.getShortNamed();
-    settingUpBootstrap = createSettingUpBootstrap(nodeConfig.getProtocol());
+    this.shortNamedNode = node.getDescriptor().isShortName();
+    settingUpBootstrap = createSettingUpBootstrap(moduleConnection.getProtocol());
   }
 
   @Override
@@ -165,7 +162,8 @@ class ModuleClient implements Closeable {
                            : NioDatagramChannel.class;
 
       return bootstrap -> bootstrap
-          .channel(clientChannelClass);
+          .channel(clientChannelClass)
+          .option(SO_BROADCAST, true);
     case SCTP:
       return bootstrap -> bootstrap
           .channel(NioSctpChannel.class);

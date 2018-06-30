@@ -163,16 +163,13 @@ public final class Node implements Closeable {
     modulePing = new ModulePing(this);
     moduleLookup = new ModuleLookup(epmd);
     moduleConnection = new ModuleConnection(
+        config,
         descriptor.getNodeName(),
         config.getServer().getBossThreads(),
         config.getServer().getWorkerThreads()
     );
     moduleServer = new ModuleServer(this, moduleConnection, port);
-    moduleClient = ModuleClient.builder()
-        .node(this)
-        .moduleConnection(moduleConnection)
-        .nodeConfig(config)
-        .build();
+    moduleClient = new ModuleClient(this, moduleConnection);
     moduleMailbox = new ModuleMailbox(this, () -> generatorPid.generate());
   }
 

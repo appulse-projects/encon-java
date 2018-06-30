@@ -21,12 +21,12 @@ import static java.lang.Integer.MAX_VALUE;
 import static lombok.AccessLevel.PRIVATE;
 import static lombok.AccessLevel.PROTECTED;
 
+import io.netty.channel.Channel;
 import io.netty.channel.ChannelDuplexHandler;
 import io.netty.channel.ChannelInboundHandler;
 import io.netty.channel.ChannelInitializer;
 import io.netty.channel.ChannelOutboundHandler;
 import io.netty.channel.ChannelPipeline;
-import io.netty.channel.socket.SocketChannel;
 import io.netty.handler.codec.LengthFieldBasedFrameDecoder;
 import io.netty.handler.codec.LengthFieldPrepender;
 import io.netty.handler.logging.LoggingHandler;
@@ -44,7 +44,7 @@ import lombok.extern.slf4j.Slf4j;
 @Slf4j
 @RequiredArgsConstructor(access = PROTECTED)
 @FieldDefaults(level = PRIVATE, makeFinal = true)
-abstract class AbstractHandshakeChannelInitializer extends ChannelInitializer<SocketChannel> {
+abstract class AbstractHandshakeChannelInitializer extends ChannelInitializer<Channel> {
 
   private static final ChannelDuplexHandler LOGGING_HANDLER;
 
@@ -75,12 +75,12 @@ abstract class AbstractHandshakeChannelInitializer extends ChannelInitializer<So
   ChannelInboundHandler decoder;
 
   @Override
-  protected void initChannel (SocketChannel socketChannel) throws Exception {
+  protected void initChannel (Channel channel) throws Exception {
     throw new UnsupportedOperationException();
   }
 
-  protected void initChannel (SocketChannel socketChannel, AbstractHandshakeHandler handler) {
-    socketChannel.pipeline()
+  protected void initChannel (Channel channel, AbstractHandshakeHandler handler) {
+    channel.pipeline()
         .addLast("LOGGING", LOGGING_HANDLER)
         .addLast("READ_TIMEOUT", new ReadTimeoutHandler(5))
         .addLast("LENGTH_PREPENDER", LENGTH_FIELD_PREPENDER)
@@ -90,6 +90,6 @@ abstract class AbstractHandshakeChannelInitializer extends ChannelInitializer<So
         .addLast("HANDLER", handler);
 
     log.debug("Handshake pipeline for {} was initialized",
-              socketChannel.remoteAddress());
+              channel.remoteAddress());
   }
 }

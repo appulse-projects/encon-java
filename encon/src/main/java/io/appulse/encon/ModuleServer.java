@@ -22,17 +22,23 @@ import static io.netty.channel.ChannelOption.SO_KEEPALIVE;
 import static io.netty.channel.ChannelOption.SO_REUSEADDR;
 import static io.netty.channel.ChannelOption.TCP_NODELAY;
 import static io.netty.channel.ChannelOption.WRITE_BUFFER_WATER_MARK;
-import static io.netty.handler.logging.LogLevel.DEBUG;
 import static lombok.AccessLevel.PRIVATE;
 
 import java.io.Closeable;
 
 import io.appulse.encon.connection.handshake.HandshakeServerInitializer;
 
+import io.netty.bootstrap.Bootstrap;
 import io.netty.bootstrap.ServerBootstrap;
 import io.netty.buffer.PooledByteBufAllocator;
+import io.netty.channel.ChannelHandler;
 import io.netty.channel.WriteBufferWaterMark;
-import io.netty.handler.logging.LoggingHandler;
+import io.netty.channel.epoll.Epoll;
+import io.netty.channel.epoll.EpollDatagramChannel;
+import io.netty.channel.epoll.EpollServerSocketChannel;
+import io.netty.channel.sctp.nio.NioSctpServerChannel;
+import io.netty.channel.socket.nio.NioDatagramChannel;
+import io.netty.channel.socket.nio.NioServerSocketChannel;
 import lombok.NonNull;
 import lombok.SneakyThrows;
 import lombok.experimental.FieldDefaults;
@@ -57,7 +63,21 @@ class ModuleServer implements Closeable {
     this.node = node;
     this.moduleConnection = moduleConnection;
     this.port = port;
-    start();
+
+    log.debug("Starting server on port {}", port);
+    switch (moduleConnection.getProtocol()) {
+    case TCP:
+      tcp();
+      break;
+    case UDP:
+      udp();
+      break;
+    case SCTP:
+      sctp();
+      break;
+    default:
+      throw new UnsupportedOperationException("Unsupported protocol: " + moduleConnection.getProtocol());
+    }
   }
 
   @Override
@@ -68,23 +88,16 @@ class ModuleServer implements Closeable {
   }
 
   @SneakyThrows
-  private void start () {
-    log.debug("Starting server on port {}", port);
-
+  private void tcp () {
     new ServerBootstrap()
         .group(moduleConnection.getBossGroup(),
-               moduleConnection.getWorkerGroup())
-        .channel(moduleConnection.getServerChannelClass())
-        .handler(new LoggingHandler(DEBUG))
-        .childHandler(HandshakeServerInitializer.builder()
-            .node(node)
-            .consumer(moduleConnection::add)
-            .channelCloseAction(remote -> {
-              log.debug("Closing connection to {}", remote);
-              node.moduleLookup.remove(remote);
-              node.moduleConnection.remove(remote);
-            })
-            .build())
+               moduleConnection.getWorkerGroup()
+        )
+        .channel(Epoll.isAvailable()
+                 ? EpollServerSocketChannel.class
+                 : NioServerSocketChannel.class
+        )
+        .childHandler(createMainChannelHandler())
         .option(SO_BACKLOG, 1024)
         .option(SO_REUSEADDR, true)
         .childOption(SO_REUSEADDR, true)
@@ -93,5 +106,47 @@ class ModuleServer implements Closeable {
         .childOption(WRITE_BUFFER_WATER_MARK, new WriteBufferWaterMark(64 * 1024, 128 * 1024))
         .childOption(ALLOCATOR, new PooledByteBufAllocator(true))
         .bind(port);
+  }
+
+  private void udp () {
+    new Bootstrap()
+        .group(moduleConnection.getWorkerGroup())
+        .channel(Epoll.isAvailable()
+                 ? EpollDatagramChannel.class
+                 : NioDatagramChannel.class
+        )
+        .handler(createMainChannelHandler())
+        .option(SO_BACKLOG, 1024)
+        .option(SO_REUSEADDR, true)
+        .bind(port);
+  }
+
+  private void sctp () {
+    new ServerBootstrap()
+        .group(moduleConnection.getBossGroup(),
+               moduleConnection.getWorkerGroup()
+        )
+        .channel(NioSctpServerChannel.class)
+        .childHandler(createMainChannelHandler())
+        .option(SO_BACKLOG, 1024)
+        .option(SO_REUSEADDR, true)
+        .childOption(SO_REUSEADDR, true)
+        .childOption(SO_KEEPALIVE, true)
+        .childOption(TCP_NODELAY, true)
+        .childOption(WRITE_BUFFER_WATER_MARK, new WriteBufferWaterMark(64 * 1024, 128 * 1024))
+        .childOption(ALLOCATOR, new PooledByteBufAllocator(true))
+        .bind(port);
+  }
+
+  private ChannelHandler createMainChannelHandler () {
+    return HandshakeServerInitializer.builder()
+        .node(node)
+        .consumer(moduleConnection::add)
+        .channelCloseAction(remote -> {
+          log.debug("Closing connection to {}", remote);
+          node.moduleLookup.remove(remote);
+          node.moduleConnection.remove(remote);
+        })
+        .build();
   }
 }

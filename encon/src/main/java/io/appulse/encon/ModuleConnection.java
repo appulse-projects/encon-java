@@ -27,15 +27,14 @@ import java.util.concurrent.ConcurrentHashMap;
 import java.util.function.Function;
 
 import io.appulse.encon.common.RemoteNode;
+import io.appulse.encon.config.NodeConfig;
 import io.appulse.encon.connection.Connection;
+import io.appulse.epmd.java.core.model.Protocol;
 
 import io.netty.channel.EventLoopGroup;
-import io.netty.channel.ServerChannel;
 import io.netty.channel.epoll.Epoll;
 import io.netty.channel.epoll.EpollEventLoopGroup;
-import io.netty.channel.epoll.EpollServerSocketChannel;
 import io.netty.channel.nio.NioEventLoopGroup;
-import io.netty.channel.socket.nio.NioServerSocketChannel;
 import io.netty.util.ResourceLeakDetector;
 import io.netty.util.concurrent.DefaultThreadFactory;
 import io.netty.util.internal.SystemPropertyUtil;
@@ -67,11 +66,15 @@ class ModuleConnection implements Closeable {
   EventLoopGroup workerGroup;
 
   @Getter
-  Class<? extends ServerChannel> serverChannelClass;
+  Protocol protocol;
 
   Map<RemoteNode, CompletableFuture<Connection>> cache;
 
-  ModuleConnection (@NonNull String prefix, int bossThreads, int workerThreads) {
+  ModuleConnection (@NonNull NodeConfig nodeConfig,
+                    @NonNull String prefix,
+                    int bossThreads,
+                    int workerThreads
+  ) {
     cache = new ConcurrentHashMap<>();
 
     val bossThreadFactory = new DefaultThreadFactory(prefix + "-nbg");
@@ -80,12 +83,11 @@ class ModuleConnection implements Closeable {
     if (Epoll.isAvailable()) {
       bossGroup = new EpollEventLoopGroup(bossThreads, bossThreadFactory);
       workerGroup = new EpollEventLoopGroup(workerThreads, workerThreadFactory);
-      serverChannelClass = EpollServerSocketChannel.class;
     } else {
       bossGroup = new NioEventLoopGroup(bossThreads, bossThreadFactory);
       workerGroup = new NioEventLoopGroup(workerThreads, workerThreadFactory);
-      serverChannelClass = NioServerSocketChannel.class;
     }
+    protocol = nodeConfig.getProtocol();
   }
 
   @Override

@@ -25,8 +25,8 @@ import io.appulse.encon.Node;
 import io.appulse.encon.common.RemoteNode;
 import io.appulse.encon.connection.Connection;
 
+import io.netty.channel.Channel;
 import io.netty.channel.ChannelInboundHandler;
-import io.netty.channel.socket.SocketChannel;
 import lombok.Builder;
 import lombok.NonNull;
 import lombok.experimental.FieldDefaults;
@@ -66,13 +66,13 @@ public final class HandshakeServerInitializer extends AbstractHandshakeChannelIn
   }
 
   @Override
-  protected void initChannel (SocketChannel socketChannel) throws Exception {
+  protected void initChannel (Channel channel) throws Exception {
     log.debug("Initializing new server socket channel pipeline for {}",
-              socketChannel.remoteAddress());
+              channel.remoteAddress());
 
     CompletableFuture<Connection> future = new CompletableFuture<>();
     val handler = new HandshakeHandlerServer(node, future, channelCloseAction);
-    initChannel(socketChannel, handler);
+    initChannel(channel, handler);
     consumer.accept(future);
   }
 }
