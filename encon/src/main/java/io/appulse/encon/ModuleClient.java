@@ -25,14 +25,24 @@ import static lombok.AccessLevel.PRIVATE;
 import java.io.Closeable;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.TimeUnit;
+import java.util.function.UnaryOperator;
 
 import io.appulse.encon.common.RemoteNode;
+import io.appulse.encon.config.NodeConfig;
 import io.appulse.encon.connection.Connection;
 import io.appulse.encon.connection.handshake.HandshakeClientInitializer;
+import io.appulse.epmd.java.core.model.Protocol;
 
 import io.netty.bootstrap.Bootstrap;
+import io.netty.channel.Channel;
+import io.netty.channel.epoll.Epoll;
+import io.netty.channel.epoll.EpollDatagramChannel;
+import io.netty.channel.epoll.EpollSocketChannel;
+import io.netty.channel.sctp.nio.NioSctpChannel;
+import io.netty.channel.socket.nio.NioDatagramChannel;
+import io.netty.channel.socket.nio.NioSocketChannel;
+import lombok.Builder;
 import lombok.NonNull;
-import lombok.RequiredArgsConstructor;
 import lombok.SneakyThrows;
 import lombok.experimental.FieldDefaults;
 import lombok.extern.slf4j.Slf4j;
@@ -44,17 +54,27 @@ import lombok.val;
  * @author Artem Labazin
  */
 @Slf4j
-@RequiredArgsConstructor
 @FieldDefaults(level = PRIVATE, makeFinal = true)
 class ModuleClient implements Closeable {
 
-  @NonNull
   Node node;
 
-  @NonNull
   ModuleConnection moduleConnection;
 
   boolean shortNamedNode;
+
+  UnaryOperator<Bootstrap> settingUpBootstrap;
+
+  @Builder
+  ModuleClient (@NonNull Node node,
+                @NonNull ModuleConnection moduleConnection,
+                @NonNull NodeConfig nodeConfig
+  ) {
+    this.node = node;
+    this.moduleConnection = moduleConnection;
+    this.shortNamedNode = nodeConfig.getShortNamed();
+    settingUpBootstrap = createSettingUpBootstrap(nodeConfig.getProtocol());
+  }
 
   @Override
   public void close () {
@@ -103,11 +123,8 @@ class ModuleClient implements Closeable {
     log.debug("Creating new client's connection\nto {}", remote);
     CompletableFuture<Connection> future = new CompletableFuture<>();
 
-    new Bootstrap()
+    Bootstrap bootstrap = new Bootstrap()
         .group(moduleConnection.getWorkerGroup())
-        .channel(moduleConnection.getClientChannelClass())
-        .option(SO_KEEPALIVE, true)
-        .option(TCP_NODELAY, true)
         .option(CONNECT_TIMEOUT_MILLIS, 5000)
         .handler(HandshakeClientInitializer.builder()
             .node(node)
@@ -119,11 +136,41 @@ class ModuleClient implements Closeable {
               node.moduleConnection.remove(remoteNode);
             })
             .build()
-        )
+        );
+
+    settingUpBootstrap
+        .apply(bootstrap)
         .connect(remote.getDescriptor().getAddress(),
                  remote.getPort());
 
     moduleConnection.add(future);
     return future;
+  }
+
+  private UnaryOperator<Bootstrap> createSettingUpBootstrap (Protocol protocol) {
+    Class<? extends Channel> clientChannelClass;
+    switch (protocol) {
+    case TCP:
+      clientChannelClass = Epoll.isAvailable()
+                           ? EpollSocketChannel.class
+                           : NioSocketChannel.class;
+
+      return bootstrap -> bootstrap
+          .channel(clientChannelClass)
+          .option(SO_KEEPALIVE, true)
+          .option(TCP_NODELAY, true);
+    case UDP:
+      clientChannelClass = Epoll.isAvailable()
+                           ? EpollDatagramChannel.class
+                           : NioDatagramChannel.class;
+
+      return bootstrap -> bootstrap
+          .channel(clientChannelClass);
+    case SCTP:
+      return bootstrap -> bootstrap
+          .channel(NioSctpChannel.class);
+    default:
+      throw new UnsupportedOperationException("Unsupported protocol: " + protocol);
+    }
   }
 }

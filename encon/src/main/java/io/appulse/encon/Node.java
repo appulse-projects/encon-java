@@ -168,7 +168,11 @@ public final class Node implements Closeable {
         config.getServer().getWorkerThreads()
     );
     moduleServer = new ModuleServer(this, moduleConnection, port);
-    moduleClient = new ModuleClient(this, moduleConnection, config.getShortNamed());
+    moduleClient = ModuleClient.builder()
+        .node(this)
+        .moduleConnection(moduleConnection)
+        .nodeConfig(config)
+        .build();
     moduleMailbox = new ModuleMailbox(this, () -> generatorPid.generate());
   }
 

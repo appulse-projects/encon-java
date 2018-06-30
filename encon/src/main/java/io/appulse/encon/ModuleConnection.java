@@ -29,16 +29,13 @@ import java.util.function.Function;
 import io.appulse.encon.common.RemoteNode;
 import io.appulse.encon.connection.Connection;
 
-import io.netty.channel.Channel;
 import io.netty.channel.EventLoopGroup;
 import io.netty.channel.ServerChannel;
 import io.netty.channel.epoll.Epoll;
 import io.netty.channel.epoll.EpollEventLoopGroup;
 import io.netty.channel.epoll.EpollServerSocketChannel;
-import io.netty.channel.epoll.EpollSocketChannel;
 import io.netty.channel.nio.NioEventLoopGroup;
 import io.netty.channel.socket.nio.NioServerSocketChannel;
-import io.netty.channel.socket.nio.NioSocketChannel;
 import io.netty.util.ResourceLeakDetector;
 import io.netty.util.concurrent.DefaultThreadFactory;
 import io.netty.util.internal.SystemPropertyUtil;
@@ -70,9 +67,6 @@ class ModuleConnection implements Closeable {
   EventLoopGroup workerGroup;
 
   @Getter
-  Class<? extends Channel> clientChannelClass;
-
-  @Getter
   Class<? extends ServerChannel> serverChannelClass;
 
   Map<RemoteNode, CompletableFuture<Connection>> cache;
@@ -86,12 +80,10 @@ class ModuleConnection implements Closeable {
     if (Epoll.isAvailable()) {
       bossGroup = new EpollEventLoopGroup(bossThreads, bossThreadFactory);
       workerGroup = new EpollEventLoopGroup(workerThreads, workerThreadFactory);
-      clientChannelClass = EpollSocketChannel.class;
       serverChannelClass = EpollServerSocketChannel.class;
     } else {
       bossGroup = new NioEventLoopGroup(bossThreads, bossThreadFactory);
       workerGroup = new NioEventLoopGroup(workerThreads, workerThreadFactory);
-      clientChannelClass = NioSocketChannel.class;
       serverChannelClass = NioServerSocketChannel.class;
     }
   }
