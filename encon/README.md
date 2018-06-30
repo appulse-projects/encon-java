@@ -14,7 +14,7 @@ First of all, add encon's dependency:
   <dependency>
     <groupId>io.appulse.encon</groupId>
     <artifactId>encon</artifactId>
-    <version>1.3.1</version>
+    <version>1.4.0</version>
   </dependency>
   ...
 </dependencies>
@@ -23,7 +23,7 @@ First of all, add encon's dependency:
 **Gradle**:
 
 ```groovy
-compile 'io.appulse.encon.java:encon:1.3.1'
+compile 'io.appulse.encon.java:encon:1.4.0'
 ```
 
 Let's create a new `Erlang` node:
