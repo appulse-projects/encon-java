@@ -50,8 +50,12 @@ public final class TermMapper {
     if (ErlangTerm.class.isAssignableFrom(type)) {
       return (T) container;
     }
-    PojoDescriptor descriptor = PojoParser.parse(type);
-    Deserializer<?> deserializer = descriptor.getDeserializer();
+
+    Deserializer<?> deserializer = Deserializer.findInPredefined(type);
+    if (deserializer == null) {
+      PojoDescriptor descriptor = PojoParser.parse(type);
+      deserializer = descriptor.getDeserializer();
+    }
     return (T) deserializer.deserialize(container);
   }
 
@@ -67,8 +71,12 @@ public final class TermMapper {
       return (ErlangTerm) object;
     }
     val type = object.getClass();
-    PojoDescriptor descriptor = PojoParser.parse(type);
-    Serializer<?> serializer = descriptor.getSerializer();
+
+    Serializer<?> serializer = Serializer.findInPredefined(type);
+    if (serializer == null) {
+      PojoDescriptor descriptor = PojoParser.parse(type);
+      serializer = descriptor.getSerializer();
+    }
     return serializer.serializeUntyped(object);
   }
 
