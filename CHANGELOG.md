@@ -24,6 +24,15 @@ and this project adheres to [Semantic Versioning](http://semver.org/spec/v2.0.0.
 - Add Spring Boot support.
 - Remove non blocking queues, because it doesn't guarantee the order.
 
+## [1.4.0](https://github.com/appulse-projects/encon-java/releases/tag/1.4.0) - 2018-07-07
+
+Add `encon-handler`.
+
+### Changed
+
+- Add `asText` implementation for `ErlangBinary`.
+- Update dependencies.
+
 ## [1.3.1](https://github.com/appulse-projects/encon-java/releases/tag/1.3.1) - 2018-06-28
 
 Fix short node name host detection.
