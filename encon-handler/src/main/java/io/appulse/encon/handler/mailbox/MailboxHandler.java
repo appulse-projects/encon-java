@@ -1,5 +1,5 @@
 /*
- * Copyright 2018 the original author or authors..
+ * Copyright 2018 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -14,19 +14,26 @@
  * limitations under the License.
  */
 
-package io.appulse.encon.handler;
+package io.appulse.encon.handler.mailbox;
 
-
-import io.appulse.encon.connection.control.ControlMessage;
-import io.appulse.encon.mailbox.Mailbox;
-import io.appulse.encon.terms.ErlangTerm;
+import java.io.Closeable;
 
 /**
+ * Mailbox wrapper for automatic handling received messages.
  *
  * @since 1.4.0
- * @author alabazin
+ * @author Artem Labazin
  */
-public interface MessageHandler {
+public interface MailboxHandler extends Closeable {
 
-  void handle (Mailbox self, ControlMessage header, ErlangTerm body);
+  /**
+   * Starts single thread executor for long-term messages handling.
+   */
+  void startExecutor ();
+
+  /**
+   * One-time message handling. It is applicable for the situations, for example,
+   * when you already have your own executor service.
+   */
+  void oneTimeShot ();
 }

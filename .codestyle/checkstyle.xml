@@ -233,7 +233,7 @@ limitations under the License.
     <module name="OperatorWrap">
       <property name="option" value="NL"/>
       <property name="tokens"
-                value="BAND, BOR, BSR, BXOR, DIV, EQUAL, GE, GT, LAND, LE, LITERAL_INSTANCEOF, LT, MINUS, MOD, NOT_EQUAL, QUESTION, SL, SR, STAR"/>
+                value="BAND, BOR, BSR, BXOR, DIV, EQUAL, GE, GT, LE, LITERAL_INSTANCEOF, LT, MINUS, MOD, NOT_EQUAL, QUESTION, SL, SR, STAR"/>
     </module>
     <module name="ParenPad"/>
     <module name="SeparatorWrap">

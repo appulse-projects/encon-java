@@ -1,5 +1,5 @@
 /*
- * Copyright 2018 the original author or authors..
+ * Copyright 2018 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -14,37 +14,56 @@
  * limitations under the License.
  */
 
-package io.appulse.encon.handler;
+package io.appulse.encon.handler.mailbox;
 
+import static io.appulse.encon.mailbox.MailboxQueueType.NON_BLOCKING;
 import static lombok.AccessLevel.PRIVATE;
 
 import io.appulse.encon.connection.regular.Message;
+import io.appulse.encon.handler.message.MessageHandler;
 import io.appulse.encon.mailbox.Mailbox;
 
 import lombok.Builder;
-import lombok.NonNull;
 import lombok.experimental.FieldDefaults;
 
 /**
+ * {@link AbstractMailboxHandler} implementation for non-blocking queue mailboxes.
  *
  * @since 1.4.0
  * @author alabazin
  */
 @FieldDefaults(level = PRIVATE, makeFinal = true)
-public class BlockingMailboxHandler extends AbstractMailboxHandler {
+public class NonBlockingMailboxHandler extends AbstractMailboxHandler {
 
   Mailbox mailbox;
 
+  /**
+   * Constructor.
+   *
+   * @param messageHandler received messages handler
+   *
+   * @param mailbox mailbox
+   */
   @Builder
-  public BlockingMailboxHandler (@NonNull MessageHandler messageHandler,
-                                 @NonNull Mailbox mailbox
+  public NonBlockingMailboxHandler (MessageHandler messageHandler,
+                                    Mailbox mailbox
   ) {
     super(messageHandler, mailbox);
     this.mailbox = mailbox;
+
+    if (mailbox.getQueueType() != NON_BLOCKING) {
+      throw new IllegalArgumentException("Non-blocking mailbox handler works only with non-blocking queues");
+    }
   }
 
   @Override
-  protected Message getMessage() {
-    return mailbox.receive();
+  protected Message getMessage () {
+    while (Thread.interrupted()) {
+      Message message = mailbox.receive();
+      if (message != null) {
+        return message;
+      }
+    }
+    return null;
   }
 }

@@ -1,5 +1,5 @@
 /*
- * Copyright 2018 the original author or authors..
+ * Copyright 2018 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -14,48 +14,60 @@
  * limitations under the License.
  */
 
-package io.appulse.encon.handler.mock;
+package io.appulse.encon.handler.message.matcher;
 
-import static io.appulse.encon.handler.mock.ArgumentsWrapper.UNDEFINED;
+import static io.appulse.encon.handler.message.matcher.MethodArgumentsWrapper.UNDEFINED;
 import static lombok.AccessLevel.PRIVATE;
 
 import java.util.List;
 import java.util.Map;
 
 import io.appulse.encon.connection.control.ControlMessage;
-import io.appulse.encon.handler.MessageHandler;
+import io.appulse.encon.handler.message.MessageHandler;
 import io.appulse.encon.mailbox.Mailbox;
 import io.appulse.encon.terms.ErlangTerm;
 
+import lombok.NonNull;
 import lombok.RequiredArgsConstructor;
 import lombok.experimental.FieldDefaults;
+import lombok.extern.slf4j.Slf4j;
 import lombok.val;
 
 /**
+ * {@link MessageHandler} implementation which allows to register methods of different classes as
+ * incoming messages handlers.
  *
  * @since 1.4.0
  * @author alabazin
  */
+@Slf4j
 @RequiredArgsConstructor
 @FieldDefaults(level = PRIVATE, makeFinal = true)
-public class MethodReferenceMessageHandler implements MessageHandler {
+public class MethodMatcherMessageHandler implements MessageHandler {
 
-  public static MethodReferenceMessageHandlerBuilder builder () {
-    return new MethodReferenceMessageHandlerBuilder();
+  /**
+   * Start building new {@link MethodMatcherMessageHandler} instance.
+   *
+   * @return {@link MethodMatcherMessageHandlerBuilder} builder
+   */
+  public static MethodMatcherMessageHandlerBuilder builder () {
+    return new MethodMatcherMessageHandlerBuilder();
   }
 
-  Map<ArgumentsWrapper, List<MethodDescriptor>> map;
+  @NonNull
+  Map<MethodArgumentsWrapper, List<MethodDescriptor>> map;
 
   @Override
   public void handle (Mailbox self, ControlMessage header, ErlangTerm body) {
-    val wrapper = ArgumentsWrapper.of(body.getType());
+    log.debug("in: {}", body);
+    val wrapper = MethodArgumentsWrapper.of(body.getType());
     if (wrapper == UNDEFINED) {
-
+      throw new IllegalArgumentException("Undefined wrapper type");
     }
 
     val list = map.get(wrapper);
     if (list == null) {
-
+      throw new IllegalArgumentException("There is no handler for this wrapper: " + wrapper);
     }
 
     list.stream()

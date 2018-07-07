@@ -17,6 +17,7 @@
 package io.appulse.encon.terms.type;
 
 import static io.appulse.encon.terms.TermType.BINARY;
+import static java.nio.charset.StandardCharsets.UTF_8;
 import static lombok.AccessLevel.PRIVATE;
 
 import io.appulse.encon.terms.ErlangTerm;
@@ -75,6 +76,11 @@ public class ErlangBinary extends ErlangTerm {
   @Override
   public byte[] asBinary (byte[] defaultValue) {
     return bytes.clone();
+  }
+
+  @Override
+  public String asText (String defaultValue) {
+    return new String(bytes, UTF_8);
   }
 
   @Override

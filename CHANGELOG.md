@@ -20,14 +20,13 @@ and this project adheres to [Semantic Versioning](http://semver.org/spec/v2.0.0.
 - Rethink handshake implementation design.
 - Add handshake error handling (exceptions? error logs?).
 - Turn on checkstyle JavaDocs module.
-<<<<<<< HEAD
-=======
 - Add updates to the protocol, like new `ControlMessage`.
+- Add Spring Boot support.
+- Remove non blocking queues, because it doesn't guarantee the order.
 
 ## [1.3.1](https://github.com/appulse-projects/encon-java/releases/tag/1.3.1) - 2018-06-28
 
 Fix short node name host detection.
->>>>>>> e4caf7ba4c04dd3e3709441b44608c6324b4b5b7
 
 ## [1.3.0](https://github.com/appulse-projects/encon-java/releases/tag/1.3.0) - 2018-06-28
 

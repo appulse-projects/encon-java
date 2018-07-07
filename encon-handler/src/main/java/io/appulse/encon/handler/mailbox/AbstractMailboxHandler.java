@@ -1,5 +1,5 @@
 /*
- * Copyright 2018 the original author or authors..
+ * Copyright 2018 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -13,53 +13,70 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package io.appulse.encon.handler;
+
+package io.appulse.encon.handler.mailbox;
 
 import static lombok.AccessLevel.PRIVATE;
 
-import java.io.Closeable;
 import java.util.concurrent.ExecutorService;
 
 import io.appulse.encon.connection.regular.Message;
+import io.appulse.encon.handler.message.MessageHandler;
 import io.appulse.encon.mailbox.Mailbox;
 import io.appulse.encon.mailbox.exception.ReceivedExitException;
 import io.appulse.utils.threads.AppulseExecutors;
 import io.appulse.utils.threads.AppulseThreadFactory;
 
+import lombok.NonNull;
 import lombok.RequiredArgsConstructor;
 import lombok.experimental.FieldDefaults;
 import lombok.experimental.NonFinal;
+import lombok.extern.slf4j.Slf4j;
 import lombok.val;
 
 /**
+ * Abstract implementation of {@link MailboxHandler} with specified implementation,
+ * you only need to "tell" how to get a message from a queue.
  *
  * @since 1.4.0
  * @author alabazin
  */
+@Slf4j
 @RequiredArgsConstructor
 @FieldDefaults(level = PRIVATE, makeFinal = true)
-public abstract class AbstractMailboxHandler implements Closeable {
+public abstract class AbstractMailboxHandler implements MailboxHandler {
 
+  @NonNull
   MessageHandler messageHandler;
 
+  @NonNull
   Mailbox self;
 
   @NonFinal
   ExecutorService executorService;
 
-  public void handleSync () {
+  @Override
+  public void oneTimeShot () {
     Message message;
     try {
       message = getMessage();
     } catch (ReceivedExitException ex) {
+      log.error("Exit exception", ex);
       return;
     }
+
+    if (message == null) {
+      log.warn("NULL message received");
+      return;
+    }
+
     val header = message.getHeader();
     val body = message.getBody();
     messageHandler.handle(self, header, body);
   }
 
-  public synchronized void handleAsync () {
+  @Override
+  public void startExecutor () {
     if (executorService != null) {
       return;
     }
@@ -72,19 +89,24 @@ public abstract class AbstractMailboxHandler implements Closeable {
 
     executorService.execute(() -> {
       while (!Thread.interrupted()) {
-        handleSync();
+        oneTimeShot();
       }
     });
   }
 
   @Override
-  public void close() {
+  public void close () {
     if (executorService == null) {
       return;
     }
     executorService.shutdown();
   }
 
+  /**
+   * Abstract method for receiving message.
+   *
+   * @return a new message
+   */
   protected abstract Message getMessage ();
 
   private String createThreadName () {

@@ -1,5 +1,5 @@
 /*
- * Copyright 2018 the original author or authors..
+ * Copyright 2018 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -13,14 +13,29 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package io.appulse.encon.handler.mock.matcher;
+
+package io.appulse.encon.handler.message;
+
+import io.appulse.encon.connection.control.ControlMessage;
+import io.appulse.encon.mailbox.Mailbox;
+import io.appulse.encon.terms.ErlangTerm;
 
 /**
- * Internal interface that informs that the matcher is intended to capture varargs.
- * This information is needed when mockito collects the arguments.
+ * Received messages handler interface.
  *
+ * @since 1.4.0
  * @author alabazin
  */
-public interface VarargMatcher {
+public interface MessageHandler {
 
+  /**
+   * Process an incoming message.
+   *
+   * @param self this mailbox reference
+   *
+   * @param header received message header
+   *
+   * @param body received message payload
+   */
+  void handle (Mailbox self, ControlMessage header, ErlangTerm body);
 }

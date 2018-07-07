@@ -1,5 +1,5 @@
 /*
- * Copyright 2018 the original author or authors..
+ * Copyright 2018 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -13,7 +13,8 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package io.appulse.encon.handler.mock;
+
+package io.appulse.encon.handler.message.matcher;
 
 import io.appulse.encon.terms.ErlangTerm;
 import io.appulse.encon.terms.TermType;
@@ -22,16 +23,18 @@ import lombok.val;
 
 /**
  *
+ * @since 1.4.0
  * @author alabazin
  */
-enum ArgumentsWrapper {
+enum MethodArgumentsWrapper {
 
   TUPLE,
   LIST,
   MAP,
+  NONE,
   UNDEFINED;
 
-  static ArgumentsWrapper of (TermType type) {
+  static MethodArgumentsWrapper of (TermType type) {
     if (type == null) {
       return UNDEFINED;
     }
@@ -45,7 +48,7 @@ enum ArgumentsWrapper {
     case LARGE_TUPLE:
       return TUPLE;
     default:
-      return UNDEFINED;
+      return NONE;
     }
   }
 
@@ -58,6 +61,8 @@ enum ArgumentsWrapper {
       return term.isTuple();
     case MAP:
       return term.isMap();
+    case NONE:
+      return !term.isCollectionTerm();
     default:
       return false;
     }
