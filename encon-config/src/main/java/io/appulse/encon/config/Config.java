@@ -117,6 +117,11 @@ public final class Config {
 
   Map<String, NodeConfig> nodes;
 
+  /**
+   * Copy constructor.
+   *
+   * @param config config to copy
+   */
   public Config (Config config) {
     defaults = ofNullable(config.getDefaults())
         .map(Defaults::new)

@@ -29,7 +29,6 @@ import static io.appulse.epmd.java.core.model.NodeType.R6_ERLANG;
 import static io.appulse.epmd.java.core.model.Protocol.TCP;
 import static io.appulse.epmd.java.core.model.Version.R6;
 import static java.lang.Boolean.FALSE;
-import static java.lang.Boolean.TRUE;
 import static java.util.Arrays.asList;
 import static java.util.Locale.ENGLISH;
 import static java.util.Optional.ofNullable;
@@ -223,7 +222,6 @@ public class Defaults {
 
   @Builder.Default
   MailboxConfig mailbox = MailboxConfig.builder()
-      .blocking(TRUE)
       .build();
 
   @Builder.Default
@@ -238,6 +236,11 @@ public class Defaults {
       .level(-1)
       .build();
 
+  /**
+   * Copy constructor.
+   *
+   * @param defaults config to copy
+   */
   public Defaults (Defaults defaults) {
     epmdPort = defaults.getEpmdPort();
     type = defaults.getType();

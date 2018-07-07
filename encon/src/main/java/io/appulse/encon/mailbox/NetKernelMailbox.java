@@ -38,7 +38,7 @@ import lombok.val;
 class NetKernelMailbox extends Mailbox {
 
   NetKernelMailbox (Node node, ErlangPid pid) {
-    super(null, node, pid, new BlockingMailboxQueue(new SynchronousQueue<>()));
+    super(null, node, pid, new SynchronousQueue<>());
   }
 
   @Override

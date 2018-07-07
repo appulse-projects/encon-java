@@ -14,46 +14,45 @@
  * limitations under the License.
  */
 
-package io.appulse.encon.mailbox;
+package io.appulse.encon.handler.mailbox;
 
-import static io.appulse.encon.mailbox.MailboxQueueType.NON_BLOCKING;
 import static lombok.AccessLevel.PRIVATE;
 
-import java.util.Queue;
-
 import io.appulse.encon.connection.regular.Message;
+import io.appulse.encon.handler.message.MessageHandler;
+import io.appulse.encon.mailbox.Mailbox;
 
-import lombok.RequiredArgsConstructor;
+import lombok.Builder;
 import lombok.experimental.FieldDefaults;
 
 /**
+ * Default {@link AbstractMailboxHandler} implementation.
  *
- * @since 1.2.0
- * @author Artem Labazin
+ * @since 1.5.0
+ * @author alabazin
  */
-@RequiredArgsConstructor
 @FieldDefaults(level = PRIVATE, makeFinal = true)
-class NonBlockingMailboxQueue implements MailboxQueue {
+public class DefaultMailboxHandler extends AbstractMailboxHandler {
 
-  Queue<Message> queue;
+  Mailbox mailbox;
 
-  @Override
-  public void add (Message message) {
-    queue.add(message);
+  /**
+   * Constructor.
+   *
+   * @param messageHandler received messages handler
+   *
+   * @param mailbox mailbox
+   */
+  @Builder
+  public DefaultMailboxHandler (MessageHandler messageHandler,
+                                Mailbox mailbox
+  ) {
+    super(messageHandler, mailbox);
+    this.mailbox = mailbox;
   }
 
   @Override
-  public Message get () {
-    return queue.poll();
-  }
-
-  @Override
-  public int size () {
-    return queue.size();
-  }
-
-  @Override
-  public MailboxQueueType type () {
-    return NON_BLOCKING;
+  protected Message getMessage () {
+    return mailbox.receive();
   }
 }
