@@ -21,8 +21,9 @@ import static lombok.AccessLevel.PRIVATE;
 
 import java.io.Closeable;
 import java.util.Map;
-import java.util.Queue;
+import java.util.concurrent.BlockingQueue;
 import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.LinkedBlockingQueue;
 import java.util.function.Supplier;
 
 import io.appulse.encon.Node;
@@ -136,21 +137,14 @@ public final class ModuleMailbox implements Closeable {
 
     String name;
 
-    MailboxQueueType type;
-
-    Queue<Message> queue;
+    BlockingQueue<Message> queue = new LinkedBlockingQueue<>();
 
     public NewMailboxBuilder name (String mailboxName) {
       this.name = mailboxName;
       return this;
     }
 
-    public NewMailboxBuilder type (MailboxQueueType mailboxType) {
-      this.type = mailboxType;
-      return this;
-    }
-
-    public NewMailboxBuilder queue (Queue<Message> mailboxQueue) {
+    public NewMailboxBuilder queue (BlockingQueue<Message> mailboxQueue) {
       this.queue = mailboxQueue;
       return this;
     }
@@ -160,7 +154,7 @@ public final class ModuleMailbox implements Closeable {
       Mailbox mailbox = Mailbox.builder()
           .name(name)
           .node(node)
-          .queue(MailboxQueue.from(queue, type))
+          .queue(queue)
           .pid(pid)
           .build();
 

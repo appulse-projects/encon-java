@@ -22,7 +22,19 @@ and this project adheres to [Semantic Versioning](http://semver.org/spec/v2.0.0.
 - Turn on checkstyle JavaDocs module.
 - Add updates to the protocol, like new `ControlMessage`.
 - Add Spring Boot support.
-- Remove non blocking queues, because it doesn't guarantee the order.
+
+## [1.5.0](https://github.com/appulse-projects/encon-java/releases/tag/1.5.0) - 2018-07-07
+
+Remove non blocking queues, because it doesn't guarantee the order.
+
+### Changed
+
+- Replaced non-blocking queue to blocking.
+- Edit docs.
+
+### Removed
+
+- Non-blocking queues.
 
 ## [1.4.0](https://github.com/appulse-projects/encon-java/releases/tag/1.4.0) - 2018-07-07
 

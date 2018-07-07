@@ -16,8 +16,6 @@
 
 package io.appulse.encon;
 
-import static io.appulse.encon.mailbox.MailboxQueueType.BLOCKING;
-import static io.appulse.encon.mailbox.MailboxQueueType.NON_BLOCKING;
 import static lombok.AccessLevel.PACKAGE;
 
 import java.io.Closeable;
@@ -99,9 +97,6 @@ public final class Node implements Closeable {
     config.getMailboxes().forEach(it -> {
       node.mailbox()
           .name(it.getName())
-          .type(it.getBlocking()
-                ? BLOCKING
-                : NON_BLOCKING)
           .build();
     });
 

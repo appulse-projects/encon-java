@@ -68,6 +68,11 @@ public class ServerConfig {
 
   Integer workerThreads;
 
+  /**
+   * Copy constructor.
+   *
+   * @param serverConfig config to copy
+   */
   public ServerConfig (ServerConfig serverConfig) {
     port = serverConfig.getPort();
     bossThreads = serverConfig.getBossThreads();
