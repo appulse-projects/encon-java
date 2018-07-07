@@ -12,6 +12,7 @@ Sub-modules descriptions:
 - [Encon config](./encon-config/README.md) - configuration builder classes;
 - [Encon](./encon/README.md) - the lib itself;
 - [Encon databind](./encon-databind/README.md) - serializers/deserializers from/to Java/Eralng objects;
+- [Encon handler](./encon-handler/README.md) - helpers for handling received messages in mailbox;
 
 ## Development
 
