@@ -111,10 +111,14 @@ MyService2 service2 = new MyService2();
 
 MessageHandler handler = MethodMatcherMessageHandler.builder()
     .wrap(service1)
+        // redirects '[]' (empty list) to method MyService1.handler1
         .list(it -> it.handler1())
+        // redirects tuple {any_number, any_string, atom(false)}
+        // to MyService1.handler2
         .tuple(it -> it.handler2(anyInt(), anyString(), eq(false)))
     .wrap(service2)
-        .tuple(it -> it.popa(eq(42)))
+        // redirects {42} to MyService2.popa
+        .tuple(it -> it.popa(42))
     .build();
 
 // start it in a separate thread:
