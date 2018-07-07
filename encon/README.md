@@ -14,7 +14,7 @@ First of all, add encon's dependency:
   <dependency>
     <groupId>io.appulse.encon</groupId>
     <artifactId>encon</artifactId>
-    <version>1.4.0</version>
+    <version>1.5.0</version>
   </dependency>
   ...
 </dependencies>
@@ -23,7 +23,7 @@ First of all, add encon's dependency:
 **Gradle**:
 
 ```groovy
-compile 'io.appulse.encon.java:encon:1.4.0'
+compile 'io.appulse.encon.java:encon:1.5.0'
 ```
 
 Let's create a new `Erlang` node:
@@ -57,7 +57,6 @@ After `node` creation, we could register several mailboxes:
 
 ```java
 
-import static io.appulse.encon.mailbox.MailboxQueueType.NON_BLOCKING;
 import static io.appulse.encon.java.terms.Erlang.tuple;
 
 import io.appulse.encon.connection.regular.Message;
@@ -67,7 +66,7 @@ import io.appulse.encon.terms.ErlangTerm;
 
 // Mailbox #1
 // ----------
-// Default mailbox's type is `MailboxQueueType.BLOCKING`,
+// Mailbox's type is `MailboxQueueType.BLOCKING`, by default
 // it uses `java.util.concurrent.LinkedBlockingQueue` under the hood.
 //
 Mailbox mailbox1 = node.mailbox()
@@ -75,7 +74,7 @@ Mailbox mailbox1 = node.mailbox()
     .build();
 
 for (int count = 0; count < 3; count++) {
-  // Mailbox.receive() is a blocking operation in that case
+  // Mailbox.receive() is a blocking operation
   Message message = mailbox.receive();
 
   ErlangTerm body = message.getBody();
@@ -87,46 +86,17 @@ for (int count = 0; count < 3; count++) {
 
 // Mailbox #2
 // ----------
-// Specify `MailboxQueueType.NON_BLOCKING` type, in this case
-// it uses `java.util.concurrent.ConcurrentLinkedQueue` under the hood.
-//
-Mailbox mailbox2 = node.mailbox()
-    .name("echo-mailbox-2")
-    .type(NON_BLOCKING)
-    .build();
-
-while (true) {
-  // Mailbox.receive() is a non-blocking operation in this case,
-  // that is why we have `if` clause.
-  Message message = mailbox2.receive();
-  if (message == null) {
-    continue;
-  }
-  ErlangTerm body = message.getBody();
-  mailbox2.send("another-node", "another-mailbox", tuple(
-    mailbox2.getPid(), body.getUnsafe(1)
-  ));
-}
-
-
-// Mailbox #3
-// ----------
-// Specify `MailboxQueueType.NON_BLOCKING` type and
-// set our own `java.util.Queue` instance.
+// Set your own `java.util.concurrent.BlockingQueue` instance.
+// `java.util.concurrent.SynchronousQueue` instance in that case.
 //
 Mailbox mailbox3 = node.mailbox()
     .name("echo-mailbox-2")
-    .type(NON_BLOCKING)
-    .queue(new LinkedBlockingQueue<>())
+    .queue(new SynchronousQueue<>())
     .build();
 
 while (true) {
-  // Mailbox.receive() is a non-blocking operation in this case,
-  // that is why we have `if` clause.
   Message message = mailbox3.receive();
-  if (message == null) {
-    continue;
-  }
+
   ErlangTerm body = message.getBody();
   mailbox3.send("another-node", "another-mailbox", tuple(
     mailbox3.getPid(), body.getUnsafe(1)

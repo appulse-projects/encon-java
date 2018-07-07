@@ -48,21 +48,18 @@ public class MailboxConfig {
         .map(Object::toString)
         .ifPresent(builder::name);
 
-    ofNullable(map.get("blocking"))
-        .map(Object::toString)
-        .map(Boolean::valueOf)
-        .ifPresent(builder::blocking);
-
     return builder.build();
   }
 
   String name;
 
-  Boolean blocking;
-
+  /**
+   * Copy constructor.
+   *
+   * @param mailboxConfig config for copying
+   */
   public MailboxConfig (MailboxConfig mailboxConfig) {
     name = mailboxConfig.getName();
-    blocking = mailboxConfig.getBlocking();
   }
 
   /**
@@ -73,9 +70,6 @@ public class MailboxConfig {
    * @return reference to this object (for chain calls)
    */
   public MailboxConfig withDefaultsFrom (@NonNull MailboxConfig defaults) {
-    blocking = ofNullable(blocking)
-        .orElse(defaults.getBlocking());
-
     return this;
   }
 }

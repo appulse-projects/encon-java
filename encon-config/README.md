@@ -14,7 +14,7 @@ First of all, add config's dependency:
   <dependency>
     <groupId>io.appulse.encon</groupId>
     <artifactId>encon-config</artifactId>
-    <version>1.4.0</version>
+    <version>1.5.0</version>
   </dependency>
   ...
 </dependencies>
@@ -23,7 +23,7 @@ First of all, add config's dependency:
 **Gradle**:
 
 ```groovy
-compile 'io.appulse.encon.java:encon-config:1.4.0'
+compile 'io.appulse.encon.java:encon-config:1.5.0'
 ```
 
 ### File based configuration
@@ -57,8 +57,6 @@ defaults:
   distribution-flags:
     - MAP_TAG
     - BIG_CREATION
-  mailbox:
-    blocking: false
   server:
     boss-threads: 2
     worker-threads: 4
@@ -87,9 +85,7 @@ nodes:
       - BIG_CREATION
     mailboxes:
       - name: net_kernel
-        blocking: false
       - name: another
-        blocking: true
       - name: another_one
     server:
       port: 8971
@@ -101,7 +97,6 @@ nodes:
     cookie: popa
     mailboxes:
       - name: net_kernel
-        blocking: false
 
 ```
 
@@ -123,9 +118,6 @@ Config config = Config.builder()
             MAP_TAG,
             BIG_CREATION
         )))
-        .mailbox(MailboxConfig.builder()
-            .blocking(false)
-            .build())
         .server(ServerConfig.builder()
             .bossThreads(2)
             .workerThreads(4)
@@ -150,11 +142,9 @@ Config config = Config.builder()
         .distributionFlag(BIG_CREATION)
         .mailbox(MailboxConfig.builder()
             .name("net_kernel")
-            .blocking(false)
             .build())
         .mailbox(MailboxConfig.builder()
             .name("another")
-            .blocking(true)
             .build())
         .mailbox(MailboxConfig.builder()
             .name("another")
@@ -171,7 +161,6 @@ Config config = Config.builder()
         .cookie("popa")
         .mailbox(MailboxConfig.builder()
             .name("net_kernel")
-            .blocking(false)
             .build())
         .build()
     )

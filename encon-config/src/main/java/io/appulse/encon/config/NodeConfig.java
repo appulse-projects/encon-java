@@ -155,6 +155,11 @@ public class NodeConfig {
 
   CompressionConfig compression;
 
+  /**
+   * Copy constructor.
+   *
+   * @param nodeConfig config to copy
+   */
   public NodeConfig (NodeConfig nodeConfig) {
     epmdPort = nodeConfig.getEpmdPort();
     type = nodeConfig.getType();
