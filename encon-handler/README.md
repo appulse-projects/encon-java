@@ -124,5 +124,7 @@ MessageHandler handler = MethodMatcherMessageHandler.builder()
 // start it in a separate thread:
 handler.startExecutor();
 // ...
+
+// handler is a Closeable object
 handler.close();
 ```
