@@ -27,7 +27,7 @@ limitations under the License.
     <artifactId>encon-parent</artifactId>
     <version>1.4.0</version>
   </parent>
-  
+
   <artifactId>encon-handler</artifactId>
   <packaging>jar</packaging>
 
@@ -43,11 +43,16 @@ limitations under the License.
       <artifactId>encon</artifactId>
       <version>${project.version}</version>
     </dependency>
-    
+    <dependency>
+      <groupId>${project.groupId}</groupId>
+      <artifactId>encon-databind</artifactId>
+      <version>${project.version}</version>
+    </dependency>
+
     <dependency>
       <groupId>cglib</groupId>
       <artifactId>cglib</artifactId>
-      <version>3.2.6</version>
+      <version>3.2.7</version>
     </dependency>
 
     <dependency>
@@ -93,7 +98,7 @@ limitations under the License.
         <artifactId>maven-failsafe-plugin</artifactId>
       </plugin>
 
-<!--      <plugin>
+      <plugin>
         <groupId>org.codehaus.mojo</groupId>
         <artifactId>findbugs-maven-plugin</artifactId>
       </plugin>
@@ -105,7 +110,7 @@ limitations under the License.
       <plugin>
         <groupId>org.apache.maven.plugins</groupId>
         <artifactId>maven-checkstyle-plugin</artifactId>
-      </plugin>-->
+      </plugin>
     </plugins>
   </build>
 </project>
