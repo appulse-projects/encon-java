@@ -7,11 +7,11 @@ Java implementation of Erlang node connector (distribution protocol).
 
 Sub-modules descriptions:
 
-- [Encon common](./encon-common/README.md)
-- [Encon terms](./encon-terms/README.md)
-- [Encon config](./encon-config/README.md)
-- [Encon](./encon/README.md)
-- [Encon databind](./encon-databind/README.md)
+- [Encon common](./encon-common/README.md) - the set of common classes for all subprojects;
+- [Encon terms](./encon-terms/README.md) - Erlang's terms classes and different helpers;
+- [Encon config](./encon-config/README.md) - configuration builder classes;
+- [Encon](./encon/README.md) - the lib itself;
+- [Encon databind](./encon-databind/README.md) - serializers/deserializers from/to Java/Eralng objects;
 
 ## Development
 
