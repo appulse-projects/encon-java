@@ -61,6 +61,11 @@ public class CompressionConfig {
 
   Integer level;
 
+  /**
+   * Copy constructor.
+   *
+   * @param compressionConfig config to copy
+   */
   public CompressionConfig (CompressionConfig compressionConfig) {
     enabled = compressionConfig.getEnabled();
     level = compressionConfig.getLevel();

@@ -102,9 +102,6 @@ public class ConfigTest {
       softly.assertThat(defaults.getMailbox())
           .isNotNull();
 
-      softly.assertThat(defaults.getMailbox().getBlocking())
-          .isTrue();
-
       softly.assertThat(defaults.getServer())
           .isNotNull();
 
@@ -141,7 +138,6 @@ public class ConfigTest {
             .high(high)
             .distributionFlags(distributionFlags)
             .mailbox(MailboxConfig.builder()
-                .blocking(false)
                 .build())
             .server(ServerConfig.builder()
                 .bossThreads(bossThreads)
@@ -180,9 +176,6 @@ public class ConfigTest {
 
       softly.assertThat(defaults.getMailbox())
           .isNotNull();
-
-      softly.assertThat(defaults.getMailbox().getBlocking())
-          .isFalse();
 
       softly.assertThat(defaults.getServer())
           .isNotNull();
@@ -282,12 +275,6 @@ public class ConfigTest {
       softly.assertThat(defaults.getDistributionFlags())
           .contains(MAP_TAG, BIG_CREATION);
 
-      softly.assertThat(defaults.getMailbox())
-          .isNotNull();
-
-      softly.assertThat(defaults.getMailbox().getBlocking())
-          .isFalse();
-
       softly.assertThat(defaults.getServer())
           .isNotNull();
 
@@ -350,8 +337,6 @@ public class ConfigTest {
           .findFirst()
           .orElse(null);
       assertThat(mailbox1).isNotNull();
-      softly.assertThat(mailbox1.getBlocking())
-          .isFalse();
 
       MailboxConfig mailbox2 = node1.getMailboxes()
           .stream()
@@ -359,8 +344,6 @@ public class ConfigTest {
           .findFirst()
           .orElse(null);
       assertThat(mailbox2).isNotNull();
-      softly.assertThat(mailbox2.getBlocking())
-          .isTrue();
 
       MailboxConfig mailbox3 = node1.getMailboxes()
           .stream()
@@ -368,8 +351,6 @@ public class ConfigTest {
           .findFirst()
           .orElse(null);
       assertThat(mailbox3).isNotNull();
-      softly.assertThat(mailbox3.getBlocking())
-          .isFalse();
 
       softly.assertThat(node1.getServer())
           .isNotNull();
@@ -423,8 +404,6 @@ public class ConfigTest {
           .findFirst()
           .orElse(null);
       assertThat(mailbox1).isNotNull();
-      softly.assertThat(mailbox1.getBlocking())
-          .isFalse();
 
       softly.assertThat(node2.getServer())
           .isNotNull();
@@ -456,7 +435,6 @@ public class ConfigTest {
                 BIG_CREATION
             )))
             .mailbox(MailboxConfig.builder()
-                .blocking(false)
                 .build())
             .server(ServerConfig.builder()
                 .bossThreads(2)
@@ -485,11 +463,9 @@ public class ConfigTest {
                 .name("net_kernel")
                 .build())
             .mailbox(MailboxConfig.builder()
-                .blocking(true)
                 .build())
             .mailbox(MailboxConfig.builder()
                 .name("another")
-                .blocking(false)
                 .build())
             .server(ServerConfig.builder()
                 .port(8971)
@@ -502,7 +478,6 @@ public class ConfigTest {
             .cookie("popa")
             .mailbox(MailboxConfig.builder()
                 .name("net_kernel")
-                .blocking(false)
                 .build())
             .build()
         )
@@ -540,9 +515,6 @@ public class ConfigTest {
 
         softly.assertThat(defaults.getMailbox())
             .isNotNull();
-
-        softly.assertThat(defaults.getMailbox().getBlocking())
-            .isFalse();
 
         softly.assertThat(defaults.getServer())
             .isNotNull();
@@ -606,8 +578,6 @@ public class ConfigTest {
             .findFirst()
             .orElse(null);
         assertThat(mailbox1).isNotNull();
-        softly.assertThat(mailbox1.getBlocking())
-            .isFalse();
 
         MailboxConfig mailbox2 = node1.getMailboxes()
             .stream()
@@ -615,8 +585,6 @@ public class ConfigTest {
             .findFirst()
             .orElse(null);
         assertThat(mailbox2).isNotNull();
-        softly.assertThat(mailbox2.getBlocking())
-            .isTrue();
 
         MailboxConfig mailbox3 = node1.getMailboxes()
             .stream()
@@ -624,8 +592,6 @@ public class ConfigTest {
             .findFirst()
             .orElse(null);
         assertThat(mailbox3).isNotNull();
-        softly.assertThat(mailbox3.getBlocking())
-            .isFalse();
 
         softly.assertThat(node1.getServer())
             .isNotNull();
@@ -679,8 +645,6 @@ public class ConfigTest {
             .findFirst()
             .orElse(null);
         assertThat(mailbox1).isNotNull();
-        softly.assertThat(mailbox1.getBlocking())
-            .isFalse();
 
         softly.assertThat(node2.getServer())
             .isNotNull();

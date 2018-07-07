@@ -21,6 +21,7 @@ import static lombok.AccessLevel.PRIVATE;
 
 import java.io.Closeable;
 import java.util.Set;
+import java.util.concurrent.BlockingQueue;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.atomic.AtomicBoolean;
 
@@ -48,6 +49,7 @@ import lombok.EqualsAndHashCode;
 import lombok.Getter;
 import lombok.NonNull;
 import lombok.Setter;
+import lombok.SneakyThrows;
 import lombok.ToString;
 import lombok.experimental.FieldDefaults;
 import lombok.experimental.NonFinal;
@@ -85,7 +87,7 @@ public class Mailbox implements Closeable {
   ErlangPid pid;
 
   @NonNull
-  MailboxQueue queue;
+  BlockingQueue<Message> queue;
 
   @Getter
   Set<ErlangPid> links = ConcurrentHashMap.newKeySet();
@@ -99,8 +101,9 @@ public class Mailbox implements Closeable {
    *
    * @throws ReceivedExitException someone exits
    */
+  @SneakyThrows
   public Message receive () {
-    Message message = queue.get();
+    Message message = queue.take();
     if (message == null) {
       return message;
     }
@@ -136,15 +139,6 @@ public class Mailbox implements Closeable {
    */
   public int size () {
     return queue.size();
-  }
-
-  /**
-   * Returns a mailbox queue type.
-   *
-   * @return a mailbox queue type
-   */
-  public MailboxQueueType getQueueType () {
-    return queue.type();
   }
 
   /**
