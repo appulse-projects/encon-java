@@ -42,6 +42,7 @@ import org.junit.Test;
 
 /**
  *
+ * @since 1.6.0
  * @author Artem Labazin
  */
 @FieldDefaults(level = PRIVATE, makeFinal = true)

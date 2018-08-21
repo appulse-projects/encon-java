@@ -21,6 +21,7 @@ import static io.appulse.encon.terms.TermType.LIST;
 import static io.appulse.encon.terms.TermType.MAP;
 import static io.appulse.encon.terms.TermType.SMALL_TUPLE;
 import static java.util.Collections.emptyIterator;
+import static java.util.Optional.empty;
 import static java.util.Optional.ofNullable;
 
 import java.util.Iterator;
@@ -146,7 +147,7 @@ public interface CollectionTerm extends ValueTerm, Iterable<ErlangTerm> {
    *         contained elements, and for Map number of fields.
    */
   default int size () {
-    return 0;
+    return 1;
   }
 
   /**
@@ -169,7 +170,7 @@ public interface CollectionTerm extends ValueTerm, Iterable<ErlangTerm> {
    */
   default Optional<ErlangTerm> get (int index) {
     if (index < 0 || index >= size()) {
-      throw new ArrayIndexOutOfBoundsException(index);
+      return empty();
     }
     val result = getUnsafe(index);
     return ofNullable(result);
@@ -194,7 +195,9 @@ public interface CollectionTerm extends ValueTerm, Iterable<ErlangTerm> {
    *         specified element, {@code null} otherwise.
    */
   default ErlangTerm getUnsafe (int index) {
-    return null;
+    return index == 0
+           ? (ErlangTerm) this
+           : null;
   }
 
   /**

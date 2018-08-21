@@ -16,89 +16,92 @@
 
 package io.appulse.encon.handler.message.matcher;
 
-import static io.appulse.encon.databind.TermMapper.deserialize;
-import static java.util.stream.Collectors.joining;
+import static java.util.Optional.ofNullable;
+import static lombok.AccessLevel.PRIVATE;
 
+import java.lang.reflect.Field;
 import java.lang.reflect.Method;
-import java.util.stream.IntStream;
+import java.util.Objects;
 import java.util.stream.Stream;
 
+import io.appulse.encon.databind.annotation.IgnoreField;
+import io.appulse.encon.handler.message.matcher.MethodArgumentMatcher.InstanceOf;
 import io.appulse.encon.terms.ErlangTerm;
 
 import lombok.Builder;
-import lombok.SneakyThrows;
-import lombok.Value;
+import lombok.Getter;
+import lombok.NonNull;
+import lombok.ToString;
+import lombok.experimental.FieldDefaults;
 import lombok.extern.slf4j.Slf4j;
-import lombok.val;
 
 /**
  *
- * @since 1.4.0
+ * @since 1.6.0
  * @author alabazin
  */
 @Slf4j
-@Value
-@Builder
-class MethodDescriptor {
+@Getter
+@ToString
+@FieldDefaults(level = PRIVATE, makeFinal = true)
+final class MethodDescriptor {
 
-  Object proxy;
-
-  Method method;
-
-  MethodArgumentsWrapper wrapper;
-
-  MethodArgumentMatcher[] matchers;
-
-  @Override
-  public String toString () {
-    val str = Stream.of(matchers)
-        .map(Object::getClass)
-        .map(Class::getSimpleName)
-        .collect(joining(","));
-
-    return new StringBuilder()
-        .append("MethodDescriptor(")
-        .append("proxy=").append(proxy.getClass().getSimpleName()).append(", ")
-        .append("method=").append(method.getName()).append(", ")
-        .append("wrapper=").append(wrapper).append(", ")
-        .append("matchers=").append(str).append(')')
-        .toString();
+  private static boolean isUserPojo (Class<?> type) {
+    return ofNullable(type)
+        .map(Class::getPackage)
+        .filter(Objects::nonNull)
+        .map(Package::getName)
+        .filter(Objects::nonNull)
+        .filter(it -> !it.startsWith("java."))
+        .filter(it -> !it.startsWith("io.appulse.encon.terms."))
+        .isPresent();
   }
 
-  @SneakyThrows
-  void invoke (ErlangTerm term) {
-    if (!term.isCollectionTerm()) {
-      Class<?> type = method.getParameterTypes()[0];
-      Object argument = deserialize(term, type);
-      method.invoke(proxy, argument);
-      return;
-    }
+  MethodMatcher matcher;
 
+  MethodArgumentsTransformer transformer;
+
+  MethodInvoker invoker;
+
+  @Builder
+  private MethodDescriptor (@NonNull Object proxy,
+                            @NonNull Method method,
+                            @NonNull MethodArgumentsWrapper wrapper,
+                            MethodArgumentMatcher[] matchers
+  ) {
     Class<?>[] types = method.getParameterTypes();
-    Object[] arguments = IntStream.range(0, types.length)
-        .mapToObj(index -> deserialize(term.getUnsafe(index), types[index]))
-        .toArray();
+    Class<?> userPojoType = null;
 
-    method.invoke(proxy, arguments);
+    if (types.length == 1 && isUserPojo(types[0])) {
+      userPojoType = types[0];
+      types = Stream.of(userPojoType.getDeclaredFields())
+          .filter(it -> !it.isAnnotationPresent(IgnoreField.class))
+          .map(Field::getType)
+          .toArray(Class<?>[]::new);
+    }
+
+    MethodArgumentMatcher[] argumentMatchers = ofNullable(matchers)
+        .orElse(Stream.of(types)
+            .map(it -> new InstanceOf(it))
+            .toArray(MethodArgumentMatcher[]::new)
+        );
+
+    matcher = new MethodMatcher(wrapper, argumentMatchers);
+    transformer = new MethodArgumentsTransformer(userPojoType, types);
+    invoker = new MethodInvoker(proxy, method);
   }
 
-  boolean isApplicable (ErlangTerm term) {
-    if (!wrapper.isApplicable(term) || matchers.length != term.size()) {
-      return false;
-    }
+  int elements () {
+    return matcher.getMatchers().length;
+  }
 
-    if (!term.isCollectionTerm()) {
-      return matchers.length == 1 &&
-             matchers[0].matches(term);
-    }
+  boolean matches (ErlangTerm term) {
+    return matcher.matches(term);
+  }
 
-    for (int index = 0; index < matchers.length; index++) {
-      val element = term.getUnsafe(index);
-      val matcher = matchers[index];
-      if (!matcher.matches(element)) {
-        return false;
-      }
-    }
-    return true;
+  Object invoke (ErlangTerm term) {
+    Object[] arguments = transformer.transform(term);
+    log.debug("transforming term {} into {}", term, arguments);
+    return invoker.invoke(arguments);
   }
 }

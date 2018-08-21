@@ -21,7 +21,14 @@ and this project adheres to [Semantic Versioning](http://semver.org/spec/v2.0.0.
 - Add handshake error handling (exceptions? error logs?).
 - Turn on checkstyle JavaDocs module.
 - Add updates to the protocol, like new `ControlMessage`.
-- Add Spring Boot support.
+
+## [1.6.0](https://github.com/appulse-projects/encon-java/releases/tag/1.6.0) - 2018-08-21
+
+### Added
+
+- Spring Boot support.
+- Benchmarks.
+- Example projects.
 
 ## [1.5.0](https://github.com/appulse-projects/encon-java/releases/tag/1.5.0) - 2018-07-07
 

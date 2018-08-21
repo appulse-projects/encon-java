@@ -21,6 +21,7 @@ import static lombok.AccessLevel.PRIVATE;
 
 import java.io.Closeable;
 import java.util.Collection;
+import java.util.Iterator;
 import java.util.Map;
 import java.util.Optional;
 import java.util.concurrent.ConcurrentHashMap;
@@ -46,7 +47,7 @@ import lombok.val;
 @Slf4j
 @RequiredArgsConstructor(access = PRIVATE)
 @FieldDefaults(level = PRIVATE, makeFinal = true)
-public final class Nodes implements Closeable {
+public final class Nodes implements Iterable<Node>, Closeable {
 
   /**
    * Creates blank set of nodes with default config.
@@ -228,5 +229,10 @@ public final class Nodes implements Closeable {
   public void close () {
     nodes.values().forEach(Node::close);
     nodes.clear();
+  }
+
+  @Override
+  public Iterator<Node> iterator () {
+    return nodes().iterator();
   }
 }
