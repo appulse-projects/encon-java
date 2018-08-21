@@ -47,7 +47,7 @@ import lombok.val;
  * @author Artem Labazin
  */
 @ToString
-@EqualsAndHashCode(callSuper = true)
+@EqualsAndHashCode(callSuper = true, of = "bytes")
 @FieldDefaults(level = PRIVATE, makeFinal = true)
 public class ErlangAtom extends ErlangTerm {
 

@@ -33,15 +33,21 @@ import java.util.List;
 
 import io.appulse.encon.handler.message.matcher.MethodMatcherMessageHandler;
 import io.appulse.encon.terms.ErlangTerm;
-
+import io.appulse.utils.test.TestMethodNamePrinter;
 import lombok.val;
+
+import org.junit.Rule;
 import org.junit.Test;
+import org.junit.rules.TestRule;
 
 /**
  *
  * @author alabazin
  */
 public class MethodMatcherMessageHandlerTest {
+
+  @Rule
+  public TestRule watcher = new TestMethodNamePrinter();
 
   static List<String> list = new ArrayList<>();
 

@@ -22,6 +22,7 @@ import io.appulse.encon.databind.deserializer.Deserializer;
 import io.appulse.encon.databind.serializer.Serializer;
 
 import lombok.Builder;
+import lombok.ToString;
 import lombok.Value;
 
 /**
@@ -32,6 +33,7 @@ import lombok.Value;
  */
 @Value
 @Builder
+@ToString(of = "field")
 public final class FieldDescriptor {
 
   Field field;

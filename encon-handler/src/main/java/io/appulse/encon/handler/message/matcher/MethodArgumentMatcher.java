@@ -26,7 +26,9 @@ import io.appulse.encon.terms.ErlangTerm;
 
 import lombok.NonNull;
 import lombok.RequiredArgsConstructor;
+import lombok.ToString;
 import lombok.experimental.FieldDefaults;
+import lombok.extern.slf4j.Slf4j;
 
 /**
  * Method argument matcher.
@@ -66,6 +68,8 @@ public interface MethodArgumentMatcher {
   /**
    * Matches instances of specific class type.
    */
+  @Slf4j
+  @ToString
   @RequiredArgsConstructor
   @FieldDefaults(level = PRIVATE, makeFinal = true)
   class InstanceOf implements MethodArgumentMatcher {
@@ -75,12 +79,17 @@ public interface MethodArgumentMatcher {
 
     @Override
     public boolean matches (ErlangTerm term) {
+      log.debug("matching term {} with type {}", term, clazz);
       if (term == null) {
+        log.debug("term is null, doesn't match");
         return false;
       }
       try {
-        return deserialize(term, clazz) != null;
+        boolean result = deserialize(term, clazz) != null;
+        log.debug("matcher result is: {}", result);
+        return result;
       } catch (Exception ex) {
+        log.error("matching exception", ex);
         return false;
       }
     }
@@ -89,6 +98,8 @@ public interface MethodArgumentMatcher {
   /**
    * Matches terms with equals content value.
    */
+  @Slf4j
+  @ToString
   @RequiredArgsConstructor
   @FieldDefaults(level = PRIVATE, makeFinal = true)
   class Equals implements MethodArgumentMatcher {
@@ -98,14 +109,22 @@ public interface MethodArgumentMatcher {
 
     @Override
     public boolean matches (ErlangTerm term) {
+      log.debug("matching term {} with value {}", term, wanted);
+
       Object deserialized = deserialize(term, wanted.getClass());
-      return Objects.deepEquals(wanted, deserialized);
+      log.debug("deserialized: {}", deserialized);
+
+      boolean result = Objects.deepEquals(wanted, deserialized);
+      log.debug("matcher result is: {}", result);
+      return result;
     }
   }
 
   /**
    * Matches text terms which contains specified substring.
    */
+  @Slf4j
+  @ToString
   @RequiredArgsConstructor
   @FieldDefaults(level = PRIVATE, makeFinal = true)
   class Contains implements MethodArgumentMatcher {
@@ -115,9 +134,14 @@ public interface MethodArgumentMatcher {
 
     @Override
     public boolean matches (ErlangTerm term) {
-      return term != null &&
+      log.debug("matching term {} contains '{}'", term, substring);
+
+      boolean result = term != null &&
              term.isTextual() &&
              term.asText().contains(substring);
+
+      log.debug("matcher result is: {}", result);
+      return result;
     }
   }
 

@@ -17,15 +17,26 @@
 package io.appulse.encon;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static java.util.Optional.ofNullable;
+
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
 
 import io.appulse.encon.config.Config;
 import io.appulse.encon.config.Defaults;
 import io.appulse.encon.config.MailboxConfig;
 import io.appulse.encon.config.NodeConfig;
 import io.appulse.encon.config.ServerConfig;
+import io.appulse.epmd.java.server.cli.CommonOptions;
+import io.appulse.epmd.java.server.command.server.ServerCommandExecutor;
+import io.appulse.epmd.java.server.command.server.ServerCommandOptions;
+import io.appulse.utils.SocketUtils;
 import io.appulse.utils.test.TestMethodNamePrinter;
 
 import lombok.val;
+
+import org.junit.AfterClass;
+import org.junit.BeforeClass;
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.rules.TestRule;
@@ -37,8 +48,30 @@ import org.junit.rules.TestRule;
  */
 public class NodesTest {
 
+  private static ExecutorService executor;
+
+  private static ServerCommandExecutor epmdServer;
+
   @Rule
   public TestRule watcher = new TestMethodNamePrinter();
+
+  @BeforeClass
+  public static void beforeClass () {
+    if (SocketUtils.isPortAvailable(4369)) {
+      executor = Executors.newSingleThreadExecutor();
+      epmdServer = new ServerCommandExecutor(new CommonOptions(), new ServerCommandOptions());
+      executor.execute(epmdServer::execute);
+    }
+  }
+
+  @AfterClass
+  public static void afterClass () {
+    ofNullable(epmdServer)
+      .ifPresent(ServerCommandExecutor::close);
+
+    ofNullable(executor)
+      .ifPresent(ExecutorService::shutdown);
+  }
 
   @Test
   public void instantiating () {

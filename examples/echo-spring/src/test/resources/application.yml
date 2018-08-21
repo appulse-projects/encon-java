@@ -1,0 +1,4 @@
+
+spring.encon:
+  defaults:
+    cookie: secret

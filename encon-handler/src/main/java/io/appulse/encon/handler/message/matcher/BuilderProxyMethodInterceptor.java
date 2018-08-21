@@ -17,13 +17,10 @@
 package io.appulse.encon.handler.message.matcher;
 
 import static io.appulse.encon.handler.message.matcher.MethodArgumentMatcher.NULL;
-import static java.util.Optional.ofNullable;
 import static lombok.AccessLevel.PRIVATE;
 
 import java.lang.reflect.Method;
-import java.util.LinkedList;
 import java.util.List;
-import java.util.Map;
 import java.util.stream.Stream;
 
 import io.appulse.encon.handler.message.matcher.MethodArgumentMatcher.Equals;
@@ -31,6 +28,7 @@ import io.appulse.encon.handler.message.matcher.MethodArgumentMatcher.Equals;
 import lombok.Builder;
 import lombok.RequiredArgsConstructor;
 import lombok.experimental.FieldDefaults;
+import lombok.extern.slf4j.Slf4j;
 import net.sf.cglib.proxy.MethodInterceptor;
 import net.sf.cglib.proxy.MethodProxy;
 
@@ -39,6 +37,7 @@ import net.sf.cglib.proxy.MethodProxy;
  * @since 1.4.0
  * @author alabazin
  */
+@Slf4j
 @Builder
 @RequiredArgsConstructor
 @FieldDefaults(level = PRIVATE, makeFinal = true)
@@ -46,7 +45,7 @@ class BuilderProxyMethodInterceptor implements MethodInterceptor {
 
   private static final MethodArgumentMatcher[] EMPTY = new MethodArgumentMatcher[0];
 
-  Map<MethodArgumentsWrapper, List<MethodDescriptor>> map;
+  List<MethodDescriptor> list;
 
   MethodArgumentsWrapper wrapper;
 
@@ -54,37 +53,34 @@ class BuilderProxyMethodInterceptor implements MethodInterceptor {
 
   @Override
   public Object intercept (Object obj, Method method, Object[] args, MethodProxy proxy) throws Throwable {
-    map.compute(wrapper, (key, value) -> {
-      List<MethodDescriptor> list = ofNullable(value)
-          .orElse(new LinkedList<>());
+    log.debug("method {}.{}({}), storage size: {}",
+              obj.getClass().getSimpleName(), method.getName(), args, ThreadLocalStorage.size());
 
-      MethodArgumentMatcher[] matchers = null;
-      if (args == null || args.length == 0) {
-        matchers = EMPTY;
-      } else if (ThreadLocalStorage.isEmpty()) {
-        matchers = Stream.of(args)
-            .map(it -> it == null
-                        ? NULL
-                        : new Equals(it)
-            )
-            .toArray(MethodArgumentMatcher[]::new);
-      } else if (ThreadLocalStorage.size() == args.length) {
-        matchers = ThreadLocalStorage.elements();
-      } else {
-        throw new IllegalArgumentException("Ambiguous method call");
-      }
-      ThreadLocalStorage.clear();
+    MethodArgumentMatcher[] matchers = null;
+    if (args == null || args.length == 0) {
+      matchers = EMPTY;
+    } else if (ThreadLocalStorage.isEmpty()) {
+      matchers = Stream.of(args)
+          .map(it -> it == null
+                      ? NULL
+                      : new Equals(it)
+          )
+          .toArray(MethodArgumentMatcher[]::new);
+    } else if (ThreadLocalStorage.size() >= args.length) {
+      matchers = ThreadLocalStorage.elements();
+    } else {
+      throw new IllegalArgumentException("Ambiguous method call");
+    }
+    ThreadLocalStorage.clear();
 
-      MethodDescriptor descriptor = MethodDescriptor.builder()
-          .proxy(target)
-          .method(method)
-          .matchers(matchers)
-          .wrapper(wrapper)
-          .build();
+    MethodDescriptor descriptor = MethodDescriptor.builder()
+        .proxy(target)
+        .method(method)
+        .matchers(matchers)
+        .wrapper(wrapper)
+        .build();
 
-      list.add(descriptor);
-      return list;
-    });
+    list.add(descriptor);
     return null;
   }
 }

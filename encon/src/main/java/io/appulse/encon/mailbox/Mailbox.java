@@ -23,6 +23,7 @@ import java.io.Closeable;
 import java.util.Set;
 import java.util.concurrent.BlockingQueue;
 import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicBoolean;
 
 import io.appulse.encon.Node;
@@ -97,6 +98,27 @@ public class Mailbox implements Closeable {
   /**
    * Returns a new mailbox message.
    *
+   * @param timeout how long to wait before giving up, in units of
+   *        {@code unit}
+   * @param unit a {@code TimeUnit} determining how to interpret the
+   *        {@code timeout} parameter
+   *
+   * @return a new {@link Message}
+   *
+   * @throws ReceivedExitException someone exits
+   */
+  @SneakyThrows
+  public Message receive (long timeout, TimeUnit unit) {
+    Message message = queue.poll(timeout, unit);
+    while (shouldContinueReceive(message)) {
+      message = queue.poll(timeout, unit);
+    }
+    return message;
+  }
+
+  /**
+   * Returns a new mailbox message.
+   *
    * @return a new {@link Message}
    *
    * @throws ReceivedExitException someone exits
@@ -104,32 +126,10 @@ public class Mailbox implements Closeable {
   @SneakyThrows
   public Message receive () {
     Message message = queue.take();
-    if (message == null) {
-      return message;
+    while (shouldContinueReceive(message)) {
+      message = queue.take();
     }
-
-    val header = message.getHeader();
-    switch (header.getTag()) {
-    case LINK:
-      links.add(((Link) header).getFrom());
-      break;
-    case UNLINK:
-      links.remove(((Unlink) header).getFrom());
-      break;
-    case EXIT:
-    case EXIT2:
-      Exit exit = (Exit) header;
-      exit(exit.getFrom(), exit.getReason());
-      break;
-    case EXIT_TT:
-    case EXIT2_TT:
-      ExitTraceToken exitTrace = (ExitTraceToken) header;
-      exit(exitTrace.getFrom(), exitTrace.getReason());
-      break;
-    default:
-      return message;
-    }
-    return receive();
+    return message;
   }
 
   /**
@@ -350,5 +350,34 @@ public class Mailbox implements Closeable {
 
     exit(reason);
     throw new ReceivedExitException(from, reason);
+  }
+
+  private boolean shouldContinueReceive (Message message) {
+    if (message == null) {
+      return false;
+    }
+
+    val header = message.getHeader();
+    switch (header.getTag()) {
+    case LINK:
+      links.add(((Link) header).getFrom());
+      break;
+    case UNLINK:
+      links.remove(((Unlink) header).getFrom());
+      break;
+    case EXIT:
+    case EXIT2:
+      Exit exit = (Exit) header;
+      exit(exit.getFrom(), exit.getReason());
+      break;
+    case EXIT_TT:
+    case EXIT2_TT:
+      ExitTraceToken exitTrace = (ExitTraceToken) header;
+      exit(exitTrace.getFrom(), exitTrace.getReason());
+      break;
+    default:
+      return false;
+    }
+    return true;
   }
 }

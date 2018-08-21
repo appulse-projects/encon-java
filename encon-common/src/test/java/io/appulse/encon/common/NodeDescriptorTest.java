@@ -77,7 +77,7 @@ public class NodeDescriptorTest {
     String tmp = InetAddress.getLocalHost().getHostName();
     int dotIndex = tmp.indexOf('.');
     String hostName = dotIndex > 0
-                      ? tmp.substring(dotIndex)
+                      ? tmp.substring(0, dotIndex)
                       : tmp;
 
     String node = "popa";

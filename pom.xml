@@ -24,7 +24,7 @@ limitations under the License.
 
   <groupId>io.appulse.encon</groupId>
   <artifactId>encon-parent</artifactId>
-  <version>1.5.0</version>
+  <version>1.6.0</version>
   <packaging>pom</packaging>
 
   <properties>
@@ -45,6 +45,9 @@ limitations under the License.
     <module>encon-databind</module>
     <module>encon</module>
     <module>encon-handler</module>
+    <module>encon-spring</module>
+    <module>examples</module>
+    <module>benchmark</module>
   </modules>
 
   <name>encon</name>
@@ -71,7 +74,7 @@ limitations under the License.
     <url>https://github.com/appulse-projects/encon-java</url>
     <connection>scm:git:https://github.com/appulse-projects/encon-java.git</connection>
     <developerConnection>scm:git:https://github.com/appulse-projects/encon-java.git</developerConnection>
-    <tag>1.5.0</tag>
+    <tag>1.6.0</tag>
   </scm>
 
   <distributionManagement>
@@ -113,7 +116,7 @@ limitations under the License.
       <dependency>
         <groupId>org.projectlombok</groupId>
         <artifactId>lombok</artifactId>
-        <version>1.18.0</version>
+        <version>1.18.2</version>
       </dependency>
 
       <dependency>
@@ -162,17 +165,17 @@ limitations under the License.
       <dependency>
         <groupId>io.netty</groupId>
         <artifactId>netty-buffer</artifactId>
-        <version>4.1.25.Final</version>
+        <version>4.1.28.Final</version>
       </dependency>
       <dependency>
         <groupId>io.netty</groupId>
         <artifactId>netty-handler</artifactId>
-        <version>4.1.25.Final</version>
+        <version>4.1.28.Final</version>
       </dependency>
       <dependency>
         <groupId>io.netty</groupId>
         <artifactId>netty-transport-native-epoll</artifactId>
-        <version>4.1.25.Final</version>
+        <version>4.1.28.Final</version>
         <classifier>linux-x86_64</classifier>
         <exclusions>
           <exclusion>
@@ -198,12 +201,12 @@ limitations under the License.
       <dependency>
         <groupId>org.assertj</groupId>
         <artifactId>assertj-core</artifactId>
-        <version>3.10.0</version>
+        <version>3.11.0</version>
       </dependency>
       <dependency>
         <groupId>org.mockito</groupId>
         <artifactId>mockito-core</artifactId>
-        <version>2.19.0</version>
+        <version>2.21.0</version>
       </dependency>
     </dependencies>
   </dependencyManagement>
@@ -265,7 +268,7 @@ limitations under the License.
             <dependency>
               <groupId>com.puppycrawl.tools</groupId>
               <artifactId>checkstyle</artifactId>
-              <version>8.11</version>
+              <version>8.12</version>
             </dependency>
           </dependencies>
           <executions>
@@ -286,6 +289,68 @@ limitations under the License.
             </execution>
           </executions>
         </plugin>
+
+        <plugin>
+          <groupId>org.apache.maven.plugins</groupId>
+          <artifactId>maven-javadoc-plugin</artifactId>
+          <version>2.10.4</version>
+          <configuration>
+            <additionalOptions>-Xdoclint:none</additionalOptions>
+            <additionalparam>-Xdoclint:none</additionalparam>
+            <breakiterator>true</breakiterator>
+            <charset>UTF-8</charset>
+            <docencoding>UTF-8</docencoding>
+            <encoding>UTF-8</encoding>
+            <failOnError>true</failOnError>
+            <show>protected</show>
+            <source>1.8</source>
+            <version>true</version>
+          </configuration>
+          <executions>
+            <execution>
+              <id>attach-javadocs</id>
+              <goals>
+                <goal>jar</goal>
+              </goals>
+              <phase>package</phase>
+            </execution>
+          </executions>
+        </plugin>
+
+        <plugin>
+          <groupId>org.apache.maven.plugins</groupId>
+          <artifactId>maven-deploy-plugin</artifactId>
+          <version>2.8.2</version>
+          <configuration>
+            <skip>true</skip>
+          </configuration>
+        </plugin>
+        <plugin>
+          <groupId>org.sonatype.plugins</groupId>
+          <artifactId>nexus-staging-maven-plugin</artifactId>
+          <version>1.6.8</version>
+          <extensions>true</extensions>
+          <configuration>
+            <serverId>ossrh</serverId>
+            <nexusUrl>https://oss.sonatype.org/</nexusUrl>
+            <autoReleaseAfterClose>true</autoReleaseAfterClose>
+          </configuration>
+        </plugin>
+
+        <plugin>
+          <groupId>org.apache.maven.plugins</groupId>
+          <artifactId>maven-gpg-plugin</artifactId>
+          <version>1.6</version>
+          <executions>
+            <execution>
+              <id>sign-artifacts</id>
+              <phase>verify</phase>
+              <goals>
+                <goal>sign</goal>
+              </goals>
+            </execution>
+          </executions>
+        </plugin>
       </plugins>
     </pluginManagement>
 
@@ -300,33 +365,6 @@ limitations under the License.
             <goals>
               <goal>jar</goal>
             </goals>
-          </execution>
-        </executions>
-      </plugin>
-
-     <plugin>
-        <groupId>org.apache.maven.plugins</groupId>
-        <artifactId>maven-javadoc-plugin</artifactId>
-        <version>2.10.4</version>
-        <configuration>
-          <additionalOptions>-Xdoclint:none</additionalOptions>
-          <additionalparam>-Xdoclint:none</additionalparam>
-          <breakiterator>true</breakiterator>
-          <charset>UTF-8</charset>
-          <docencoding>UTF-8</docencoding>
-          <encoding>UTF-8</encoding>
-          <failOnError>true</failOnError>
-          <show>protected</show>
-          <source>1.8</source>
-          <version>true</version>
-        </configuration>
-        <executions>
-          <execution>
-            <id>attach-javadocs</id>
-            <goals>
-              <goal>jar</goal>
-            </goals>
-            <phase>package</phase>
           </execution>
         </executions>
       </plugin>
@@ -364,41 +402,6 @@ limitations under the License.
             <goals>
               <goal>integration-test</goal>
               <goal>verify</goal>
-            </goals>
-          </execution>
-        </executions>
-      </plugin>
-
-      <plugin>
-        <groupId>org.apache.maven.plugins</groupId>
-        <artifactId>maven-deploy-plugin</artifactId>
-        <version>2.8.2</version>
-        <configuration>
-          <skip>true</skip>
-        </configuration>
-      </plugin>
-      <plugin>
-        <groupId>org.sonatype.plugins</groupId>
-        <artifactId>nexus-staging-maven-plugin</artifactId>
-        <version>1.6.8</version>
-        <extensions>true</extensions>
-        <configuration>
-          <serverId>ossrh</serverId>
-          <nexusUrl>https://oss.sonatype.org/</nexusUrl>
-          <autoReleaseAfterClose>true</autoReleaseAfterClose>
-        </configuration>
-      </plugin>
-
-     <plugin>
-        <groupId>org.apache.maven.plugins</groupId>
-        <artifactId>maven-gpg-plugin</artifactId>
-        <version>1.6</version>
-        <executions>
-          <execution>
-            <id>sign-artifacts</id>
-            <phase>verify</phase>
-            <goals>
-              <goal>sign</goal>
             </goals>
           </execution>
         </executions>

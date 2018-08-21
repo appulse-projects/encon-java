@@ -62,7 +62,7 @@ enum MethodArgumentsWrapper {
     case MAP:
       return term.isMap();
     case NONE:
-      return !term.isCollectionTerm();
+      return true;
     default:
       return false;
     }

@@ -13,6 +13,9 @@ Sub-modules descriptions:
 - [Encon](./encon/README.md) - the lib itself;
 - [Encon databind](./encon-databind/README.md) - serializers/deserializers from/to Java/Eralng objects;
 - [Encon handler](./encon-handler/README.md) - helpers for handling received messages in mailbox;
+- [Encon Spring](./encon-spring/README.md) - Spring Boot integration;
+- [Encon examples](./examples/README.md) - different encon's examples;
+- [Encon benchmark](./benchmark/README.md) - encon's benchmarks;
 
 ## Development
 
@@ -41,11 +44,25 @@ To build the project, do the following:
 $> mvn clean compile
 ...
 [INFO] ------------------------------------------------------------------------
+[INFO] Reactor Summary:
+[INFO]
+[INFO] encon 1.6.0 ........................................ SUCCESS [  0.116 s]
+[INFO] encon-common ....................................... SUCCESS [ 10.523 s]
+[INFO] encon-terms ........................................ SUCCESS [ 10.679 s]
+[INFO] encon-config ....................................... SUCCESS [  7.860 s]
+[INFO] encon-databind ..................................... SUCCESS [  8.767 s]
+[INFO] encon .............................................. SUCCESS [ 13.951 s]
+[INFO] encon-handler ...................................... SUCCESS [  9.302 s]
+[INFO] encon-spring ....................................... SUCCESS [  9.062 s]
+[INFO] examples ........................................... SUCCESS [  0.003 s]
+[INFO] echo ............................................... SUCCESS [  1.131 s]
+[INFO] echo-spring ........................................ SUCCESS [  1.217 s]
+[INFO] benchmark 1.6.0 .................................... SUCCESS [  1.659 s]
+[INFO] ------------------------------------------------------------------------
 [INFO] BUILD SUCCESS
 [INFO] ------------------------------------------------------------------------
-[INFO] Total time: 20.719 s
-[INFO] Finished at: 2018-02-02T13:25:56+03:00
-[INFO] Final Memory: 41M/380M
+[INFO] Total time: 01:15 min
+[INFO] Finished at: 2018-08-20T18:36:04+03:00
 [INFO] ------------------------------------------------------------------------
 ```
 
@@ -63,7 +80,7 @@ $> mvn clean test
 [INFO]
 [INFO] Results:
 [INFO]
-[INFO] Tests run: 7, Failures: 0, Errors: 0, Skipped: 0
+[INFO] Tests run: 67, Failures: 0, Errors: 0, Skipped: 0
 [INFO]
 ...
 ```

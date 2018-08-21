@@ -16,17 +16,19 @@
 
 package io.appulse.encon.handler.message.matcher;
 
-import static io.appulse.encon.handler.message.matcher.MethodArgumentsWrapper.UNDEFINED;
+import static java.util.Optional.ofNullable;
 import static lombok.AccessLevel.PRIVATE;
 
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
 
 import io.appulse.encon.connection.control.ControlMessage;
 import io.appulse.encon.handler.message.MessageHandler;
 import io.appulse.encon.mailbox.Mailbox;
 import io.appulse.encon.terms.ErlangTerm;
 
+import lombok.Getter;
 import lombok.NonNull;
 import lombok.RequiredArgsConstructor;
 import lombok.experimental.FieldDefaults;
@@ -41,6 +43,7 @@ import lombok.val;
  * @author alabazin
  */
 @Slf4j
+@Getter
 @RequiredArgsConstructor
 @FieldDefaults(level = PRIVATE, makeFinal = true)
 public class MethodMatcherMessageHandler implements MessageHandler {
@@ -55,24 +58,35 @@ public class MethodMatcherMessageHandler implements MessageHandler {
   }
 
   @NonNull
-  Map<MethodArgumentsWrapper, List<MethodDescriptor>> map;
+  Map<Integer, List<MethodDescriptor>> map;
 
   @Override
   public void handle (Mailbox self, ControlMessage header, ErlangTerm body) {
-    log.debug("in: {}", body);
-    val wrapper = MethodArgumentsWrapper.of(body.getType());
-    if (wrapper == UNDEFINED) {
-      throw new IllegalArgumentException("Undefined wrapper type");
-    }
+    log.debug("new message to {}\nterm: {}", self, body);
 
-    val list = map.get(wrapper);
+    val list = ofNullable(body.size())
+        .map(map::get)
+        .filter(Objects::nonNull)
+        .orElse(null);
+
     if (list == null) {
-      throw new IllegalArgumentException("There is no handler for this wrapper: " + wrapper);
+      val message = new StringBuilder()
+          .append("There is no handler for ").append(body.size()).append(" arguments, only ")
+          .append(map.keySet())
+          .toString();
+
+      throw new IllegalArgumentException(message);
     }
 
-    list.stream()
-        .filter(it -> it.isApplicable(body))
-        .findFirst()
-        .ifPresent(it -> it.invoke(body));
+    val optional = list.stream()
+        .filter(it -> it.matches(body))
+        .findFirst();
+
+    if (optional.isPresent()) {
+      log.debug("handler found");
+      optional.get().invoke(body);
+    } else {
+      log.warn("there is no matched handler for {}", body);
+    }
   }
 }

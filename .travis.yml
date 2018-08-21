@@ -52,6 +52,9 @@ deploy:
     - "encon-handler/target/encon-handler-$project_version.jar"
     - "encon-handler/target/encon-handler-$project_version-javadoc.jar"
     - "encon-handler/target/encon-handler-$project_version-sources.jar"
+    - "encon-spring/target/encon-spring-$project_version.jar"
+    - "encon-spring/target/encon-spring-$project_version-javadoc.jar"
+    - "encon-spring/target/encon-spring-$project_version-sources.jar"
   skip_cleanup: true
   on:
     tags: true

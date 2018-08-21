@@ -20,13 +20,14 @@ import static io.appulse.encon.handler.message.matcher.MethodArgumentsWrapper.LI
 import static io.appulse.encon.handler.message.matcher.MethodArgumentsWrapper.MAP;
 import static io.appulse.encon.handler.message.matcher.MethodArgumentsWrapper.NONE;
 import static io.appulse.encon.handler.message.matcher.MethodArgumentsWrapper.TUPLE;
+import static java.util.stream.Collectors.groupingBy;
 import static lombok.AccessLevel.PACKAGE;
 import static lombok.AccessLevel.PRIVATE;
 
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.CopyOnWriteArrayList;
 
 import lombok.NoArgsConstructor;
 import lombok.RequiredArgsConstructor;
@@ -47,7 +48,7 @@ import net.sf.cglib.proxy.Enhancer;
 @SuppressWarnings("PMD.AccessorMethodGeneration")
 public class MethodMatcherMessageHandlerBuilder {
 
-  Map<MethodArgumentsWrapper, List<MethodDescriptor>> map = new ConcurrentHashMap<>();
+  List<MethodDescriptor> list = new CopyOnWriteArrayList<>();
 
   Map<WrapperCacheKey, Object> wrappedCache = new HashMap<>();
 
@@ -70,6 +71,8 @@ public class MethodMatcherMessageHandlerBuilder {
    * @return a new {@link MethodMatcherMessageHandler}
    */
   public MethodMatcherMessageHandler build () {
+    Map<Integer, List<MethodDescriptor>> map = list.stream()
+        .collect(groupingBy(MethodDescriptor::elements));
     return new MethodMatcherMessageHandler(map);
   }
 
@@ -83,7 +86,7 @@ public class MethodMatcherMessageHandlerBuilder {
     val enhancer = new Enhancer();
     enhancer.setSuperclass(object.getClass());
     enhancer.setCallback(BuilderProxyMethodInterceptor.builder()
-        .map(map)
+        .list(list)
         .wrapper(wrapper)
         .target(object)
         .build());
@@ -110,6 +113,7 @@ public class MethodMatcherMessageHandlerBuilder {
     public WrapperBuilder<T1> tuple (ConsumerWithException<T1> comsumer) {
       T1 proxy = createProxy(object, TUPLE);
       comsumer.accept(proxy);
+      ThreadLocalStorage.clear();
       return new WrapperBuilder<>(object);
     }
 
@@ -124,6 +128,7 @@ public class MethodMatcherMessageHandlerBuilder {
     public WrapperBuilder<T1> list (ConsumerWithException<T1> comsumer) {
       T1 proxy = createProxy(object, LIST);
       comsumer.accept(proxy);
+      ThreadLocalStorage.clear();
       return new WrapperBuilder<>(object);
     }
 
@@ -138,6 +143,7 @@ public class MethodMatcherMessageHandlerBuilder {
     public WrapperBuilder<T1> map (ConsumerWithException<T1> comsumer) {
       T1 proxy = createProxy(object, MAP);
       comsumer.accept(proxy);
+      ThreadLocalStorage.clear();
       return new WrapperBuilder<>(object);
     }
 
@@ -152,6 +158,7 @@ public class MethodMatcherMessageHandlerBuilder {
     public WrapperBuilder<T1> none (ConsumerWithException<T1> comsumer) {
       T1 proxy = createProxy(object, NONE);
       comsumer.accept(proxy);
+      ThreadLocalStorage.clear();
       return new WrapperBuilder<>(object);
     }
   }
@@ -178,6 +185,7 @@ public class MethodMatcherMessageHandlerBuilder {
     public WrapperBuilder<T2> tuple (ConsumerWithException<T2> comsumer) {
       T2 proxy = createProxy(object, TUPLE);
       comsumer.accept(proxy);
+      ThreadLocalStorage.clear();
       return this;
     }
 
@@ -192,6 +200,7 @@ public class MethodMatcherMessageHandlerBuilder {
     public WrapperBuilder<T2> list (ConsumerWithException<T2> comsumer) {
       T2 proxy = createProxy(object, LIST);
       comsumer.accept(proxy);
+      ThreadLocalStorage.clear();
       return this;
     }
 
@@ -206,6 +215,7 @@ public class MethodMatcherMessageHandlerBuilder {
     public WrapperBuilder<T2> map (ConsumerWithException<T2> comsumer) {
       T2 proxy = createProxy(object, MAP);
       comsumer.accept(proxy);
+      ThreadLocalStorage.clear();
       return this;
     }
 
@@ -220,6 +230,7 @@ public class MethodMatcherMessageHandlerBuilder {
     public WrapperBuilder<T2> none (ConsumerWithException<T2> comsumer) {
       T2 proxy = createProxy(object, NONE);
       comsumer.accept(proxy);
+      ThreadLocalStorage.clear();
       return this;
     }
 

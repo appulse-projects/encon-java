@@ -27,6 +27,7 @@ import lombok.NonNull;
 import lombok.RequiredArgsConstructor;
 import lombok.SneakyThrows;
 import lombok.experimental.FieldDefaults;
+import lombok.extern.slf4j.Slf4j;
 
 /**
  * Common collection POJO's deserializer from tuple or list.
@@ -36,6 +37,7 @@ import lombok.experimental.FieldDefaults;
  * @since 1.1.0
  * @author Artem Labazin
  */
+@Slf4j
 @RequiredArgsConstructor
 @FieldDefaults(level = PRIVATE, makeFinal = true)
 public class PojoDeserializerCollection<T> implements Deserializer<T> {
@@ -51,8 +53,14 @@ public class PojoDeserializerCollection<T> implements Deserializer<T> {
     for (int i = 0; i < fields.size(); i++) {
       FieldDescriptor descriptor = fields.get(i);
       ErlangTerm term = tuple.getUnsafe(i);
-      Object value = descriptor.getDeserializer().deserialize(term);
-      descriptor.getField().set(result, value);
+      try {
+        Object value = descriptor.getDeserializer().deserialize(term);
+        descriptor.getField().set(result, value);
+      } catch (Exception ex) {
+        log.error("\n  error with descriptor '{}'\n  and term: {}\n  at index: {}\n  in tuple: {}",
+                  descriptor, term, i, tuple, ex);
+        throw ex;
+      }
     }
     return result;
   }

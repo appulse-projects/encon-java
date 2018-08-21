@@ -24,8 +24,8 @@ import java.net.InetAddress;
 import java.net.UnknownHostException;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
+import java.util.stream.Stream;
 
-import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import lombok.AllArgsConstructor;
 import lombok.EqualsAndHashCode;
 import lombok.NonNull;
@@ -50,11 +50,6 @@ import lombok.val;
 @Value
 @EqualsAndHashCode(of = "fullName")
 @AllArgsConstructor(access = PRIVATE)
-@SuppressWarnings({
-    "PMD.AvoidThrowingRawExceptionTypes",
-    "PMD.AvoidLiteralsInIfCondition"
-})
-@SuppressFBWarnings("RV_RETURN_VALUE_OF_PUTIFABSENT_IGNORED")
 public class NodeDescriptor implements Serializable {
 
   private static final long serialVersionUID = 7324588959922091097L;
@@ -73,13 +68,13 @@ public class NodeDescriptor implements Serializable {
     try {
       LOCALHOST = InetAddress.getLocalHost();
     } catch (UnknownHostException ex) {
-      throw new RuntimeException(ex);
+      throw new IllegalStateException(ex);
     }
     LOOPBACK = InetAddress.getLoopbackAddress();
     LONG_HOST_NAME = LOCALHOST.getHostName();
     val dotIndex = LONG_HOST_NAME.indexOf('.');
     SHORT_HOST_NAME = dotIndex > 0
-                      ? LONG_HOST_NAME.substring(dotIndex)
+                      ? LONG_HOST_NAME.substring(0, dotIndex)
                       : LONG_HOST_NAME;
     NODE_DESCRIPTOR_CACHE = new ConcurrentHashMap<>();
   }
@@ -101,9 +96,11 @@ public class NodeDescriptor implements Serializable {
       return cached;
     }
     val descriptor = getFromCacheOrCreateNew(node);
-    NODE_DESCRIPTOR_CACHE.putIfAbsent(node, descriptor);
-    NODE_DESCRIPTOR_CACHE.putIfAbsent(descriptor.getFullName(), descriptor);
-    NODE_DESCRIPTOR_CACHE.putIfAbsent(descriptor.getNodeName(), descriptor);
+    Stream.of(
+        descriptor.getFullName(),
+        descriptor.getNodeName(),
+        node
+    ).forEach(it -> NODE_DESCRIPTOR_CACHE.putIfAbsent(it, descriptor));
     return descriptor;
   }
 
@@ -120,16 +117,17 @@ public class NodeDescriptor implements Serializable {
    *
    * @return parsed {@link NodeDescriptor} instance
    */
-
   public static NodeDescriptor from (@NonNull String node, boolean isShortName) {
     val cached = NODE_DESCRIPTOR_CACHE.get(node);
     if (cached != null) {
       return cached;
     }
     val descriptor = getFromCacheOrCreateNew(node, isShortName);
-    NODE_DESCRIPTOR_CACHE.putIfAbsent(node, descriptor);
-    NODE_DESCRIPTOR_CACHE.putIfAbsent(descriptor.getFullName(), descriptor);
-    NODE_DESCRIPTOR_CACHE.putIfAbsent(descriptor.getNodeName(), descriptor);
+    Stream.of(
+        descriptor.getFullName(),
+        descriptor.getNodeName(),
+        node
+    ).forEach(it -> NODE_DESCRIPTOR_CACHE.putIfAbsent(it, descriptor));
     return descriptor;
   }
 
@@ -205,7 +203,8 @@ public class NodeDescriptor implements Serializable {
 
   @SneakyThrows
   private static NodeDescriptor parse (@NonNull String node, boolean isShortName) {
-    val tokens = node.split("@", 2);
+    val expectedTokensCount = 2;
+    val tokens = node.split("@", expectedTokensCount);
 
     val nodeName = tokens[0];
     if (nodeName.isEmpty()) {
@@ -214,7 +213,7 @@ public class NodeDescriptor implements Serializable {
 
     String hostName;
     InetAddress address;
-    if (tokens.length == 2) {
+    if (tokens.length == expectedTokensCount) {
       hostName = tokens[1];
       if (isShortName && hostName.contains(".")) {
         val message = String.format("Using host name '%s' in short node name is illegal, " +
