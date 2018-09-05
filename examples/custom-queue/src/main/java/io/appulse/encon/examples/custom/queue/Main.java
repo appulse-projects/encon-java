@@ -13,6 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+
 package io.appulse.encon.examples.custom.queue;
 
 import static io.appulse.encon.terms.Erlang.string;

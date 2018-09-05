@@ -36,4 +36,10 @@ public interface MailboxHandler extends Closeable {
    * when you already have your own executor service.
    */
   void oneTimeShot ();
+
+  /**
+   * Overrides {@link Closeable#close} method without a checked exception.
+   */
+  @Override
+  void close ();
 }

@@ -37,5 +37,6 @@ limitations under the License.
     <module>echo-spring</module>
     <module>custom-queue</module>
     <module>databind</module>
+    <module>handler-basic</module>
   </modules>
 </project>
