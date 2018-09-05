@@ -13,9 +13,11 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package io.appulse.encon.examples.simple;
+package io.appulse.encon.examples.custom.queue;
 
 import static io.appulse.encon.terms.Erlang.string;
+
+import java.util.concurrent.SynchronousQueue;
 
 import io.appulse.encon.Node;
 import io.appulse.encon.Nodes;
@@ -40,6 +42,9 @@ public class Main {
 
     Mailbox mailbox = node.mailbox()
         .name("my_process")
+        // Specify your own java.util.concurrent.BlockingQueue
+        // implementation
+        .queue(new SynchronousQueue<>())
         .build();
 
     // receives a tuple {pid, string}
