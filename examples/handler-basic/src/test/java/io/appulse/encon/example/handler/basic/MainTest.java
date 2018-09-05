@@ -14,19 +14,15 @@
  * limitations under the License.
  */
 
-package io.appulse.encon.examples.databind;
+package io.appulse.encon.example.handler.basic;
 
+import static io.appulse.encon.terms.Erlang.atom;
+import static io.appulse.encon.terms.Erlang.tuple;
 import static java.util.concurrent.TimeUnit.SECONDS;
 import static org.assertj.core.api.Assertions.assertThat;
-import static java.util.Arrays.asList;
-import static java.util.Collections.singleton;
-
-import java.util.concurrent.ExecutorService;
-import java.util.concurrent.Executors;
 
 import io.appulse.encon.Node;
 import io.appulse.encon.Nodes;
-import io.appulse.encon.databind.TermMapper;
 import io.appulse.encon.mailbox.Mailbox;
 import io.appulse.encon.terms.ErlangTerm;
 
@@ -41,8 +37,8 @@ public class MainTest {
 
   @Test
   public void test () throws Exception {
-    ExecutorService executorService = Executors.newSingleThreadExecutor();
-    executorService.execute(() -> Main.main(null));
+    Server server = new Server();
+    server.start();
 
     SECONDS.sleep(2);
 
@@ -50,27 +46,13 @@ public class MainTest {
       Mailbox mailbox = node.mailbox()
           .build();
 
-      Pojo request = new Pojo(
-          mailbox.getPid(),
-          "Artem",
-          27,
-          true,
-          543,
-          asList("java", "nim", "elixir"),
-          "developer",
-          singleton("popa"),
-          "some long string...or not",
-          new Boolean[] { true, false, true }
-      );
-      ErlangTerm requestTerm = TermMapper.serialize(request);
+      mailbox.send("java@localhost", "my_process", tuple(mailbox.getPid(), atom("hello world")));
 
-      mailbox.send("java@localhost", "my_process", requestTerm);
+      ErlangTerm payload = mailbox.receive(20, SECONDS).getBody();
 
-
-      ErlangTerm responseTerm = mailbox.receive(20, SECONDS).getBody();
-      Pojo response = TermMapper.deserialize(responseTerm, Pojo.class);
-
-      assertThat(response).isEqualTo(request);
+      assertThat(payload.asText()).isEqualTo("hello world");
+    } finally {
+      server.stop();
     }
   }
 }

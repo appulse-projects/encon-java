@@ -14,45 +14,46 @@
  * limitations under the License.
  */
 
-package io.appulse.encon.examples.databind;
+package io.appulse.encon.example.handler.basic;
+
+import static lombok.AccessLevel.PRIVATE;
 
 import io.appulse.encon.Node;
 import io.appulse.encon.Nodes;
-import io.appulse.encon.databind.TermMapper;
+import io.appulse.encon.handler.mailbox.DefaultMailboxHandler;
+import io.appulse.encon.handler.mailbox.MailboxHandler;
 import io.appulse.encon.mailbox.Mailbox;
-import io.appulse.encon.terms.ErlangTerm;
-import io.appulse.encon.terms.type.ErlangPid;
+
+import lombok.experimental.FieldDefaults;
 
 /**
  *
  * @since 1.6.1
  * @author Artem Labazin
  */
-public class Main {
+@FieldDefaults(level = PRIVATE)
+public class Server {
 
-  public static void main(String[] args) {
-    Node node = Nodes.singleNode("java@localhost", true);
+  Node node;
 
+  MailboxHandler handler;
+
+  public void start () {
+    node = Nodes.singleNode("java@localhost", true);
     Mailbox mailbox = node.mailbox()
         .name("my_process")
         .build();
+    
+    handler = DefaultMailboxHandler.builder()
+      .messageHandler(new DummyMessageHandler())
+      .mailbox(mailbox)
+      .build();
 
-    // receives an encoded POJO as Erlang term
-    ErlangTerm request = mailbox.receive().getBody();
-    // parse Erlang term to Pojo.class
-    Pojo pojo = TermMapper.deserialize(request, Pojo.class);
-    ErlangPid from = pojo.getSender();
+    handler.startExecutor();
+  }
 
-    System.out.format("from %s message: %s\n", from, pojo);
-
-    pojo.setSender(mailbox.getPid());
-    // serialize object into Erlang term
-    ErlangTerm response = TermMapper.serialize(pojo);
-
-    // sends back a pojo
-    mailbox.send(from, response);
-
-    // and close the node
+  public void stop () {
+    handler.close();
     node.close();
   }
 }
