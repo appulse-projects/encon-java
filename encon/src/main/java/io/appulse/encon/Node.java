@@ -61,7 +61,7 @@ public final class Node implements Closeable {
 
   static Node newInstance (@NonNull String name, @NonNull NodeConfig config) {
 
-    val descriptor = NodeDescriptor.from(name);
+    val descriptor = NodeDescriptor.from(name, config.getShortNamed());
     log.debug("Creating new Node '{}' with config:\n  {}\n", descriptor.getFullName(), config);
 
     val meta = Meta.builder()
