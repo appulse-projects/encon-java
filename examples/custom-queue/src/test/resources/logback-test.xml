@@ -16,25 +16,15 @@ See the License for the specific language governing permissions and
 limitations under the License.
 -->
 
-<project xmlns="http://maven.apache.org/POM/4.0.0"
-         xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+<configuration>
+  <include resource="io/appulse/logging/logback/base.xml"/>
 
-  <modelVersion>4.0.0</modelVersion>
-
-  <parent>
-    <groupId>io.appulse.encon</groupId>
-    <artifactId>encon-parent</artifactId>
-    <version>1.6.1</version>
-  </parent>
-
-  <artifactId>examples</artifactId>
-  <packaging>pom</packaging>
-
-  <modules>
-    <module>simple</module>
-    <module>echo</module>
-    <module>echo-spring</module>
-    <module>custom-queue</module>
-  </modules>
-</project>
+  <logger name="org.testcontainers" level="INFO"/>
+  <logger name="org.apache.http" level="WARN"/>
+  <logger name="com.github.dockerjava" level="WARN"/>
+  <logger name="org.zeroturnaround.exec" level="WARN"/>
+  <logger name="io.appulse.encon.handler" level="DEBUG"/>
+  <logger name="io.appulse.encon.spring" level="DEBUG"/>
+  <logger name="io.appulse.encon.databind" level="DEBUG"/>
+  <!--<logger name="io.netty" level="DEBUG"/>-->
+</configuration>
