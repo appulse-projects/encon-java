@@ -33,8 +33,8 @@ limitations under the License.
 
   <modules>
     <module>simple</module>
-    <module>echo</module>
-    <module>echo-spring</module>
+    <module>echo-server</module>
+    <module>echo-server-spring</module>
     <module>custom-queue</module>
     <module>databind</module>
     <module>handler-basic</module>
