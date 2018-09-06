@@ -36,7 +36,7 @@ public class Main {
 
   public static void main(String[] args) {
     NodeConfig config = NodeConfig.builder()
-        .shortNamed(true)
+        .shortName(true)
         .build();
 
     Node node = Nodes.singleNode("java@localhost", config);

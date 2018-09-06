@@ -134,7 +134,7 @@ public class Defaults {
     ofNullable(map.get("short-name"))
         .map(Object::toString)
         .map(Boolean::valueOf)
-        .ifPresent(builder::shortNamed);
+        .ifPresent(builder::shortName);
 
     ofNullable(map.get("cookie"))
         .map(Object::toString)
@@ -145,19 +145,15 @@ public class Defaults {
         .map(Protocol::valueOf)
         .ifPresent(builder::protocol);
 
-    if (map.containsKey("version") && map.get("version") instanceof Map) {
-      val versionMap = (Map<String, Object>) map.get("version");
-
-      ofNullable(versionMap.get("low"))
+    ofNullable(map.get("low-version"))
           .map(Object::toString)
           .map(Version::valueOf)
-          .ifPresent(builder::low);
+        .ifPresent(builder::lowVersion);
 
-      ofNullable(versionMap.get("high"))
+    ofNullable(map.get("high-version"))
           .map(Object::toString)
           .map(Version::valueOf)
-          .ifPresent(builder::high);
-    }
+        .ifPresent(builder::highVersion);
 
     ofNullable(map.get("distribution-flags"))
         .filter(it -> it instanceof List)
@@ -193,7 +189,7 @@ public class Defaults {
   NodeType type = R6_ERLANG;
 
   @Builder.Default
-  Boolean shortNamed = FALSE;
+  Boolean shortName = FALSE;
 
   @Builder.Default
   String cookie = getDefaultCookie();
@@ -202,10 +198,10 @@ public class Defaults {
   Protocol protocol = TCP;
 
   @Builder.Default
-  Version low = R6;
+  Version lowVersion = R6;
 
   @Builder.Default
-  Version high = R6;
+  Version highVersion = R6;
 
   @Builder.Default
   Set<DistributionFlag> distributionFlags = new HashSet<>(asList(
@@ -244,11 +240,11 @@ public class Defaults {
   public Defaults (Defaults defaults) {
     epmdPort = defaults.getEpmdPort();
     type = defaults.getType();
-    shortNamed = defaults.getShortNamed();
+    shortName = defaults.getShortName();
     cookie = defaults.getCookie();
     protocol = defaults.getProtocol();
-    low = defaults.getLow();
-    high = defaults.getHigh();
+    lowVersion = defaults.getLowVersion();
+    highVersion = defaults.getHighVersion();
     distributionFlags = ofNullable(defaults.getDistributionFlags())
         .map(HashSet::new)
         .orElse(null);

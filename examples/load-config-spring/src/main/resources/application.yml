@@ -1,0 +1,43 @@
+
+spring.encon:
+  defaults:
+    type: R3_ERLANG
+    short-name: true
+    cookie: secret
+    protocol: TCP
+    low-version: R4
+    high-version: R6
+    distribution-flags:
+      - MAP_TAG
+      - BIG_CREATION
+    server:
+      boss-threads: 2
+      worker-threads: 4
+
+  nodes:
+    node-1:
+      type: R3_HIDDEN
+      cookie: non-secret
+      low-version: R5C
+      high-version: R6
+      distribution-flags:
+        - EXTENDED_REFERENCES
+        - EXTENDED_PIDS_PORTS
+        - BIT_BINARIES
+        - NEW_FLOATS
+        - FUN_TAGS
+        - NEW_FUN_TAGS
+        - UTF8_ATOMS
+        - MAP_TAG
+        - BIG_CREATION
+      mailboxes:
+        - name: another
+        - name: another_one
+      server:
+        port: 8971
+        boss-threads: 1
+        worker-threads: 2
+
+    node-2:
+      short-name: false
+      cookie: popa

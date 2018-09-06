@@ -51,9 +51,8 @@ defaults:
   short-name: true
   cookie: secret
   protocol: UDP
-  version:
-    low: R4
-    high: R6
+  low-version: R4
+  high-version: R6
   distribution-flags:
     - MAP_TAG
     - BIG_CREATION
@@ -70,9 +69,8 @@ nodes:
     type: R3_HIDDEN
     cookie: non-secret
     protocol: SCTP
-    version:
-      low: R5C
-      high: R6
+    low-version: R5C
+    high-version: R6
     distribution-flags:
       - EXTENDED_REFERENCES
       - EXTENDED_PIDS_PORTS
@@ -109,11 +107,11 @@ Config config = Config.builder()
     .defaults(Defaults.builder()
         .epmdPort(8888)
         .type(R3_ERLANG)
-        .shortNamed(true)
+        .shortName(true)
         .cookie(secret)
         .protocol(UDP)
-        .low(R4)
-        .high(R6)
+        .lowVersion(R4)
+        .highVersion(R6)
         .distributionFlags(new HashSet<>(asList(
             MAP_TAG,
             BIG_CREATION
@@ -129,8 +127,8 @@ Config config = Config.builder()
         .type(R3_HIDDEN)
         .cookie("non-secret")
         .protocol(SCTP)
-        .low(R5C)
-        .high(R6)
+        .lowVersion(R5C)
+        .highVersion(R6)
         .distributionFlag(EXTENDED_REFERENCES)
         .distributionFlag(EXTENDED_PIDS_PORTS)
         .distributionFlag(BIT_BINARIES)
@@ -157,7 +155,7 @@ Config config = Config.builder()
         .build()
     )
     .node("node-2", NodeConfig.builder()
-        .shortNamed(false)
+        .shortName(false)
         .cookie("popa")
         .mailbox(MailboxConfig.builder()
             .name("net_kernel")

@@ -57,7 +57,7 @@ public class EnconBenchmark {
    @Setup(Trial)
    public void setup () {
      val config = NodeConfig.builder()
-         .shortNamed(TRUE)
+         .shortName(TRUE)
          .build();
 
      node = Nodes.singleNode("node-" + System.nanoTime(), config);
@@ -116,7 +116,7 @@ public class EnconBenchmark {
     @Setup(Trial)
     public void setup () {
       val config = NodeConfig.builder()
-          .shortNamed(TRUE)
+          .shortName(TRUE)
           .build();
 
       node1 = Nodes.singleNode("node-" + System.nanoTime(), config);

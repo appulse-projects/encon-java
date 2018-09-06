@@ -48,7 +48,7 @@ class EchoServerNode implements Runnable, Closeable {
 
   EchoServerNode (String nodeName, String cookie, String mailboxName) {
     NodeConfig config = NodeConfig.builder()
-        .shortNamed(TRUE)
+        .shortName(TRUE)
         .cookie(cookie)
         .build();
 

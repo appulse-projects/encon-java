@@ -55,9 +55,14 @@ public class MailboxOperations {
   }
 
   static String generateName (Mailbox mailbox) {
+    String name = mailbox.getName();
+    if (name == null || name.isEmpty()) {
+      return generateName(mailbox.getNode());
+    }
     return new StringBuilder()
         .append(mailbox.getNode().getDescriptor().getNodeName())
-        .append(ofNullable(mailbox.getName()).orElse(""))
+        .append('_')
+        .append(name)
         .append("MailboxOperations")
         .toString();
   }

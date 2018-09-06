@@ -40,5 +40,6 @@ limitations under the License.
     <module>handler-basic</module>
     <module>handler-advanced</module>
     <module>load-config</module>
+    <module>load-config-spring</module>
   </modules>
 </project>

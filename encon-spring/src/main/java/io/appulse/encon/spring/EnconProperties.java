@@ -16,16 +16,21 @@
 
 package io.appulse.encon.spring;
 
+import static java.lang.Boolean.TRUE;
+import static lombok.AccessLevel.PACKAGE;
 import static lombok.AccessLevel.PRIVATE;
 
 import java.util.LinkedHashMap;
 import java.util.Map;
+
+import javax.annotation.PostConstruct;
 
 import io.appulse.encon.config.Config;
 import io.appulse.encon.config.Defaults;
 import io.appulse.encon.config.NodeConfig;
 
 import lombok.Data;
+import lombok.Getter;
 import lombok.NonNull;
 import lombok.experimental.FieldDefaults;
 import org.springframework.boot.context.properties.ConfigurationProperties;
@@ -44,15 +49,30 @@ import org.springframework.validation.annotation.Validated;
 @ConfigurationProperties(prefix = "spring.encon")
 public class EnconProperties {
 
-  boolean enabled = true;
+  @Getter(value = PACKAGE, lazy = true)
+  final Config config = createConfig();
 
-  @NonNull
-  Defaults defaults = Defaults.INSTANCE;
+  Boolean enabled;
+
+  Defaults defaults;
 
   @NonNull
   Map<String, NodeConfig> nodes = new LinkedHashMap<>();
 
-  final Config getConfig () {
+  /**
+   * Post construct. Initialize with default values the fields.
+   */
+  @PostConstruct
+  public void postConstruct () {
+    if (enabled == null) {
+      enabled = TRUE;
+    }
+    if (defaults == null) {
+      defaults = Defaults.INSTANCE;
+    }
+  }
+
+  private Config createConfig () {
     return Config.builder()
         .defaults(defaults)
         .nodes(nodes)

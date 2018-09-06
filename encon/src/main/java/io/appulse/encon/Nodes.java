@@ -100,7 +100,7 @@ public final class Nodes implements Iterable<Node>, Closeable {
    */
   public static Node singleNode (@NonNull String name, boolean isShortNamed) {
     return singleNode(name, NodeConfig.builder()
-                      .shortNamed(isShortNamed)
+                      .shortName(isShortNamed)
                       .build());
   }
 
@@ -146,7 +146,7 @@ public final class Nodes implements Iterable<Node>, Closeable {
    */
   public Node newNode (@NonNull String name, boolean isShortNamed) {
     val nodeConfig = NodeConfig.builder()
-        .shortNamed(isShortNamed)
+        .shortName(isShortNamed)
         .build();
     return newNode(name, nodeConfig);
   }
