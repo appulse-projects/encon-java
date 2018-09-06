@@ -47,7 +47,7 @@ import org.springframework.test.context.junit4.SpringRunner;
 
 /**
  *
- * @since 1.6.1
+ * @since 1.6.2
  * @author Artem Labazin
  */
 @Slf4j

@@ -25,7 +25,7 @@ limitations under the License.
   <parent>
     <groupId>io.appulse.encon</groupId>
     <artifactId>examples</artifactId>
-    <version>1.6.1</version>
+    <version>1.6.2</version>
   </parent>
 
   <dependencyManagement>
@@ -39,7 +39,7 @@ limitations under the License.
       </dependency>
 	</dependencies>
   </dependencyManagement>
-  
+
   <groupId>io.appulse.encon.examples</groupId>
   <artifactId>load-config-spring</artifactId>
   <packaging>jar</packaging>
@@ -88,7 +88,7 @@ limitations under the License.
       <scope>test</scope>
     </dependency>
   </dependencies>
-  
+
   <build>
     <plugins>
       <plugin>

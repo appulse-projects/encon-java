@@ -22,6 +22,17 @@ and this project adheres to [Semantic Versioning](http://semver.org/spec/v2.0.0.
 - Turn on checkstyle JavaDocs module.
 - Add updates to the protocol, like new `ControlMessage`.
 
+## [1.6.2](https://github.com/appulse-projects/encon-java/releases/tag/1.6.2) - 2018-09-06
+
+### Added
+
+- Many new example projects.
+
+### Changed
+
+- Names of some properties in `Defaults` and `NodeConfig` configurations, for better compatibility with `Spring` and its way of config instanctiation;
+- Completed readme files.
+
 ## [1.6.1](https://github.com/appulse-projects/encon-java/releases/tag/1.6.1) - 2018-09-05
 
 ### Added

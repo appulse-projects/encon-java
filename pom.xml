@@ -24,7 +24,7 @@ limitations under the License.
 
   <groupId>io.appulse.encon</groupId>
   <artifactId>encon-parent</artifactId>
-  <version>1.6.1</version>
+  <version>1.6.2</version>
   <packaging>pom</packaging>
 
   <properties>
@@ -74,7 +74,7 @@ limitations under the License.
     <url>https://github.com/appulse-projects/encon-java</url>
     <connection>scm:git:https://github.com/appulse-projects/encon-java.git</connection>
     <developerConnection>scm:git:https://github.com/appulse-projects/encon-java.git</developerConnection>
-    <tag>1.6.1</tag>
+    <tag>1.6.2</tag>
   </scm>
 
   <distributionManagement>
@@ -148,7 +148,7 @@ limitations under the License.
       <dependency>
         <groupId>org.erlang.otp</groupId>
         <artifactId>jinterface</artifactId>
-        <version>1.6.1</version>
+        <version>1.6.2</version>
       </dependency>
 
       <dependency>
