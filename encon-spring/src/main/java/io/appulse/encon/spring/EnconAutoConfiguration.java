@@ -82,12 +82,35 @@ class EnconAutoConfiguration {
 
   @Bean
   @ConditionalOnMissingBean
+  @SuppressWarnings("PMD.AvoidInstantiatingObjectsInLoops")
   public Nodes defaultEnconNodes (Config config) {
     val nodes = Nodes.start(config);
     for (Node node : nodes) {
       val descriptor = node.getDescriptor();
       val name = descriptor.getNodeName();
-      context.getBeanFactory().registerSingleton(name, node);
+
+      val beanFactory = context.getBeanFactory();
+
+      // register node as bean
+      beanFactory.registerSingleton(name, node);
+
+      // register all mailboxes as beans with name pattern:
+      // <node_name>_<mailbox_name>Mailbox
+      node.mailboxes()
+          .values()
+          .stream()
+          .filter(it -> it.getName() != null && !it.getName().isEmpty())
+          .filter(it -> !"net_kernel".equalsIgnoreCase(it.getName()))
+          .forEach(it -> {
+            val mailboxName = new StringBuilder()
+                .append(name)
+                .append('_')
+                .append(it.getName())
+                .append("Mailbox")
+                .toString();
+
+            beanFactory.registerSingleton(mailboxName, it);
+          });
     }
     return nodes;
   }

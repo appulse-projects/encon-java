@@ -84,16 +84,16 @@ public class ConfigTest {
       softly.assertThat(defaults.getType())
           .isEqualTo(R6_ERLANG);
 
-      softly.assertThat(defaults.getShortNamed())
+      softly.assertThat(defaults.getShortName())
           .isFalse();
 
       softly.assertThat(defaults.getProtocol())
           .isEqualTo(TCP);
 
-      softly.assertThat(defaults.getLow())
+      softly.assertThat(defaults.getLowVersion())
           .isEqualTo(R6);
 
-      softly.assertThat(defaults.getHigh())
+      softly.assertThat(defaults.getHighVersion())
           .isEqualTo(R6);
 
       softly.assertThat(defaults.getDistributionFlags())
@@ -134,8 +134,8 @@ public class ConfigTest {
             .epmdPort(epmdPort)
             .type(type)
             .protocol(protocol)
-            .low(low)
-            .high(high)
+            .lowVersion(low)
+            .highVersion(high)
             .distributionFlags(distributionFlags)
             .mailbox(MailboxConfig.builder()
                 .build())
@@ -159,16 +159,16 @@ public class ConfigTest {
       softly.assertThat(defaults.getType())
           .isEqualTo(type);
 
-      softly.assertThat(defaults.getShortNamed())
+      softly.assertThat(defaults.getShortName())
           .isFalse();
 
       softly.assertThat(defaults.getProtocol())
           .isEqualTo(protocol);
 
-      softly.assertThat(defaults.getLow())
+      softly.assertThat(defaults.getLowVersion())
           .isEqualTo(low);
 
-      softly.assertThat(defaults.getHigh())
+      softly.assertThat(defaults.getHighVersion())
           .isEqualTo(high);
 
       softly.assertThat(defaults.getDistributionFlags())
@@ -207,16 +207,16 @@ public class ConfigTest {
       softly.assertThat(nodeConfig.getType())
           .isEqualTo(R6_ERLANG);
 
-      softly.assertThat(nodeConfig.getShortNamed())
+      softly.assertThat(nodeConfig.getShortName())
           .isFalse();
 
       softly.assertThat(nodeConfig.getProtocol())
           .isEqualTo(TCP);
 
-      softly.assertThat(nodeConfig.getLow())
+      softly.assertThat(nodeConfig.getLowVersion())
           .isEqualTo(R6);
 
-      softly.assertThat(nodeConfig.getHigh())
+      softly.assertThat(nodeConfig.getHighVersion())
           .isEqualTo(R6);
 
       softly.assertThat(nodeConfig.getDistributionFlags())
@@ -257,7 +257,7 @@ public class ConfigTest {
       softly.assertThat(defaults.getType())
           .isEqualTo(R3_ERLANG);
 
-      softly.assertThat(defaults.getShortNamed())
+      softly.assertThat(defaults.getShortName())
           .isTrue();
 
       softly.assertThat(defaults.getCookie())
@@ -266,10 +266,10 @@ public class ConfigTest {
       softly.assertThat(defaults.getProtocol())
           .isEqualTo(UDP);
 
-      softly.assertThat(defaults.getLow())
+      softly.assertThat(defaults.getLowVersion())
           .isEqualTo(R4);
 
-      softly.assertThat(defaults.getHigh())
+      softly.assertThat(defaults.getHighVersion())
           .isEqualTo(R6);
 
       softly.assertThat(defaults.getDistributionFlags())
@@ -301,7 +301,7 @@ public class ConfigTest {
       softly.assertThat(node1.getType())
           .isEqualTo(R3_HIDDEN);
 
-      softly.assertThat(node1.getShortNamed())
+      softly.assertThat(node1.getShortName())
           .isTrue();
 
       softly.assertThat(node1.getCookie())
@@ -310,10 +310,10 @@ public class ConfigTest {
       softly.assertThat(node1.getProtocol())
           .isEqualTo(SCTP);
 
-      softly.assertThat(node1.getLow())
+      softly.assertThat(node1.getLowVersion())
           .isEqualTo(R5C);
 
-      softly.assertThat(node1.getHigh())
+      softly.assertThat(node1.getHighVersion())
           .isEqualTo(R6);
 
       softly.assertThat(node1.getDistributionFlags()).contains(
@@ -375,7 +375,7 @@ public class ConfigTest {
       softly.assertThat(node2.getType())
           .isEqualTo(R3_ERLANG);
 
-      softly.assertThat(node2.getShortNamed())
+      softly.assertThat(node2.getShortName())
           .isFalse();
 
       softly.assertThat(node2.getCookie())
@@ -384,10 +384,10 @@ public class ConfigTest {
       softly.assertThat(node2.getProtocol())
           .isEqualTo(UDP);
 
-      softly.assertThat(node2.getLow())
+      softly.assertThat(node2.getLowVersion())
           .isEqualTo(R4);
 
-      softly.assertThat(node2.getHigh())
+      softly.assertThat(node2.getHighVersion())
           .isEqualTo(R6);
 
       softly.assertThat(node2.getDistributionFlags()).contains(
@@ -425,11 +425,11 @@ public class ConfigTest {
         .defaults(Defaults.builder()
             .epmdPort(8888)
             .type(R3_ERLANG)
-            .shortNamed(true)
+            .shortName(true)
             .cookie("secret")
             .protocol(UDP)
-            .low(R4)
-            .high(R6)
+            .lowVersion(R4)
+            .highVersion(R6)
             .distributionFlags(new HashSet<>(asList(
                 MAP_TAG,
                 BIG_CREATION
@@ -445,11 +445,11 @@ public class ConfigTest {
         .node("node-1", NodeConfig.builder()
             .epmdPort(7373)
             .type(R3_HIDDEN)
-            .shortNamed(false)
+            .shortName(false)
             .cookie("non-secret")
             .protocol(SCTP)
-            .low(R5C)
-            .high(R6)
+            .lowVersion(R5C)
+            .highVersion(R6)
             .distributionFlag(EXTENDED_REFERENCES)
             .distributionFlag(EXTENDED_PIDS_PORTS)
             .distributionFlag(BIT_BINARIES)
@@ -495,7 +495,7 @@ public class ConfigTest {
         softly.assertThat(defaults.getType())
             .isEqualTo(R3_ERLANG);
 
-        softly.assertThat(defaults.getShortNamed())
+        softly.assertThat(defaults.getShortName())
             .isTrue();
 
         softly.assertThat(defaults.getCookie())
@@ -504,10 +504,10 @@ public class ConfigTest {
         softly.assertThat(defaults.getProtocol())
             .isEqualTo(UDP);
 
-        softly.assertThat(defaults.getLow())
+        softly.assertThat(defaults.getLowVersion())
             .isEqualTo(R4);
 
-        softly.assertThat(defaults.getHigh())
+        softly.assertThat(defaults.getHighVersion())
             .isEqualTo(R6);
 
         softly.assertThat(defaults.getDistributionFlags())
@@ -542,7 +542,7 @@ public class ConfigTest {
         softly.assertThat(node1.getType())
             .isEqualTo(R3_HIDDEN);
 
-        softly.assertThat(node1.getShortNamed())
+        softly.assertThat(node1.getShortName())
             .isFalse();
 
         softly.assertThat(node1.getCookie())
@@ -551,10 +551,10 @@ public class ConfigTest {
         softly.assertThat(node1.getProtocol())
             .isEqualTo(SCTP);
 
-        softly.assertThat(node1.getLow())
+        softly.assertThat(node1.getLowVersion())
             .isEqualTo(R5C);
 
-        softly.assertThat(node1.getHigh())
+        softly.assertThat(node1.getHighVersion())
             .isEqualTo(R6);
 
         softly.assertThat(node1.getDistributionFlags()).contains(
@@ -616,7 +616,7 @@ public class ConfigTest {
         softly.assertThat(node2.getType())
             .isEqualTo(R3_ERLANG);
 
-        softly.assertThat(node2.getShortNamed())
+        softly.assertThat(node2.getShortName())
             .isTrue();
 
         softly.assertThat(node2.getCookie())
@@ -625,10 +625,10 @@ public class ConfigTest {
         softly.assertThat(node2.getProtocol())
             .isEqualTo(UDP);
 
-        softly.assertThat(node2.getLow())
+        softly.assertThat(node2.getLowVersion())
             .isEqualTo(R4);
 
-        softly.assertThat(node2.getHigh())
+        softly.assertThat(node2.getHighVersion())
             .isEqualTo(R6);
 
         softly.assertThat(node2.getDistributionFlags()).contains(

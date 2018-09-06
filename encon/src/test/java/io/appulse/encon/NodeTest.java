@@ -138,7 +138,7 @@ public class NodeTest {
     val name1 = createName();
     val name2 = createName();
     node = Nodes.singleNode(name1, NodeConfig.builder()
-                            .shortNamed(true)
+                            .shortName(true)
                             .cookie("secret")
                             .build()
     );
@@ -159,7 +159,7 @@ public class NodeTest {
         .isFalse();
 
     try (val node2 = Nodes.singleNode(name2, NodeConfig.builder()
-                                      .shortNamed(true)
+                                      .shortName(true)
                                       .cookie("secret")
                                       .build())) {
 
@@ -175,7 +175,7 @@ public class NodeTest {
   public void instantiating () throws Exception {
     val name = createName();
     node = Nodes.singleNode(name, NodeConfig.builder()
-                            .shortNamed(true)
+                            .shortName(true)
                             .mailbox(MailboxConfig.builder()
                                 .name("one")
                                 .build())
@@ -225,7 +225,7 @@ public class NodeTest {
   @Test
   public void sendWithRedirect () throws Exception {
     val config = NodeConfig.builder()
-        .shortNamed(true)
+        .shortName(true)
         .cookie("secret")
         .server(ServerConfig.builder()
             .bossThreads(1)
@@ -285,7 +285,7 @@ public class NodeTest {
   public void send () throws Exception {
     val name = createName();
     node = Nodes.singleNode(name, NodeConfig.builder()
-                            .shortNamed(true)
+                            .shortName(true)
                             .cookie("secret")
                             .server(ServerConfig.builder()
                                 .port(8500)

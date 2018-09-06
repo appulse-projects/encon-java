@@ -39,7 +39,6 @@ import lombok.NoArgsConstructor;
 import lombok.NonNull;
 import lombok.Singular;
 import lombok.experimental.FieldDefaults;
-import lombok.val;
 
 /**
  * Node configuration settings.
@@ -76,7 +75,7 @@ public class NodeConfig {
     ofNullable(map.get("short-name"))
         .map(Object::toString)
         .map(Boolean::valueOf)
-        .ifPresent(builder::shortNamed);
+        .ifPresent(builder::shortName);
 
     ofNullable(map.get("cookie"))
         .map(Object::toString)
@@ -87,19 +86,15 @@ public class NodeConfig {
         .map(Protocol::valueOf)
         .ifPresent(builder::protocol);
 
-    if (map.containsKey("version") && map.get("version") instanceof Map) {
-      val versionMap = (Map<String, Object>) map.get("version");
+    ofNullable(map.get("low-version"))
+        .map(Object::toString)
+        .map(Version::valueOf)
+        .ifPresent(builder::lowVersion);
 
-      ofNullable(versionMap.get("low"))
-          .map(Object::toString)
-          .map(Version::valueOf)
-          .ifPresent(builder::low);
-
-      ofNullable(versionMap.get("high"))
-          .map(Object::toString)
-          .map(Version::valueOf)
-          .ifPresent(builder::high);
-    }
+    ofNullable(map.get("high-version"))
+        .map(Object::toString)
+        .map(Version::valueOf)
+        .ifPresent(builder::highVersion);
 
     ofNullable(map.get("distribution-flags"))
         .filter(it -> it instanceof List)
@@ -135,15 +130,15 @@ public class NodeConfig {
 
   NodeType type;
 
-  Boolean shortNamed;
+  Boolean shortName;
 
   String cookie;
 
   Protocol protocol;
 
-  Version low;
+  Version lowVersion;
 
-  Version high;
+  Version highVersion;
 
   @Singular
   Set<DistributionFlag> distributionFlags;
@@ -163,11 +158,11 @@ public class NodeConfig {
   public NodeConfig (NodeConfig nodeConfig) {
     epmdPort = nodeConfig.getEpmdPort();
     type = nodeConfig.getType();
-    shortNamed = nodeConfig.getShortNamed();
+    shortName = nodeConfig.getShortName();
     cookie = nodeConfig.getCookie();
     protocol = nodeConfig.getProtocol();
-    low = nodeConfig.getLow();
-    high = nodeConfig.getHigh();
+    lowVersion = nodeConfig.getLowVersion();
+    highVersion = nodeConfig.getHighVersion();
     distributionFlags = ofNullable(nodeConfig.getDistributionFlags())
         .map(HashSet::new)
         .orElse(null);
@@ -199,8 +194,8 @@ public class NodeConfig {
     type = ofNullable(type)
         .orElse(defaults.getType());
 
-    shortNamed = ofNullable(shortNamed)
-        .orElse(defaults.getShortNamed());
+    shortName = ofNullable(shortName)
+        .orElse(defaults.getShortName());
 
     cookie = ofNullable(cookie)
         .orElse(defaults.getCookie());
@@ -208,11 +203,11 @@ public class NodeConfig {
     protocol = ofNullable(protocol)
         .orElse(defaults.getProtocol());
 
-    low = ofNullable(low)
-        .orElse(defaults.getLow());
+    lowVersion = ofNullable(lowVersion)
+        .orElse(defaults.getLowVersion());
 
-    high = ofNullable(high)
-        .orElse(defaults.getHigh());
+    highVersion = ofNullable(highVersion)
+        .orElse(defaults.getHighVersion());
 
     distributionFlags = ofNullable(distributionFlags)
         .filter(it -> !it.isEmpty())

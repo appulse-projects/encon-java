@@ -61,14 +61,14 @@ public final class Node implements Closeable {
 
   static Node newInstance (@NonNull String name, @NonNull NodeConfig config) {
 
-    val descriptor = NodeDescriptor.from(name, config.getShortNamed());
+    val descriptor = NodeDescriptor.from(name, config.getShortName());
     log.debug("Creating new Node '{}' with config:\n  {}\n", descriptor.getFullName(), config);
 
     val meta = Meta.builder()
         .type(config.getType())
         .protocol(config.getProtocol())
-        .low(config.getLow())
-        .high(config.getHigh())
+        .low(config.getLowVersion())
+        .high(config.getHighVersion())
         .flags(config.getDistributionFlags())
         .build();
 
@@ -163,7 +163,7 @@ public final class Node implements Closeable {
         config.getServer().getWorkerThreads()
     );
     moduleServer = new ModuleServer(this, moduleConnection, port);
-    moduleClient = new ModuleClient(this, moduleConnection, config.getShortNamed());
+    moduleClient = new ModuleClient(this, moduleConnection, config.getShortName());
     moduleMailbox = new ModuleMailbox(this, () -> generatorPid.generate());
   }
 

@@ -44,7 +44,7 @@ import io.appulse.encon.config.NodeConfig;
 // Creating node's config.
 // For more details - see encon-config project
 NodeConfig config = NodeConfig.builder()
-    .shortNamed(true) // true - for local nodes, false (default) - for remote accessable
+    .shortName(true) // true - for local nodes, false (default) - for remote accessable
     .cookie("secret")
     .build();
 
@@ -131,7 +131,7 @@ public class Main {
 
   public static void main (String[] args) {
     NodeConfig config = NodeConfig.builder()
-        .shortNamed(true)
+        .shortName(true)
         .build();
 
     Node node = Nodes.singleNode("java@localhost", config);

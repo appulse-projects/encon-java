@@ -40,6 +40,7 @@ limitations under the License.
 	</dependencies>
   </dependencyManagement>
 
+  <groupId>io.appulse.encon.examples</groupId>
   <artifactId>echo-server-spring</artifactId>
   <packaging>jar</packaging>
 
@@ -87,4 +88,13 @@ limitations under the License.
       <scope>test</scope>
     </dependency>
   </dependencies>
+  
+  <build>
+    <plugins>
+      <plugin>
+        <groupId>org.springframework.boot</groupId>
+        <artifactId>spring-boot-maven-plugin</artifactId>
+      </plugin>
+    </plugins>
+  </build>
 </project>

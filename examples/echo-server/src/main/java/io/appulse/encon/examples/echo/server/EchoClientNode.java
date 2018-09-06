@@ -43,7 +43,7 @@ class EchoClientNode implements Closeable {
 
   EchoClientNode (String cookie) {
     NodeConfig config = NodeConfig.builder()
-        .shortNamed(TRUE)
+        .shortName(TRUE)
         .cookie(cookie)
         .build();
 

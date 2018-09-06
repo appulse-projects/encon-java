@@ -5,9 +5,8 @@ defaults:
   short-name: true
   cookie: secret
   protocol: UDP
-  version:
-    low: R4
-    high: R6
+  low-version: R4
+  high-version: R6
   distribution-flags:
     - MAP_TAG
     - BIG_CREATION
@@ -21,9 +20,8 @@ nodes:
     type: R3_HIDDEN
     cookie: non-secret
     protocol: SCTP
-    version:
-      low: R5C
-      high: R6
+    low-version: R5C
+    high-version: R6
     distribution-flags:
       - EXTENDED_REFERENCES
       - EXTENDED_PIDS_PORTS
