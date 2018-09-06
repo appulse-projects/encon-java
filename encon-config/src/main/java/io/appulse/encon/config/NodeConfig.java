@@ -177,6 +177,9 @@ public class NodeConfig {
             .collect(toList())
         )
         .orElse(null);
+    server = ofNullable(nodeConfig.getServer())
+        .map(ServerConfig::new)
+        .orElse(null);
     compression = ofNullable(nodeConfig.getCompression())
         .map(CompressionConfig::new)
         .orElse(null);

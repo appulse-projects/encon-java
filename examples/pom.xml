@@ -39,5 +39,6 @@ limitations under the License.
     <module>databind</module>
     <module>handler-basic</module>
     <module>handler-advanced</module>
+    <module>load-config</module>
   </modules>
 </project>
