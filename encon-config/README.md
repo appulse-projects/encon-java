@@ -23,7 +23,7 @@ First of all, add config's dependency:
 **Gradle**:
 
 ```groovy
-compile 'io.appulse.encon.java:encon-config:1.6.2'
+compile 'io.appulse.encon:encon-config:1.6.2'
 ```
 
 ### File based configuration
