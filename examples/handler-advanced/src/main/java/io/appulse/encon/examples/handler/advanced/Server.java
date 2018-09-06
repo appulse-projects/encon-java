@@ -14,16 +14,24 @@
  * limitations under the License.
  */
 
-package io.appulse.encon.example.handler.basic;
+package io.appulse.encon.examples.handler.advanced;
 
+import static io.appulse.encon.handler.message.matcher.Matchers.anyInt;
+import static io.appulse.encon.handler.message.matcher.Matchers.anyString;
+import static io.appulse.encon.handler.message.matcher.Matchers.eq;
 import static lombok.AccessLevel.PRIVATE;
+
+import java.util.LinkedList;
 
 import io.appulse.encon.Node;
 import io.appulse.encon.Nodes;
 import io.appulse.encon.handler.mailbox.DefaultMailboxHandler;
 import io.appulse.encon.handler.mailbox.MailboxHandler;
+import io.appulse.encon.handler.message.MessageHandler;
+import io.appulse.encon.handler.message.matcher.MethodMatcherMessageHandler;
 import io.appulse.encon.mailbox.Mailbox;
 
+import lombok.Getter;
 import lombok.experimental.FieldDefaults;
 
 /**
@@ -33,6 +41,9 @@ import lombok.experimental.FieldDefaults;
  */
 @FieldDefaults(level = PRIVATE)
 public class Server {
+
+  @Getter
+  final LinkedList<String> history = new LinkedList<>();
 
   Node node;
 
@@ -44,8 +55,23 @@ public class Server {
         .name("my_process")
         .build();
 
+    MyService1 service1 = new MyService1(history);
+    MyService2 service2 = new MyService2(history);
+
+    MessageHandler messageHandler = MethodMatcherMessageHandler.builder()
+        .wrap(service1)
+            // redirects '[]' (empty list) to method MyService1.handler1
+            .list(it -> it.handler1())
+            // redirects tuple {any_number, any_string, atom(true)}
+            // to MyService1.handler2
+            .tuple(it -> it.handler2(anyInt(), anyString(), eq(true)))
+        .wrap(service2)
+            // redirects {42} to MyService2.popa
+            .none(it -> it.handler3(42))
+        .build();
+
     mailboxHandler = DefaultMailboxHandler.builder()
-      .messageHandler(new DummyMessageHandler())
+      .messageHandler(messageHandler)
       .mailbox(mailbox)
       .build();
 

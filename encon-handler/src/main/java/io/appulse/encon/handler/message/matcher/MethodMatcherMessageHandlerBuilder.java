@@ -36,6 +36,7 @@ import lombok.Value;
 import lombok.experimental.FieldDefaults;
 import lombok.val;
 import net.sf.cglib.proxy.Enhancer;
+import net.sf.cglib.proxy.MethodInterceptor;
 
 /**
  * Builder of a new {@link MethodMatcherMessageHandler} instance.
@@ -83,15 +84,13 @@ public class MethodMatcherMessageHandlerBuilder {
       return (T) proxy;
     }
 
-    val enhancer = new Enhancer();
-    enhancer.setSuperclass(object.getClass());
-    enhancer.setCallback(BuilderProxyMethodInterceptor.builder()
+    MethodInterceptor callback = BuilderProxyMethodInterceptor.builder()
         .list(list)
         .wrapper(wrapper)
         .target(object)
-        .build());
+        .build();
 
-    T result = (T) enhancer.create();
+    T result = (T) Enhancer.create(object.getClass(), callback);
     wrappedCache.put(cacheKey, result);
     return result;
   }

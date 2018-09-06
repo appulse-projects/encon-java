@@ -38,5 +38,6 @@ limitations under the License.
     <module>custom-queue</module>
     <module>databind</module>
     <module>handler-basic</module>
+    <module>handler-advanced</module>
   </modules>
 </project>

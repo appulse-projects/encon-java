@@ -14,37 +14,33 @@
  * limitations under the License.
  */
 
-package io.appulse.encon.echo.server.spring;
+package io.appulse.encon.examples.handler.advanced;
 
 import static lombok.AccessLevel.PRIVATE;
 
-import io.appulse.encon.databind.annotation.AsErlangTuple;
-import io.appulse.encon.terms.ErlangTerm;
-import io.appulse.encon.terms.type.ErlangPid;
+import java.util.LinkedList;
 
 import lombok.AllArgsConstructor;
-import lombok.Builder;
-import lombok.Data;
 import lombok.NoArgsConstructor;
-import lombok.NonNull;
 import lombok.experimental.FieldDefaults;
 
 /**
  *
- * @since 1.6.0
- * @author alabazin
+ * @since 1.6.1
+ * @author Artem Labazin
  */
-@Data
-@Builder
-@AsErlangTuple
 @NoArgsConstructor
 @AllArgsConstructor
 @FieldDefaults(level = PRIVATE)
-public class MyPojo1 {
+public class MyService1 {
 
-  @NonNull
-  ErlangPid sender;
+  LinkedList<String> callHistory;
 
-  @NonNull
-  ErlangTerm payload;
+  public void handler1 () {
+    callHistory.add("handler1()");
+  }
+
+  public void handler2 (int a, String b, boolean c) {
+    callHistory.add("handler2(" + a + ", " + b + ", " + c + ")");
+  }
 }
