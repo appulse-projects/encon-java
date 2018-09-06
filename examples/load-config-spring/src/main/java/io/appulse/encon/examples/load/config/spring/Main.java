@@ -21,7 +21,7 @@ import org.springframework.boot.autoconfigure.SpringBootApplication;
 
 /**
  *
- * @since 1.6.1
+ * @since 1.6.2
  * @author Artem Labazin
  */
 @SpringBootApplication
