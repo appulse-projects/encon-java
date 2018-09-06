@@ -23,7 +23,7 @@ First of all, add dependency:
 **Gradle**:
 
 ```groovy
-compile 'io.appulse.encon.java:encon-handler:1.6.2'
+compile 'io.appulse.encon:encon-handler:1.6.2'
 ```
 
 ### Basics
