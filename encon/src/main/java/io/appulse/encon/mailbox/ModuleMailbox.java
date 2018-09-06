@@ -125,6 +125,9 @@ public final class ModuleMailbox implements Closeable {
   }
 
   public void registerNetKernelMailbox () {
+    if (names.containsKey("net_kernel")) {
+      return;
+    }
     ErlangPid pid = pidProducer.get();
     Mailbox netKernel = new NetKernelMailbox(node, pid);
     pids.put(pid, netKernel);
