@@ -16,7 +16,12 @@
 
 package io.appulse.encon.terms;
 
+import static java.util.stream.Collectors.toMap;
 import static lombok.AccessLevel.PRIVATE;
+
+import java.util.Map;
+import java.util.function.Function;
+import java.util.stream.Stream;
 
 import io.appulse.encon.terms.type.ErlangAtom;
 import io.appulse.encon.terms.type.ErlangBinary;
@@ -36,7 +41,6 @@ import io.appulse.encon.terms.type.ErlangTuple;
 
 import lombok.Getter;
 import lombok.experimental.FieldDefaults;
-import lombok.val;
 
 /**
  * Enumeration of all available term types.
@@ -945,6 +949,13 @@ public enum TermType {
    */
   UNKNOWN(-1);
 
+  private static final Map<Integer, TermType> VALUES;
+
+  static {
+    VALUES = Stream.of(TermType.values())
+        .collect(toMap(it -> (int) it.getCode(), Function.identity()));
+  }
+
   @Getter
   byte code;
 
@@ -967,12 +978,7 @@ public enum TermType {
    *
    * @return parsed {@link TermType} instance
    */
-  public static TermType of (byte code) {
-    for (val type : values()) {
-      if (type.getCode() == code) {
-        return type;
-      }
-    }
-    return UNKNOWN;
+  public static TermType of (int code) {
+    return VALUES.getOrDefault(code, UNKNOWN);
   }
 }
