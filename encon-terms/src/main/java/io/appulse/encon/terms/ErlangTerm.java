@@ -133,7 +133,7 @@ public abstract class ErlangTerm implements IntegerTerm,
     case SMALL_ATOM_UTF8:
     case ATOM:
     case SMALL_ATOM:
-      return (T) new ErlangAtom(type, buffer);
+      return (T) ErlangAtom.cached(type, buffer);
     default:
       val message = String.format("Unknown term type %s (%d)", type.name(), typeByte);
       throw new ErlangTermDecodeException(message);
