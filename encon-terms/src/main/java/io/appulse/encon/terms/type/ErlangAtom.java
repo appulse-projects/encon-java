@@ -21,21 +21,25 @@ import static io.appulse.encon.terms.TermType.SMALL_ATOM;
 import static io.appulse.encon.terms.TermType.SMALL_ATOM_UTF8;
 import static java.nio.charset.StandardCharsets.ISO_8859_1;
 import static java.nio.charset.StandardCharsets.UTF_8;
+import static java.util.Locale.ENGLISH;
 import static lombok.AccessLevel.PRIVATE;
 
 import java.nio.charset.Charset;
+import java.util.Arrays;
 
+import io.appulse.encon.common.LruCache;
 import io.appulse.encon.terms.ErlangTerm;
 import io.appulse.encon.terms.TermType;
 import io.appulse.encon.terms.exception.IllegalErlangTermTypeException;
 
 import io.netty.buffer.ByteBuf;
+import io.netty.util.ByteProcessor;
 import lombok.EqualsAndHashCode;
+import lombok.Getter;
 import lombok.NonNull;
 import lombok.ToString;
 import lombok.experimental.FieldDefaults;
 import lombok.experimental.NonFinal;
-import lombok.val;
 
 /**
  * An atom is a literal, a constant with name. An atom is to be enclosed in
@@ -53,13 +57,48 @@ public class ErlangAtom extends ErlangTerm {
 
   private static final long serialVersionUID = -2748345367418129439L;
 
-  private static final byte[] TRUE_BYTES = Boolean.TRUE.toString().getBytes(UTF_8);
-
-  private static final byte[] FALSE_BYTES = Boolean.FALSE.toString().getBytes(UTF_8);
-
   private static final int MAX_ATOM_CODE_POINTS_LENGTH = 255;
 
   private static final int MAX_SMALL_ATOM_BYTES_LENGTH = 255;
+
+  private static final LruCache<Object, ErlangAtom> CACHE = new LruCache<>(100);
+
+  private static final ErlangAtom ATOM_TRUE = cached(Boolean.TRUE.toString().toLowerCase(ENGLISH));
+
+  private static final ErlangAtom ATOM_FALSE = cached(Boolean.FALSE.toString().toLowerCase(ENGLISH));
+
+  public static ErlangAtom cached (boolean value) {
+    return value
+           ? ATOM_TRUE
+           : ATOM_FALSE;
+  }
+
+  public static ErlangAtom cached (String value) {
+    Charset charset = UTF_8;
+    byte[] bytes = value.getBytes(charset);
+    int hashCode = Arrays.hashCode(bytes);
+    return CACHE.computeIfAbsent(hashCode, key -> new ErlangAtom(value, charset, bytes));
+  }
+
+  @SuppressWarnings("deprecation")
+  public static ErlangAtom cached (TermType type, ByteBuf buffer) {
+    ByteArrayHashCode byteProcessor = new ByteArrayHashCode();
+
+    int length = type == SMALL_ATOM || type == SMALL_ATOM_UTF8
+                 ? buffer.readUnsignedByte()
+                 : buffer.readUnsignedShort();
+
+    buffer.forEachByte(buffer.readerIndex(), length, byteProcessor);
+
+    return CACHE.compute(byteProcessor.getHashCode(), (key, value) -> {
+      if (value == null) {
+        return new ErlangAtom(type, buffer, length);
+      } else {
+        buffer.skipBytes(length);
+        return value;
+      }
+    });
+  }
 
   @NonFinal
   String value;
@@ -67,29 +106,6 @@ public class ErlangAtom extends ErlangTerm {
   byte[] bytes;
 
   transient Charset charset;
-
-  /**
-   * Constructs Erlang's term object with specific {@link TermType} from {@link ByteBuf}.
-   *
-   * @param type   object's type
-   *
-   * @param buffer byte buffer
-   */
-  @SuppressWarnings("deprecation")
-  public ErlangAtom (TermType type, @NonNull ByteBuf buffer) {
-    super(type);
-
-    val length = type == SMALL_ATOM || type == SMALL_ATOM_UTF8
-                 ? buffer.readUnsignedByte()
-                 : buffer.readUnsignedShort();
-
-    charset = type == SMALL_ATOM_UTF8 || type == ATOM_UTF8
-              ? UTF_8
-              : ISO_8859_1;
-
-    bytes = new byte[length];
-    buffer.readBytes(bytes);
-  }
 
   /**
    * Constructs Erlang's atom object with specific {@link String} value.
@@ -124,8 +140,47 @@ public class ErlangAtom extends ErlangTerm {
     charset = UTF_8;
     this.value = Boolean.toString(value);
     bytes = value
-            ? TRUE_BYTES
-            : FALSE_BYTES;
+            ? Boolean.TRUE.toString().getBytes(charset)
+            : Boolean.FALSE.toString().getBytes(charset);
+  }
+
+  /**
+   * Constructs Erlang's term object with specific {@link TermType} from {@link ByteBuf}.
+   *
+   * @param type   object's type
+   *
+   * @param buffer byte buffer
+   *
+   * @param length amount of useful bytes
+   */
+  private ErlangAtom (TermType type, ByteBuf buffer, int length) {
+    super(type);
+
+    charset = type == SMALL_ATOM_UTF8 || type == ATOM_UTF8
+              ? UTF_8
+              : ISO_8859_1;
+
+    bytes = new byte[length];
+    buffer.readBytes(bytes);
+  }
+
+  @SuppressWarnings("PMD.ArrayIsStoredDirectly")
+  private ErlangAtom (String value, Charset charset, byte[] bytes) {
+    super();
+
+    this.value = value.codePointCount(0, value.length()) <= MAX_ATOM_CODE_POINTS_LENGTH
+                 ? value
+                 // Throwing an exception would be better I think, but truncation
+                 // seems to be the way it has been done in other parts of OTP...
+                 : new String(value.codePoints().toArray(), 0, MAX_ATOM_CODE_POINTS_LENGTH);
+
+    this.charset = charset;
+    this.bytes = bytes;
+    if (bytes.length > MAX_SMALL_ATOM_BYTES_LENGTH) {
+      setType(ATOM_UTF8);
+    } else {
+      setType(SMALL_ATOM_UTF8);
+    }
   }
 
   @Override
@@ -174,5 +229,18 @@ public class ErlangAtom extends ErlangTerm {
       throw new IllegalErlangTermTypeException(getClass(), getType());
     }
     buffer.writeBytes(bytes);
+  }
+
+  @Getter
+  @FieldDefaults(level = PRIVATE)
+  private static class ByteArrayHashCode implements ByteProcessor {
+
+    int hashCode = 1;
+
+    @Override
+    public boolean process (byte value) throws Exception {
+      hashCode = 31 * hashCode + value;
+      return true;
+    }
   }
 }

@@ -23,6 +23,7 @@ import static lombok.AccessLevel.PRIVATE;
 import java.util.stream.LongStream;
 
 import io.appulse.encon.common.NodeDescriptor;
+import io.appulse.encon.terms.Erlang;
 import io.appulse.encon.terms.ErlangTerm;
 import io.appulse.encon.terms.TermType;
 import io.appulse.encon.terms.exception.IllegalErlangTermTypeException;
@@ -108,7 +109,7 @@ public class ErlangReference extends ErlangTerm {
   private ErlangReference (TermType type, @NonNull String node, long id, long[] ids, int creation) {
     super(ofNullable(type).orElse(NEW_REFERENCE));
 
-    this.node = new ErlangAtom(node);
+    this.node = Erlang.atom(node);
     this.ids = ofNullable(ids)
         .map(it -> it.clone())
         .map(it -> {

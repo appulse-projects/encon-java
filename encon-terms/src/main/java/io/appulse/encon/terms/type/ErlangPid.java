@@ -21,6 +21,7 @@ import static java.util.Optional.ofNullable;
 import static lombok.AccessLevel.PRIVATE;
 
 import io.appulse.encon.common.NodeDescriptor;
+import io.appulse.encon.terms.Erlang;
 import io.appulse.encon.terms.ErlangTerm;
 import io.appulse.encon.terms.TermType;
 import io.appulse.encon.terms.exception.IllegalErlangTermTypeException;
@@ -87,7 +88,7 @@ public class ErlangPid extends ErlangTerm {
   @Builder
   private ErlangPid (TermType type, @NonNull String node, int id, int serial, int creation) {
     super(ofNullable(type).orElse(PID));
-    this.node = new ErlangAtom(node);
+    this.node = Erlang.atom(node);
 
     if (getType() == PID) {
       this.id = id & 0x7FFF; // 15 bits
