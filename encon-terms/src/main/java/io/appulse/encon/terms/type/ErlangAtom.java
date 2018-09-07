@@ -61,7 +61,7 @@ public class ErlangAtom extends ErlangTerm {
 
   private static final int MAX_SMALL_ATOM_BYTES_LENGTH = 255;
 
-  private static final LruCache<Object, ErlangAtom> CACHE = new LruCache<>(1000);
+  private static final LruCache<Integer, ErlangAtom> CACHE = new LruCache<>(1000);
 
   private static final ErlangAtom ATOM_TRUE = cached(Boolean.TRUE.toString().toLowerCase(ENGLISH));
 

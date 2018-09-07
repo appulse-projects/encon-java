@@ -108,7 +108,7 @@ public abstract class ErlangTerm implements IntegerTerm,
       return (T) new ErlangPort(type, buffer);
     case PID:
     case NEW_PID:
-      return (T) new ErlangPid(type, buffer);
+      return (T) ErlangPid.cached(type, buffer);
     case SMALL_TUPLE:
     case LARGE_TUPLE:
       return (T) new ErlangTuple(type, buffer);
