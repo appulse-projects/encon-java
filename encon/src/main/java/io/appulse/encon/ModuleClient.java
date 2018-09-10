@@ -16,7 +16,9 @@
 
 package io.appulse.encon;
 
+import static io.netty.channel.ChannelOption.ALLOCATOR;
 import static io.netty.channel.ChannelOption.CONNECT_TIMEOUT_MILLIS;
+import static io.netty.channel.ChannelOption.SINGLE_EVENTEXECUTOR_PER_GROUP;
 import static io.netty.channel.ChannelOption.SO_KEEPALIVE;
 import static io.netty.channel.ChannelOption.TCP_NODELAY;
 import static java.util.concurrent.TimeUnit.SECONDS;
@@ -109,6 +111,8 @@ class ModuleClient implements Closeable {
         .option(SO_KEEPALIVE, true)
         .option(TCP_NODELAY, true)
         .option(CONNECT_TIMEOUT_MILLIS, 5000)
+        .option(ALLOCATOR, moduleConnection.getAllocator())
+        .option(SINGLE_EVENTEXECUTOR_PER_GROUP, true)
         .handler(HandshakeClientInitializer.builder()
             .node(node)
             .future(future)

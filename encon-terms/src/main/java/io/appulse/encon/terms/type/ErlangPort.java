@@ -21,6 +21,7 @@ import static java.util.Optional.ofNullable;
 import static lombok.AccessLevel.PRIVATE;
 
 import io.appulse.encon.common.NodeDescriptor;
+import io.appulse.encon.terms.Erlang;
 import io.appulse.encon.terms.ErlangTerm;
 import io.appulse.encon.terms.TermType;
 import io.appulse.encon.terms.exception.IllegalErlangTermTypeException;
@@ -94,7 +95,7 @@ public class ErlangPort extends ErlangTerm {
   @Builder
   private ErlangPort (TermType type, @NonNull String node, int id, int creation) {
     super(ofNullable(type).orElse(PORT));
-    this.node = new ErlangAtom(node);
+    this.node = Erlang.atom(node);
 
     if (getType() == PORT) {
       this.id = id & 0xFFFFFFF; // 28 bits

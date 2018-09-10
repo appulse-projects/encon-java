@@ -29,6 +29,7 @@ import io.appulse.encon.terms.ErlangTerm;
 import io.appulse.encon.terms.type.ErlangAtom;
 import io.appulse.encon.terms.type.ErlangPid;
 
+import io.netty.buffer.ByteBuf;
 import lombok.NonNull;
 import lombok.Value;
 
@@ -99,4 +100,15 @@ public class Message {
   ControlMessage header;
 
   ErlangTerm body;
+
+  public void writeTo (ByteBuf buffer) {
+    buffer.writeByte(0x70);
+    buffer.writeByte(0x83);
+    header.writeTo(buffer);
+
+    if (body != null) {
+      buffer.writeByte(0x83);
+      body.writeTo(buffer);
+    }
+  }
 }

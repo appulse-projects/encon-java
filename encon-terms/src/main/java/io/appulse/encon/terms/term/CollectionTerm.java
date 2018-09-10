@@ -28,8 +28,8 @@ import java.util.Iterator;
 import java.util.Map;
 import java.util.Optional;
 
+import io.appulse.encon.terms.Erlang;
 import io.appulse.encon.terms.ErlangTerm;
-import io.appulse.encon.terms.type.ErlangAtom;
 import io.appulse.encon.terms.type.ErlangList;
 import io.appulse.encon.terms.type.ErlangMap;
 import io.appulse.encon.terms.type.ErlangTuple;
@@ -212,7 +212,7 @@ public interface CollectionTerm extends ValueTerm, Iterable<ErlangTerm> {
    *         key term. {@link Optional#empty} otherwise.
    */
   default Optional<ErlangTerm> getByAtom (@NonNull String fieldName) {
-    val term = new ErlangAtom(fieldName);
+    val term = Erlang.atom(fieldName);
     return get(term);
   }
 

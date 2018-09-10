@@ -17,7 +17,6 @@
 package io.appulse.encon.connection.regular;
 
 import static io.netty.handler.logging.LogLevel.DEBUG;
-import static java.lang.Integer.MAX_VALUE;
 
 import java.util.function.Consumer;
 
@@ -25,38 +24,23 @@ import io.appulse.encon.Node;
 import io.appulse.encon.common.RemoteNode;
 
 import io.netty.channel.ChannelDuplexHandler;
-import io.netty.channel.ChannelInboundHandler;
-import io.netty.channel.ChannelOutboundHandler;
 import io.netty.channel.ChannelPipeline;
-import io.netty.handler.codec.LengthFieldBasedFrameDecoder;
-import io.netty.handler.codec.LengthFieldPrepender;
 import io.netty.handler.logging.LoggingHandler;
 import lombok.NonNull;
-import lombok.val;
+import lombok.extern.slf4j.Slf4j;
 
 /**
  *
  * @since 1.0.0
  * @author Artem Labazin
  */
+@Slf4j
 public final class RegularPipeline {
 
   private static final ChannelDuplexHandler LOGGING_HANDLER;
 
-  private static final LengthFieldPrepender LENGTH_FIELD_PREPENDER;
-
-  private static final ChannelInboundHandler TICK_TOCK_HANDLER;
-
-  private static final ChannelOutboundHandler MESSAGE_ENCODER;
-
-  private static final ChannelInboundHandler MESSAGE_DECODER;
-
   static {
     LOGGING_HANDLER = new LoggingHandler(DEBUG);
-    LENGTH_FIELD_PREPENDER = new LengthFieldPrepender(4, false);
-    TICK_TOCK_HANDLER = new TickTockHandler();
-    MESSAGE_ENCODER = new MessageEncoder();
-    MESSAGE_DECODER = new MessageDecoder();
   }
 
   public static ConnectionHandler setup (@NonNull ChannelPipeline pipeline,
@@ -64,16 +48,16 @@ public final class RegularPipeline {
                                          @NonNull RemoteNode remoteNode,
                                          @NonNull Consumer<RemoteNode> channelCloseAction
   ) {
-    val handler = new ConnectionHandler(node, remoteNode, channelCloseAction);
+    ConnectionHandler handler = ConnectionHandler.builder()
+        .node(node)
+        .remote(remoteNode)
+        .channelCloseAction(channelCloseAction)
+        .build();
 
-    pipeline
-        .addLast(LOGGING_HANDLER)
-        .addLast(TICK_TOCK_HANDLER)
-        .addLast(LENGTH_FIELD_PREPENDER)
-        .addLast(new LengthFieldBasedFrameDecoder(MAX_VALUE, 0, 4))
-        .addLast(MESSAGE_ENCODER)
-        .addLast(MESSAGE_DECODER)
-        .addLast(handler);
+    if (log.isDebugEnabled()) {
+      pipeline.addLast(LOGGING_HANDLER);
+    }
+    pipeline.addLast(handler);
 
     return handler;
   }
