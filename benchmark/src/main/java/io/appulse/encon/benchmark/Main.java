@@ -115,7 +115,10 @@ public class Main {
     }
     executor = Executors.newSingleThreadExecutor();
 
-    server = new ServerCommandExecutor(new CommonOptions(), new ServerCommandOptions());
+    ServerCommandOptions options = new ServerCommandOptions();
+    options.setChecks(true);
+
+    server = new ServerCommandExecutor(new CommonOptions(), options);
     executor.execute(server::execute);
   }
 

@@ -29,6 +29,8 @@ import java.util.function.Function;
 import io.appulse.encon.common.RemoteNode;
 import io.appulse.encon.connection.Connection;
 
+import io.netty.buffer.ByteBufAllocator;
+import io.netty.buffer.PooledByteBufAllocator;
 import io.netty.channel.Channel;
 import io.netty.channel.EventLoopGroup;
 import io.netty.channel.ServerChannel;
@@ -75,6 +77,9 @@ class ModuleConnection implements Closeable {
   @Getter
   Class<? extends ServerChannel> serverChannelClass;
 
+  @Getter
+  ByteBufAllocator allocator;
+
   Map<RemoteNode, CompletableFuture<Connection>> cache;
 
   ModuleConnection (@NonNull String prefix, int bossThreads, int workerThreads) {
@@ -94,6 +99,7 @@ class ModuleConnection implements Closeable {
       clientChannelClass = NioSocketChannel.class;
       serverChannelClass = NioServerSocketChannel.class;
     }
+    allocator = new PooledByteBufAllocator(true);
   }
 
   @Override
