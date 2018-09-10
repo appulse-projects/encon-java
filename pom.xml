@@ -24,7 +24,7 @@ limitations under the License.
 
   <groupId>io.appulse.encon</groupId>
   <artifactId>encon-parent</artifactId>
-  <version>1.6.2</version>
+  <version>1.6.3</version>
   <packaging>pom</packaging>
 
   <properties>
@@ -74,7 +74,7 @@ limitations under the License.
     <url>https://github.com/appulse-projects/encon-java</url>
     <connection>scm:git:https://github.com/appulse-projects/encon-java.git</connection>
     <developerConnection>scm:git:https://github.com/appulse-projects/encon-java.git</developerConnection>
-    <tag>1.6.2</tag>
+    <tag>1.6.3</tag>
   </scm>
 
   <distributionManagement>
@@ -108,6 +108,11 @@ limitations under the License.
       <id>ambivalence42</id>
       <name>Sokol Andrey</name>
       <email>sokolandrey1993@mail.ru</email>
+    </developer>
+    <developer>
+      <id>isv</id>
+      <name>Stan Ignatev</name>
+      <email>i.v.stanislav@gmail.com</email>
     </developer>
   </developers>
 
@@ -165,17 +170,17 @@ limitations under the License.
       <dependency>
         <groupId>io.netty</groupId>
         <artifactId>netty-buffer</artifactId>
-        <version>4.1.28.Final</version>
+        <version>4.1.29.Final</version>
       </dependency>
       <dependency>
         <groupId>io.netty</groupId>
         <artifactId>netty-handler</artifactId>
-        <version>4.1.28.Final</version>
+        <version>4.1.29.Final</version>
       </dependency>
       <dependency>
         <groupId>io.netty</groupId>
         <artifactId>netty-transport-native-epoll</artifactId>
-        <version>4.1.28.Final</version>
+        <version>4.1.29.Final</version>
         <classifier>linux-x86_64</classifier>
         <exclusions>
           <exclusion>
@@ -201,12 +206,12 @@ limitations under the License.
       <dependency>
         <groupId>org.assertj</groupId>
         <artifactId>assertj-core</artifactId>
-        <version>3.11.0</version>
+        <version>3.11.1</version>
       </dependency>
       <dependency>
         <groupId>org.mockito</groupId>
         <artifactId>mockito-core</artifactId>
-        <version>2.21.0</version>
+        <version>2.22.0</version>
       </dependency>
     </dependencies>
   </dependencyManagement>
@@ -316,41 +321,6 @@ limitations under the License.
             </execution>
           </executions>
         </plugin>
-
-        <plugin>
-          <groupId>org.apache.maven.plugins</groupId>
-          <artifactId>maven-deploy-plugin</artifactId>
-          <version>2.8.2</version>
-          <configuration>
-            <skip>true</skip>
-          </configuration>
-        </plugin>
-        <plugin>
-          <groupId>org.sonatype.plugins</groupId>
-          <artifactId>nexus-staging-maven-plugin</artifactId>
-          <version>1.6.8</version>
-          <extensions>true</extensions>
-          <configuration>
-            <serverId>ossrh</serverId>
-            <nexusUrl>https://oss.sonatype.org/</nexusUrl>
-            <autoReleaseAfterClose>true</autoReleaseAfterClose>
-          </configuration>
-        </plugin>
-
-        <plugin>
-          <groupId>org.apache.maven.plugins</groupId>
-          <artifactId>maven-gpg-plugin</artifactId>
-          <version>1.6</version>
-          <executions>
-            <execution>
-              <id>sign-artifacts</id>
-              <phase>verify</phase>
-              <goals>
-                <goal>sign</goal>
-              </goals>
-            </execution>
-          </executions>
-        </plugin>
       </plugins>
     </pluginManagement>
 
@@ -402,6 +372,41 @@ limitations under the License.
             <goals>
               <goal>integration-test</goal>
               <goal>verify</goal>
+            </goals>
+          </execution>
+        </executions>
+      </plugin>
+
+      <plugin>
+        <groupId>org.apache.maven.plugins</groupId>
+        <artifactId>maven-deploy-plugin</artifactId>
+        <version>2.8.2</version>
+        <configuration>
+          <skip>true</skip>
+        </configuration>
+      </plugin>
+      <plugin>
+        <groupId>org.sonatype.plugins</groupId>
+        <artifactId>nexus-staging-maven-plugin</artifactId>
+        <version>1.6.8</version>
+        <extensions>true</extensions>
+        <configuration>
+          <serverId>ossrh</serverId>
+          <nexusUrl>https://oss.sonatype.org/</nexusUrl>
+          <autoReleaseAfterClose>true</autoReleaseAfterClose>
+        </configuration>
+      </plugin>
+
+      <plugin>
+        <groupId>org.apache.maven.plugins</groupId>
+        <artifactId>maven-gpg-plugin</artifactId>
+        <version>1.6</version>
+        <executions>
+          <execution>
+            <id>sign-artifacts</id>
+            <phase>verify</phase>
+            <goals>
+              <goal>sign</goal>
             </goals>
           </execution>
         </executions>

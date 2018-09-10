@@ -85,7 +85,7 @@ public final class Erlang {
    * @return {@link ErlangInteger} new instance
    */
   public static ErlangInteger number (char value) {
-    return new ErlangInteger(value);
+    return ErlangInteger.cached(value);
   }
 
   /**
@@ -96,7 +96,7 @@ public final class Erlang {
    * @return {@link ErlangInteger} new instance
    */
   public static ErlangInteger number (byte value) {
-    return new ErlangInteger(value);
+    return ErlangInteger.cached(value);
   }
 
   /**
@@ -107,7 +107,7 @@ public final class Erlang {
    * @return {@link ErlangInteger} new instance
    */
   public static ErlangInteger number (short value) {
-    return new ErlangInteger(value);
+    return ErlangInteger.cached(value);
   }
 
   /**
@@ -118,7 +118,7 @@ public final class Erlang {
    * @return {@link ErlangInteger} new instance
    */
   public static ErlangInteger number (int value) {
-    return new ErlangInteger(value);
+    return ErlangInteger.cached(value);
   }
 
   /**
@@ -129,7 +129,7 @@ public final class Erlang {
    * @return {@link ErlangInteger} new instance
    */
   public static ErlangInteger number (long value) {
-    return new ErlangInteger(value);
+    return ErlangInteger.cached(value);
   }
 
   /**
@@ -140,7 +140,7 @@ public final class Erlang {
    * @return {@link ErlangInteger} new instance
    */
   public static ErlangInteger number (@NonNull BigInteger value) {
-    return new ErlangInteger(value);
+    return ErlangInteger.cached(value);
   }
 
   /**

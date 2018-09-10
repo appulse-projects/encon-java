@@ -99,7 +99,7 @@ public abstract class ControlMessage {
     val elements = Stream.of(elements())
         .collect(toCollection(LinkedList::new));
 
-    elements.addFirst(ErlangInteger.from(getTag().getCode()));
+    elements.addFirst(ErlangInteger.cached(getTag().getCode()));
     return new ErlangTuple(elements);
   }
 

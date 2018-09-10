@@ -22,9 +22,23 @@
 
 | Benchmark                                                                                                      | Mode  | Cnt | Score       | Error       | Units |
 |----------------------------------------------------------------------------------------------------------------|-------|-----|------------:|------------:|-------|
-| [EnconBenchmark.mailbox2mailbox](./src/main/java/io/appulse/encon/benchmark/EnconBenchmark.java#L103)          | thrpt | 25  | 4611737.930 | ± 54595.578 | ops/s |
-| [EnconBenchmark.node2node](./src/main/java/io/appulse/encon/benchmark/EnconBenchmark.java#L177)                | thrpt | 25  |   13969.833 |   ± 164.199 | ops/s |
-| [EnconBenchmark.oneDirection](./src/main/java/io/appulse/encon/benchmark/EnconBenchmark.java#L167)             | thrpt | 25  |   28028.764 |   ± 262.720 | ops/s |
-| [JInterfaceBenchmark.mailbox2mailbox](./src/main/java/io/appulse/encon/benchmark/JInterfaceBenchmark.java#L99) | thrpt | 25  | 4370604.847 | ± 15769.278 | ops/s |
-| [JInterfaceBenchmark.node2node](./src/main/java/io/appulse/encon/benchmark/JInterfaceBenchmark.java#L175)      | thrpt | 25  |   17196.521 |   ± 113.159 | ops/s |
-| [JInterfaceBenchmark.oneDirection](./src/main/java/io/appulse/encon/benchmark/JInterfaceBenchmark.java#L165)   | thrpt | 25  |   34529.556 |   ± 207.977 | ops/s |
+| [EnconBenchmark.mailbox2mailbox](./src/main/java/io/appulse/encon/benchmark/EnconBenchmark.java#L103)          | thrpt | 25  | 4562837.232 | ± 48730.020 | ops/s |
+| [EnconBenchmark.node2node](./src/main/java/io/appulse/encon/benchmark/EnconBenchmark.java#L177)                | thrpt | 25  |   13744.084 |   ± 160.906 | ops/s |
+| [EnconBenchmark.oneDirection](./src/main/java/io/appulse/encon/benchmark/EnconBenchmark.java#L167)             | thrpt | 25  |   27665.670 |   ± 230.607 | ops/s |
+| [JInterfaceBenchmark.mailbox2mailbox](./src/main/java/io/appulse/encon/benchmark/JInterfaceBenchmark.java#L99) | thrpt | 25  | 4345167.985 | ± 22392.570 | ops/s |
+| [JInterfaceBenchmark.node2node](./src/main/java/io/appulse/encon/benchmark/JInterfaceBenchmark.java#L175)      | thrpt | 25  |   13850.978 |   ± 126.660 | ops/s |
+| [JInterfaceBenchmark.oneDirection](./src/main/java/io/appulse/encon/benchmark/JInterfaceBenchmark.java#L165)   | thrpt | 25  |   27590.545 |   ± 253.874 | ops/s |
+
+How to run the benchmarks:
+
+```bash
+$> mvn clean package \
+     -DskipTests \
+     -Dgpg.skip \
+     -Dfindbugs.skip=true \
+     -Dpmd.skip=true \
+     -Dcheckstyle.skip \
+     -Dmaven.test.skip=true \
+     -pl benchmark -am; and \
+   java -Xms1G -Xmx2G -jar benchmark/target/benchmarks.jar
+```
