@@ -95,7 +95,7 @@ public abstract class ErlangTerm implements IntegerTerm,
     case INTEGER:
     case SMALL_BIG:
     case LARGE_BIG:
-      return (T) new ErlangInteger(type, buffer);
+      return (T) ErlangInteger.cached(type, buffer);
     case FLOAT:
     case NEW_FLOAT:
       return (T) new ErlangFloat(type, buffer);

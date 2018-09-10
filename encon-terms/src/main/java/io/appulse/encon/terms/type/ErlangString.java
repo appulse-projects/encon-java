@@ -102,7 +102,7 @@ public class ErlangString extends ErlangTerm {
     case LIST:
       val elements = value.codePoints()
           .boxed()
-          .map(ErlangInteger::from)
+          .map(ErlangInteger::cached)
           .toArray(ErlangInteger[]::new);
 
       buffer.writerIndex(positionBefore);

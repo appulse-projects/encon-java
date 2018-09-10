@@ -17,8 +17,11 @@
 package io.appulse.encon;
 
 import static io.netty.channel.ChannelOption.ALLOCATOR;
+import static io.netty.channel.ChannelOption.CONNECT_TIMEOUT_MILLIS;
+import static io.netty.channel.ChannelOption.SINGLE_EVENTEXECUTOR_PER_GROUP;
 import static io.netty.channel.ChannelOption.SO_BACKLOG;
 import static io.netty.channel.ChannelOption.SO_KEEPALIVE;
+import static io.netty.channel.ChannelOption.SO_RCVBUF;
 import static io.netty.channel.ChannelOption.SO_REUSEADDR;
 import static io.netty.channel.ChannelOption.TCP_NODELAY;
 import static io.netty.channel.ChannelOption.WRITE_BUFFER_WATER_MARK;
@@ -30,7 +33,6 @@ import java.io.Closeable;
 import io.appulse.encon.connection.handshake.HandshakeServerInitializer;
 
 import io.netty.bootstrap.ServerBootstrap;
-import io.netty.buffer.PooledByteBufAllocator;
 import io.netty.channel.WriteBufferWaterMark;
 import io.netty.handler.logging.LoggingHandler;
 import lombok.NonNull;
@@ -87,11 +89,15 @@ class ModuleServer implements Closeable {
             .build())
         .option(SO_BACKLOG, 1024)
         .option(SO_REUSEADDR, true)
+        .option(CONNECT_TIMEOUT_MILLIS, 5000)
+        .option(ALLOCATOR, moduleConnection.getAllocator())
+        .option(SINGLE_EVENTEXECUTOR_PER_GROUP, true)
         .childOption(SO_REUSEADDR, true)
         .childOption(SO_KEEPALIVE, true)
         .childOption(TCP_NODELAY, true)
+        .childOption(SO_RCVBUF, 128 * 1024)
         .childOption(WRITE_BUFFER_WATER_MARK, new WriteBufferWaterMark(64 * 1024, 128 * 1024))
-        .childOption(ALLOCATOR, new PooledByteBufAllocator(true))
+        .childOption(ALLOCATOR, moduleConnection.getAllocator())
         .bind(port);
   }
 }
