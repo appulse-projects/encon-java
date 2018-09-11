@@ -107,8 +107,6 @@ public class JInterface_SimpleBenchmarks {
 
     OtpErlangPid serverMailboxPid;
 
-    Thread serverThread;
-
     OtpNode clientNode;
 
     OtpMbox clientMailbox;
@@ -120,16 +118,6 @@ public class JInterface_SimpleBenchmarks {
       serverNode = new OtpNode("node-server-" + System.nanoTime() + "@localhost");
       serverMailbox = serverNode.createMbox();
       serverMailboxPid = serverMailbox.self();
-
-      serverThread = new Thread(() -> {
-          try {
-            while (!java.lang.Thread.interrupted()) {
-              serverMailbox.receive();
-            }
-          } catch (Throwable ex) {
-          }
-      });
-      serverThread.start();
 
       clientNode = new OtpNode("node-client-" + System.nanoTime() + "@localhost");
       clientMailbox = clientNode.createMbox();
@@ -144,8 +132,6 @@ public class JInterface_SimpleBenchmarks {
 
       serverMailbox.close();
       serverNode.close();
-
-      serverThread.interrupt();
     }
   }
 }
