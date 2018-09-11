@@ -52,9 +52,9 @@ import org.openjdk.jmh.infra.ThreadParams;
  */
 @State(Benchmark)
 @OutputTimeUnit(SECONDS)
-@Warmup(iterations = 1)
+@Warmup(iterations = 10)
 @BenchmarkMode(Throughput)
-@Measurement(iterations = 1)
+@Measurement(iterations = 20)
 public class Encon_Node2NodeBenchmarks {
 
   Node serverNode;
