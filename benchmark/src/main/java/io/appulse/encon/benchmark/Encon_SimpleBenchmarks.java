@@ -122,8 +122,6 @@ public class Encon_SimpleBenchmarks {
 
     ErlangPid serverMailboxPid;
 
-    Thread serverThread;
-
     Node clientNode;
 
     Mailbox clientMailbox;
@@ -145,16 +143,6 @@ public class Encon_SimpleBenchmarks {
       serverMailbox = serverNode.mailbox().build();
       serverMailboxPid = serverMailbox.getPid();
 
-      serverThread = new Thread(() -> {
-          try {
-            while (!java.lang.Thread.interrupted()) {
-              serverMailbox.receive();
-            }
-          } catch (Throwable ex) {
-          }
-      });
-      serverThread.start();
-
       clientNode = Nodes.singleNode("node-client-" + System.nanoTime(), config);
       clientMailbox = clientNode.mailbox().build();
 
@@ -168,8 +156,6 @@ public class Encon_SimpleBenchmarks {
 
       serverMailbox.close();
       serverNode.close();
-
-      serverThread.interrupt();
     }
   }
 }
