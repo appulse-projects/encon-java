@@ -2,6 +2,39 @@
 
 ## Benchmark host machine
 
+For benchmarking we are using `DigitalOcean`'s CPU Optimized Droplets:
+
+```bash
+$> sudo lshw -short
+H/W path      Device      Class      Description
+================================================
+                          system     Droplet
+/0                        bus        Motherboard
+/0/0                      memory     96KiB BIOS
+/0/401                    processor  Intel(R) Xeon(R) CPU E5-2697A v4 @ 2.60GHz
+/0/402                    processor  Intel(R) Xeon(R) CPU E5-2697A v4 @ 2.60GHz
+/0/1000                   memory     4GiB System Memory
+/0/1000/0                 memory     4GiB DIMM RAM
+/0/100                    bridge     440FX - 82441FX PMC [Natoma]
+/0/100/1                  bridge     82371SB PIIX3 ISA [Natoma/Triton II]
+/0/100/1.1                storage    82371SB PIIX3 IDE [Natoma/Triton II]
+/0/100/1.2                bus        82371SB PIIX3 USB [Natoma/Triton II]
+/0/100/1.2/1  usb1        bus        UHCI Host Controller
+/0/100/1.3                bridge     82371AB/EB/MB PIIX4 ACPI
+/0/100/2                  display    QXL paravirtual graphic card
+/0/100/3                  network    Virtio network device
+/0/100/3/0    eth0        network    Ethernet interface
+/0/100/4                  storage    Virtio SCSI
+/0/100/4/0                generic    Virtual I/O device
+/0/100/5                  storage    Virtio block device
+/0/100/5/0    /dev/vda    disk       26GB Virtual I/O device
+/0/100/5/0/1  /dev/vda1   volume     24GiB EXT4 volume
+/0/100/5/0/e  /dev/vda14  volume     4095KiB BIOS Boot partition
+/0/100/5/0/f  /dev/vda15  volume     105MiB Windows FAT volume
+/0/100/6                  generic    Virtio memory balloon
+/0/100/6/0                generic    Virtual I/O device
+```
+
 * **JMH version:** 1.21
 
 * **VM version:** JDK 1.8.0_181, Java HotSpot(TM) 64-Bit Server VM, 25.181-b13
