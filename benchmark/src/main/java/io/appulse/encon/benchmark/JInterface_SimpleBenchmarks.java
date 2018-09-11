@@ -38,7 +38,7 @@ import org.openjdk.jmh.infra.Blackhole;
 
 /**
  *
- * @since 1.6.0
+ * @since 1.6.3
  * @author Artem Labazin
  */
 @OutputTimeUnit(SECONDS)
@@ -64,13 +64,11 @@ public class JInterface_SimpleBenchmarks {
   @State(Benchmark)
   public static class Mailbox2MailboxAndBackState {
 
-    OtpNode node1;
+    OtpNode node;
 
     OtpMbox mailbox1;
 
     OtpErlangPid pid1;
-
-    OtpNode node2;
 
     OtpMbox mailbox2;
 
@@ -80,12 +78,12 @@ public class JInterface_SimpleBenchmarks {
 
     @Setup(Trial)
     public void setup () throws Exception {
-      node1 = new OtpNode("node-1-" + System.nanoTime() + "@localhost");
-      mailbox1 = node1.createMbox();
+      node = new OtpNode("node-" + System.nanoTime() + "@localhost");
+
+      mailbox1 = node.createMbox();
       pid1 = mailbox1.self();
 
-      node2 = new OtpNode("node-2-" + System.nanoTime() + "@localhost");
-      mailbox2 = node2.createMbox();
+      mailbox2 = node.createMbox();
       pid2 = mailbox2.self();
 
       data = new OtpErlangBinary(new byte[] { 1, 2, 3, 4, 5 });
@@ -94,10 +92,9 @@ public class JInterface_SimpleBenchmarks {
     @TearDown(Trial)
     public void tearDown () {
       mailbox1.close();
-      node1.close();
-
       mailbox2.close();
-      node2.close();
+
+      node.close();
     }
   }
 
