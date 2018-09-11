@@ -69,7 +69,7 @@ public class ErlangInteger extends ErlangTerm {
   /**
    * Creates cached {@link ErlangInteger} value.
    *
-   * @param number integer value
+   * @param value integer value
    *
    * @return new or cached {@link ErlangInteger} object
    */
@@ -88,7 +88,7 @@ public class ErlangInteger extends ErlangTerm {
   /**
    * Creates cached {@link ErlangInteger} value.
    *
-   * @param number integer value
+   * @param value integer value
    *
    * @return new or cached {@link ErlangInteger} object
    */
@@ -108,7 +108,7 @@ public class ErlangInteger extends ErlangTerm {
   /**
    * Creates cached {@link ErlangInteger} value.
    *
-   * @param number integer value
+   * @param value integer value
    *
    * @return new or cached {@link ErlangInteger} object
    */
@@ -128,7 +128,7 @@ public class ErlangInteger extends ErlangTerm {
   /**
    * Creates cached {@link ErlangInteger} value.
    *
-   * @param number integer value
+   * @param value integer value
    *
    * @return new or cached {@link ErlangInteger} object
    */
@@ -150,7 +150,7 @@ public class ErlangInteger extends ErlangTerm {
   /**
    * Creates cached {@link ErlangInteger} value.
    *
-   * @param number integer value
+   * @param value integer value
    *
    * @return new or cached {@link ErlangInteger} object
    */
@@ -176,7 +176,7 @@ public class ErlangInteger extends ErlangTerm {
   /**
    * Creates cached {@link ErlangInteger} value.
    *
-   * @param number integer value
+   * @param value integer value
    *
    * @return new or cached {@link ErlangInteger} object
    */
@@ -184,10 +184,6 @@ public class ErlangInteger extends ErlangTerm {
     if (value.bitLength() < Long.BYTES) {
       return cached(value.longValue());
     }
-    // int hashCode = value.signum() == -1
-    //                ? 32
-    //                : 31;
-    // return CACHE.computeIfAbsent(hashCode, key -> new ErlangInteger(value));
     return new ErlangInteger(value);
   }
 
