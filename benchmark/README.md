@@ -79,7 +79,7 @@ $> sudo apt-get update && sudo apt-get upgrade
 3. Install `Git`, `Java 8` and `Maven`:
 
 ```bash
-$> sudo apt-get install oracle-java8-installer git maven
+$> sudo apt-get install -y oracle-java8-installer git maven
 ```
 
 4. Clone the repo:

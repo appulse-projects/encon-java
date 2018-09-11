@@ -47,7 +47,7 @@ import org.openjdk.jmh.infra.ThreadParams;
 
 /**
  *
- * @since 1.6.0
+ * @since 1.6.3
  * @author Artem Labazin
  */
 @State(Benchmark)

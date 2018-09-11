@@ -44,7 +44,7 @@ import org.openjdk.jmh.infra.Blackhole;
 
 /**
  *
- * @since 1.6.0
+ * @since 1.6.3
  * @author Artem Labazin
  */
 @OutputTimeUnit(SECONDS)
@@ -70,13 +70,11 @@ public class Encon_SimpleBenchmarks {
   @State(Benchmark)
   public static class Mailbox2MailboxAndBackState {
 
-    Node node1;
+    Node node;
 
     Mailbox mailbox1;
 
     ErlangPid pid1;
-
-    Node node2;
 
     Mailbox mailbox2;
 
@@ -95,12 +93,12 @@ public class Encon_SimpleBenchmarks {
           )
           .build();
 
-      node1 = Nodes.singleNode("node-1-" + System.nanoTime(), config);
-      mailbox1 = node1.mailbox().build();
+      node = Nodes.singleNode("node-" + System.nanoTime(), config);
+
+      mailbox1 = node.mailbox().build();
       pid1 = mailbox1.getPid();
 
-      node2 = Nodes.singleNode("node-2-" + System.nanoTime(), config);
-      mailbox2 = node2.mailbox().build();
+      mailbox2 = node.mailbox().build();
       pid2 = mailbox2.getPid();
 
       data = binary(new byte[] { 1, 2, 3, 4, 5 });
@@ -109,10 +107,9 @@ public class Encon_SimpleBenchmarks {
     @TearDown(Trial)
     public void tearDown () {
       mailbox1.close();
-      node1.close();
-
       mailbox2.close();
-      node2.close();
+
+      node.close();
     }
   }
 
