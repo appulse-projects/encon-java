@@ -48,9 +48,9 @@ import org.openjdk.jmh.infra.Blackhole;
  * @author Artem Labazin
  */
 @OutputTimeUnit(SECONDS)
-@Warmup(iterations = 1)
+@Warmup(iterations = 10)
 @BenchmarkMode(Throughput)
-@Measurement(iterations = 1)
+@Measurement(iterations = 20)
 public class Encon_SimpleBenchmarks {
 
   @Benchmark
