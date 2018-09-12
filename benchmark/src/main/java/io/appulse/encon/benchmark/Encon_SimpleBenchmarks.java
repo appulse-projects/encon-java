@@ -61,12 +61,6 @@ public class Encon_SimpleBenchmarks {
     blackHole.consume(state.mailbox1.receive());
   }
 
-  @Benchmark
-  public void oneDirectionSend (OneDirectionSendState state, Blackhole blackHole) {
-    state.clientMailbox.send(state.serverMailboxPid, state.data);
-    blackHole.consume(state.serverMailbox.receive());
-  }
-
   @State(Benchmark)
   public static class Mailbox2MailboxAndBackState {
 
@@ -110,52 +104,6 @@ public class Encon_SimpleBenchmarks {
       mailbox2.close();
 
       node.close();
-    }
-  }
-
-  @State(Benchmark)
-  public static class OneDirectionSendState {
-
-    Node serverNode;
-
-    Mailbox serverMailbox;
-
-    ErlangPid serverMailboxPid;
-
-    Node clientNode;
-
-    Mailbox clientMailbox;
-
-    ErlangTerm data;
-
-    @Setup(Trial)
-    public void setup () throws Exception {
-      NodeConfig config = NodeConfig.builder()
-          .shortName(TRUE)
-          .server(ServerConfig.builder()
-              .bossThreads(1)
-              .workerThreads(1)
-              .build()
-          )
-          .build();
-
-      serverNode = Nodes.singleNode("node-server-" + System.nanoTime(), config);
-      serverMailbox = serverNode.mailbox().build();
-      serverMailboxPid = serverMailbox.getPid();
-
-      clientNode = Nodes.singleNode("node-client-" + System.nanoTime(), config);
-      clientMailbox = clientNode.mailbox().build();
-
-      data = binary(new byte[] { 1, 2, 3, 4, 5 });
-    }
-
-    @TearDown(Trial)
-    public void tearDown () {
-      clientMailbox.close();
-      clientNode.close();
-
-      serverMailbox.close();
-      serverNode.close();
     }
   }
 }
