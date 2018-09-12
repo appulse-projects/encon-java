@@ -53,33 +53,49 @@ H/W path      Device      Class      Description
 
 ## The results
 
-| Benchmark                                                                                                      | Mode  | Cnt | Score       | Error       | Units |
-|----------------------------------------------------------------------------------------------------------------|-------|-----|------------:|------------:|-------|
-| [EnconBenchmark.mailbox2mailbox](./src/main/java/io/appulse/encon/benchmark/EnconBenchmark.java#L103)          | thrpt | 25  | 4562837.232 | ± 48730.020 | ops/s |
-| [EnconBenchmark.node2node](./src/main/java/io/appulse/encon/benchmark/EnconBenchmark.java#L177)                | thrpt | 25  |   13744.084 |   ± 160.906 | ops/s |
-| [EnconBenchmark.oneDirection](./src/main/java/io/appulse/encon/benchmark/EnconBenchmark.java#L167)             | thrpt | 25  |   27665.670 |   ± 230.607 | ops/s |
-| [JInterfaceBenchmark.mailbox2mailbox](./src/main/java/io/appulse/encon/benchmark/JInterfaceBenchmark.java#L99) | thrpt | 25  | 4345167.985 | ± 22392.570 | ops/s |
-| [JInterfaceBenchmark.node2node](./src/main/java/io/appulse/encon/benchmark/JInterfaceBenchmark.java#L175)      | thrpt | 25  |   13850.978 |   ± 126.660 | ops/s |
-| [JInterfaceBenchmark.oneDirection](./src/main/java/io/appulse/encon/benchmark/JInterfaceBenchmark.java#L165)   | thrpt | 25  |   27590.545 |   ± 253.874 | ops/s |
+### Multi client tests
+
+The installation consist of a server node at separate thread, which echoes the messages and **N**-threads-clients, which pitch the messages and receive it back.
+
+| implementation                                                                                                                                                       | clients | score       | error       | units |
+|:---------------------------------------------------------------------------------------------------------------------------------------------------------------------|:-------:|------------:|------------:|:------|
+| [encon](https://github.com/appulse-projects/encon-java/blob/master/benchmark/src/main/java/io/appulse/encon/benchmark/Encon_Node2NodeBenchmarks.java#L130)           |       1 |   11679.266 |     414.090 | ops/s |
+| [jinterface](https://github.com/appulse-projects/encon-java/blob/master/benchmark/src/main/java/io/appulse/encon/benchmark/JInterface_Node2NodeBenchmarks.java#L109) |       1 |   11862.914 |     385.573 | ops/s |
+| [encon](https://github.com/appulse-projects/encon-java/blob/master/benchmark/src/main/java/io/appulse/encon/benchmark/Encon_Node2NodeBenchmarks.java#L138)           |       2 |   22337.500 |     918.292 | ops/s |
+| [jinterface](https://github.com/appulse-projects/encon-java/blob/master/benchmark/src/main/java/io/appulse/encon/benchmark/JInterface_Node2NodeBenchmarks.java#L117) |       2 |   18217.878 |     861.270 | ops/s |
+| [encon](https://github.com/appulse-projects/encon-java/blob/master/benchmark/src/main/java/io/appulse/encon/benchmark/Encon_Node2NodeBenchmarks.java#L146)           |       4 |   36001.870 |    2033.472 | ops/s |
+| [jinterface](https://github.com/appulse-projects/encon-java/blob/master/benchmark/src/main/java/io/appulse/encon/benchmark/JInterface_Node2NodeBenchmarks.java#L125) |       4 |   23202.485 |    1295.186 | ops/s |
+| [encon](https://github.com/appulse-projects/encon-java/blob/master/benchmark/src/main/java/io/appulse/encon/benchmark/Encon_Node2NodeBenchmarks.java#L154)           |       8 |   44742.858 |    1865.853 | ops/s |
+| [jinterface](https://github.com/appulse-projects/encon-java/blob/master/benchmark/src/main/java/io/appulse/encon/benchmark/JInterface_Node2NodeBenchmarks.java#L133) |       8 |   23495.184 |     671.766 | ops/s |
+
+### Mailbox to mailbox
+
+In this test we have only one node and two mailboxes which send the message to each other.
+
+| implementation                                                                                                                                                   | score       | error       | units |
+|:-----------------------------------------------------------------------------------------------------------------------------------------------------------------|------------:|------------:|:------|
+| [encon](https://github.com/appulse-projects/encon-java/blob/master/benchmark/src/main/java/io/appulse/encon/benchmark/Encon_SimpleBenchmarks.java#L57)           | 4080746.356 |   79809.419 | ops/s |
+| [jinterface](https://github.com/appulse-projects/encon-java/blob/master/benchmark/src/main/java/io/appulse/encon/benchmark/JInterface_SimpleBenchmarks.java#L51) | 4885380.490 |   61920.971 | ops/s |
+
 
 ## How to setup the environment
 
 1. Add Java repository:
 
 ```bash
-$> sudo add-apt-repository ppa:webupd8team/java
+$> sudo add-apt-repository --yes ppa:webupd8team/java
 ```
 
 2. Update and upgrade the distro:
 
 ```bash
-$> sudo apt-get update && sudo apt-get upgrade
+$> sudo apt-get update --yes && sudo apt-get upgrade --yes
 ```
 
 3. Install `Git`, `Java 8` and `Maven`:
 
 ```bash
-$> sudo apt-get install -y oracle-java8-installer git maven
+$> sudo apt-get install --yes oracle-java8-installer git maven
 ```
 
 4. Clone the repo:
@@ -113,4 +129,23 @@ $> mvn clean package \
 
 ```bash
 $> nohup java -Xms1G -Xmx2G -jar benchmark/target/benchmarks.jar > job.logs 2>&1 &
+```
+
+### One-liner
+
+```bash
+$> sudo add-apt-repository --yes ppa:webupd8team/java && \
+   sudo apt-get update --yes && sudo apt-get upgrade --yes && \
+   sudo apt-get install --yes oracle-java8-installer git maven && \
+   git clone https://github.com/appulse-projects/encon-java.git && \
+   cd encon-java && \
+   mvn clean package \
+     -DskipTests \
+     -Dgpg.skip \
+     -Dfindbugs.skip=true \
+     -Dpmd.skip=true \
+     -Dcheckstyle.skip \
+     -Dmaven.test.skip=true \
+     -pl benchmark -am && \
+  nohup java -Xms1G -Xmx2G -jar benchmark/target/benchmarks.jar > job.logs 2>&1 &
 ```
