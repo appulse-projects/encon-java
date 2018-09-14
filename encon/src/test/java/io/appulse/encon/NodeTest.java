@@ -28,6 +28,7 @@ import static java.util.concurrent.TimeUnit.MILLISECONDS;
 import static java.util.concurrent.TimeUnit.SECONDS;
 import static org.assertj.core.api.Assertions.assertThat;
 import static java.util.Optional.ofNullable;
+import static io.appulse.encon.connection.control.ControlMessageTag.SEND;
 
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
@@ -35,6 +36,8 @@ import java.util.concurrent.Executors;
 import io.appulse.encon.config.MailboxConfig;
 import io.appulse.encon.config.NodeConfig;
 import io.appulse.encon.config.ServerConfig;
+import io.appulse.encon.connection.control.ControlMessage;
+import io.appulse.encon.connection.regular.Message;
 import io.appulse.encon.mailbox.Mailbox;
 import io.appulse.encon.mailbox.exception.ReceivedExitException;
 import io.appulse.encon.terms.ErlangTerm;
@@ -376,6 +379,43 @@ public class NodeTest {
       return;
     }
     assertThat(false).isTrue();
+  }
+
+  @Test
+  public void remoteProcedureCall () throws Exception {
+    val name = createName();
+    node = Nodes.singleNode(name, NodeConfig.builder()
+        .shortName(true)
+        .cookie("secret")
+        .build());
+
+    Mailbox mailbox = node.mailbox().build();
+    mailbox.call(ELIXIR_ECHO_SERVER, "erlang", "date");
+
+    Message message = mailbox.receive(5, SECONDS);
+    assertThat(message.getHeader())
+        .extracting(ControlMessage::getTag)
+        .isEqualTo(SEND);
+
+    assertThat(message.getBody())
+        .isNotNull();
+
+    ErlangTerm term = message.getBody();
+    assertThat(term.isTuple()).isTrue();
+    assertThat(term.size()).isEqualTo(2);
+
+    assertThat(term.getUnsafe(0).asText()).isEqualTo("rex");
+    assertThat(term.getUnsafe(1).isTuple()).isTrue();
+
+    ErlangTerm response1 = term.getUnsafe(1);
+    assertThat(response1.getUnsafe(0).isNumber()).isTrue();
+    assertThat(response1.getUnsafe(1).isNumber()).isTrue();
+    assertThat(response1.getUnsafe(2).isNumber()).isTrue();
+
+
+    mailbox.call(ELIXIR_ECHO_SERVER, "erlang", "date");
+    ErlangTerm response2 = mailbox.receiveRemoteProcedureResult(5, SECONDS);
+    assertThat(response2).isEqualTo(response1);
   }
 
   private String createName () {

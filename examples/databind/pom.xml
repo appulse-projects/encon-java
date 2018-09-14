@@ -25,7 +25,7 @@ limitations under the License.
   <parent>
     <groupId>io.appulse.encon</groupId>
     <artifactId>examples</artifactId>
-    <version>1.6.3</version>
+    <version>1.6.4</version>
   </parent>
 
   <groupId>io.appulse.encon.examples</groupId>
@@ -39,7 +39,7 @@ limitations under the License.
     <maven.compiler.source>1.8</maven.compiler.source>
     <maven.compiler.target>1.8</maven.compiler.target>
 
-    <start-class>io.appulse.encon.examples.databind</start-class>
+    <start-class>io.appulse.encon.examples.databind.Main</start-class>
   </properties>
 
   <dependencies>
