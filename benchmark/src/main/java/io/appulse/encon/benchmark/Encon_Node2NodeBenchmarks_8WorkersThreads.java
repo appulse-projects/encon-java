@@ -55,7 +55,7 @@ import org.openjdk.jmh.infra.ThreadParams;
 @Warmup(iterations = 10)
 @BenchmarkMode(Throughput)
 @Measurement(iterations = 20)
-public class Encon_Node2NodeBenchmarks {
+public class Encon_Node2NodeBenchmarks_8WorkersThreads {
 
   Node serverNode;
 
@@ -77,7 +77,7 @@ public class Encon_Node2NodeBenchmarks {
         .shortName(TRUE)
         .server(ServerConfig.builder()
             .bossThreads(1)
-            .workerThreads(2)
+            .workerThreads(8)
             .build()
         )
         .build()

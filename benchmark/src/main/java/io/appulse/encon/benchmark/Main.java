@@ -78,6 +78,8 @@ public class Main {
 
       startEpmd();
       try {
+        // System.out.println("Press ENTER for start...");
+        // System.console().readLine();
         runner.run();
         stopEpmd();
       } catch (NoBenchmarksException e) {

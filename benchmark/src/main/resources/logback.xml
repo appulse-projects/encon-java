@@ -20,5 +20,8 @@ limitations under the License.
   <include resource="io/appulse/logging/logback/base.xml"/>
 
   <logger name="io.appulse" level="WARN"/>
+  <!-- <logger name="io.appulse.encon.connection.regular" level="DEBUG"/> -->
   <logger name="io.netty" level="WARN"/>
+  <!-- <logger name="io.netty" level="DEBUG"/> -->
+  <!-- <logger name="io.netty.handler.logging.LoggingHandler" level="DEBUG"/> -->
 </configuration>

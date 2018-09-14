@@ -16,6 +16,10 @@
 
 package io.appulse.encon.mailbox;
 
+import static io.appulse.encon.terms.Erlang.NIL;
+import static io.appulse.encon.terms.Erlang.atom;
+import static io.appulse.encon.terms.Erlang.list;
+import static io.appulse.encon.terms.Erlang.tuple;
 import static lombok.AccessLevel.PACKAGE;
 import static lombok.AccessLevel.PRIVATE;
 
@@ -40,8 +44,8 @@ import io.appulse.encon.exception.NoSuchRemoteNodeException;
 import io.appulse.encon.mailbox.exception.MailboxWithSuchNameDoesntExistException;
 import io.appulse.encon.mailbox.exception.MailboxWithSuchPidDoesntExistException;
 import io.appulse.encon.mailbox.exception.ReceivedExitException;
-import io.appulse.encon.terms.Erlang;
 import io.appulse.encon.terms.ErlangTerm;
+import io.appulse.encon.terms.type.ErlangAtom;
 import io.appulse.encon.terms.type.ErlangPid;
 
 import lombok.AllArgsConstructor;
@@ -71,6 +75,7 @@ import lombok.val;
 })
 @EqualsAndHashCode
 @AllArgsConstructor
+@SuppressWarnings("PMD.GodClass")
 @FieldDefaults(level = PRIVATE, makeFinal = true)
 public class Mailbox implements Closeable {
 
@@ -103,7 +108,8 @@ public class Mailbox implements Closeable {
    * @param unit a {@code TimeUnit} determining how to interpret the
    *        {@code timeout} parameter
    *
-   * @return a new {@link Message}
+   * @return a new {@link Message}, or {@code null} if the
+   *         specified waiting time elapses before an element is available
    *
    * @throws ReceivedExitException someone exits
    */
@@ -197,7 +203,6 @@ public class Mailbox implements Closeable {
     if (remote == null) {
       throw new NoSuchRemoteNodeException(descriptor);
     }
-
     send(remote, mailbox, body);
   }
 
@@ -217,6 +222,281 @@ public class Mailbox implements Closeable {
       node.connect(remote)
           .send(Message.sendToRegisteredProcess(pid, mailbox, body));
     }
+  }
+
+  /**
+   * Send an RPC request to the remote Erlang node. This convenience function
+   * creates the following message and sends it to 'rex' on the remote node:
+   *
+   * <pre>
+   * { selfPid, { :call, :module_name, :function_name, [arguments], :user } }
+   * </pre>
+   *
+   * <p>
+   * Note that this method has unpredicatble results if the remote node is not
+   * an Erlang node.
+   * </p>
+   *
+   * <p>
+   * The response will be send back to this node in format:
+   * <pre>
+   * { :rex, response_body }
+   * </pre>
+   * </p>
+   *
+   * @param remoteNodeName remote node name
+   *
+   * @param module the name of the Erlang module containing the function to be called.
+   *
+   * @param function the name of the function to call.
+   *
+   * @param args a list of Erlang terms, to be used as arguments to the function.
+   *
+   * @since 1.6.4
+   */
+  public void call (@NonNull String remoteNodeName, @NonNull String module, @NonNull String function, ErlangTerm ...args) {
+    call(remoteNodeName, atom(module), atom(function), args);
+  }
+
+  /**
+   * Send an RPC request to the remote Erlang node. This convenience function
+   * creates the following message and sends it to 'rex' on the remote node:
+   *
+   * <pre>
+   * { selfPid, { :call, :module_name, :function_name, [arguments], :user } }
+   * </pre>
+   *
+   * <p>
+   * Note that this method has unpredicatble results if the remote node is not
+   * an Erlang node.
+   * </p>
+   *
+   * <p>
+   * The response will be send back to this node in format:
+   * <pre>
+   * { :rex, response_body }
+   * </pre>
+   * </p>
+   *
+   * @param descriptor remote node descriptor
+   *
+   * @param module the name of the Erlang module containing the function to be called.
+   *
+   * @param function the name of the function to call.
+   *
+   * @param args a list of Erlang terms, to be used as arguments to the function.
+   *
+   * @since 1.6.4
+   */
+  public void call (@NonNull NodeDescriptor descriptor, @NonNull String module, @NonNull String function, ErlangTerm ...args) {
+    call(descriptor, atom(module), atom(function), args);
+  }
+
+  /**
+   * Send an RPC request to the remote Erlang node. This convenience function
+   * creates the following message and sends it to 'rex' on the remote node:
+   *
+   * <pre>
+   * { selfPid, { :call, :module_name, :function_name, [arguments], :user } }
+   * </pre>
+   *
+   * <p>
+   * Note that this method has unpredicatble results if the remote node is not
+   * an Erlang node.
+   * </p>
+   *
+   * <p>
+   * The response will be send back to this node in format:
+   * <pre>
+   * { :rex, response_body }
+   * </pre>
+   * </p>
+   *
+   * @param remote remote node descriptor
+   *
+   * @param module the name of the Erlang module containing the function to be called.
+   *
+   * @param function the name of the function to call.
+   *
+   * @param args a list of Erlang terms, to be used as arguments to the function.
+   *
+   * @since 1.6.4
+   */
+  public void call (@NonNull RemoteNode remote, @NonNull String module, @NonNull String function, ErlangTerm ...args) {
+    call(remote, atom(module), atom(function), args);
+  }
+
+  /**
+   * Send an RPC request to the remote Erlang node. This convenience function
+   * creates the following message and sends it to 'rex' on the remote node:
+   *
+   * <pre>
+   * { selfPid, { :call, :module_name, :function_name, [arguments], :user } }
+   * </pre>
+   *
+   * <p>
+   * Note that this method has unpredicatble results if the remote node is not
+   * an Erlang node.
+   * </p>
+   *
+   * <p>
+   * The response will be send back to this node in format:
+   * <pre>
+   * { :rex, response_body }
+   * </pre>
+   * </p>
+   *
+   * @param remoteNodeName remote node name
+   *
+   * @param module the atom of the Erlang module containing the function to be called.
+   *
+   * @param function the atom of the function to call.
+   *
+   * @param args a list of Erlang terms, to be used as arguments to the function.
+   *
+   * @since 1.6.4
+   */
+  public void call (@NonNull String remoteNodeName, @NonNull ErlangAtom module, @NonNull ErlangAtom function, ErlangTerm ...args) {
+    val descriptor = NodeDescriptor.from(remoteNodeName);
+    call(descriptor, module, function, args);
+  }
+
+  /**
+   * Send an RPC request to the remote Erlang node. This convenience function
+   * creates the following message and sends it to 'rex' on the remote node:
+   *
+   * <pre>
+   * { selfPid, { :call, :module_name, :function_name, [arguments], :user } }
+   * </pre>
+   *
+   * <p>
+   * Note that this method has unpredicatble results if the remote node is not
+   * an Erlang node.
+   * </p>
+   *
+   * <p>
+   * The response will be send back to this node in format:
+   * <pre>
+   * { :rex, response_body }
+   * </pre>
+   * </p>
+   *
+   * @param descriptor remote node descriptor
+   *
+   * @param module the atom of the Erlang module containing the function to be called.
+   *
+   * @param function the atom of the function to call.
+   *
+   * @param args a list of Erlang terms, to be used as arguments to the function.
+   *
+   * @since 1.6.4
+   */
+  public void call (@NonNull NodeDescriptor descriptor, @NonNull ErlangAtom module, @NonNull ErlangAtom function, ErlangTerm ...args) {
+    RemoteNode remote = node.lookup(descriptor);
+    if (remote == null) {
+      throw new NoSuchRemoteNodeException(descriptor);
+    }
+    call(remote, module, function, args);
+  }
+
+  /**
+   * Send an RPC request to the remote Erlang node. This convenience function
+   * creates the following message and sends it to 'rex' on the remote node:
+   *
+   * <pre>
+   * { selfPid, { :call, :module_name, :function_name, [arguments], :user } }
+   * </pre>
+   *
+   * <p>
+   * Note that this method has unpredicatble results if the remote node is not
+   * an Erlang node.
+   * </p>
+   *
+   * <p>
+   * The response will be send back to this node in format:
+   * <pre>
+   * { :rex, response_body }
+   * </pre>
+   * </p>
+   *
+   * @param remote remote node descriptor
+   *
+   * @param module the atom of the Erlang module containing the function to be called.
+   *
+   * @param function the atom of the function to call.
+   *
+   * @param args a list of Erlang terms, to be used as arguments to the function.
+   *
+   * @since 1.6.4
+   */
+  public void call (@NonNull RemoteNode remote, @NonNull ErlangAtom module, @NonNull ErlangAtom function, ErlangTerm ...args) {
+    ErlangTerm argumentsList;
+    if (args == null || args.length == 0) {
+      argumentsList = NIL;
+    } else if (args.length == 1 && args[0].isList()) {
+      argumentsList = args[0];
+    } else {
+      argumentsList = list(args);
+    }
+
+    send(remote, "rex", tuple(
+        pid,
+        tuple(
+            atom("call"),
+            module,
+            function,
+            argumentsList,
+            atom("user")
+        )
+    ));
+  }
+
+  /**
+   * Receive an RPC reply from the remote Erlang node. This convenience
+   * function receives a message from the remote node, and expects it to have
+   * the following format:
+   *
+   * <pre>
+   * { :rex, ErlangTerm }
+   * </pre>
+   *
+   * @return the second element of the tuple if the received message is a
+   *         two-tuple, otherwise null. No further error checking is
+   *         performed.
+   */
+  public ErlangTerm receiveRemoteProcedureResult () {
+    return receive().getBody()
+        .get(1)
+        .orElse(null);
+  }
+
+  /**
+   * Receive an RPC reply from the remote Erlang node. This convenience
+   * function receives a message from the remote node, and expects it to have
+   * the following format:
+   *
+   * <pre>
+   * { :rex, ErlangTerm }
+   * </pre>
+   *
+   * @param timeout how long to wait before giving up, in units of
+   *        {@code unit}
+   * @param unit a {@code TimeUnit} determining how to interpret the
+   *        {@code timeout} parameter
+   *
+   * @return the second element of the tuple if the received message is a
+   *         two-tuple, otherwise null. No further error checking is
+   *         performed. It also could return {@ null} if the specified
+   *         waiting time elapses before an element is available
+   */
+  public ErlangTerm receiveRemoteProcedureResult (long timeout, TimeUnit unit) {
+    Message message = receive(timeout, unit);
+    if (message == null) {
+      return null;
+    }
+    return message.getBody()
+        .get(1)
+        .orElse(null);
   }
 
   /**
@@ -282,7 +562,17 @@ public class Mailbox implements Closeable {
    * @param reason the exit's reason
    */
   public void exit (@NonNull String reason) {
-    exit(Erlang.atom(reason));
+    exit(atom(reason));
+  }
+
+
+  /**
+   * Exits this mailbox with 'normal' reason.
+   *
+   * @since 1.6.4
+   */
+  public void exit () {
+    exit("normal");
   }
 
   /**

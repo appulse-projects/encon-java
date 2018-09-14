@@ -22,6 +22,21 @@ and this project adheres to [Semantic Versioning](http://semver.org/spec/v2.0.0.
 - Turn on checkstyle JavaDocs module.
 - Add updates to the protocol, like new `ControlMessage`.
 
+## [1.6.4](https://github.com/appulse-projects/encon-java/releases/tag/1.6.4) - 2018-09-14
+
+### Added
+
+- `Mailbox.call()` and `Mailbox.receiveRemoteProcedureResult()`, a remote procedure call functionality;
+- `Mailbox.exit()` without arguments, for normal mailbox exiting;
+- Benchmark's `README.md` section about how to run single/group of becnhmark(s).
+
+### Changed
+
+- Tuned server and client `Netty`'s settings, especially its `WRITE_BUFFER_WATER_MARK` option;
+- Now, use `channel.eventLoop().execute(Runnable)` for server's responses, instead of creating composite buffer and single `writeAndFlush` call;
+- Benchmark's results;
+- Fix samples `pom.xml` files.
+
 ## [1.6.3](https://github.com/appulse-projects/encon-java/releases/tag/1.6.3) - 2018-09-11
 
 ### Changed

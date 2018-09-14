@@ -16,6 +16,7 @@
 
 package io.appulse.encon.terms;
 
+import java.io.Serializable;
 import java.math.BigDecimal;
 import java.math.BigInteger;
 import java.nio.charset.Charset;
@@ -34,6 +35,7 @@ import io.appulse.encon.terms.type.ErlangMap;
 import io.appulse.encon.terms.type.ErlangNil;
 import io.appulse.encon.terms.type.ErlangString;
 import io.appulse.encon.terms.type.ErlangTuple;
+import io.appulse.utils.SerializationUtils;
 
 import lombok.NonNull;
 
@@ -185,6 +187,20 @@ public final class Erlang {
    */
   public static ErlangBinary binary (@NonNull byte[] value) {
     return new ErlangBinary(value);
+  }
+
+  /**
+   * Creates new {@link ErlangBinary} instance from {@link Serializable} object.
+   *
+   * @param value serializable object
+   *
+   * @return {@link ErlangBinary} new instance
+   *
+   * @since 1.6.4
+   */
+  public static ErlangBinary binary (@NonNull Serializable value) {
+    byte[] bytes = SerializationUtils.serialize(value);
+    return binary(bytes);
   }
 
   /**

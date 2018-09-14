@@ -142,10 +142,10 @@ public final class ConnectionHandler extends ByteToMessageDecoder implements Clo
         .buffer(Integer.BYTES)
         .writeInt(out.readableBytes());
 
-    val popa = channel.alloc().compositeBuffer(2)
-        .addComponents(true, messageLength, out);
-
-    channel.writeAndFlush(popa);
+    channel.eventLoop().execute(() -> {
+      channel.write(messageLength);
+      channel.writeAndFlush(out);
+    });
   }
 
   @Override

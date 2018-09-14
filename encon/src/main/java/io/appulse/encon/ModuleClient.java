@@ -17,10 +17,12 @@
 package io.appulse.encon;
 
 import static io.netty.channel.ChannelOption.ALLOCATOR;
+import static io.netty.channel.ChannelOption.AUTO_READ;
 import static io.netty.channel.ChannelOption.CONNECT_TIMEOUT_MILLIS;
 import static io.netty.channel.ChannelOption.SINGLE_EVENTEXECUTOR_PER_GROUP;
 import static io.netty.channel.ChannelOption.SO_KEEPALIVE;
 import static io.netty.channel.ChannelOption.TCP_NODELAY;
+import static io.netty.channel.ChannelOption.WRITE_BUFFER_WATER_MARK;
 import static java.util.concurrent.TimeUnit.SECONDS;
 import static lombok.AccessLevel.PRIVATE;
 
@@ -33,6 +35,7 @@ import io.appulse.encon.connection.Connection;
 import io.appulse.encon.connection.handshake.HandshakeClientInitializer;
 
 import io.netty.bootstrap.Bootstrap;
+import io.netty.channel.WriteBufferWaterMark;
 import lombok.NonNull;
 import lombok.RequiredArgsConstructor;
 import lombok.SneakyThrows;
@@ -109,10 +112,12 @@ class ModuleClient implements Closeable {
         .group(moduleConnection.getWorkerGroup())
         .channel(moduleConnection.getClientChannelClass())
         .option(SO_KEEPALIVE, true)
+        .option(AUTO_READ, true)
         .option(TCP_NODELAY, true)
         .option(CONNECT_TIMEOUT_MILLIS, 5000)
         .option(ALLOCATOR, moduleConnection.getAllocator())
         .option(SINGLE_EVENTEXECUTOR_PER_GROUP, true)
+        .option(WRITE_BUFFER_WATER_MARK, new WriteBufferWaterMark(16 * 1024, 64 * 1024))
         .handler(HandshakeClientInitializer.builder()
             .node(node)
             .future(future)
