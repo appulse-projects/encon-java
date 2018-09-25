@@ -27,11 +27,11 @@ import java.math.BigDecimal;
 import java.math.BigInteger;
 import java.util.Arrays;
 
-import io.appulse.encon.common.LruCache;
 import io.appulse.encon.terms.ErlangTerm;
 import io.appulse.encon.terms.TermType;
 import io.appulse.encon.terms.exception.ErlangTermDecodeException;
 import io.appulse.encon.terms.exception.IllegalErlangTermTypeException;
+import io.appulse.utils.cache.LruCache;
 
 import io.netty.buffer.ByteBuf;
 import io.netty.util.ByteProcessor;
