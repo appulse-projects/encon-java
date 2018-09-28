@@ -22,6 +22,12 @@ and this project adheres to [Semantic Versioning](http://semver.org/spec/v2.0.0.
 - Turn on checkstyle JavaDocs module.
 - Add updates to the protocol, like new `ControlMessage`.
 
+## [1.6.5](https://github.com/appulse-projects/encon-java/releases/tag/1.6.5) - 2018-09-28
+
+### Changed
+
+- Quick fix for [GitHub issue](https://github.com/appulse-projects/encon-java/issues/10), added `ATOM` and `SMALL_ATOM` serialization.
+
 ## [1.6.4](https://github.com/appulse-projects/encon-java/releases/tag/1.6.4) - 2018-09-14
 
 ### Added
