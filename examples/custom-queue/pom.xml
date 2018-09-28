@@ -25,7 +25,7 @@ limitations under the License.
   <parent>
     <groupId>io.appulse.encon</groupId>
     <artifactId>examples</artifactId>
-    <version>1.6.4</version>
+    <version>1.6.5</version>
   </parent>
 
   <groupId>io.appulse.encon.examples</groupId>

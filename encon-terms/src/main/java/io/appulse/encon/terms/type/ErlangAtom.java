@@ -220,9 +220,11 @@ public class ErlangAtom extends ErlangTerm {
   protected void serialize (ByteBuf buffer) {
     switch (getType()) {
     case SMALL_ATOM_UTF8:
+    case SMALL_ATOM:
       buffer.writeByte(bytes.length);
       break;
     case ATOM_UTF8:
+    case ATOM:
       buffer.writeShort(bytes.length);
       break;
     default:
