@@ -41,6 +41,7 @@ import lombok.experimental.FieldDefaults;
  * @since 2.0.0
  */
 @ToString
+@SuppressWarnings("unchecked")
 @EqualsAndHashCode(callSuper = false)
 @FieldDefaults(level = PRIVATE, makeFinal = true)
 final class ConfigurationProgrammatical extends AbstractConfig {
@@ -65,7 +66,7 @@ final class ConfigurationProgrammatical extends AbstractConfig {
     }
   }
 
-  @SuppressWarnings({ "unchecked", "PMD.AvoidInstantiatingObjectsInLoops"})
+  @SuppressWarnings("PMD.AvoidInstantiatingObjectsInLoops")
   private static Tuple unfoldKey (Map<String, Object> map, String key) {
     Map<String, Object> current = map;
     String currentKey = key;
@@ -124,7 +125,6 @@ final class ConfigurationProgrammatical extends AbstractConfig {
         .collect(toList());
   }
 
-  @SuppressWarnings("unchecked")
   private static Object processValue (Object object) {
     if (object instanceof Map) {
       return processMap((Map<String, Object>) object);
@@ -138,7 +138,6 @@ final class ConfigurationProgrammatical extends AbstractConfig {
     return object;
   }
 
-  @SuppressWarnings("unchecked")
   private static Object merge (Object left, Object right) {
     if (left == null) {
       return right;
