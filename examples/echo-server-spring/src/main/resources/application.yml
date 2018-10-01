@@ -1,4 +1,8 @@
 
 spring.encon:
-  defaults:
-    cookie: secret
+  nodes:
+    echo-client:
+      shortName: true
+    echo-server:
+      shortName: true
+

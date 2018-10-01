@@ -22,6 +22,13 @@ and this project adheres to [Semantic Versioning](http://semver.org/spec/v2.0.0.
 - Turn on checkstyle JavaDocs module.
 - Add updates to the protocol, like new `ControlMessage`.
 
+## [2.0.0](https://github.com/appulse-projects/encon-java/releases/tag/2.0.0) - 2018-10-14
+
+### Changed
+
+- Module `encon-config` now is a configuration framework for laoding, dumping and mapping different configurations and a fancy and flexible way;
+- According to the new `encon-config` implementation, all configurations were moved to the appropriate modules.
+
 ## [1.6.5](https://github.com/appulse-projects/encon-java/releases/tag/1.6.5) - 2018-09-28
 
 ### Changed

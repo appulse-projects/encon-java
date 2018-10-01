@@ -24,7 +24,7 @@ import java.util.Optional;
 
 import io.appulse.encon.Node;
 import io.appulse.encon.Nodes;
-import io.appulse.encon.config.NodeConfig;
+import io.appulse.encon.NodesConfig.NodeConfig;
 import io.appulse.encon.connection.regular.Message;
 import io.appulse.encon.mailbox.Mailbox;
 import io.appulse.encon.terms.ErlangTerm;

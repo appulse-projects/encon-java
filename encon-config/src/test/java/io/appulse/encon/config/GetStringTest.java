@@ -16,31 +16,29 @@
 
 package io.appulse.encon.config;
 
-import java.util.concurrent.atomic.AtomicInteger;
+import static org.assertj.core.api.Assertions.assertThat;
 
-import io.appulse.utils.SocketUtils;
+import java.net.URL;
 
-import lombok.val;
+import io.appulse.utils.ResourceUtils;
+
+import org.junit.Test;
 
 /**
  *
- * @since 1.0.0
  * @author Artem Labazin
+ * @since 2.0.0
  */
-final class ServerPortGenerator {
+public class GetStringTest {
 
-  private static final AtomicInteger UPPER_BOUND = new AtomicInteger(65535);
+  @Test
+  public void test () {
+    URL url = ResourceUtils.getResourceUrls("", "string.yml").get(0);
+    Config config = Config.load(url);
 
-  static int nextPort () {
-    while (true) {
-      val currentValue = UPPER_BOUND.get();
-      val port = SocketUtils.findFreePort(1024, currentValue - 1).get();
-      if (UPPER_BOUND.compareAndSet(currentValue, port)) {
-        return port;
-      }
-    }
-  }
-
-  private ServerPortGenerator () {
+    assertThat(config.getString("one"))
+        .isPresent().hasValue("popa");
+    assertThat(config.getString("two"))
+        .isPresent().hasValue("3");
   }
 }

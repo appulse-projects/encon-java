@@ -33,11 +33,10 @@ import static io.appulse.encon.connection.control.ControlMessageTag.SEND;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 
-import io.appulse.encon.config.MailboxConfig;
-import io.appulse.encon.config.NodeConfig;
-import io.appulse.encon.config.ServerConfig;
 import io.appulse.encon.connection.control.ControlMessage;
 import io.appulse.encon.connection.regular.Message;
+import io.appulse.encon.NodesConfig.NodeConfig;
+import io.appulse.encon.NodesConfig.NodeConfig.ServerConfig;
 import io.appulse.encon.mailbox.Mailbox;
 import io.appulse.encon.mailbox.exception.ReceivedExitException;
 import io.appulse.encon.terms.ErlangTerm;
@@ -141,9 +140,9 @@ public class NodeTest {
     val name1 = createName();
     val name2 = createName();
     node = Nodes.singleNode(name1, NodeConfig.builder()
-                            .shortName(true)
-                            .cookie("secret")
-                            .build()
+        .shortName(true)
+        .cookie("secret")
+        .build()
     );
 
     assertThat(node.ping(ELIXIR_ECHO_SERVER))
@@ -178,19 +177,10 @@ public class NodeTest {
   public void instantiating () throws Exception {
     val name = createName();
     node = Nodes.singleNode(name, NodeConfig.builder()
-                            .shortName(true)
-                            .mailbox(MailboxConfig.builder()
-                                .name("one")
-                                .build())
-                            .mailbox(MailboxConfig.builder()
-                                .name("two")
-                                .build())
-                            .build()
+        .shortName(true)
+        .build()
     );
-
-    assertThat(node.mailbox("one")).isNotNull();
-    assertThat(node.mailbox("two")).isNotNull();
-    assertThat(node.mailbox("three")).isNull();
+    assertThat(node.mailbox("one")).isNull();
   }
 
   @Test

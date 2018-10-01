@@ -25,7 +25,7 @@ limitations under the License.
   <parent>
     <groupId>io.appulse.encon</groupId>
     <artifactId>encon-parent</artifactId>
-    <version>1.6.5</version>
+    <version>2.0.0</version>
   </parent>
 
   <artifactId>encon-common</artifactId>

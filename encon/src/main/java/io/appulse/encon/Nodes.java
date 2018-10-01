@@ -26,16 +26,14 @@ import java.util.Map;
 import java.util.Optional;
 import java.util.concurrent.ConcurrentHashMap;
 
+import io.appulse.encon.NodesConfig.NodeConfig;
 import io.appulse.encon.common.NodeDescriptor;
 import io.appulse.encon.config.Config;
-import io.appulse.encon.config.Defaults;
-import io.appulse.encon.config.NodeConfig;
 
 import lombok.NonNull;
 import lombok.RequiredArgsConstructor;
 import lombok.experimental.FieldDefaults;
 import lombok.extern.slf4j.Slf4j;
-import lombok.val;
 
 /**
  * The set of different helper functions
@@ -55,7 +53,9 @@ public final class Nodes implements Iterable<Node>, Closeable {
    * @return a new {@link Nodes} instance
    */
   public static Nodes start () {
-    val config = Config.builder().build();
+    Config config = Config.builder()
+        .build();
+
     return start(config);
   }
 
@@ -67,13 +67,12 @@ public final class Nodes implements Iterable<Node>, Closeable {
    * @return a new {@link Nodes} instance
    */
   public static Nodes start (@NonNull Config config) {
-    val copy = new Config(config);
-    log.debug("Creating ERTS instance with config {}", copy);
+    log.debug("Creating ERTS instance with config {}", config);
 
-    val erts = new Nodes(copy.getDefaults(), new ConcurrentHashMap<>());
-    copy.getNodes()
-        .entrySet()
-        .forEach(it -> erts.newNode(it.getKey(), it.getValue()));
+    Nodes erts = new Nodes(config, new ConcurrentHashMap<>());
+    config.get(NodesConfig.class).ifPresent(cfg -> {
+      cfg.getNodes().forEach((name, nodeConfig) -> erts.newNode(name, nodeConfig));
+    });
 
     return erts;
   }
@@ -114,12 +113,10 @@ public final class Nodes implements Iterable<Node>, Closeable {
    * @return new {@link Node} instance
    */
   public static Node singleNode (@NonNull String name, @NonNull NodeConfig nodeConfig) {
-    val copy = new NodeConfig(nodeConfig);
-    copy.withDefaultsFrom(Defaults.INSTANCE);
-    return Node.newInstance(name, copy);
+    return Node.newInstance(name, nodeConfig);
   }
 
-  Defaults defaults;
+  Config config;
 
   Map<NodeDescriptor, Node> nodes;
 
@@ -131,7 +128,7 @@ public final class Nodes implements Iterable<Node>, Closeable {
    * @return new {@link Node} instance
    */
   public Node newNode (@NonNull String name) {
-    val nodeConfig = NodeConfig.builder().build();
+    NodeConfig nodeConfig = config.get("nodex." + name, NodeConfig.class, NodeConfig.DEFAULT);
     return newNode(name, nodeConfig);
   }
 
@@ -145,9 +142,9 @@ public final class Nodes implements Iterable<Node>, Closeable {
    * @return new {@link Node} instance
    */
   public Node newNode (@NonNull String name, boolean isShortNamed) {
-    val nodeConfig = NodeConfig.builder()
-        .shortName(isShortNamed)
-        .build();
+    NodeConfig nodeConfig = config.get("nodex." + name, NodeConfig.class, NodeConfig.DEFAULT)
+        .withShortName(isShortNamed);
+
     return newNode(name, nodeConfig);
   }
 
@@ -162,9 +159,7 @@ public final class Nodes implements Iterable<Node>, Closeable {
    * @return new {@link Node} instance
    */
   public Node newNode (@NonNull String name, @NonNull NodeConfig nodeConfig) {
-    val copy = new NodeConfig(nodeConfig);
-    copy.withDefaultsFrom(defaults);
-    val node = Node.newInstance(name, copy);
+    Node node = Node.newInstance(name, nodeConfig);
     nodes.put(node.getDescriptor(), node);
     return node;
   }
@@ -177,7 +172,7 @@ public final class Nodes implements Iterable<Node>, Closeable {
    * @return optional value, which could contains a searching node
    */
   public Optional<Node> node (@NonNull String name) {
-    val descriptor = NodeDescriptor.from(name);
+    NodeDescriptor descriptor = NodeDescriptor.from(name);
     return node(descriptor);
   }
 
@@ -209,7 +204,7 @@ public final class Nodes implements Iterable<Node>, Closeable {
    * @return the previous value associated with a name, or {@code null} if there was no mapping for name.
    */
   public Node remove (@NonNull String name) {
-    val descriptor = NodeDescriptor.from(name);
+    NodeDescriptor descriptor = NodeDescriptor.from(name);
     return remove(descriptor);
   }
 

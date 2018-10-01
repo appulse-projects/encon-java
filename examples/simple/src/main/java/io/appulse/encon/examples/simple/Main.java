@@ -20,7 +20,7 @@ import static io.appulse.encon.terms.Erlang.string;
 
 import io.appulse.encon.Node;
 import io.appulse.encon.Nodes;
-import io.appulse.encon.config.NodeConfig;
+import io.appulse.encon.NodesConfig.NodeConfig;
 import io.appulse.encon.mailbox.Mailbox;
 import io.appulse.encon.terms.ErlangTerm;
 import io.appulse.encon.terms.type.ErlangPid;
