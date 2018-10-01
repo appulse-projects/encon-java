@@ -14,7 +14,7 @@ First of all, add config's dependency:
   <dependency>
     <groupId>io.appulse.encon</groupId>
     <artifactId>encon-config</artifactId>
-    <version>1.6.5</version>
+    <version>2.0.0</version>
   </dependency>
   ...
 </dependencies>
@@ -23,7 +23,7 @@ First of all, add config's dependency:
 **Gradle**:
 
 ```groovy
-compile 'io.appulse.encon:encon-config:1.6.5'
+compile 'io.appulse.encon:encon-config:2.0.0'
 ```
 
 ### File based configuration

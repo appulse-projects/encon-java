@@ -1,0 +1,25 @@
+
+nodes:
+  node-1:
+    shortName: true
+    cookie: secret
+    flags:
+      - ONE
+      - THREE
+
+    mailboxes:
+
+      mailbox-1:
+        handler: handler-1
+
+      mailbox-2:
+        name: popa
+        handler: handler-2
+
+  node-2:
+    epmdPort: 1234
+    flags:
+      - TWO
+    mailboxes:
+      mailbox-3:
+        handler: handler-3

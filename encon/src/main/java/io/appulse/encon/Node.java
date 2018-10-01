@@ -23,10 +23,10 @@ import java.util.Map;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.TimeUnit;
 
+import io.appulse.encon.NodesConfig.NodeConfig;
 import io.appulse.encon.common.Meta;
 import io.appulse.encon.common.NodeDescriptor;
 import io.appulse.encon.common.RemoteNode;
-import io.appulse.encon.config.NodeConfig;
 import io.appulse.encon.connection.Connection;
 import io.appulse.encon.mailbox.Mailbox;
 import io.appulse.encon.mailbox.ModuleMailbox;
@@ -41,7 +41,6 @@ import lombok.NonNull;
 import lombok.ToString;
 import lombok.experimental.FieldDefaults;
 import lombok.extern.slf4j.Slf4j;
-import lombok.val;
 
 /**
  * Node's state holder and provider of all needed functions.
@@ -59,23 +58,26 @@ import lombok.val;
 @FieldDefaults(level = PACKAGE, makeFinal = true)
 public final class Node implements Closeable {
 
-  static Node newInstance (@NonNull String name, @NonNull NodeConfig config) {
+  //  static Node newInstance (@NonNull String name, @NonNull Config config) {
+  //    NodeConfig nodeConfig = config.get(NodeConfig.class, NodeConfig.DEFAULT);
+  static Node newInstance (@NonNull String name, @NonNull NodeConfig nodeConfig) {
+    NodeConfig configCopy = new NodeConfig(nodeConfig);
 
-    val descriptor = NodeDescriptor.from(name, config.getShortName());
-    log.debug("Creating new Node '{}' with config:\n  {}\n", descriptor.getFullName(), config);
+    NodeDescriptor descriptor = NodeDescriptor.from(name, configCopy.getShortName());
+    log.debug("Creating new Node '{}' with config:\n  {}\n", descriptor.getFullName(), configCopy);
 
-    val meta = Meta.builder()
-        .type(config.getType())
-        .protocol(config.getProtocol())
-        .low(config.getLowVersion())
-        .high(config.getHighVersion())
-        .flags(config.getDistributionFlags())
+    Meta meta = Meta.builder()
+        .type(configCopy.getType())
+        .protocol(configCopy.getProtocol())
+        .low(configCopy.getLowVersion())
+        .high(configCopy.getHighVersion())
+        .flags(configCopy.getDistributionFlags())
         .build();
 
-    val epmd = new EpmdClient(config.getEpmdPort());
-    val creation = epmd.register(Registration.builder()
+    EpmdClient epmd = new EpmdClient(configCopy.getEpmdPort());
+    int creation = epmd.register(Registration.builder()
         .name(descriptor.getNodeName())
-        .port(config.getServer().getPort())
+        .port(configCopy.getServer().getOrFindAndSetPort())
         .type(meta.getType())
         .protocol(meta.getProtocol())
         .high(meta.getHigh())
@@ -89,16 +91,10 @@ public final class Node implements Closeable {
         .meta(meta)
         .epmd(epmd)
         .creation(creation)
-        .config(config)
+        .config(configCopy)
         .build();
 
     node.moduleMailbox.registerNetKernelMailbox();
-
-    config.getMailboxes().forEach(it -> {
-      node.mailbox()
-          .name(it.getName())
-          .build();
-    });
 
     log.debug("Node '{}' was created", descriptor.getFullName());
     return node;
@@ -144,12 +140,14 @@ public final class Node implements Closeable {
                 int creation,
                 @NonNull NodeConfig config
   ) {
+    NodeConfig configCopy = new NodeConfig(config);
+
     this.descriptor = descriptor;
     this.meta = meta;
     this.epmd = epmd;
 
-    cookie = config.getCookie();
-    port = config.getServer().getPort();
+    cookie = configCopy.getCookie();
+    port = configCopy.getServer().getOrFindAndSetPort();
 
     generatorPid = new GeneratorPid(descriptor.getFullName(), creation);
     generatorPort = new GeneratorPort(descriptor.getFullName(), creation);
@@ -159,11 +157,11 @@ public final class Node implements Closeable {
     moduleLookup = new ModuleLookup(epmd);
     moduleConnection = new ModuleConnection(
         descriptor.getNodeName(),
-        config.getServer().getBossThreads(),
-        config.getServer().getWorkerThreads()
+        configCopy.getServer().getBossThreads(),
+        configCopy.getServer().getWorkerThreads()
     );
     moduleServer = new ModuleServer(this, moduleConnection, port);
-    moduleClient = new ModuleClient(this, moduleConnection, config.getShortName());
+    moduleClient = new ModuleClient(this, moduleConnection, configCopy.getShortName());
     moduleMailbox = new ModuleMailbox(this, () -> generatorPid.generate());
   }
 

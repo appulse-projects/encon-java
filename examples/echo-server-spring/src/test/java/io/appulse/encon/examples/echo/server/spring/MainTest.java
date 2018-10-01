@@ -36,6 +36,7 @@ import io.appulse.epmd.java.server.command.server.ServerCommandExecutor;
 import io.appulse.epmd.java.server.command.server.ServerCommandOptions;
 import io.appulse.utils.SocketUtils;
 import io.appulse.utils.test.TestMethodNamePrinter;
+
 import org.junit.AfterClass;
 import org.junit.BeforeClass;
 import org.junit.Rule;

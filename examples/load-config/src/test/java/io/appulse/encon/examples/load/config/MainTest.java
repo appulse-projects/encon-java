@@ -100,9 +100,7 @@ public class MainTest {
 
 
     assertThat(node.mailbox("net_kernel")).isNotNull();
-    assertThat(node.mailbox("another")).isNotNull();
-    assertThat(node.mailbox("another_one")).isNotNull();
-    assertThat(node.mailboxes()).hasSize(3);
+    assertThat(node.mailboxes()).hasSize(1);
   }
 
   private void checkNode2 (Server server) {

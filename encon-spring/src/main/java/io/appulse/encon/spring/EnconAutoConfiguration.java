@@ -33,6 +33,7 @@ import io.appulse.encon.mailbox.Mailbox;
 import io.appulse.encon.spring.EnconAutoConfiguration.MailboxOperationsConfiguration;
 
 import lombok.experimental.FieldDefaults;
+import lombok.extern.slf4j.Slf4j;
 import lombok.val;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.config.ConfigurableListableBeanFactory;
@@ -52,6 +53,7 @@ import org.springframework.context.support.AbstractApplicationContext;
  * @since 1.6.0
  * @author Artem Labazin
  */
+@Slf4j
 @Configuration
 @ConditionalOnClass({
     Node.class,
@@ -84,6 +86,7 @@ class EnconAutoConfiguration {
   @ConditionalOnMissingBean
   @SuppressWarnings("PMD.AvoidInstantiatingObjectsInLoops")
   public Nodes defaultEnconNodes (Config config) {
+    log.debug("Configuration loaded\n{}", config);
     val nodes = Nodes.start(config);
     for (Node node : nodes) {
       val descriptor = node.getDescriptor();

@@ -1,0 +1,12 @@
+
+one.two.three:
+  four: 4
+  five.six: 6
+  seven:
+    - 1
+    - 2
+    - 3
+    - name: popa
+      my.age: 11
+      
+zero: 0

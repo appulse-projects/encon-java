@@ -23,15 +23,12 @@ import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 
 import io.appulse.encon.config.Config;
-import io.appulse.encon.config.Defaults;
-import io.appulse.encon.config.MailboxConfig;
-import io.appulse.encon.config.NodeConfig;
-import io.appulse.encon.config.ServerConfig;
 import io.appulse.epmd.java.server.cli.CommonOptions;
 import io.appulse.epmd.java.server.command.server.ServerCommandExecutor;
 import io.appulse.epmd.java.server.command.server.ServerCommandOptions;
 import io.appulse.utils.SocketUtils;
 import io.appulse.utils.test.TestMethodNamePrinter;
+import io.appulse.encon.NodesConfig.NodeConfig;
 
 import lombok.val;
 
@@ -75,29 +72,17 @@ public class NodesTest {
 
   @Test
   public void instantiating () {
-    val config = Config.builder()
-        .defaults(Defaults.builder()
-            .cookie("kojima-secret")
-            .server(ServerConfig.builder()
-                .bossThreads(1)
-                .workerThreads(1)
-                .build())
+    Config config = Config.builder()
+        .config(NodesConfig.builder()
+            .node("kojima1", NodeConfig.DEFAULT)
+            .node("kojima2", NodeConfig.DEFAULT)
             .build())
-        .node("kojima1", new NodeConfig())
-        .node("kojima2", new NodeConfig())
-        .node("ocelot", NodeConfig.builder()
-              .mailbox(MailboxConfig.builder()
-                  .name("revolver")
-                  .build())
-              .build())
         .build();
 
-    try (val nodes = Nodes.start(config)) {
+    try (Nodes nodes = Nodes.start(config)) {
       assertThat(nodes.node("kojima1"))
           .isPresent();
       assertThat(nodes.node("kojima2"))
-          .isPresent();
-      assertThat(nodes.node("ocelot"))
           .isPresent();
       assertThat(nodes.node("kojima3"))
           .isNotPresent();
