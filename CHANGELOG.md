@@ -22,6 +22,13 @@ and this project adheres to [Semantic Versioning](http://semver.org/spec/v2.0.0.
 - Turn on checkstyle JavaDocs module.
 - Add updates to the protocol, like new `ControlMessage`.
 
+## [1.6.6](https://github.com/appulse-projects/encon-java/releases/tag/1.6.6) - 2018-10-02
+
+### Changed
+
+- Quick fix for [GitHub issue](https://github.com/appulse-projects/encon-java/issues/11), refactored `ErlangInteger` cache;
+- Correctly setup `checkstyle`/`epmd`/`findbugs` validation phases.
+
 ## [1.6.5](https://github.com/appulse-projects/encon-java/releases/tag/1.6.5) - 2018-09-28
 
 ### Changed
