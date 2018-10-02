@@ -31,12 +31,9 @@ import io.appulse.encon.terms.ErlangTerm;
 import io.appulse.encon.terms.TermType;
 import io.appulse.encon.terms.exception.ErlangTermDecodeException;
 import io.appulse.encon.terms.exception.IllegalErlangTermTypeException;
-import io.appulse.utils.cache.LruCache;
 
 import io.netty.buffer.ByteBuf;
-import io.netty.util.ByteProcessor;
 import lombok.EqualsAndHashCode;
-import lombok.Getter;
 import lombok.NonNull;
 import lombok.ToString;
 import lombok.experimental.FieldDefaults;
@@ -64,8 +61,6 @@ public class ErlangInteger extends ErlangTerm {
 
   private static final int MAX_SMALL_BIG_BYTES_LENGTH = 255;
 
-  private static final LruCache<Integer, ErlangInteger> CACHE = new LruCache<>(1000);
-
   /**
    * Creates cached {@link ErlangInteger} value.
    *
@@ -74,15 +69,7 @@ public class ErlangInteger extends ErlangTerm {
    * @return new or cached {@link ErlangInteger} object
    */
   public static ErlangInteger cached (byte value) {
-    int hashCode = 31 + value;
-
-    ErlangInteger result = CACHE.get(hashCode);
-    if (result != null) {
-      return result;
-    }
-    result = new ErlangInteger(value);
-    CACHE.put(hashCode, result);
-    return result;
+    return ErlangIntegerCache.CACHE[value + (-ErlangIntegerCache.LOW)];
   }
 
   /**
@@ -93,16 +80,10 @@ public class ErlangInteger extends ErlangTerm {
    * @return new or cached {@link ErlangInteger} object
    */
   public static ErlangInteger cached (char value) {
-    int hashCode = 31 + (byte) (value >> 8);
-    hashCode = 31 * hashCode + (byte) value;
-
-    ErlangInteger result = CACHE.get(hashCode);
-    if (result != null) {
-      return result;
+    if (value <= ErlangIntegerCache.HIGH) {
+      return ErlangIntegerCache.CACHE[value + (-ErlangIntegerCache.LOW)];
     }
-    result = new ErlangInteger(value);
-    CACHE.put(hashCode, result);
-    return result;
+    return new ErlangInteger(value);
   }
 
   /**
@@ -113,16 +94,10 @@ public class ErlangInteger extends ErlangTerm {
    * @return new or cached {@link ErlangInteger} object
    */
   public static ErlangInteger cached (short value) {
-    int hashCode = 31 + (byte) (value >> 8);
-    hashCode = 31 * hashCode + (byte) value;
-
-    ErlangInteger result = CACHE.get(hashCode);
-    if (result != null) {
-      return result;
+    if (value >= ErlangIntegerCache.LOW && value <= ErlangIntegerCache.HIGH) {
+      return ErlangIntegerCache.CACHE[value + (-ErlangIntegerCache.LOW)];
     }
-    result = new ErlangInteger(value);
-    CACHE.put(hashCode, result);
-    return result;
+    return new ErlangInteger(value);
   }
 
   /**
@@ -133,18 +108,10 @@ public class ErlangInteger extends ErlangTerm {
    * @return new or cached {@link ErlangInteger} object
    */
   public static ErlangInteger cached (int value) {
-    int hashCode = 31 + (byte) (value >> 24);
-    hashCode = 31 * hashCode + (byte) (value >> 16);
-    hashCode = 31 * hashCode + (byte) (value >> 8);
-    hashCode = 31 * hashCode + (byte) value;
-
-    ErlangInteger result = CACHE.get(hashCode);
-    if (result != null) {
-      return result;
+    if (value >= ErlangIntegerCache.LOW && value <= ErlangIntegerCache.HIGH) {
+      return ErlangIntegerCache.CACHE[value + (-ErlangIntegerCache.LOW)];
     }
-    result = new ErlangInteger(value);
-    CACHE.put(hashCode, result);
-    return result;
+    return new ErlangInteger(value);
   }
 
   /**
@@ -155,22 +122,10 @@ public class ErlangInteger extends ErlangTerm {
    * @return new or cached {@link ErlangInteger} object
    */
   public static ErlangInteger cached (long value) {
-    int hashCode = 31 + (byte) (value >> 56);
-    hashCode = 31 * hashCode + (byte) (value >> 48);
-    hashCode = 31 * hashCode + (byte) (value >> 40);
-    hashCode = 31 * hashCode + (byte) (value >> 32);
-    hashCode = 31 * hashCode + (byte) (value >> 24);
-    hashCode = 31 * hashCode + (byte) (value >> 16);
-    hashCode = 31 * hashCode + (byte) (value >> 8);
-    hashCode = 31 * hashCode + (byte) value;
-
-    ErlangInteger result = CACHE.get(hashCode);
-    if (result != null) {
-      return result;
+    if (value >= ErlangIntegerCache.LOW && value <= ErlangIntegerCache.HIGH) {
+      return ErlangIntegerCache.CACHE[(int) value + (-ErlangIntegerCache.LOW)];
     }
-    result = new ErlangInteger(value);
-    CACHE.put(hashCode, result);
-    return result;
+    return new ErlangInteger(value);
   }
 
   /**
@@ -185,39 +140,6 @@ public class ErlangInteger extends ErlangTerm {
       return cached(value.longValue());
     }
     return new ErlangInteger(value);
-  }
-
-  public static ErlangInteger cached (TermType type, @NonNull ByteBuf buffer) {
-    int index = buffer.readerIndex();
-    ByteArrayHashCode byteProcessor = new ByteArrayHashCode();
-
-    int length;
-    switch (type) {
-    case SMALL_INTEGER:
-      length = Byte.BYTES;
-      break;
-    case INTEGER:
-      length = Integer.BYTES;
-      break;
-    case SMALL_BIG:
-      length = buffer.readByte() + Byte.BYTES;
-      break;
-    case LARGE_BIG:
-    default:
-      length = buffer.readInt() + Byte.BYTES;
-    }
-
-    buffer.forEachByte(buffer.readerIndex(), length, byteProcessor);
-
-    return CACHE.compute(byteProcessor.getHashCode(), (key, value) -> {
-      if (value == null) {
-        buffer.readerIndex(index);
-        return new ErlangInteger(type, buffer);
-      } else {
-        buffer.skipBytes(length);
-        return value;
-      }
-    });
   }
 
   BigInteger value;
@@ -476,16 +398,21 @@ public class ErlangInteger extends ErlangTerm {
     }
   }
 
-  @Getter
-  @FieldDefaults(level = PRIVATE)
-  private static class ByteArrayHashCode implements ByteProcessor {
+  @SuppressWarnings("PMD.AvoidInstantiatingObjectsInLoops")
+  private static class ErlangIntegerCache {
 
-    int hashCode = 1;
+    private static final int LOW = -128;
 
-    @Override
-    public boolean process (byte value) throws Exception {
-      hashCode = 31 * hashCode + value;
-      return true;
+    private static final int HIGH = 127;
+
+    private static final ErlangInteger[] CACHE;
+
+    static {
+      CACHE = new ErlangInteger[(HIGH - LOW) + 1];
+      int value = LOW;
+      for (int index = 0; index < CACHE.length; index++) {
+        CACHE[index] = new ErlangInteger(value++);
+      }
     }
   }
 }

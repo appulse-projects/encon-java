@@ -167,6 +167,13 @@ public class ErlangIntegerTest {
     }
   }
 
+  @Test
+  public void cached () {
+    ErlangInteger num1 = ErlangInteger.cached(1273);
+    ErlangInteger num2 = ErlangInteger.cached(117);
+    assertThat(num1).isNotEqualTo(num2);
+  }
+
   @SneakyThrows
   private byte[] bytes (char value) {
     try (OtpOutputStream output = new OtpOutputStream()) {
