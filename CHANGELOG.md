@@ -21,6 +21,7 @@ and this project adheres to [Semantic Versioning](http://semver.org/spec/v2.0.0.
 - Add handshake error handling (exceptions? error logs?).
 - Turn on checkstyle JavaDocs module.
 - Add updates to the protocol, like new `ControlMessage`.
+- Do we really need `ErlangInteger.cache` methods?
 
 ## [1.6.6](https://github.com/appulse-projects/encon-java/releases/tag/1.6.6) - 2018-10-02
 
