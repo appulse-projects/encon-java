@@ -23,6 +23,12 @@ and this project adheres to [Semantic Versioning](http://semver.org/spec/v2.0.0.
 - Add updates to the protocol, like new `ControlMessage`.
 - Do we really need `ErlangInteger.cache` methods?
 
+## [1.6.7](https://github.com/appulse-projects/encon-java/releases/tag/1.6.7) - 2018-10-07
+
+### Changed
+
+- Quick fix for [GitHub issue](https://github.com/appulse-projects/encon-java/issues/13), removed `ErlangPid` and `EralngAtom` caches.
+
 ## [1.6.6](https://github.com/appulse-projects/encon-java/releases/tag/1.6.6) - 2018-10-02
 
 ### Changed

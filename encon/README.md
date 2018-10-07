@@ -21,7 +21,7 @@ Adding encon's dependency to your `JVM` app:
   <dependency>
     <groupId>io.appulse.encon</groupId>
     <artifactId>encon</artifactId>
-    <version>1.6.6</version>
+    <version>1.6.7</version>
   </dependency>
   ...
 </dependencies>
@@ -30,7 +30,7 @@ Adding encon's dependency to your `JVM` app:
 **Gradle**:
 
 ```groovy
-compile 'io.appulse.encon:encon:1.6.6'
+compile 'io.appulse.encon:encon:1.6.7'
 ```
 
 ## Start the Node

@@ -27,6 +27,7 @@ import erlang.OtpOutputStream;
 import io.appulse.encon.terms.ErlangTerm;
 import io.appulse.utils.Bytes;
 import io.appulse.utils.test.TestMethodNamePrinter;
+import io.netty.buffer.Unpooled;
 import lombok.SneakyThrows;
 import lombok.val;
 import org.assertj.core.api.SoftAssertions;
