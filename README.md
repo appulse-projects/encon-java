@@ -1,7 +1,7 @@
 # Overview
 
 [![build_status](https://travis-ci.org/appulse-projects/encon-java.svg?branch=master)](https://travis-ci.org/appulse-projects/encon-java)
-[![maven_central](https://maven-badges.herokuapp.com/maven-central/io.appulse.encon/encon/badge.svg)](https://maven-badges.herokuapp.com/maven-central/io.appulse.encon/encon)
+[![maven_central](https://maven-badges.herokuapp.com/maven-central/io.appulse.encon/encon/badge.svg)]https://search.maven.org/search?q=g:io.appulse.encon%20AND%20v:1.6.7)
 [![License](http://img.shields.io/:license-apache-brightgreen.svg)](http://www.apache.org/licenses/LICENSE-2.0.html)
 
 Java implementation of **E**rlang **N**ode **CON**nector (using Eralng Distribution Protocol). For more information, visit the [site](https://appulse.io).
