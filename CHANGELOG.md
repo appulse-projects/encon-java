@@ -22,6 +22,7 @@ and this project adheres to [Semantic Versioning](http://semver.org/spec/v2.0.0.
 - Turn on checkstyle JavaDocs module.
 - Add updates to the protocol, like new `ControlMessage`.
 - Do we really need `ErlangInteger.cache` methods?
+- Add atom's table equivalent.
 
 ## [1.6.7](https://github.com/appulse-projects/encon-java/releases/tag/1.6.7) - 2018-10-07
 
