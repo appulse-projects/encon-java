@@ -1,3 +1,8 @@
+[![build_status](https://travis-ci.org/appulse-projects/encon-java.svg?branch=master)](https://travis-ci.org/appulse-projects/encon-java)
+[![maven_central](https://maven-badges.herokuapp.com/maven-central/io.appulse.encon/encon-databind/badge.svg)](https://search.maven.org/search?q=a:encon-databind)
+[![License](http://img.shields.io/:license-apache-brightgreen.svg)](http://www.apache.org/licenses/LICENSE-2.0.html)
+[![JavaDoc](http://www.javadoc.io/badge/io.appulse.encon/encon-databind.svg)](http://www.javadoc.io/doc/io.appulse.encon/encon-databind)
+
 # Overview
 
 This is a Java library that can be used to convert Java Objects into their Erlang representation.
