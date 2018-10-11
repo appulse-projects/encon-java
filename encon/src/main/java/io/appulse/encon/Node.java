@@ -133,6 +133,8 @@ public final class Node implements Closeable {
 
   ModuleClient moduleClient;
 
+  ModuleRemoteProcedureCall moduleRemoteProcedureCall;
+
   @Builder
   private Node (@NonNull NodeDescriptor descriptor,
                 @NonNull Meta meta,
@@ -163,6 +165,18 @@ public final class Node implements Closeable {
     moduleServer = new ModuleServer(this, moduleConnection, port);
     moduleClient = new ModuleClient(this, moduleConnection, configCopy.getShortName());
     moduleMailbox = new ModuleMailbox(this, () -> generatorPid.generate());
+
+    moduleRemoteProcedureCall = new ModuleRemoteProcedureCall(this);
+  }
+
+  /**
+   * Returns reference on {@link ModuleRemoteProcedureCall} instance
+   * for calling remote node's functions.
+   *
+   * @return {@link ModuleRemoteProcedureCall} instance.
+   */
+  public ModuleRemoteProcedureCall rpc () {
+    return moduleRemoteProcedureCall;
   }
 
   /**
