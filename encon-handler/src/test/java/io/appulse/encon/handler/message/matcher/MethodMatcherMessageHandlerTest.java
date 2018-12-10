@@ -33,26 +33,30 @@ import java.util.List;
 
 import io.appulse.encon.handler.message.matcher.MethodMatcherMessageHandler;
 import io.appulse.encon.terms.ErlangTerm;
-import io.appulse.utils.test.TestMethodNamePrinter;
-import lombok.val;
 
-import org.junit.Rule;
-import org.junit.Test;
-import org.junit.rules.TestRule;
+import lombok.val;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.DisplayName;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.TestInfo;
 
 /**
  *
  * @author Artem Labazin
  */
-public class MethodMatcherMessageHandlerTest {
-
-  @Rule
-  public TestRule watcher = new TestMethodNamePrinter();
+@DisplayName("Method matcher message handler tests")
+class MethodMatcherMessageHandlerTest {
 
   static List<String> list = new ArrayList<>();
 
+  @BeforeEach
+  void beforeEach (TestInfo testInfo) {
+    System.out.println("- " + testInfo.getDisplayName());
+  }
+
   @Test
-  public void test () {
+  @DisplayName("different handlers matches")
+  void test () {
     MyService1 service1 = new MyService1();
     MyService2 service2 = new MyService2();
 
@@ -76,7 +80,8 @@ public class MethodMatcherMessageHandlerTest {
   }
 
   @Test
-  public void throwsAmbigousException () {
+  @DisplayName("throws ambigous exception")
+  void throwsAmbigousException () {
     MyService2 service = new MyService2();
     val builder = MethodMatcherMessageHandler.builder()
         .wrap(service);
