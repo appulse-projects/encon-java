@@ -96,6 +96,7 @@ $> sudo apt-get install --yes git curl zip unzip
 
 ```bash
 $> curl -s "https://get.sdkman.io" | bash
+$> source "$HOME/.sdkman/bin/sdkman-init.sh"
 ```
 
 4. Install `Java`:
@@ -143,6 +144,7 @@ $> nohup java -Xms3G -Xmx4G -jar benchmark/target/benchmarks.jar > job.logs 2>&1
 $> sudo apt-get update --yes && sudo apt-get upgrade --yes && \
    sudo apt-get install --yes git curl zip unzip && \
    curl -s "https://get.sdkman.io" | bash && \
+   source "$HOME/.sdkman/bin/sdkman-init.sh" && \
    sdk install java 11.0.1-open && \
    git clone https://github.com/appulse-projects/encon-java.git && \
    cd encon-java && \
