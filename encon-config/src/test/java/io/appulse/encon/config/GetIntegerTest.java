@@ -23,17 +23,27 @@ import java.net.URL;
 
 import io.appulse.utils.ResourceUtils;
 
-import org.junit.Test;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.DisplayName;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.TestInfo;
 
 /**
  *
  * @author Artem Labazin
  * @since 2.0.0
  */
-public class GetIntegerTest {
+@DisplayName("Extracting integer options from config")
+class GetIntegerTest {
+
+  @BeforeEach
+  void beforeEach (TestInfo testInfo) {
+    System.out.println("- " + testInfo.getDisplayName());
+  }
 
   @Test
-  public void test () {
+  @DisplayName("checks integer options")
+  void test () {
     URL url = ResourceUtils.getResourceUrls("", "int.yml").get(0);
     Config config = Config.load(url);
 

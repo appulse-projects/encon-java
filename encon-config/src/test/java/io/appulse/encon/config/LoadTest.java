@@ -19,6 +19,7 @@ package io.appulse.encon.config;
 import static java.util.Arrays.asList;
 import static java.util.stream.Collectors.toList;
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.assertThatThrownBy;
 
 import java.io.File;
 import java.net.URI;
@@ -34,22 +35,34 @@ import io.appulse.encon.config.exception.ConfigLoadingFileNotFoundException;
 import io.appulse.utils.ResourceUtils;
 
 import lombok.SneakyThrows;
-import org.junit.Test;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.DisplayName;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.TestInfo;
 
 /**
  *
  * @author Artem Labazin
  * @since 2.0.0
  */
-public class LoadTest {
+@DisplayName("Configuration loading tests")
+class LoadTest {
 
-  @Test(expected = ConfigLoadingFileNotFoundException.class)
-  public void loadNonexistentFile () {
-    Config.load("nonexistent.yml");
+  @BeforeEach
+  void beforeEach (TestInfo testInfo) {
+    System.out.println("- " + testInfo.getDisplayName());
   }
 
   @Test
-  public void loadMap () {
+  @DisplayName("try to load nonexistent configuration file")
+  void loadNonexistentFile () {
+    assertThatThrownBy(() -> Config.load("nonexistent.yml"))
+        .isInstanceOf(ConfigLoadingFileNotFoundException.class);
+  }
+
+  @Test
+  @DisplayName("load configuration from map")
+  void loadMap () {
     Map<String, Object> subMap = new HashMap<>();
     subMap.put("name", "popa");
     subMap.put("my.age", 11);
@@ -65,7 +78,8 @@ public class LoadTest {
   }
 
 //  @Test
-  public void loadProperties () {
+//  @DisplayName("load configuration from properties")
+  void loadProperties () {
     Properties properties = new Properties();
     properties.put("one.two.three.four", 4);
     properties.put("one.two.three.five.six", 6);
@@ -81,7 +95,8 @@ public class LoadTest {
   }
 
   @Test
-  public void loadUrl () {
+  @DisplayName("load configuration by URL")
+  void loadUrl () {
     getUrlFiles().forEach(url -> {
       Config config = Config.load(url);
       checkConfig(config, url.toString());
@@ -89,7 +104,8 @@ public class LoadTest {
   }
 
   @Test
-  public void loadUri () {
+  @DisplayName("load configuration by URI")
+  void loadUri () {
     getUriFiles().forEach(uri -> {
       Config config = Config.load(uri);
       checkConfig(config, uri.toString());
@@ -97,7 +113,8 @@ public class LoadTest {
   }
 
   @Test
-  public void loadFile () {
+  @DisplayName("load configuration by File")
+  void loadFile () {
     getUriFiles().stream().map(File::new).forEach(file -> {
       Config config = Config.load(file);
       checkConfig(config, file.toString());
@@ -105,7 +122,8 @@ public class LoadTest {
   }
 
   @Test
-  public void loadPath () {
+  @DisplayName("load configuration by Path")
+  void loadPath () {
     getUriFiles().stream().map(Paths::get).forEach(path -> {
       Config config = Config.load(path);
       checkConfig(config, path.toString());
@@ -113,7 +131,8 @@ public class LoadTest {
   }
 
   @Test
-  public void loadFileName () {
+  @DisplayName("load configuration by file name")
+  void loadFileName () {
     getUriFiles().stream().map(Paths::get).map(Path::toString).forEach(fileName -> {
       Config config = Config.load(fileName);
       checkConfig(config, fileName);
