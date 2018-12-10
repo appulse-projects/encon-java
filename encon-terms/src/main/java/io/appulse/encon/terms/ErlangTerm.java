@@ -108,7 +108,7 @@ public abstract class ErlangTerm implements IntegerTerm,
       return (T) new ErlangPort(type, buffer);
     case PID:
     case NEW_PID:
-      return (T) ErlangPid.cached(type, buffer);
+      return (T) new ErlangPid(type, buffer);
     case SMALL_TUPLE:
     case LARGE_TUPLE:
       return (T) new ErlangTuple(type, buffer);
@@ -133,7 +133,7 @@ public abstract class ErlangTerm implements IntegerTerm,
     case SMALL_ATOM_UTF8:
     case ATOM:
     case SMALL_ATOM:
-      return (T) ErlangAtom.cached(type, buffer);
+      return (T) new ErlangAtom(type, buffer);
     default:
       val message = String.format("Unknown term type %s (%d)", type.name(), typeByte);
       throw new ErlangTermDecodeException(message);
