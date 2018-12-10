@@ -28,6 +28,8 @@ import lombok.Value;
 @EqualsAndHashCode(callSuper = true)
 public class ConfigMappingEnumValueNotFoundException extends ConfigMappingUnsupportedTypeException {
 
+  private static final long serialVersionUID = 4085006616020486199L;
+
   String nodeAsString;
 
   public ConfigMappingEnumValueNotFoundException (Class<?> type, String nodeAsString) {

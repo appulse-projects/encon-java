@@ -23,17 +23,27 @@ import java.net.URL;
 
 import io.appulse.utils.ResourceUtils;
 
-import org.junit.Test;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.DisplayName;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.TestInfo;
 
 /**
  *
  * @author Artem Labazin
  * @since 2.0.0
  */
-public class GetLongTest {
+@DisplayName("Extracting long options from config")
+class GetLongTest {
+
+  @BeforeEach
+  void beforeEach (TestInfo testInfo) {
+    System.out.println("- " + testInfo.getDisplayName());
+  }
 
   @Test
-  public void test () {
+  @DisplayName("checks long options")
+  void test () {
     URL url = ResourceUtils.getResourceUrls("", "long.yml").get(0);
     Config config = Config.load(url);
 

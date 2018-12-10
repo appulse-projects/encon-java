@@ -24,17 +24,27 @@ import java.util.Map;
 
 import io.appulse.utils.ResourceUtils;
 
-import org.junit.Test;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.DisplayName;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.TestInfo;
 
 /**
  *
  * @author Artem Labazin
  * @since 2.0.0
  */
-public class GetObjectTest {
+@DisplayName("Extracting object options from config")
+class GetObjectTest {
+
+  @BeforeEach
+  void beforeEach (TestInfo testInfo) {
+    System.out.println("- " + testInfo.getDisplayName());
+  }
 
   @Test
-  public void test () {
+  @DisplayName("checks object options")
+  void test () {
     URL url = ResourceUtils.getResourceUrls("", "object.yml").get(0);
     Config config = Config.load(url);
 
