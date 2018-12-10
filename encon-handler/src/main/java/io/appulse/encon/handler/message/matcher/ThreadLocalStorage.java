@@ -22,7 +22,7 @@ import java.util.List;
 /**
  *
  * @since 1.4.0
- * @author alabazin
+ * @author Artem Labazin
  */
 final class ThreadLocalStorage {
 

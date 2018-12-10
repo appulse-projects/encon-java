@@ -24,7 +24,7 @@ import lombok.val;
 /**
  *
  * @since 1.4.0
- * @author alabazin
+ * @author Artem Labazin
  */
 enum MethodArgumentsWrapper {
 

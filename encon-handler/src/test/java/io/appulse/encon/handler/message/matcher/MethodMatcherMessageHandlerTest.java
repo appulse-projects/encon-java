@@ -42,7 +42,7 @@ import org.junit.rules.TestRule;
 
 /**
  *
- * @author alabazin
+ * @author Artem Labazin
  */
 public class MethodMatcherMessageHandlerTest {
 

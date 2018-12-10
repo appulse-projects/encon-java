@@ -33,7 +33,7 @@ import lombok.extern.slf4j.Slf4j;
 /**
  *
  * @since 1.6.0
- * @author alabazin
+ * @author Artem Labazin
  */
 @Slf4j
 @Getter
