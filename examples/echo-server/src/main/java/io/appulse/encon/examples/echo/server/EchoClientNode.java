@@ -35,13 +35,13 @@ import lombok.experimental.FieldDefaults;
  * @author Artem Labazin
  */
 @FieldDefaults(level = PRIVATE, makeFinal = true)
-class EchoClientNode implements Closeable {
+public class EchoClientNode implements Closeable {
 
   Node node;
 
   Mailbox mailbox;
 
-  EchoClientNode (String cookie) {
+  public EchoClientNode (String cookie) {
     NodeConfig config = NodeConfig.builder()
         .shortName(TRUE)
         .cookie(cookie)

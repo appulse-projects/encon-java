@@ -20,9 +20,9 @@ import static io.appulse.encon.terms.Erlang.atom;
 import static io.appulse.encon.terms.Erlang.number;
 import static io.appulse.encon.terms.Erlang.string;
 import static io.appulse.encon.terms.Erlang.tuple;
-import static org.junit.Assert.assertEquals;
 import static java.util.Arrays.asList;
 import static java.util.Collections.singleton;
+import static org.junit.jupiter.api.Assertions.assertEquals;
 
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
@@ -39,16 +39,16 @@ import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 import lombok.EqualsAndHashCode;
-import org.junit.After;
-import org.junit.Before;
-import org.junit.Test;
+import org.junit.jupiter.api.AfterEach;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 
 /**
  *
  * @since 1.6.0
  * @author Artem Labazin
  */
-public class MainTest {
+class MainTest {
 
   final String SERVER_NODE_NAME = "echo-server";
   final String SERVER_MAILBOX_NAME = "echo";
@@ -59,8 +59,8 @@ public class MainTest {
   EchoServerNode server;
   EchoClientNode client;
 
-  @Before
-  public void before () {
+  @BeforeEach
+  void beforeEach () {
     server = new EchoServerNode(SERVER_NODE_NAME, COOKIE, SERVER_MAILBOX_NAME);
     client = new EchoClientNode(COOKIE);
 
@@ -68,15 +68,15 @@ public class MainTest {
     executor.execute(server);
   }
 
-  @After
-  public void after () {
+  @AfterEach
+  void afterEach () {
     client.close();
     server.close();
     executor.shutdown();
   }
 
   @Test
-  public void term () {
+  void term () {
     ErlangTerm request = tuple(
         atom("ok"),
         number(42),
@@ -91,7 +91,7 @@ public class MainTest {
   }
 
   @Test
-  public void pojo () {
+  void pojo () {
     MyPojo request = new MyPojo(
         "Artem",
         27,
