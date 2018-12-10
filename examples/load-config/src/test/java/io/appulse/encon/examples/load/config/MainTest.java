@@ -36,7 +36,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 import io.appulse.encon.Node;
 
 import lombok.extern.slf4j.Slf4j;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 
 /**
  *
@@ -44,10 +44,10 @@ import org.junit.Test;
  * @author Artem Labazin
  */
 @Slf4j
-public class MainTest {
+class MainTest {
 
   @Test
-  public void test () {
+  void test () {
     Server server = new Server();
     server.start();
 

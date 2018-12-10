@@ -35,19 +35,19 @@ import io.appulse.epmd.java.server.cli.CommonOptions;
 import io.appulse.epmd.java.server.command.server.ServerCommandExecutor;
 import io.appulse.epmd.java.server.command.server.ServerCommandOptions;
 import io.appulse.utils.SocketUtils;
-import io.appulse.utils.test.TestMethodNamePrinter;
 
-import org.junit.AfterClass;
-import org.junit.BeforeClass;
-import org.junit.Rule;
-import org.junit.Test;
-import org.junit.rules.TestRule;
-import org.junit.runner.RunWith;
+import org.junit.jupiter.api.AfterAll;
+import org.junit.jupiter.api.BeforeAll;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.extension.ExtendWith;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.TestInfo;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.SpringBootConfiguration;
-import org.springframework.test.context.junit4.SpringRunner;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.context.annotation.ComponentScan;
+import org.springframework.test.context.junit.jupiter.SpringExtension;
+import org.springframework.test.context.junit4.SpringRunner;
 
 /**
  *
@@ -60,24 +60,15 @@ import org.springframework.context.annotation.ComponentScan;
     EchoClient.class,
     EnconProperties.class
 })
-@RunWith(SpringRunner.class)
-public class MainTest {
+@ExtendWith(SpringExtension.class)
+class MainTest {
 
   private static ExecutorService executor;
 
   private static ServerCommandExecutor epmdServer;
 
-  @Rule
-  public TestRule watcher = new TestMethodNamePrinter();
-
-  @Autowired
-  EchoClient client;
-
-  @Autowired
-  EchoServer server;
-
-  @BeforeClass
-  public static void beforeClass () {
+  @BeforeAll
+  static void beforeAll () {
     if (SocketUtils.isPortAvailable(4369)) {
       executor = Executors.newSingleThreadExecutor();
       epmdServer = new ServerCommandExecutor(new CommonOptions(), new ServerCommandOptions());
@@ -85,8 +76,8 @@ public class MainTest {
     }
   }
 
-  @AfterClass
-  public static void afterClass () {
+  @AfterAll
+  static void afterAll () {
     ofNullable(epmdServer)
       .ifPresent(ServerCommandExecutor::close);
 
@@ -94,8 +85,19 @@ public class MainTest {
       .ifPresent(ExecutorService::shutdown);
   }
 
+  @Autowired
+  EchoClient client;
+
+  @Autowired
+  EchoServer server;
+
+  @BeforeEach
+  void beforeEach (TestInfo testInfo) {
+    System.out.println("- " + testInfo.getDisplayName());
+  }
+
   @Test
-  public void term () {
+  void term () {
     ErlangTerm request = tuple(
         client.pid(),
         tuple(
@@ -115,7 +117,7 @@ public class MainTest {
   }
 
   @Test
-  public void pojo () {
+  void pojo () {
     MyPojo2 request = new MyPojo2(
         client.pid(),
         "Artem",

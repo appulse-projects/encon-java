@@ -196,6 +196,12 @@ limitations under the License.
         <artifactId>server</artifactId>
         <version>1.0.2</version>
       </dependency>
+      
+      <dependency>
+        <groupId>org.yaml</groupId>
+        <artifactId>snakeyaml</artifactId>
+        <version>1.23</version>
+      </dependency>
 
       <dependency>
         <groupId>org.erlang.otp</groupId>
