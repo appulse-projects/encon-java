@@ -31,6 +31,7 @@ import org.junit.jupiter.api.TestInfo;
  * @author Artem Labazin
  * @since 1.0.0
  */
+@DisplayName("Check node descriptor")
 class NodeDescriptorTest {
 
   @BeforeEach
@@ -39,7 +40,7 @@ class NodeDescriptorTest {
   }
 
   @Test
-  @DisplayName("Parse short node's name with localhost host")
+  @DisplayName("parse short node's name with localhost host")
   void fullShortName () throws Exception {
     InetAddress address = InetAddress.getByName("localhost");
     String fullName = "popa@localhost";
@@ -74,7 +75,7 @@ class NodeDescriptorTest {
   }
 
   @Test
-  @DisplayName("Parse short node's name without host")
+  @DisplayName("parse short node's name without host")
   void shortName () throws Exception {
     InetAddress address = InetAddress.getLoopbackAddress();
     String tmp = InetAddress.getLocalHost().getHostName();
@@ -115,7 +116,7 @@ class NodeDescriptorTest {
   }
 
   @Test
-  @DisplayName("Parse full node's name with host")
+  @DisplayName("parse full node's name with host")
   void fullLongName () throws Exception {
     InetAddress address = InetAddress.getByName("localhost");
     String fullName = "popa@localhost";

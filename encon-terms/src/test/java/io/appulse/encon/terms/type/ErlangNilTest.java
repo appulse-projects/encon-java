@@ -22,27 +22,31 @@ import static org.assertj.core.api.Assertions.assertThat;
 
 import io.appulse.encon.terms.ErlangTerm;
 import io.appulse.utils.Bytes;
-import io.appulse.utils.test.TestMethodNamePrinter;
 
 import erlang.OtpOutputStream;
 import lombok.SneakyThrows;
 import lombok.val;
-import org.junit.Rule;
-import org.junit.Test;
-import org.junit.rules.TestRule;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.DisplayName;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.TestInfo;
 
 /**
  *
  * @author Artem Labazin
  * @since 1.0.0
  */
-public class ErlangNilTest {
+@DisplayName("Check Erlang's NIL term type")
+class ErlangNilTest {
 
-  @Rule
-  public TestRule watcher = new TestMethodNamePrinter();
+  @BeforeEach
+  void beforeEach (TestInfo testInfo) {
+    System.out.println("- " + testInfo.getDisplayName());
+  }
 
   @Test
-  public void newInstance () {
+  @DisplayName("create new instance from bytes")
+  void newInstance () {
     val bytes = Bytes.allocate()
         .put1B(NIL.getCode())
         .array();
@@ -54,7 +58,8 @@ public class ErlangNilTest {
   }
 
   @Test
-  public void toBytes () {
+  @DisplayName("convert instance to byte array")
+  void toBytes () {
     val expected = Bytes.allocate()
         .put1B(NIL.getCode())
         .array();
@@ -64,7 +69,8 @@ public class ErlangNilTest {
   }
 
   @Test
-  public void encode () {
+  @DisplayName("encode instance to byte array and compare with jinterface output")
+  void encode () {
     assertThat(new ErlangNil().toBytes())
         .isEqualTo(bytes());
   }

@@ -24,28 +24,34 @@ import static org.assertj.core.api.Assertions.assertThat;
 import erlang.OtpErlangPid;
 import erlang.OtpInputStream;
 import erlang.OtpOutputStream;
+
 import io.appulse.encon.terms.ErlangTerm;
 import io.appulse.utils.Bytes;
-import io.appulse.utils.test.TestMethodNamePrinter;
+
 import lombok.SneakyThrows;
 import lombok.val;
 import org.assertj.core.api.SoftAssertions;
-import org.junit.Rule;
-import org.junit.Test;
-import org.junit.rules.TestRule;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.DisplayName;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.TestInfo;
 
 /**
  *
  * @author Artem Labazin
  * @since 1.0.0
  */
-public class ErlangPidTest {
+@DisplayName("Check Erlang's Pid term type")
+class ErlangPidTest {
 
-  @Rule
-  public TestRule watcher = new TestMethodNamePrinter();
+  @BeforeEach
+  void beforeEach (TestInfo testInfo) {
+    System.out.println("- " + testInfo.getDisplayName());
+  }
 
   @Test
-  public void newInstance () {
+  @DisplayName("create new instance from bytes")
+  void newInstance () {
     val node = "popa";
     val id = 500;
     val serial = 10;
@@ -78,7 +84,8 @@ public class ErlangPidTest {
   }
 
   @Test
-  public void toBytes () {
+  @DisplayName("convert instance to byte array")
+  void toBytes () {
     val node = "popa";
     val id = 500;
     val serial = 10;
@@ -104,7 +111,8 @@ public class ErlangPidTest {
   }
 
   @Test
-  public void encode () {
+  @DisplayName("encode instance to byte array and compare with jinterface output")
+  void encode () {
     assertThat(ErlangPid.builder()
         .node("popa@localhost")
         .id(1)
@@ -128,7 +136,8 @@ public class ErlangPidTest {
   }
 
   @Test
-  public void decode () throws Exception {
+  @DisplayName("decode instance from byte array and compare with jinterface result")
+  void decode () throws Exception {
     byte[] bytes1 = Bytes.allocate()
         .put1B(PID.getCode())
         .put(new ErlangAtom("popa@localhost").toBytes())

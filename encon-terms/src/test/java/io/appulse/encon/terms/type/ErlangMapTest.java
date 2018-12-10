@@ -22,31 +22,34 @@ import java.util.ArrayList;
 import java.util.LinkedHashMap;
 import java.util.List;
 
-
 import io.appulse.encon.terms.ErlangTerm;
-import io.appulse.utils.test.TestMethodNamePrinter;
 
 import erlang.OtpErlangMap;
 import erlang.OtpErlangObject;
 import erlang.OtpErlangString;
 import erlang.OtpOutputStream;
 import lombok.SneakyThrows;
-import org.junit.Rule;
-import org.junit.Test;
-import org.junit.rules.TestRule;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.DisplayName;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.TestInfo;
 
 /**
  *
  * @author Artem Labazin
  * @since 1.0.0
  */
-public class ErlangMapTest {
+@DisplayName("Check Erlang's Map term type")
+class ErlangMapTest {
 
-  @Rule
-  public TestRule watcher = new TestMethodNamePrinter();
+  @BeforeEach
+  void beforeEach (TestInfo testInfo) {
+    System.out.println("- " + testInfo.getDisplayName());
+  }
 
   @Test
-  public void encode () {
+  @DisplayName("encode instance to byte array and compare with jinterface output")
+  void encode () {
     LinkedHashMap<String, String> value = new LinkedHashMap<>(3);
     value.put("one", "1");
     value.put("two", "2");

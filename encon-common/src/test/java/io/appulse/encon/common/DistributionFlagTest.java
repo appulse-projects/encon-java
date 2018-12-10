@@ -33,6 +33,7 @@ import org.junit.jupiter.api.TestInfo;
  * @author Artem Labazin
  * @since 1.0.0
  */
+@DisplayName("Check distribution flags enum")
 class DistributionFlagTest {
 
   @BeforeEach
@@ -41,7 +42,7 @@ class DistributionFlagTest {
   }
 
   @Test
-  @DisplayName("Check if distribution flag's code could be converted to its enum value")
+  @DisplayName("check if distribution flag's code could be converted to its enum value")
   void couldConvert () {
     Stream.of(DistributionFlag.values()).forEach(it -> {
       assertThat(DistributionFlag.parse(it.getCode()))
@@ -52,7 +53,7 @@ class DistributionFlagTest {
   }
 
   @Test
-  @DisplayName("Unfold integer to set of distribution flags")
+  @DisplayName("unfold integer to set of distribution flags")
   void unfold () {
     assertThat(DistributionFlag.parse(262_147))
         .hasSize(3)
@@ -60,7 +61,7 @@ class DistributionFlagTest {
   }
 
   @Test
-  @DisplayName("Fold enum values to integer")
+  @DisplayName("fold enum values to integer")
   void fold () {
     assertThat(DistributionFlag.bitwiseOr(PUBLISHED, ATOM_CACHE, BIG_CREATION))
         .isEqualTo(262_147);
