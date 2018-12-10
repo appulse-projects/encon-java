@@ -35,7 +35,7 @@ import net.sf.cglib.proxy.MethodProxy;
 /**
  *
  * @since 1.4.0
- * @author alabazin
+ * @author Artem Labazin
  */
 @Slf4j
 @Builder

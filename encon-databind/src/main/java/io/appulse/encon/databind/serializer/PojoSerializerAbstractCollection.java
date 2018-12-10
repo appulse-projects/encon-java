@@ -26,7 +26,7 @@ import lombok.val;
  * Abstract collection serializer.
  *
  * @since 1.1.0
- * @author alabazin
+ * @author Artem Labazin
  */
 abstract class PojoSerializerAbstractCollection<T> implements Serializer<T> {
 

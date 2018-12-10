@@ -36,7 +36,7 @@ import lombok.extern.slf4j.Slf4j;
  * Method invoker.
  *
  * @since 1.6.0
- * @author alabazin
+ * @author Artem Labazin
  */
 @Slf4j
 @Getter

@@ -41,7 +41,7 @@ import io.appulse.encon.handler.message.matcher.MethodArgumentMatcher.StartsWith
  * The set of pattern matching helpers.
  *
  * @since 1.4.0
- * @author alabazin
+ * @author Artem Labazin
  */
 public final class Matchers {
 

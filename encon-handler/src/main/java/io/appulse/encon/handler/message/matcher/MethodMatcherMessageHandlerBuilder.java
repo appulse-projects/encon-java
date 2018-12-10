@@ -42,7 +42,7 @@ import net.sf.cglib.proxy.MethodInterceptor;
  * Builder of a new {@link MethodMatcherMessageHandler} instance.
  *
  * @since 1.4.0
- * @author alabazin
+ * @author Artem Labazin
  */
 @NoArgsConstructor(access = PACKAGE)
 @FieldDefaults(level = PRIVATE, makeFinal = true)

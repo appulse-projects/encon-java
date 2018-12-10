@@ -30,7 +30,7 @@ import lombok.val;
 /**
  *
  * @since 1.6.0
- * @author alabazin
+ * @author Artem Labazin
  */
 enum MessageWrapper {
 

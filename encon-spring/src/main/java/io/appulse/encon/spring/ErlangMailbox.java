@@ -30,7 +30,7 @@ import org.springframework.stereotype.Component;
 /**
  *
  * @since 1.6.0
- * @author alabazin
+ * @author Artem Labazin
  */
 @Component
 @Documented

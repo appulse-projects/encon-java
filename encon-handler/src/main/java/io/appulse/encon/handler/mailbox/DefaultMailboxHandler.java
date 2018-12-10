@@ -29,7 +29,7 @@ import lombok.experimental.FieldDefaults;
  * Default {@link AbstractMailboxHandler} implementation.
  *
  * @since 1.5.0
- * @author alabazin
+ * @author Artem Labazin
  */
 @FieldDefaults(level = PRIVATE, makeFinal = true)
 public class DefaultMailboxHandler extends AbstractMailboxHandler {

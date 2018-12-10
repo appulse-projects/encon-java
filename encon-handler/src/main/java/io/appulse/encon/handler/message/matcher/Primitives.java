@@ -22,7 +22,7 @@ import java.util.Map;
 /**
  *
  * @since 1.4.0
- * @author alabazin
+ * @author Artem Labazin
  */
 final class Primitives {
 
