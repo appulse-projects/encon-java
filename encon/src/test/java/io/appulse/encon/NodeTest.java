@@ -31,8 +31,8 @@ import static java.util.Optional.ofNullable;
 
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
+import java.util.concurrent.ThreadLocalRandom;
 
-import io.appulse.encon.connection.regular.Message;
 import io.appulse.encon.ModuleRemoteProcedureCall.RpcResponse;
 import io.appulse.encon.NodesConfig.NodeConfig;
 import io.appulse.encon.NodesConfig.NodeConfig.ServerConfig;
@@ -40,23 +40,21 @@ import io.appulse.encon.mailbox.Mailbox;
 import io.appulse.encon.mailbox.exception.ReceivedExitException;
 import io.appulse.encon.terms.ErlangTerm;
 import io.appulse.encon.terms.type.ErlangAtom;
-import io.appulse.utils.test.TestMethodNamePrinter;
 import io.appulse.epmd.java.server.cli.CommonOptions;
 import io.appulse.epmd.java.server.command.server.ServerCommandExecutor;
 import io.appulse.epmd.java.server.command.server.ServerCommandOptions;
 import io.appulse.utils.SocketUtils;
 
-import java.util.concurrent.ThreadLocalRandom;
-
 import lombok.val;
 import lombok.extern.slf4j.Slf4j;
 import org.assertj.core.api.SoftAssertions;
-import org.junit.AfterClass;
-import org.junit.BeforeClass;
-import org.junit.After;
-import org.junit.Rule;
-import org.junit.Test;
-import org.junit.rules.TestRule;
+import org.junit.jupiter.api.AfterAll;
+import org.junit.jupiter.api.AfterEach;
+import org.junit.jupiter.api.BeforeAll;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.DisplayName;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.TestInfo;
 
 /**
  *
@@ -64,7 +62,8 @@ import org.junit.rules.TestRule;
  * @since 1.0.0
  */
 @Slf4j
-public class NodeTest {
+@DisplayName("Node tests")
+class NodeTest {
 
   private static final String ELIXIR_ECHO_SERVER = "echo@localhost";
 
@@ -72,14 +71,10 @@ public class NodeTest {
 
   private static ServerCommandExecutor epmdServer;
 
-  @Rule
-  public TestRule watcher = new TestMethodNamePrinter();
-
-
   Node node;
 
-  @BeforeClass
-  public static void beforeClass () {
+  @BeforeAll
+  static void beforeAll () {
     if (SocketUtils.isPortAvailable(4369)) {
       executor = Executors.newSingleThreadExecutor();
       epmdServer = new ServerCommandExecutor(new CommonOptions(), new ServerCommandOptions());
@@ -87,8 +82,8 @@ public class NodeTest {
     }
   }
 
-  @AfterClass
-  public static void afterClass () {
+  @AfterAll
+  static void afterAll () {
     ofNullable(epmdServer)
       .ifPresent(ServerCommandExecutor::close);
 
@@ -96,8 +91,13 @@ public class NodeTest {
       .ifPresent(ExecutorService::shutdown);
   }
 
-  @After
-  public void after () throws Exception {
+  @BeforeEach
+  void beforeEach (TestInfo testInfo) {
+    System.out.println("- " + testInfo.getDisplayName());
+  }
+
+  @AfterEach
+  void afterEach () throws Exception {
     if (node != null) {
       node.close();
       node = null;
@@ -106,7 +106,8 @@ public class NodeTest {
   }
 
   @Test
-  public void register () {
+  @DisplayName("node registration")
+  void register () {
     val name = createName();
     node = Nodes.singleNode(name, true);
 
@@ -135,7 +136,8 @@ public class NodeTest {
   }
 
   @Test
-  public void ping () throws Exception {
+  @DisplayName("sending ping message")
+  void ping () throws Exception {
     val name1 = createName();
     val name2 = createName();
     node = Nodes.singleNode(name1, NodeConfig.builder()
@@ -173,7 +175,8 @@ public class NodeTest {
   }
 
   @Test
-  public void instantiating () throws Exception {
+  @DisplayName("simple instantiating")
+  void instantiating () throws Exception {
     val name = createName();
     node = Nodes.singleNode(name, NodeConfig.builder()
         .shortName(true)
@@ -183,7 +186,8 @@ public class NodeTest {
   }
 
   @Test
-  public void sendFromOneToAnotherNode () throws Exception {
+  @DisplayName("send message from one node to another")
+  void sendFromOneToAnotherNode () throws Exception {
     val name1 = createName();
     val name2 = createName();
 
@@ -215,7 +219,8 @@ public class NodeTest {
   }
 
   @Test
-  public void sendWithRedirect () throws Exception {
+  @DisplayName("send message from A node, through Elixir echo, to B node")
+  void sendWithRedirect () throws Exception {
     val config = NodeConfig.builder()
         .shortName(true)
         .cookie("secret")
@@ -274,7 +279,8 @@ public class NodeTest {
   }
 
   @Test
-  public void send () throws Exception {
+  @DisplayName("send message to Elixir echo server and catch back")
+  void send () throws Exception {
     val name = createName();
     node = Nodes.singleNode(name, NodeConfig.builder()
                             .shortName(true)
@@ -316,7 +322,8 @@ public class NodeTest {
   }
 
   @Test
-  public void link () throws Exception {
+  @DisplayName("link two nodes")
+  void link () throws Exception {
     val name = createName();
     node = Nodes.singleNode(name, true);
 
@@ -344,7 +351,8 @@ public class NodeTest {
   }
 
   @Test
-  public void exit () throws Exception {
+  @DisplayName("send exit message from node A to node B")
+  void exit () throws Exception {
     val name = createName();
     node = Nodes.singleNode(name, true);
 
@@ -371,7 +379,8 @@ public class NodeTest {
   }
 
   @Test
-  public void remoteProcedureCall () throws Exception {
+  @DisplayName("send RPC message to Elixir echo server")
+  void remoteProcedureCall () throws Exception {
     val name = createName();
     node = Nodes.singleNode(name, NodeConfig.builder()
         .shortName(true)

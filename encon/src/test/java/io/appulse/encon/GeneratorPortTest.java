@@ -19,26 +19,31 @@ package io.appulse.encon;
 import static org.assertj.core.api.Assertions.assertThat;
 
 import io.appulse.encon.common.NodeDescriptor;
-import io.appulse.utils.test.TestMethodNamePrinter;
+
 import lombok.val;
 
 import org.assertj.core.api.SoftAssertions;
-import org.junit.Rule;
-import org.junit.rules.TestRule;
-import org.junit.Test;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.DisplayName;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.TestInfo;
 
 /**
  *
  * @author Artem Labazin
  * @since 1.0.0
  */
-public class GeneratorPortTest {
+@DisplayName("Port generator tests")
+class GeneratorPortTest {
 
-  @Rule
-  public TestRule watcher = new TestMethodNamePrinter();
+  @BeforeEach
+  void beforeEach (TestInfo testInfo) {
+    System.out.println("- " + testInfo.getDisplayName());
+  }
 
   @Test
-  public void generate () {
+  @DisplayName("generate")
+  void generate () {
     val descriptor = NodeDescriptor.from("popa");
     val creation = 1;
 

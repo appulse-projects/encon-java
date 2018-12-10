@@ -20,17 +20,27 @@ import static org.assertj.core.api.Assertions.assertThat;
 
 import java.util.concurrent.CompletableFuture;
 
-import org.junit.Test;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.DisplayName;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.TestInfo;
 
 /**
  *
  * @author Artem Labazin
  * @since 1.0.0
  */
-public class ConnectionModuleTest {
+@DisplayName("Connection module tests")
+class ConnectionModuleTest {
+
+  @BeforeEach
+  void beforeEach (TestInfo testInfo) {
+    System.out.println("- " + testInfo.getDisplayName());
+  }
 
   @Test
-  public void futureTests () {
+  @DisplayName("future POC")
+  void futureTests () {
     CompletableFuture<String> future = CompletableFuture.completedFuture("Hello world");
     assertThat(future)
         .isCompleted()
