@@ -55,7 +55,7 @@ public final class Erlang {
   /**
    * Cached enpty (0-size string) {@link ErlangAtom} instance.
    */
-  public static final ErlangAtom EMPTY_ATOM = ErlangAtom.cached("");
+  public static final ErlangAtom EMPTY_ATOM = new ErlangAtom("");
 
   /**
    * Creates new {@link ErlangAtom} instance from {@code boolean} (true/false value) .
@@ -65,7 +65,9 @@ public final class Erlang {
    * @return {@link ErlangAtom} new instance
    */
   public static ErlangAtom atom (boolean value) {
-    return ErlangAtom.cached(value);
+    return value
+           ? ErlangAtom.ATOM_TRUE
+           : ErlangAtom.ATOM_FALSE;
   }
 
   /**
@@ -76,7 +78,7 @@ public final class Erlang {
    * @return {@link ErlangAtom} new instance
    */
   public static ErlangAtom atom (@NonNull String value) {
-    return ErlangAtom.cached(value);
+    return new ErlangAtom(value);
   }
 
   /**
