@@ -487,7 +487,7 @@ public enum TermType {
    * </table>
    * <p>
    * Encodes a map. The <b>Arity</b> field is an unsigned 4 byte integer in big-endian format that determines the
-   * number of key-value pairs in the map. Key and value pairs (Ki => Vi) are encoded in section Pairs in the
+   * number of key-value pairs in the map. Key and value pairs (Ki =&gt; Vi) are encoded in section Pairs in the
    * following order: K1, V1, K2, V2,..., Kn, Vn.
    * <p>
    * Duplicate keys are <b>not allowed</b> within the same map.
@@ -661,7 +661,7 @@ public enum TermType {
   FUNCTION(117, ErlangFunction.class),
 
   /**
-   * This is the new encoding of internal funs: fun F/A and fun(Arg1,..) -> ... end.
+   * This is the new encoding of internal funs: fun F/A and fun(Arg1,..) -&gt; ... end.
    * <p>
    * Structure:
    * <p>

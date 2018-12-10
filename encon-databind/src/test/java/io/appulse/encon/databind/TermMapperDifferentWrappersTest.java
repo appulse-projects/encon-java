@@ -27,21 +27,33 @@ import io.appulse.encon.databind.annotation.AsErlangBinary;
 import io.appulse.encon.databind.annotation.AsErlangList;
 import io.appulse.encon.databind.annotation.AsErlangMap;
 import io.appulse.encon.databind.annotation.AsErlangTuple;
+
 import java.io.Serializable;
+
 import lombok.experimental.FieldDefaults;
 import lombok.val;
-import org.junit.Test;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.DisplayName;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.TestInfo;
 
 /**
  *
  * @since 1.1.0
  * @author Artem Labazin
  */
+@DisplayName("Different term wrappers tests")
 @FieldDefaults(level = PRIVATE, makeFinal = true)
-public class TermMapperDifferentWrappersTest {
+class TermMapperDifferentWrappersTest {
+
+  @BeforeEach
+  void beforeEach (TestInfo testInfo) {
+    System.out.println("- " + testInfo.getDisplayName());
+  }
 
   @Test
-  public void defaultWrapper () {
+  @DisplayName("default wrapper")
+  void defaultWrapper () {
     val erlangTerm = TermMapper.serialize(new DefaultWrapper());
     assertThat(erlangTerm.getType())
         .isEqualTo(SMALL_TUPLE);
@@ -51,7 +63,8 @@ public class TermMapperDifferentWrappersTest {
   }
 
   @Test
-  public void listWrapper () {
+  @DisplayName("list wrapper")
+  void listWrapper () {
     val erlangTerm = TermMapper.serialize(new ListWrapper());
     assertThat(erlangTerm.getType())
         .isEqualTo(LIST);
@@ -61,7 +74,8 @@ public class TermMapperDifferentWrappersTest {
   }
 
   @Test
-  public void tupleWrapper () {
+  @DisplayName("tuple wrapper")
+  void tupleWrapper () {
     val erlangTerm = TermMapper.serialize(new TupleWrapper());
     assertThat(erlangTerm.getType())
         .isEqualTo(SMALL_TUPLE);
@@ -71,7 +85,8 @@ public class TermMapperDifferentWrappersTest {
   }
 
   @Test
-  public void mapWrapper () {
+  @DisplayName("map wrapper")
+  void mapWrapper () {
     val erlangTerm = TermMapper.serialize(new MapWrapper());
     assertThat(erlangTerm.getType())
         .isEqualTo(MAP);
@@ -81,7 +96,8 @@ public class TermMapperDifferentWrappersTest {
   }
 
   @Test
-  public void binaryWrapper () {
+  @DisplayName("binary wrapper")
+  void binaryWrapper () {
     val erlangTerm = TermMapper.serialize(new BinaryWrapper());
     assertThat(erlangTerm.getType())
         .isEqualTo(BINARY);
