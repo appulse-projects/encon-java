@@ -26,6 +26,7 @@ import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.stream.Stream;
 
+import edu.umd.cs.findbugs.annotations.SuppressWarnings;
 import lombok.AllArgsConstructor;
 import lombok.EqualsAndHashCode;
 import lombok.NonNull;
@@ -185,6 +186,7 @@ public class NodeDescriptor implements Serializable {
 
   private static NodeDescriptor getFromCacheOrCreateNew (@NonNull String node) {
     val atIndex = node.indexOf('@');
+    @SuppressWarnings("PMD.LinguisticNaming")
     val isShortName = atIndex < 0 || node.indexOf('.', atIndex) < 0;
     return getFromCacheOrCreateNew(node, isShortName);
   }
