@@ -281,4 +281,7 @@ public final class NodesConfig {
       }
     }
   }
+
+  public static class NodeConfigBuilder {
+  }
 }

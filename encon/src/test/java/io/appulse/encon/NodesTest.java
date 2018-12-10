@@ -27,33 +27,29 @@ import io.appulse.epmd.java.server.cli.CommonOptions;
 import io.appulse.epmd.java.server.command.server.ServerCommandExecutor;
 import io.appulse.epmd.java.server.command.server.ServerCommandOptions;
 import io.appulse.utils.SocketUtils;
-import io.appulse.utils.test.TestMethodNamePrinter;
 import io.appulse.encon.NodesConfig.NodeConfig;
 
-import lombok.val;
-
-import org.junit.AfterClass;
-import org.junit.BeforeClass;
-import org.junit.Rule;
-import org.junit.Test;
-import org.junit.rules.TestRule;
+import org.junit.jupiter.api.AfterAll;
+import org.junit.jupiter.api.BeforeAll;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.DisplayName;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.TestInfo;
 
 /**
  *
  * @author Artem Labazin
  * @since 1.0.0
  */
-public class NodesTest {
+@DisplayName("Nodes cluster tests")
+class NodesTest {
 
   private static ExecutorService executor;
 
   private static ServerCommandExecutor epmdServer;
 
-  @Rule
-  public TestRule watcher = new TestMethodNamePrinter();
-
-  @BeforeClass
-  public static void beforeClass () {
+  @BeforeAll
+  static void beforeClass () {
     if (SocketUtils.isPortAvailable(4369)) {
       executor = Executors.newSingleThreadExecutor();
       epmdServer = new ServerCommandExecutor(new CommonOptions(), new ServerCommandOptions());
@@ -61,8 +57,8 @@ public class NodesTest {
     }
   }
 
-  @AfterClass
-  public static void afterClass () {
+  @AfterAll
+  static void afterClass () {
     ofNullable(epmdServer)
       .ifPresent(ServerCommandExecutor::close);
 
@@ -70,8 +66,14 @@ public class NodesTest {
       .ifPresent(ExecutorService::shutdown);
   }
 
+  @BeforeEach
+  void beforeEach (TestInfo testInfo) {
+    System.out.println("- " + testInfo.getDisplayName());
+  }
+
   @Test
-  public void instantiating () {
+  @DisplayName("start several nodes from programmatically config")
+  void instantiating () {
     Config config = Config.builder()
         .config(NodesConfig.builder()
             .node("kojima1", NodeConfig.DEFAULT)

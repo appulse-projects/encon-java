@@ -373,7 +373,7 @@ public class ModuleRemoteProcedureCall {
      *
      * @return the second element of the tuple if the received message is a
      *         two-tuple, otherwise null. No further error checking is
-     *         performed. It also could return {@ null} if the specified
+     *         performed. It also could return {@code null} if the specified
      *         waiting time elapses before an element is available
      */
     public ErlangTerm getSync (long timeout, TimeUnit unit) {
