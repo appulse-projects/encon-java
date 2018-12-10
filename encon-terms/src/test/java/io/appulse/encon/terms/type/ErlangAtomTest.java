@@ -24,11 +24,9 @@ import static org.assertj.core.api.Assertions.assertThat;
 
 import java.util.stream.IntStream;
 
-
 import io.appulse.encon.terms.Erlang;
 import io.appulse.encon.terms.ErlangTerm;
 import io.appulse.utils.Bytes;
-import io.appulse.utils.test.TestMethodNamePrinter;
 
 import erlang.OtpInputStream;
 import erlang.OtpOutputStream;
@@ -36,22 +34,27 @@ import io.netty.buffer.Unpooled;
 import lombok.SneakyThrows;
 import lombok.val;
 import org.assertj.core.api.SoftAssertions;
-import org.junit.Rule;
-import org.junit.Test;
-import org.junit.rules.TestRule;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.DisplayName;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.TestInfo;
 
 /**
  *
  * @author Artem Labazin
  * @since 1.0.0
  */
-public class ErlangAtomTest {
+@DisplayName("Check Erlang's Atom term type")
+class ErlangAtomTest {
 
-  @Rule
-  public TestRule watcher = new TestMethodNamePrinter();
+  @BeforeEach
+  void beforeEach (TestInfo testInfo) {
+    System.out.println("- " + testInfo.getDisplayName());
+  }
 
   @Test
-  public void instantiate () {
+  @DisplayName("create new instance by constructor")
+  void instantiate () {
     assertThat(new ErlangAtom("hello").getType())
         .isEqualTo(SMALL_ATOM_UTF8);
 
@@ -63,7 +66,8 @@ public class ErlangAtomTest {
   }
 
   @Test
-  public void newInstance () {
+  @DisplayName("create new instance from bytes")
+  void newInstance () {
     val value = "hello";
     val bytes = Bytes.allocate()
         .put1B(SMALL_ATOM_UTF8.getCode())
@@ -87,7 +91,8 @@ public class ErlangAtomTest {
   }
 
   @Test
-  public void toBytes () {
+  @DisplayName("convert instance to byte array")
+  void toBytes () {
     val value = "hello";
     val expected = Bytes.allocate()
         .put1B(SMALL_ATOM_UTF8.getCode())
@@ -100,7 +105,8 @@ public class ErlangAtomTest {
   }
 
   @Test
-  public void encode () {
+  @DisplayName("encode instance to byte array and compare with jinterface output")
+  void encode () {
     val smallValue = "popa";
     val smallAtom = new ErlangAtom(smallValue);
 
@@ -132,7 +138,8 @@ public class ErlangAtomTest {
   }
 
   @Test
-  public void decode () throws Exception {
+  @DisplayName("decode instance from byte array and compare with jinterface result")
+  void decode () throws Exception {
     val value1 = "hello";
     val bytes1 = Bytes.allocate()
         .put1B(SMALL_ATOM_UTF8.getCode())

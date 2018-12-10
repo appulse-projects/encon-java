@@ -27,32 +27,35 @@ import java.math.BigInteger;
 import java.util.Arrays;
 import java.util.stream.IntStream;
 
-
 import io.appulse.encon.terms.ErlangTerm;
 import io.appulse.utils.Bytes;
-import io.appulse.utils.test.TestMethodNamePrinter;
 
 import erlang.OtpErlangLong;
 import erlang.OtpInputStream;
 import erlang.OtpOutputStream;
 import lombok.SneakyThrows;
 import lombok.val;
-import org.junit.Rule;
-import org.junit.Test;
-import org.junit.rules.TestRule;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.DisplayName;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.TestInfo;
 
 /**
  *
  * @author Artem Labazin
  * @since 1.0.0
  */
-public class ErlangIntegerTest {
+@DisplayName("Check Erlang's Integer term type")
+class ErlangIntegerTest {
 
-  @Rule
-  public TestRule watcher = new TestMethodNamePrinter();
+  @BeforeEach
+  void beforeEach (TestInfo testInfo) {
+    System.out.println("- " + testInfo.getDisplayName());
+  }
 
   @Test
-  public void instantiate () {
+  @DisplayName("create new instance by constructor")
+  void instantiate () {
     assertThat(new ErlangInteger(254).getType())
         .isEqualTo(SMALL_INTEGER);
 
@@ -73,7 +76,8 @@ public class ErlangIntegerTest {
   }
 
   @Test
-  public void encode () {
+  @DisplayName("encode instance to byte array and compare with jinterface output")
+  void encode () {
     assertThat(new ErlangInteger(Character.MIN_VALUE).toBytes())
         .isEqualTo(bytes(Character.MIN_VALUE));
 
@@ -119,7 +123,8 @@ public class ErlangIntegerTest {
   }
 
   @Test
-  public void decode () throws Exception {
+  @DisplayName("decode instance from byte array and compare with jinterface result")
+  void decode () throws Exception {
     val bytes1 = Bytes.allocate()
         .put1B(SMALL_INTEGER.getCode())
         .put1B(255)
@@ -168,7 +173,8 @@ public class ErlangIntegerTest {
   }
 
   @Test
-  public void cached () {
+  @DisplayName("checks caching values")
+  void cached () {
     ErlangInteger num1 = ErlangInteger.cached(1273);
     ErlangInteger num2 = ErlangInteger.cached(117);
     assertThat(num1).isNotEqualTo(num2);
