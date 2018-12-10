@@ -80,25 +80,31 @@ In this test we have only one node and two mailboxes which send the message to e
 
 ## How to setup the environment
 
-1. Add Java repository:
-
-```bash
-$> sudo add-apt-repository --yes ppa:webupd8team/java
-```
-
-2. Update and upgrade the distro:
+1. Update and upgrade the distro:
 
 ```bash
 $> sudo apt-get update --yes && sudo apt-get upgrade --yes
 ```
 
-3. Install `Git`, `Java 8` and `Maven`:
+2. Install `git`, `curl`, `zip` and `unzip`:
 
 ```bash
-$> sudo apt-get install --yes oracle-java8-installer git maven
+$> sudo apt-get install --yes git curl zip unzip
 ```
 
-4. Clone the repo:
+3. Install `sdkman`:
+
+```bash
+$> curl -s "https://get.sdkman.io" | bash
+```
+
+4. Install `Java`:
+
+```bash
+$> sdk install java 11.0.1-open
+```
+
+5. Clone the repo:
 
 ```bash
 $> git clone https://github.com/appulse-projects/encon-java.git
@@ -115,7 +121,7 @@ $> cd encon-java
 2. Build the project with only needed dependencies:
 
 ```bash
-$> mvn clean package \
+$> ./mvnw clean package \
      -DskipTests \
      -Dgpg.skip \
      -Dfindbugs.skip=true \
@@ -128,18 +134,19 @@ $> mvn clean package \
 3. Run the tests
 
 ```bash
-$> nohup java -Xms1G -Xmx2G -jar benchmark/target/benchmarks.jar > job.logs 2>&1 &
+$> nohup java -Xms3G -Xmx4G -jar benchmark/target/benchmarks.jar > job.logs 2>&1 &
 ```
 
 ### One-liner
 
 ```bash
-$> sudo add-apt-repository --yes ppa:webupd8team/java && \
-   sudo apt-get update --yes && sudo apt-get upgrade --yes && \
-   sudo apt-get install --yes oracle-java8-installer git maven && \
+$> sudo apt-get update --yes && sudo apt-get upgrade --yes && \
+   sudo apt-get install --yes git curl zip unzip && \
+   curl -s "https://get.sdkman.io" | bash && \
+   sdk install java 11.0.1-open && \
    git clone https://github.com/appulse-projects/encon-java.git && \
    cd encon-java && \
-   mvn clean package \
+   ./mvnw clean package \
      -DskipTests \
      -Dgpg.skip \
      -Dfindbugs.skip=true \
@@ -147,5 +154,5 @@ $> sudo add-apt-repository --yes ppa:webupd8team/java && \
      -Dcheckstyle.skip \
      -Dmaven.test.skip=true \
      -pl benchmark -am && \
-  nohup java -Xms1G -Xmx2G -jar benchmark/target/benchmarks.jar > job.logs 2>&1 &
+   nohup java -Xms3G -Xmx4G -jar benchmark/target/benchmarks.jar > job.logs 2>&1 &
 ```
