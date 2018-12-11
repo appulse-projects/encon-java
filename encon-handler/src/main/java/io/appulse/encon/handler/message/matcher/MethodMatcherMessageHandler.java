@@ -40,7 +40,7 @@ import lombok.val;
  * incoming messages handlers.
  *
  * @since 1.4.0
- * @author alabazin
+ * @author Artem Labazin
  */
 @Slf4j
 @Getter

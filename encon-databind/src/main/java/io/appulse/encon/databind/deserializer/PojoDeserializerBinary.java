@@ -25,7 +25,7 @@ import lombok.NonNull;
  * Eralng's term binary deserializer to specified type.
  *
  * @since 1.1.0
- * @author alabazin
+ * @author Artem Labazin
  */
 public class PojoDeserializerBinary implements Deserializer<Object> {
 

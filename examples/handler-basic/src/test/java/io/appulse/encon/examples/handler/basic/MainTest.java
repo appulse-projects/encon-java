@@ -26,17 +26,17 @@ import io.appulse.encon.Nodes;
 import io.appulse.encon.mailbox.Mailbox;
 import io.appulse.encon.terms.ErlangTerm;
 
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 
 /**
  *
  * @since 1.6.2
  * @author Artem Labazin
  */
-public class MainTest {
+class MainTest {
 
   @Test
-  public void test () throws Exception {
+  void test () throws Exception {
     Server server = new Server();
     server.start();
 

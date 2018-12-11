@@ -25,29 +25,33 @@ import java.util.stream.IntStream;
 
 import io.appulse.encon.terms.ErlangTerm;
 import io.appulse.utils.Bytes;
-import io.appulse.utils.test.TestMethodNamePrinter;
 
 import erlang.OtpErlangString;
 import erlang.OtpInputStream;
 import erlang.OtpOutputStream;
 import lombok.SneakyThrows;
 import lombok.val;
-import org.junit.Rule;
-import org.junit.Test;
-import org.junit.rules.TestRule;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.DisplayName;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.TestInfo;
 
 /**
  *
  * @author Artem Labazin
  * @since 1.0.0
  */
-public class ErlangStringTest {
+@DisplayName("Check Erlang's String term type")
+class ErlangStringTest {
 
-  @Rule
-  public TestRule watcher = new TestMethodNamePrinter();
+  @BeforeEach
+  void beforeEach (TestInfo testInfo) {
+    System.out.println("- " + testInfo.getDisplayName());
+  }
 
   @Test
-  public void encode () {
+  @DisplayName("encode instance to byte array and compare with jinterface output")
+  void encode () {
     assertThat(new ErlangString("").toBytes())
         .isEqualTo(bytes(""));
 
@@ -64,7 +68,8 @@ public class ErlangStringTest {
   }
 
   @Test
-  public void decode () throws Exception {
+  @DisplayName("decode instance from byte array and compare with jinterface result")
+  void decode () throws Exception {
     val bytes = Bytes.allocate()
         .put1B(STRING.getCode())
         .put2B("popa".length())

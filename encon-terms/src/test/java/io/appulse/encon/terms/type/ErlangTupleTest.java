@@ -29,7 +29,6 @@ import java.util.stream.Stream;
 
 import io.appulse.encon.terms.ErlangTerm;
 import io.appulse.utils.Bytes;
-import io.appulse.utils.test.TestMethodNamePrinter;
 
 import erlang.OtpErlangAtom;
 import erlang.OtpErlangInt;
@@ -42,22 +41,27 @@ import erlang.OtpOutputStream;
 import lombok.SneakyThrows;
 import lombok.val;
 import org.assertj.core.api.SoftAssertions;
-import org.junit.Rule;
-import org.junit.Test;
-import org.junit.rules.TestRule;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.DisplayName;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.TestInfo;
 
 /**
  *
  * @author Artem Labazin
  * @since 1.0.0
  */
-public class ErlangTupleTest {
+@DisplayName("Check Erlang's Tuple term type")
+class ErlangTupleTest {
 
-  @Rule
-  public TestRule watcher = new TestMethodNamePrinter();
+  @BeforeEach
+  void beforeEach (TestInfo testInfo) {
+    System.out.println("- " + testInfo.getDisplayName());
+  }
 
   @Test
-  public void instantiate () {
+  @DisplayName("create new instance by constructor")
+  void instantiate () {
     assertThat(new ErlangTuple(new ErlangNil()).getType())
         .isEqualTo(SMALL_TUPLE);
 
@@ -71,7 +75,8 @@ public class ErlangTupleTest {
   }
 
   @Test
-  public void newInstance () {
+  @DisplayName("create new instance from bytes")
+  void newInstance () {
     val value = new ErlangNil();
     val bytes = Bytes.allocate()
         .put1B(SMALL_TUPLE.getCode())
@@ -99,7 +104,8 @@ public class ErlangTupleTest {
   }
 
   @Test
-  public void toBytes () {
+  @DisplayName("convert instance to byte array")
+  void toBytes () {
     val value = new ErlangNil();
     val expected = Bytes.allocate()
         .put1B(SMALL_TUPLE.getCode())
@@ -112,7 +118,8 @@ public class ErlangTupleTest {
   }
 
   @Test
-  public void encode () {
+  @DisplayName("encode instance to byte array and compare with jinterface output")
+  void encode () {
     String[] values = new String[] {
         "one",
         "two",

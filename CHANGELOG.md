@@ -21,6 +21,8 @@ and this project adheres to [Semantic Versioning](http://semver.org/spec/v2.0.0.
 - Add handshake error handling (exceptions? error logs?).
 - Turn on checkstyle JavaDocs module.
 - Add updates to the protocol, like new `ControlMessage`.
+- Do we really need `ErlangInteger.cache` methods?
+- Add atom's table equivalent.
 
 ## [2.0.0](https://github.com/appulse-projects/encon-java/releases/tag/2.0.0) - 2018-10-14
 
@@ -28,6 +30,20 @@ and this project adheres to [Semantic Versioning](http://semver.org/spec/v2.0.0.
 
 - Module `encon-config` now is a configuration framework for laoding, dumping and mapping different configurations and a fancy and flexible way;
 - According to the new `encon-config` implementation, all configurations were moved to the appropriate modules.
+
+## [1.6.7](https://github.com/appulse-projects/encon-java/releases/tag/1.6.7) - 2018-10-07
+
+### Changed
+
+- Quick fix for [GitHub issue](https://github.com/appulse-projects/encon-java/issues/13), removed `ErlangPid` and `EralngAtom` caches.
+
+## [1.6.6](https://github.com/appulse-projects/encon-java/releases/tag/1.6.6) - 2018-10-02
+
+### Changed
+
+- Quick fix for [GitHub issue](https://github.com/appulse-projects/encon-java/issues/11), refactored `ErlangInteger` cache;
+
+- Correctly setup `checkstyle`/`epmd`/`findbugs` validation phases.
 
 ## [1.6.5](https://github.com/appulse-projects/encon-java/releases/tag/1.6.5) - 2018-09-28
 

@@ -37,7 +37,8 @@ import lombok.Singular;
 import lombok.experimental.FieldDefaults;
 import lombok.extern.slf4j.Slf4j;
 
-import org.junit.Test;
+import org.junit.jupiter.api.DisplayName;
+import org.junit.jupiter.api.Test;
 
 /**
  *
@@ -45,7 +46,8 @@ import org.junit.Test;
  * @since 2.0.0
  */
 @Slf4j
-public class GetPojoTest {
+@DisplayName("Casting configuration tests")
+class GetPojoTest {
 
   static NodesConfig.NodeConfig.MailboxConfig NODE_1_MAILBOX = NodesConfig.NodeConfig.MailboxConfig.builder()
       .name("popa")
@@ -97,7 +99,8 @@ public class GetPojoTest {
       .build();
 
   @Test
-  public void loadYamlTest () {
+  @DisplayName("load YAML configuration")
+  void loadYamlTest () {
     URL url = ResourceUtils.getResourceUrls("", "pojo.yml").get(0);
     Config config = Config.load(url);
 
@@ -105,7 +108,8 @@ public class GetPojoTest {
   }
 
   @Test
-  public void programmaticalTest () {
+  @DisplayName("create programmatical configuration")
+  void programmaticalTest () {
     Config config = Config.builder()
         .config(NODES_CONFIG)
         .config(HANDLER)

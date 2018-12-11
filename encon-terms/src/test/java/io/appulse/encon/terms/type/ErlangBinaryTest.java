@@ -20,11 +20,9 @@ import static io.appulse.encon.terms.TermType.BINARY;
 import static io.netty.buffer.Unpooled.wrappedBuffer;
 import static org.assertj.core.api.Assertions.assertThat;
 
-
 import io.appulse.encon.terms.Erlang;
 import io.appulse.encon.terms.ErlangTerm;
 import io.appulse.utils.Bytes;
-import io.appulse.utils.test.TestMethodNamePrinter;
 
 import erlang.OtpErlangBinary;
 import erlang.OtpInputStream;
@@ -32,22 +30,27 @@ import erlang.OtpOutputStream;
 import lombok.SneakyThrows;
 import lombok.val;
 import org.assertj.core.api.SoftAssertions;
-import org.junit.Rule;
-import org.junit.Test;
-import org.junit.rules.TestRule;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.DisplayName;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.TestInfo;
 
 /**
  *
  * @author Artem Labazin
  * @since 1.0.0
  */
-public class ErlangBinaryTest {
+@DisplayName("Check Erlang's Binary term type")
+class ErlangBinaryTest {
 
-  @Rule
-  public TestRule watcher = new TestMethodNamePrinter();
+  @BeforeEach
+  void beforeEach (TestInfo testInfo) {
+    System.out.println("- " + testInfo.getDisplayName());
+  }
 
   @Test
-  public void instantiate () {
+  @DisplayName("create new instance by constructor")
+  void instantiate () {
     val value = new byte[] { 1, 2, 3 };
 
     assertThat(new ErlangBinary(value).asBinary())
@@ -55,7 +58,8 @@ public class ErlangBinaryTest {
   }
 
   @Test
-  public void newInstance () {
+  @DisplayName("create new instance from bytes")
+  void newInstance () {
     val value = new byte[] { 1, 2, 3 };
 
     val bytes = Bytes.allocate()
@@ -77,7 +81,8 @@ public class ErlangBinaryTest {
   }
 
   @Test
-  public void toBytes () {
+  @DisplayName("convert instance to byte array")
+  void toBytes () {
     val value = new byte[] { 1, 2, 3 };
 
     val expected = Bytes.allocate()
@@ -91,14 +96,16 @@ public class ErlangBinaryTest {
   }
 
   @Test
-  public void encode () {
+  @DisplayName("encode instance to byte array and compare with jinterface output")
+  void encode () {
     val binary = new byte[] { 1, 2, 3, 4, 5 };
     assertThat(Erlang.binary(binary).toBytes())
         .isEqualTo(bytes(binary));
   }
 
   @Test
-  public void decode () throws Exception {
+  @DisplayName("decode instance from byte array and compare with jinterface result")
+  void decode () throws Exception {
     val value = new byte[] { 1, 2, 3 };
 
     val bytes = Bytes.allocate()

@@ -23,38 +23,46 @@ import static org.assertj.core.api.Assertions.assertThat;
 
 import java.util.stream.Stream;
 
-import io.appulse.utils.test.TestMethodNamePrinter;
-
-import org.junit.Rule;
-import org.junit.Test;
-import org.junit.rules.TestRule;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.DisplayName;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.TestInfo;
 
 /**
  *
  * @author Artem Labazin
  * @since 1.0.0
  */
-public class DistributionFlagTest {
+@DisplayName("Check distribution flags enum")
+class DistributionFlagTest {
 
-  @Rule
-  public TestRule watcher = new TestMethodNamePrinter();
+  @BeforeEach
+  void beforeEach (TestInfo testInfo) {
+    System.out.println("- " + testInfo.getDisplayName());
+  }
 
   @Test
-  public void parse () {
+  @DisplayName("check if distribution flag's code could be converted to its enum value")
+  void couldConvert () {
     Stream.of(DistributionFlag.values()).forEach(it -> {
       assertThat(DistributionFlag.parse(it.getCode()))
           .hasSize(1)
           .first()
           .isEqualTo(it);
     });
+  }
 
+  @Test
+  @DisplayName("unfold integer to set of distribution flags")
+  void unfold () {
     assertThat(DistributionFlag.parse(262_147))
         .hasSize(3)
         .contains(PUBLISHED, ATOM_CACHE, BIG_CREATION);
   }
 
   @Test
-  public void bitwiseOr () {
+  @DisplayName("fold enum values to integer")
+  void fold () {
     assertThat(DistributionFlag.bitwiseOr(PUBLISHED, ATOM_CACHE, BIG_CREATION))
         .isEqualTo(262_147);
   }

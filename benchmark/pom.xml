@@ -31,14 +31,6 @@ limitations under the License.
   <artifactId>benchmark</artifactId>
   <packaging>jar</packaging>
 
-  <properties>
-    <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
-    <project.build.resourceEncoding>UTF-8</project.build.resourceEncoding>
-
-    <maven.compiler.source>1.8</maven.compiler.source>
-    <maven.compiler.target>1.8</maven.compiler.target>
-  </properties>
-
   <dependencies>
     <dependency>
       <groupId>io.appulse.epmd.java</groupId>
@@ -53,12 +45,6 @@ limitations under the License.
     <dependency>
       <groupId>org.erlang.otp</groupId>
       <artifactId>jinterface</artifactId>
-    </dependency>
-
-    <dependency>
-      <groupId>org.projectlombok</groupId>
-      <artifactId>lombok</artifactId>
-      <scope>provided</scope>
     </dependency>
 
     <dependency>
@@ -77,18 +63,8 @@ limitations under the License.
     <plugins>
       <plugin>
         <groupId>org.apache.maven.plugins</groupId>
-        <artifactId>maven-compiler-plugin</artifactId>
-        <version>3.1</version>
-        <configuration>
-          <compilerVersion>${maven.compiler.target}</compilerVersion>
-          <source>${maven.compiler.source}</source>
-          <target>${maven.compiler.target}</target>
-        </configuration>
-      </plugin>
-      <plugin>
-        <groupId>org.apache.maven.plugins</groupId>
         <artifactId>maven-shade-plugin</artifactId>
-        <version>2.2</version>
+        <version>3.2.1</version>
         <executions>
           <execution>
             <phase>package</phase>

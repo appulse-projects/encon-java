@@ -24,7 +24,7 @@ import io.appulse.encon.terms.ErlangTerm;
  * Received messages handler interface.
  *
  * @since 1.4.0
- * @author alabazin
+ * @author Artem Labazin
  */
 public interface MessageHandler {
 

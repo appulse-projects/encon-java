@@ -39,7 +39,7 @@ import lombok.val;
  * you only need to "tell" how to get a message from a queue.
  *
  * @since 1.4.0
- * @author alabazin
+ * @author Artem Labazin
  */
 @Slf4j
 @RequiredArgsConstructor

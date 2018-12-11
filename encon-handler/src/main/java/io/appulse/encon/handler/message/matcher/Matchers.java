@@ -41,14 +41,14 @@ import io.appulse.encon.handler.message.matcher.MethodArgumentMatcher.StartsWith
  * The set of pattern matching helpers.
  *
  * @since 1.4.0
- * @author alabazin
+ * @author Artem Labazin
  */
 public final class Matchers {
 
   /**
    * Matches <strong>anything</strong>, including nulls and varargs.
    * <p>
-   * For primitive types use {@code #any*()} family or {@link #isA(Class)} or {@link #any(Class)}.
+   * For primitive types use {@code #any*()} family or {@link #is(Class)} or {@link #any(Class)}.
    *
    * @param <T> the accepted type
    *
@@ -82,7 +82,7 @@ public final class Matchers {
    *
    * @return {@code null}
    */
-  public static <T> T isA (Class<T> type) {
+  public static <T> T is (Class<T> type) {
     reportMatcher(new InstanceOf(type));
     return defaultValue(type);
   }
@@ -356,7 +356,7 @@ public final class Matchers {
    *
    * @return {@code null}
    */
-  public static <T> T isNull () {
+  public static <T> T nullMatches () {
     reportMatcher(NULL);
     return null;
   }
@@ -368,7 +368,7 @@ public final class Matchers {
    *
    * @return {@code null}
    */
-  public static <T> T isNotNull () {
+  public static <T> T notNullMatches () {
     reportMatcher(NOT_NULL);
     return null;
   }

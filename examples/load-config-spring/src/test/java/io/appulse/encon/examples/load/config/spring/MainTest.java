@@ -16,7 +16,6 @@
 
 package io.appulse.encon.examples.load.config.spring;
 
-
 import static io.appulse.encon.common.DistributionFlag.BIG_CREATION;
 import static io.appulse.encon.common.DistributionFlag.BIT_BINARIES;
 import static io.appulse.encon.common.DistributionFlag.EXTENDED_PIDS_PORTS;
@@ -38,12 +37,12 @@ import io.appulse.encon.Node;
 import io.appulse.encon.config.Config;
 
 import lombok.extern.slf4j.Slf4j;
-import org.junit.Test;
-import org.junit.runner.RunWith;
+import org.junit.jupiter.api.extension.ExtendWith;
+import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.context.ApplicationContext;
-import org.springframework.test.context.junit4.SpringRunner;
+import org.springframework.test.context.junit.jupiter.SpringExtension;
 
 /**
  *
@@ -51,9 +50,9 @@ import org.springframework.test.context.junit4.SpringRunner;
  * @author Artem Labazin
  */
 @Slf4j
-@RunWith(SpringRunner.class)
+@ExtendWith(SpringExtension.class)
 @SpringBootTest(classes = Main.class)
-public class MainTest {
+class MainTest {
 
   @Autowired
   Config defaultConfig;
@@ -62,7 +61,7 @@ public class MainTest {
   ApplicationContext context;
 
   @Test
-  public void test () {
+  void test () {
     try {
       assertThat(context.containsBean("node-1")).isTrue();
       assertThat(context.containsBean("node-2")).isTrue();

@@ -26,7 +26,6 @@ import java.util.stream.LongStream;
 
 import io.appulse.encon.terms.ErlangTerm;
 import io.appulse.utils.Bytes;
-import io.appulse.utils.test.TestMethodNamePrinter;
 
 import erlang.OtpErlangRef;
 import erlang.OtpInputStream;
@@ -35,9 +34,10 @@ import lombok.SneakyThrows;
 import lombok.extern.slf4j.Slf4j;
 import lombok.val;
 import org.assertj.core.api.SoftAssertions;
-import org.junit.Rule;
-import org.junit.Test;
-import org.junit.rules.TestRule;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.DisplayName;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.TestInfo;
 
 /**
  *
@@ -45,13 +45,17 @@ import org.junit.rules.TestRule;
  * @since 1.0.0
  */
 @Slf4j
-public class ErlangReferenceTest {
+@DisplayName("Check Erlang's Reference term type")
+class ErlangReferenceTest {
 
-  @Rule
-  public TestRule watcher = new TestMethodNamePrinter();
+  @BeforeEach
+  void beforeEach (TestInfo testInfo) {
+    System.out.println("- " + testInfo.getDisplayName());
+  }
 
   @Test
-  public void instantiate () {
+  @DisplayName("create new instance by constructor")
+  void instantiate () {
     assertThat(ErlangReference.builder()
             .node("popa")
             .id(3)
@@ -63,7 +67,8 @@ public class ErlangReferenceTest {
   }
 
   @Test
-  public void newInstance () {
+  @DisplayName("create new instance from bytes")
+  void newInstance () {
     val node = "popa@localhost";
     val ids = new long[] { 1, 0, 0 };
     val creation = 42;
@@ -100,7 +105,8 @@ public class ErlangReferenceTest {
   }
 
   @Test
-  public void toBytes () {
+  @DisplayName("convert instance to byte array")
+  void toBytes () {
     val node = "popa@localhost";
     val ids = new long[] { 1, 0, 0 };
     val creation = 42;
@@ -129,7 +135,8 @@ public class ErlangReferenceTest {
   }
 
   @Test
-  public void encode () {
+  @DisplayName("encode instance to byte array and compare with jinterface output")
+  void encode () {
     assertThat(ErlangReference.builder()
         .node("popa@localhost")
         .ids(new long[] { 1 })
@@ -168,7 +175,8 @@ public class ErlangReferenceTest {
   }
 
   @Test
-  public void decode () throws Exception {
+  @DisplayName("decode instance from byte array and compare with jinterface result")
+  void decode () throws Exception {
     byte[] bytes1 = Bytes.allocate()
         .put1B(REFERENCE.getCode())
         .put(new ErlangAtom("popa@localhost").toBytes())

@@ -34,7 +34,7 @@ import lombok.extern.slf4j.Slf4j;
  * Method argument matcher.
  *
  * @since 1.4.0
- * @author alabazin
+ * @author Artem Labazin
  */
 public interface MethodArgumentMatcher {
 

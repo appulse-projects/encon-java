@@ -18,6 +18,8 @@ package io.appulse.encon.connection.handshake.message;
 
 import static lombok.AccessLevel.PRIVATE;
 
+import java.lang.reflect.Constructor;
+
 import io.netty.buffer.ByteBuf;
 import lombok.Getter;
 import lombok.NonNull;
@@ -38,7 +40,8 @@ public abstract class Message {
     if (!MessageType.check(buffer.readByte(), type)) {
       throw new IllegalArgumentException();
     }
-    T result = type.newInstance();
+    Constructor<T> constructor = type.getConstructor();
+    T result = constructor.newInstance();
     result.read(buffer);
     return result;
   }

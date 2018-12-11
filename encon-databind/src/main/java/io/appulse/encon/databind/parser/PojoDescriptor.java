@@ -46,4 +46,7 @@ public final class PojoDescriptor {
   public String getName () {
     return type.getSimpleName();
   }
+
+  public static class PojoDescriptorBuilder {
+  }
 }

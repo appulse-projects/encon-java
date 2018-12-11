@@ -24,17 +24,27 @@ import java.net.URL;
 
 import io.appulse.utils.ResourceUtils;
 
-import org.junit.Test;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.DisplayName;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.TestInfo;
 
 /**
  *
  * @author Artem Labazin
  * @since 2.0.0
  */
-public class GetBooleanTest {
+@DisplayName("Extracting boolean options from config")
+class GetBooleanTest {
+
+  @BeforeEach
+  void beforeEach (TestInfo testInfo) {
+    System.out.println("- " + testInfo.getDisplayName());
+  }
 
   @Test
-  public void test () {
+  @DisplayName("checks boolean options")
+  void test () {
     URL url = ResourceUtils.getResourceUrls("", "boolean.yml").get(0);
     Config config = Config.load(url);
 

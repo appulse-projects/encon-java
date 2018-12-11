@@ -38,18 +38,28 @@ import lombok.EqualsAndHashCode;
 import lombok.NoArgsConstructor;
 import lombok.experimental.FieldDefaults;
 import lombok.val;
-import org.junit.Test;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.DisplayName;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.TestInfo;
 
 /**
  *
  * @since 1.6.0
  * @author Artem Labazin
  */
+@DisplayName("Term mapping test to POJO")
 @FieldDefaults(level = PRIVATE, makeFinal = true)
-public class TermMapperTest {
+class TermMapperTest {
+
+  @BeforeEach
+  void beforeEach (TestInfo testInfo) {
+    System.out.println("- " + testInfo.getDisplayName());
+  }
 
   @Test
-  public void simple () {
+  @DisplayName("simple POJO mapping")
+  void simple () {
     val pojo = new Pojo(
         "Artem",
         27,

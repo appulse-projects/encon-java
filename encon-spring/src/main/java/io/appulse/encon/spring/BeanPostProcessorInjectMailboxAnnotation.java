@@ -43,7 +43,7 @@ import org.springframework.core.Ordered;
 /**
  *
  * @since 1.6.0
- * @author alabazin
+ * @author Artem Labazin
  */
 @RequiredArgsConstructor
 @FieldDefaults(level = PRIVATE, makeFinal = true)

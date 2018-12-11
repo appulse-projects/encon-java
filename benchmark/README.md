@@ -37,9 +37,9 @@ H/W path      Device      Class      Description
 
 * **JMH version:** 1.21
 
-* **VM version:** JDK 1.8.0_181, Java HotSpot(TM) 64-Bit Server VM, 25.181-b13
+* **VM version:** JDK 11.0.1, OpenJDK 64-Bit Server VM, 11.0.1+13
 
-* **VM options:** -Xms1G -Xmx2G
+* **VM options:** -Xms3G -Xmx4G
 
 * **Warmup:** 10 iterations, 10 s each
 
@@ -59,14 +59,14 @@ The installation consist of a server node at separate thread, which echoes the m
 
 | implementation                                                                                                                                                       | clients | score       | error       | units |
 |:---------------------------------------------------------------------------------------------------------------------------------------------------------------------|:-------:|------------:|------------:|:------|
-| [encon](https://github.com/appulse-projects/encon-java/blob/master/benchmark/src/main/java/io/appulse/encon/benchmark/Encon_Node2NodeBenchmarks.java#L130)           |       1 | `11679.266` |   `414.090` | ops/s |
-| [jinterface](https://github.com/appulse-projects/encon-java/blob/master/benchmark/src/main/java/io/appulse/encon/benchmark/JInterface_Node2NodeBenchmarks.java#L109) |       1 | `11862.914` |   `385.573` | ops/s |
-| [encon](https://github.com/appulse-projects/encon-java/blob/master/benchmark/src/main/java/io/appulse/encon/benchmark/Encon_Node2NodeBenchmarks.java#L138)           |       2 | `22337.500` |   `918.292` | ops/s |
-| [jinterface](https://github.com/appulse-projects/encon-java/blob/master/benchmark/src/main/java/io/appulse/encon/benchmark/JInterface_Node2NodeBenchmarks.java#L117) |       2 | `18217.878` |   `861.270` | ops/s |
-| [encon](https://github.com/appulse-projects/encon-java/blob/master/benchmark/src/main/java/io/appulse/encon/benchmark/Encon_Node2NodeBenchmarks.java#L146)           |       4 | `36001.870` |  `2033.472` | ops/s |
-| [jinterface](https://github.com/appulse-projects/encon-java/blob/master/benchmark/src/main/java/io/appulse/encon/benchmark/JInterface_Node2NodeBenchmarks.java#L125) |       4 | `23202.485` |  `1295.186` | ops/s |
-| [encon](https://github.com/appulse-projects/encon-java/blob/master/benchmark/src/main/java/io/appulse/encon/benchmark/Encon_Node2NodeBenchmarks.java#L154)           |       8 | `44742.858` |  `1865.853` | ops/s |
-| [jinterface](https://github.com/appulse-projects/encon-java/blob/master/benchmark/src/main/java/io/appulse/encon/benchmark/JInterface_Node2NodeBenchmarks.java#L133) |       8 | `23495.184` |   `671.766` | ops/s |
+| [encon](https://github.com/appulse-projects/encon-java/blob/master/benchmark/src/main/java/io/appulse/encon/benchmark/Encon_Node2NodeBenchmarks.java#L130)           |       1 | `13404.955` |   `832.219` | ops/s |
+| [jinterface](https://github.com/appulse-projects/encon-java/blob/master/benchmark/src/main/java/io/appulse/encon/benchmark/JInterface_Node2NodeBenchmarks.java#L109) |       1 | `11382.375` |   `358.907` | ops/s |
+| [encon](https://github.com/appulse-projects/encon-java/blob/master/benchmark/src/main/java/io/appulse/encon/benchmark/Encon_Node2NodeBenchmarks.java#L138)           |       2 | `21676.979` |   `654.934` | ops/s |
+| [jinterface](https://github.com/appulse-projects/encon-java/blob/master/benchmark/src/main/java/io/appulse/encon/benchmark/JInterface_Node2NodeBenchmarks.java#L117) |       2 | `18982.318` |   `395.596` | ops/s |
+| [encon](https://github.com/appulse-projects/encon-java/blob/master/benchmark/src/main/java/io/appulse/encon/benchmark/Encon_Node2NodeBenchmarks.java#L146)           |       4 | `33532.304` |   `609.782` | ops/s |
+| [jinterface](https://github.com/appulse-projects/encon-java/blob/master/benchmark/src/main/java/io/appulse/encon/benchmark/JInterface_Node2NodeBenchmarks.java#L125) |       4 | `23027.511` |   `327.508` | ops/s |
+| [encon](https://github.com/appulse-projects/encon-java/blob/master/benchmark/src/main/java/io/appulse/encon/benchmark/Encon_Node2NodeBenchmarks.java#L154)           |       8 | `48659.749` |   `572.108` | ops/s |
+| [jinterface](https://github.com/appulse-projects/encon-java/blob/master/benchmark/src/main/java/io/appulse/encon/benchmark/JInterface_Node2NodeBenchmarks.java#L133) |       8 | `25457.217` |   `295.665` | ops/s |
 
 ### Mailbox to mailbox
 
@@ -74,31 +74,38 @@ In this test we have only one node and two mailboxes which send the message to e
 
 | implementation                                                                                                                                                   | score         | error       | units |
 |:-----------------------------------------------------------------------------------------------------------------------------------------------------------------|--------------:|------------:|:------|
-| [encon](https://github.com/appulse-projects/encon-java/blob/master/benchmark/src/main/java/io/appulse/encon/benchmark/Encon_SimpleBenchmarks.java#L57)           | `4080746.356` | `79809.419` | ops/s |
-| [jinterface](https://github.com/appulse-projects/encon-java/blob/master/benchmark/src/main/java/io/appulse/encon/benchmark/JInterface_SimpleBenchmarks.java#L51) | `4885380.490` | `61920.971` | ops/s |
+| [encon](https://github.com/appulse-projects/encon-java/blob/master/benchmark/src/main/java/io/appulse/encon/benchmark/Encon_SimpleBenchmarks.java#L57)           | `2906135.871` | `46718.600` | ops/s |
+| [jinterface](https://github.com/appulse-projects/encon-java/blob/master/benchmark/src/main/java/io/appulse/encon/benchmark/JInterface_SimpleBenchmarks.java#L51) | `3388805.729` | `10400.968` | ops/s |
 
 
 ## How to setup the environment
 
-1. Add Java repository:
-
-```bash
-$> sudo add-apt-repository --yes ppa:webupd8team/java
-```
-
-2. Update and upgrade the distro:
+1. Update and upgrade the distro:
 
 ```bash
 $> sudo apt-get update --yes && sudo apt-get upgrade --yes
 ```
 
-3. Install `Git`, `Java 8` and `Maven`:
+2. Install `git`, `curl`, `zip` and `unzip`:
 
 ```bash
-$> sudo apt-get install --yes oracle-java8-installer git maven
+$> sudo apt-get install --yes git curl zip unzip
 ```
 
-4. Clone the repo:
+3. Install `sdkman`:
+
+```bash
+$> curl -s "https://get.sdkman.io" | bash
+$> source "$HOME/.sdkman/bin/sdkman-init.sh"
+```
+
+4. Install `Java`:
+
+```bash
+$> sdk install java 11.0.1-open
+```
+
+5. Clone the repo:
 
 ```bash
 $> git clone https://github.com/appulse-projects/encon-java.git
@@ -115,7 +122,7 @@ $> cd encon-java
 2. Build the project with only needed dependencies:
 
 ```bash
-$> mvn clean package \
+$> ./mvnw clean package \
      -DskipTests \
      -Dgpg.skip \
      -Dfindbugs.skip=true \
@@ -128,18 +135,20 @@ $> mvn clean package \
 3. Run the tests
 
 ```bash
-$> nohup java -Xms1G -Xmx2G -jar benchmark/target/benchmarks.jar > job.logs 2>&1 &
+$> nohup java -Xms3G -Xmx4G -jar benchmark/target/benchmarks.jar > job.logs 2>&1 &
 ```
 
 ### One-liner
 
 ```bash
-$> sudo add-apt-repository --yes ppa:webupd8team/java && \
-   sudo apt-get update --yes && sudo apt-get upgrade --yes && \
-   sudo apt-get install --yes oracle-java8-installer git maven && \
+$> sudo apt-get update --yes && sudo apt-get upgrade --yes && \
+   sudo apt-get install --yes git curl zip unzip && \
+   curl -s "https://get.sdkman.io" | bash && \
+   source "$HOME/.sdkman/bin/sdkman-init.sh" && \
+   sdk install java 11.0.1-open && \
    git clone https://github.com/appulse-projects/encon-java.git && \
    cd encon-java && \
-   mvn clean package \
+   ./mvnw clean package \
      -DskipTests \
      -Dgpg.skip \
      -Dfindbugs.skip=true \
@@ -147,5 +156,5 @@ $> sudo add-apt-repository --yes ppa:webupd8team/java && \
      -Dcheckstyle.skip \
      -Dmaven.test.skip=true \
      -pl benchmark -am && \
-  nohup java -Xms1G -Xmx2G -jar benchmark/target/benchmarks.jar > job.logs 2>&1 &
+   nohup java -Xms3G -Xmx4G -jar benchmark/target/benchmarks.jar > job.logs 2>&1 &
 ```

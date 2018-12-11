@@ -21,12 +21,10 @@ import static io.netty.buffer.Unpooled.wrappedBuffer;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 
-
 import io.appulse.encon.terms.Erlang;
 import io.appulse.encon.terms.exception.ErlangTermValidationException;
 import io.appulse.encon.terms.ErlangTerm;
 import io.appulse.utils.Bytes;
-import io.appulse.utils.test.TestMethodNamePrinter;
 
 import erlang.OtpErlangBitstr;
 import erlang.OtpInputStream;
@@ -34,22 +32,27 @@ import erlang.OtpOutputStream;
 import lombok.SneakyThrows;
 import lombok.val;
 import org.assertj.core.api.SoftAssertions;
-import org.junit.Rule;
-import org.junit.Test;
-import org.junit.rules.TestRule;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.DisplayName;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.TestInfo;
 
 /**
  *
  * @author Artem Labazin
  * @since 1.0.0
  */
-public class ErlangBitStringTest {
+@DisplayName("Check Erlang's BitString term type")
+class ErlangBitStringTest {
 
-  @Rule
-  public TestRule watcher = new TestMethodNamePrinter();
+  @BeforeEach
+  void beforeEach (TestInfo testInfo) {
+    System.out.println("- " + testInfo.getDisplayName());
+  }
 
   @Test
-  public void erlangTermValidationException () {
+  @DisplayName("checks throwing exceptions in constructor")
+  void erlangTermValidationException () {
     assertThatThrownBy(() -> new ErlangBitString(new byte[] { 1 }, -1))
         .isInstanceOf(ErlangTermValidationException.class)
         .hasMessage("Padding must be in range 0..7");
@@ -60,7 +63,8 @@ public class ErlangBitStringTest {
   }
 
   @Test
-  public void newInstance () {
+  @DisplayName("create new instance from bytes")
+  void newInstance () {
     val value = new byte[] { 1, 2, 3 };
     val pad = 3;
 
@@ -84,7 +88,8 @@ public class ErlangBitStringTest {
   }
 
   @Test
-  public void toBytes () {
+  @DisplayName("convert instance to byte array")
+  void toBytes () {
     val bits = new byte[] { 1, 2, 3 };
     val pad = 3;
 
@@ -100,7 +105,8 @@ public class ErlangBitStringTest {
   }
 
   @Test
-  public void encode () {
+  @DisplayName("encode instance to byte array and compare with jinterface output")
+  void encode () {
     val binary = new byte[] { 1, 2, 3 };
 
     assertThat(Erlang.bitstr(binary, 1).toBytes())
@@ -114,7 +120,8 @@ public class ErlangBitStringTest {
   }
 
   @Test
-  public void decode () throws Exception {
+  @DisplayName("decode instance from byte array and compare with jinterface result")
+  void decode () throws Exception {
     val bits = new byte[] { 1, 2, 3 };
     val pad = 3;
 

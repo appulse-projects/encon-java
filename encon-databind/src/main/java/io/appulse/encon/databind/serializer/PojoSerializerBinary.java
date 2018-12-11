@@ -30,7 +30,7 @@ import lombok.val;
  * POJO's serializer into Erlang's binary.
  *
  * @since 1.1.0
- * @author alabazin
+ * @author Artem Labazin
  */
 public class PojoSerializerBinary implements Serializer<Object> {
 

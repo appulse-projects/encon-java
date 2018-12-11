@@ -23,17 +23,27 @@ import java.net.URL;
 
 import io.appulse.utils.ResourceUtils;
 
-import org.junit.Test;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.DisplayName;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.TestInfo;
 
 /**
  *
  * @author Artem Labazin
  * @since 2.0.0
  */
-public class GetDoubleTest {
+@DisplayName("Extracting double options from config")
+class GetDoubleTest {
+
+  @BeforeEach
+  void beforeEach (TestInfo testInfo) {
+    System.out.println("- " + testInfo.getDisplayName());
+  }
 
   @Test
-  public void  test () {
+  @DisplayName("checks double options")
+  void  test () {
     URL url = ResourceUtils.getResourceUrls("", "double.yml").get(0);
     Config config = Config.load(url);
 

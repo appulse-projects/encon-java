@@ -28,22 +28,26 @@ import io.appulse.utils.ResourceUtils;
 
 import lombok.SneakyThrows;
 
-import org.junit.AfterClass;
-import org.junit.BeforeClass;
-import org.junit.Test;
+import org.junit.jupiter.api.AfterAll;
+import org.junit.jupiter.api.BeforeAll;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.DisplayName;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.TestInfo;
 
 /**
  *
  * @author Artem Labazin
  * @since 2.0.0
  */
-public class DumpTest {
+@DisplayName("Dumping configuration tests")
+class DumpTest {
 
   static Path FOLDER;
 
-  @BeforeClass
+  @BeforeAll
   @SneakyThrows
-  public static void beforeClass () {
+  static void beforeAll () {
     FOLDER = Paths.get("dump_test_folder");
 
     if (Files.exists(FOLDER)) {
@@ -55,9 +59,9 @@ public class DumpTest {
     Files.createDirectories(FOLDER);
   }
 
-  @AfterClass
+  @AfterAll
   @SneakyThrows
-  public static void afterClass () {
+  static void afterAll () {
     FOLDER = Paths.get("dump_test_folder");
 
     if (Files.exists(FOLDER)) {
@@ -69,8 +73,14 @@ public class DumpTest {
     Files.deleteIfExists(FOLDER);
   }
 
+  @BeforeEach
+  void beforeEach (TestInfo testInfo) {
+    System.out.println("- " + testInfo.getDisplayName());
+  }
+
   @Test
-  public void dumpFileName () {
+  @DisplayName("dump by file name")
+  void dumpFileName () {
     ResourceUtils.getResourceUrls("dump", "file.*").forEach(url -> {
       Config config1 = Config.load(url);
 
@@ -87,7 +97,8 @@ public class DumpTest {
   }
 
   @Test
-  public void dumpFile () {
+  @DisplayName("dump by file object")
+  void dumpFile () {
     ResourceUtils.getResourceUrls("dump", "file.*").forEach(url -> {
       Config config1 = Config.load(url);
 
@@ -104,7 +115,8 @@ public class DumpTest {
   }
 
   @Test
-  public void dumpPath () {
+  @DisplayName("dump by file path")
+  void dumpPath () {
     ResourceUtils.getResourceUrls("dump", "file.*").forEach(url -> {
       Config config1 = Config.load(url);
 

@@ -35,7 +35,7 @@ import org.springframework.validation.annotation.Validated;
 /**
  *
  * @since 1.6.0
- * @author alabazin
+ * @author Artem Labazin
  */
 @Data
 @Component

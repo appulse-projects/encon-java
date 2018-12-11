@@ -26,7 +26,7 @@ import java.lang.annotation.Target;
 /**
  *
  * @since 1.6.0
- * @author alabazin
+ * @author Artem Labazin
  */
 @Documented
 @Target(METHOD)

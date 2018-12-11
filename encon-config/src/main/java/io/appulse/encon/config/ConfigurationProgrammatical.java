@@ -190,4 +190,7 @@ final class ConfigurationProgrammatical extends AbstractConfig {
   ConfigTree getConfigTree () {
     return tree;
   }
+
+  public static class ConfigurationProgrammaticalBuilder {
+  }
 }

@@ -29,6 +29,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.concurrent.CopyOnWriteArrayList;
 
+import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import lombok.NoArgsConstructor;
 import lombok.RequiredArgsConstructor;
 import lombok.SneakyThrows;
@@ -42,7 +43,7 @@ import net.sf.cglib.proxy.MethodInterceptor;
  * Builder of a new {@link MethodMatcherMessageHandler} instance.
  *
  * @since 1.4.0
- * @author alabazin
+ * @author Artem Labazin
  */
 @NoArgsConstructor(access = PACKAGE)
 @FieldDefaults(level = PRIVATE, makeFinal = true)
@@ -77,6 +78,7 @@ public class MethodMatcherMessageHandlerBuilder {
     return new MethodMatcherMessageHandler(map);
   }
 
+  @SuppressFBWarnings("UPM_UNCALLED_PRIVATE_METHOD")
   private <T> T createProxy (T object, MethodArgumentsWrapper wrapper) {
     val cacheKey = WrapperCacheKey.of(object.getClass(), wrapper);
     val proxy = wrappedCache.get(cacheKey);

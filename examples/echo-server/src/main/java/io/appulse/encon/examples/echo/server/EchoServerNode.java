@@ -40,13 +40,13 @@ import lombok.extern.slf4j.Slf4j;
  */
 @Slf4j
 @FieldDefaults(level = PRIVATE, makeFinal = true)
-class EchoServerNode implements Runnable, Closeable {
+public class EchoServerNode implements Runnable, Closeable {
 
   Node node;
 
   Mailbox mailbox;
 
-  EchoServerNode (String nodeName, String cookie, String mailboxName) {
+  public EchoServerNode (String nodeName, String cookie, String mailboxName) {
     NodeConfig config = NodeConfig.builder()
         .shortName(TRUE)
         .cookie(cookie)
