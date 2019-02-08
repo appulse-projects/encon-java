@@ -33,11 +33,11 @@ limitations under the License.
       <dependency>
         <groupId>org.springframework.boot</groupId>
         <artifactId>spring-boot-dependencies</artifactId>
-        <version>2.1.1.RELEASE</version>
+        <version>2.1.2.RELEASE</version>
         <type>pom</type>
         <scope>import</scope>
       </dependency>
-	</dependencies>
+    </dependencies>
   </dependencyManagement>
 
   <groupId>io.appulse.encon.examples</groupId>
@@ -77,7 +77,7 @@ limitations under the License.
       <plugin>
         <groupId>org.springframework.boot</groupId>
         <artifactId>spring-boot-maven-plugin</artifactId>
-        <version>2.1.1.RELEASE</version>
+        <version>2.1.2.RELEASE</version>
       </plugin>
     </plugins>
   </build>
