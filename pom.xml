@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
 <!--
-Copyright 2018 the original author or authors.
+Copyright 2019 the original author or authors.
 
 Licensed under the Apache License, Version 2.0 (the "License");
 you may not use this file except in compliance with the License.
@@ -31,7 +31,7 @@ limitations under the License.
     <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
     <project.build.resourceEncoding>UTF-8</project.build.resourceEncoding>
 
-    <java.version>11</java.version>
+    <java.version>${java.vm.specification.version}</java.version>
 
     <maven.compiler.source>${java.version}</maven.compiler.source>
     <maven.compiler.target>${java.version}</maven.compiler.target>
@@ -57,7 +57,7 @@ limitations under the License.
     Java based Erlang Node Connector
   </description>
   <url>https://github.com/appulse-projects/encon-java</url>
-  <inceptionYear>2018</inceptionYear>
+  <inceptionYear>2019</inceptionYear>
 
   <organization>
     <name>Appulse</name>
@@ -342,9 +342,9 @@ limitations under the License.
             <additionalOptions>-Xdoclint:none</additionalOptions>
             <additionalparam>-Xdoclint:none</additionalparam>
             <breakiterator>true</breakiterator>
-            <charset>UTF-8</charset>
-            <docencoding>UTF-8</docencoding>
-            <encoding>UTF-8</encoding>
+            <charset>${project.build.sourceEncoding}</charset>
+            <docencoding>${project.build.sourceEncoding}</docencoding>
+            <encoding>${project.build.sourceEncoding}</encoding>
             <failOnError>true</failOnError>
             <show>protected</show>
             <source>${java.version}</source>
@@ -439,10 +439,22 @@ limitations under the License.
         <artifactId>maven-compiler-plugin</artifactId>
         <version>3.8.0</version>
         <configuration>
-          <release>${java.version}</release>
           <compilerVersion>${maven.compiler.target}</compilerVersion>
           <source>${maven.compiler.source}</source>
           <target>${maven.compiler.target}</target>
+        </configuration>
+      </plugin>
+
+      <plugin>
+        <groupId>org.apache.maven.plugins</groupId>
+        <artifactId>maven-resources-plugin</artifactId>
+        <configuration>
+          <delimiters>
+            <delimiter>@</delimiter>
+          </delimiters>
+          <nonFilteredFileExtensions>
+            <nonFilteredFileExtension>jks</nonFilteredFileExtension>
+          </nonFilteredFileExtensions>
         </configuration>
       </plugin>
 
@@ -470,6 +482,10 @@ limitations under the License.
           <dateFormat>yyyy-MM-dd'T'HH:mm:ssZ</dateFormat>
           <dotGitDirectory>${project.basedir}/.git</dotGitDirectory>
           <excludeProperties>
+            <excludeProperty>git.build.user.*</excludeProperty>
+            <excludeProperty>git.build.host</excludeProperty>
+            <excludeProperty>git.commit.user.*</excludeProperty>
+            <excludeProperty>git.total.commit.count</excludeProperty>
             <excludeProperty>git.closest.tag.commit.count</excludeProperty>
             <excludeProperty>git.closest.tag.name</excludeProperty>
           </excludeProperties>
@@ -481,9 +497,6 @@ limitations under the License.
         <artifactId>maven-surefire-plugin</artifactId>
         <version>2.22.1</version>
         <configuration>
-          <argLine>
-            --illegal-access=permit
-          </argLine>
           <trimStackTrace>false</trimStackTrace>
           <includes>
             <include>**/*Test.java</include>
@@ -505,9 +518,6 @@ limitations under the License.
         <artifactId>maven-failsafe-plugin</artifactId>
         <version>2.22.1</version>
         <configuration>
-          <argLine>
-            --illegal-access=permit
-          </argLine>
           <includes>
             <include>**/*IntegrationTest.java</include>
             <include>**/*IntegrationTests.java</include>
@@ -546,4 +556,39 @@ limitations under the License.
       </plugin>
     </plugins>
   </build>
+
+  <profiles>
+    <profile>
+      <id>module-java</id>
+      <activation>
+        <jdk>[9,12)</jdk>
+      </activation>
+      <build>
+        <plugins>
+          <plugin>
+            <artifactId>maven-compiler-plugin</artifactId>
+            <configuration>
+              <release>${java.version}</release>
+            </configuration>
+          </plugin>
+          <plugin>
+            <artifactId>maven-surefire-plugin</artifactId>
+            <configuration>
+              <argLine>
+                --illegal-access=permit
+              </argLine>
+            </configuration>
+          </plugin>
+          <plugin>
+            <artifactId>maven-failsafe-plugin</artifactId>
+            <configuration>
+              <argLine>
+                --illegal-access=permit
+              </argLine>
+            </configuration>
+          </plugin>
+        </plugins>
+      </build>
+    </profile>
+  </profiles>
 </project>
