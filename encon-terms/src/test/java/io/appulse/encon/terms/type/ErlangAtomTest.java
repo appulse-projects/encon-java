@@ -69,10 +69,10 @@ class ErlangAtomTest {
   @DisplayName("create new instance from bytes")
   void newInstance () {
     val value = "hello";
-    val bytes = Bytes.allocate()
-        .put1B(SMALL_ATOM_UTF8.getCode())
-        .put1B(value.getBytes(UTF_8).length)
-        .put(value.getBytes(UTF_8))
+    val bytes = Bytes.resizableArray()
+        .write1B(SMALL_ATOM_UTF8.getCode())
+        .write1B(value.getBytes(UTF_8).length)
+        .writeNB(value.getBytes(UTF_8))
         .array();
 
     ErlangAtom atom = ErlangTerm.newInstance(wrappedBuffer(bytes));
@@ -94,10 +94,10 @@ class ErlangAtomTest {
   @DisplayName("convert instance to byte array")
   void toBytes () {
     val value = "hello";
-    val expected = Bytes.allocate()
-        .put1B(SMALL_ATOM_UTF8.getCode())
-        .put1B(value.getBytes(UTF_8).length)
-        .put(value.getBytes(UTF_8))
+    val expected = Bytes.resizableArray()
+        .write1B(SMALL_ATOM_UTF8.getCode())
+        .write1B(value.getBytes(UTF_8).length)
+        .writeNB(value.getBytes(UTF_8))
         .array();
 
     assertThat(Erlang.atom(value).toBytes())
@@ -141,10 +141,10 @@ class ErlangAtomTest {
   @DisplayName("decode instance from byte array and compare with jinterface result")
   void decode () throws Exception {
     val value1 = "hello";
-    val bytes1 = Bytes.allocate()
-        .put1B(SMALL_ATOM_UTF8.getCode())
-        .put1B(value1.getBytes(UTF_8).length)
-        .put(value1.getBytes(UTF_8))
+    val bytes1 = Bytes.resizableArray()
+        .write1B(SMALL_ATOM_UTF8.getCode())
+        .write1B(value1.getBytes(UTF_8).length)
+        .writeNB(value1.getBytes(UTF_8))
         .array();
 
     try (val input = new OtpInputStream(bytes1)) {
@@ -155,10 +155,10 @@ class ErlangAtomTest {
 
 
     val value2 = "попа";
-    val bytes2 = Bytes.allocate()
-        .put1B(ATOM_UTF8.getCode())
-        .put2B(value2.getBytes(UTF_8).length)
-        .put(value2.getBytes(UTF_8))
+    val bytes2 = Bytes.resizableArray()
+        .write1B(ATOM_UTF8.getCode())
+        .write2B(value2.getBytes(UTF_8).length)
+        .writeNB(value2.getBytes(UTF_8))
         .array();
 
     try (val input = new OtpInputStream(bytes2)) {

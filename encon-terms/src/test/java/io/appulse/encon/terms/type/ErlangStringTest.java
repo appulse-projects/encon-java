@@ -70,10 +70,10 @@ class ErlangStringTest {
   @Test
   @DisplayName("decode instance from byte array and compare with jinterface result")
   void decode () throws Exception {
-    val bytes = Bytes.allocate()
-        .put1B(STRING.getCode())
-        .put2B("popa".length())
-        .put("popa", ISO_8859_1)
+    val bytes = Bytes.resizableArray()
+        .write1B(STRING.getCode())
+        .write2B("popa".length())
+        .writeNB("popa", ISO_8859_1)
         .array();
 
     try (val input = new OtpInputStream(bytes)) {

@@ -68,11 +68,11 @@ class ErlangBitStringTest {
     val value = new byte[] { 1, 2, 3 };
     val pad = 3;
 
-    val bytes = Bytes.allocate()
-        .put1B(BIT_BINNARY.getCode())
-        .put4B(value.length)
-        .put1B(8 - pad)
-        .put(value)
+    val bytes = Bytes.resizableArray()
+        .write1B(BIT_BINNARY.getCode())
+        .write4B(value.length)
+        .write1B(8 - pad)
+        .writeNB(value)
         .array();
 
     ErlangBitString bitString = ErlangTerm.newInstance(wrappedBuffer(bytes));
@@ -93,11 +93,11 @@ class ErlangBitStringTest {
     val bits = new byte[] { 1, 2, 3 };
     val pad = 3;
 
-    val bytes = Bytes.allocate()
-        .put1B(BIT_BINNARY.getCode())
-        .put4B(bits.length)
-        .put1B(8 - pad)
-        .put(new byte[] { 1, 2, 0 })
+    val bytes = Bytes.resizableArray()
+        .write1B(BIT_BINNARY.getCode())
+        .write4B(bits.length)
+        .write1B(8 - pad)
+        .writeNB(new byte[] { 1, 2, 0 })
         .array();
 
     assertThat(Erlang.bitstr(bits, pad).toBytes())
@@ -125,11 +125,11 @@ class ErlangBitStringTest {
     val bits = new byte[] { 1, 2, 3 };
     val pad = 3;
 
-    val bytes = Bytes.allocate()
-        .put1B(BIT_BINNARY.getCode())
-        .put4B(bits.length)
-        .put1B(8 - pad)
-        .put(new byte[] { 1, 2, 0 })
+    val bytes = Bytes.resizableArray()
+        .write1B(BIT_BINNARY.getCode())
+        .write4B(bits.length)
+        .write1B(8 - pad)
+        .writeNB(new byte[] { 1, 2, 0 })
         .array();
 
     try (val input = new OtpInputStream(bytes)) {

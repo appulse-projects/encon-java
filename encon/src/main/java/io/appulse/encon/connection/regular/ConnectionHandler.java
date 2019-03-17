@@ -24,6 +24,7 @@ import static lombok.AccessLevel.PRIVATE;
 
 import java.io.Closeable;
 import java.util.List;
+import java.util.concurrent.CompletableFuture;
 import java.util.function.Consumer;
 
 import io.appulse.encon.Node;
@@ -131,7 +132,7 @@ public final class ConnectionHandler extends ByteToMessageDecoder implements Clo
     close();
   }
 
-  public void send (Message message) {
+  public void send (Message message, CompletableFuture<Void> completableFuture) {
     log.debug("Sending message\nto {}\n  {}\n",
               remote, message);
 
@@ -144,7 +145,13 @@ public final class ConnectionHandler extends ByteToMessageDecoder implements Clo
 
     channel.eventLoop().execute(() -> {
       channel.write(messageLength);
-      channel.writeAndFlush(out);
+      channel.writeAndFlush(out).addListener(it -> {
+        if (it.isSuccess()) {
+          completableFuture.complete(null);
+        } else {
+          completableFuture.completeExceptionally(it.cause());
+        }
+      });
     });
   }
 

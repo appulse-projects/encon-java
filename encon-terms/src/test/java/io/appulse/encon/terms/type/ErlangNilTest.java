@@ -47,8 +47,8 @@ class ErlangNilTest {
   @Test
   @DisplayName("create new instance from bytes")
   void newInstance () {
-    val bytes = Bytes.allocate()
-        .put1B(NIL.getCode())
+    val bytes = Bytes.resizableArray()
+        .write1B(NIL.getCode())
         .array();
 
     ErlangNil nil = ErlangTerm.newInstance(wrappedBuffer(bytes));
@@ -60,8 +60,8 @@ class ErlangNilTest {
   @Test
   @DisplayName("convert instance to byte array")
   void toBytes () {
-    val expected = Bytes.allocate()
-        .put1B(NIL.getCode())
+    val expected = Bytes.resizableArray()
+        .write1B(NIL.getCode())
         .array();
 
     assertThat(new ErlangNil().toBytes())

@@ -78,10 +78,10 @@ class ErlangTupleTest {
   @DisplayName("create new instance from bytes")
   void newInstance () {
     val value = new ErlangNil();
-    val bytes = Bytes.allocate()
-        .put1B(SMALL_TUPLE.getCode())
-        .put1B(1)
-        .put(value.toBytes())
+    val bytes = Bytes.resizableArray()
+        .write1B(SMALL_TUPLE.getCode())
+        .write1B(1)
+        .writeNB(value.toBytes())
         .array();
 
     ErlangTuple tuple = ErlangTerm.newInstance(wrappedBuffer(bytes));
@@ -107,10 +107,10 @@ class ErlangTupleTest {
   @DisplayName("convert instance to byte array")
   void toBytes () {
     val value = new ErlangNil();
-    val expected = Bytes.allocate()
-        .put1B(SMALL_TUPLE.getCode())
-        .put1B(1)
-        .put(value.toBytes())
+    val expected = Bytes.resizableArray()
+        .write1B(SMALL_TUPLE.getCode())
+        .write1B(1)
+        .writeNB(value.toBytes())
         .array();
 
     assertThat(new ErlangTuple(value).toBytes())

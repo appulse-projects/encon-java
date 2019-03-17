@@ -23,6 +23,7 @@ import static lombok.AccessLevel.PRIVATE;
 import java.io.Closeable;
 import java.util.Set;
 import java.util.concurrent.BlockingQueue;
+import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicBoolean;
@@ -150,12 +151,12 @@ public class Mailbox implements Closeable {
    *
    * @param body message payload
    */
-  public void send (@NonNull ErlangPid to, @NonNull ErlangTerm body) {
+  public CompletableFuture<Void> send (@NonNull ErlangPid to, @NonNull ErlangTerm body) {
     val message = Message.send(to, body);
     if (isLocal(to)) {
-      getMailbox(to).deliver(message);
+      return getMailbox(to).thenAccept(it -> it.deliver(message));
     } else {
-      getConnection(to).send(message);
+      return getConnection(to).thenCompose(it -> it.send(message));
     }
   }
 
@@ -166,9 +167,9 @@ public class Mailbox implements Closeable {
    *
    * @param body message payload
    */
-  public void send (@NonNull String mailbox, @NonNull ErlangTerm body) {
+  public CompletableFuture<Void> send (@NonNull String mailbox, @NonNull ErlangTerm body) {
     val message = Message.send(mailbox, body);
-    getMailbox(mailbox).deliver(message);
+    return getMailbox(mailbox).thenAccept(it -> it.deliver(message));
   }
 
   /**
@@ -180,9 +181,9 @@ public class Mailbox implements Closeable {
    *
    * @param body message payload
    */
-  public void send (@NonNull String remoteNodeName, @NonNull String mailbox, @NonNull ErlangTerm body) {
+  public CompletableFuture<Void> send (@NonNull String remoteNodeName, @NonNull String mailbox, @NonNull ErlangTerm body) {
     val descriptor = NodeDescriptor.from(remoteNodeName);
-    send(descriptor, mailbox, body);
+    return send(descriptor, mailbox, body);
   }
 
   /**
@@ -194,12 +195,14 @@ public class Mailbox implements Closeable {
    *
    * @param body message payload
    */
-  public void send (@NonNull NodeDescriptor descriptor, @NonNull String mailbox, @NonNull ErlangTerm body) {
-    RemoteNode remote = node.lookup(descriptor);
+  public CompletableFuture<Void> send (@NonNull NodeDescriptor descriptor, @NonNull String mailbox, @NonNull ErlangTerm body) {
+    val remote = node.lookup(descriptor);
     if (remote == null) {
-      throw new NoSuchRemoteNodeException(descriptor);
+      val future = new CompletableFuture<Void>();
+      future.completeExceptionally(new NoSuchRemoteNodeException(descriptor));
+      return future;
     }
-    send(remote, mailbox, body);
+    return send(remote, mailbox, body);
   }
 
   /**
@@ -211,13 +214,12 @@ public class Mailbox implements Closeable {
    *
    * @param body message payload
    */
-  public void send (@NonNull RemoteNode remote, @NonNull String mailbox, @NonNull ErlangTerm body) {
+  public CompletableFuture<Void> send (@NonNull RemoteNode remote, @NonNull String mailbox, @NonNull ErlangTerm body) {
     if (isLocal(remote)) {
-      send(mailbox, body);
-    } else {
-      node.connect(remote)
-          .send(Message.sendToRegisteredProcess(pid, mailbox, body));
+      return send(mailbox, body);
     }
+    return node.connect(remote)
+        .send(Message.sendToRegisteredProcess(pid, mailbox, body));
   }
 
 
@@ -231,7 +233,8 @@ public class Mailbox implements Closeable {
     if (isLocal(to)) {
       getMailbox(to).deliver(message);
     } else {
-      getConnection(to).send(message);
+      // TODO: use future!
+      getConnection(to).send(message, null);
     }
     links.add(to);
   }
@@ -248,7 +251,8 @@ public class Mailbox implements Closeable {
     if (isLocal(to)) {
       getMailbox(to).deliver(message);
     } else {
-      getConnection(to).send(message);
+      // TODO: use future!
+      getConnection(to).send(message, null);
     }
   }
 
@@ -271,7 +275,8 @@ public class Mailbox implements Closeable {
       if (isLocal(it)) {
         getMailbox(it).deliver(message);
       } else {
-        getConnection(it).send(message);
+        // TODO: use future!
+        getConnection(it).send(message, null);
       }
     });
 
@@ -314,28 +319,34 @@ public class Mailbox implements Closeable {
     exit("normal");
   }
 
-  private Mailbox getMailbox (@NonNull String remoteName) {
-    Mailbox mailbox = node.mailbox(remoteName);
+  private CompletableFuture<Mailbox> getMailbox (@NonNull String remoteName) {
+    val future = new CompletableFuture<Mailbox>();
+    val mailbox = node.mailbox(remoteName);
     if (mailbox == null) {
-      throw new MailboxWithSuchNameDoesntExistException(remoteName);
+      future.completeExceptionally(new MailboxWithSuchNameDoesntExistException(remoteName));
+    } else {
+      future.complete(mailbox);
     }
-    return mailbox;
+    return future;
   }
 
-  private Mailbox getMailbox (@NonNull ErlangPid remotePid) {
-    Mailbox mailbox = node.mailbox(remotePid);
+  private CompletableFuture<Mailbox> getMailbox (@NonNull ErlangPid remotePid) {
+    val future = new CompletableFuture<Mailbox>();
+    val mailbox = node.mailbox(remotePid);
     if (mailbox == null) {
-      throw new MailboxWithSuchPidDoesntExistException(remotePid);
+      future.completeExceptionally(new MailboxWithSuchPidDoesntExistException(remotePid));
+    } else {
+      future.complete(mailbox);
     }
-    return mailbox;
+    return future;
   }
 
-  private Connection getConnection (@NonNull ErlangPid remotePid) {
+  private CompletableFuture<Connection> getConnection (@NonNull ErlangPid remotePid) {
     val remoteNode = node.lookup(remotePid);
     if (remoteNode == null) {
       throw new CouldntConnectException();
     }
-    return node.connect(remoteNode);
+    return node.connectAsync(remoteNode);
   }
 
   private boolean isLocal (@NonNull ErlangPid remotePid) {

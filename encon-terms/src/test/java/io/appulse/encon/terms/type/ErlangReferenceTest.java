@@ -31,7 +31,6 @@ import erlang.OtpErlangRef;
 import erlang.OtpInputStream;
 import erlang.OtpOutputStream;
 import lombok.SneakyThrows;
-import lombok.extern.slf4j.Slf4j;
 import lombok.val;
 import org.assertj.core.api.SoftAssertions;
 import org.junit.jupiter.api.BeforeEach;
@@ -44,7 +43,6 @@ import org.junit.jupiter.api.TestInfo;
  * @author Artem Labazin
  * @since 1.0.0
  */
-@Slf4j
 @DisplayName("Check Erlang's Reference term type")
 class ErlangReferenceTest {
 
@@ -73,16 +71,16 @@ class ErlangReferenceTest {
     val ids = new long[] { 1, 0, 0 };
     val creation = 42;
 
-    val builder = Bytes.allocate()
-        .put1B(NEW_REFERENCE.getCode())
-        .put2B(ids.length)
-        .put(new ErlangAtom(node).toBytes())
-        .put1B(creation)
-        .put4B(ids[0]);
+    val builder = Bytes.resizableArray()
+        .write1B(NEW_REFERENCE.getCode())
+        .write2B(ids.length)
+        .writeNB(new ErlangAtom(node).toBytes())
+        .write1B(creation)
+        .write4B(ids[0]);
 
     LongStream.of(ids)
         .skip(1)
-        .forEachOrdered(builder::put4B);
+        .forEachOrdered(builder::write4B);
 
     val expected = builder.array();
 
@@ -111,16 +109,16 @@ class ErlangReferenceTest {
     val ids = new long[] { 1, 0, 0 };
     val creation = 42;
 
-    val builder = Bytes.allocate()
-        .put1B(NEW_REFERENCE.getCode())
-        .put2B(ids.length)
-        .put(new ErlangAtom(node).toBytes())
-        .put1B(creation & 0x3)
-        .put4B(ids[0] & 0x3FFFF);
+    val builder = Bytes.resizableArray()
+        .write1B(NEW_REFERENCE.getCode())
+        .write2B(ids.length)
+        .writeNB(new ErlangAtom(node).toBytes())
+        .write1B(creation & 0x3)
+        .write4B(ids[0] & 0x3FFFF);
 
     LongStream.of(ids)
         .skip(1)
-        .forEachOrdered(builder::put4B);
+        .forEachOrdered(builder::write4B);
 
     val expected = builder.array();
 
@@ -177,11 +175,11 @@ class ErlangReferenceTest {
   @Test
   @DisplayName("decode instance from byte array and compare with jinterface result")
   void decode () throws Exception {
-    byte[] bytes1 = Bytes.allocate()
-        .put1B(REFERENCE.getCode())
-        .put(new ErlangAtom("popa@localhost").toBytes())
-        .put4B(Integer.MAX_VALUE)
-        .put1B(Integer.MAX_VALUE)
+    byte[] bytes1 = Bytes.resizableArray()
+        .write1B(REFERENCE.getCode())
+        .writeNB(new ErlangAtom("popa@localhost").toBytes())
+        .write4B(Integer.MAX_VALUE)
+        .write1B(Integer.MAX_VALUE)
         .array();
 
     try (val input = new OtpInputStream(bytes1)) {
@@ -201,14 +199,14 @@ class ErlangReferenceTest {
           .isEqualTo(otpRef.creation());
     }
 
-    byte[] bytes2 = Bytes.allocate()
-        .put1B(NEW_REFERENCE.getCode())
-        .put2B(3)
-        .put(new ErlangAtom("popa@localhost").toBytes())
-        .put1B(Integer.MAX_VALUE)
-        .put4B(Integer.MAX_VALUE)
-        .put4B(Integer.MAX_VALUE)
-        .put4B(Integer.MAX_VALUE)
+    byte[] bytes2 = Bytes.resizableArray()
+        .write1B(NEW_REFERENCE.getCode())
+        .write2B(3)
+        .writeNB(new ErlangAtom("popa@localhost").toBytes())
+        .write1B(Integer.MAX_VALUE)
+        .write4B(Integer.MAX_VALUE)
+        .write4B(Integer.MAX_VALUE)
+        .write4B(Integer.MAX_VALUE)
         .array();
 
     try (val input = new OtpInputStream(bytes2)) {
@@ -228,14 +226,14 @@ class ErlangReferenceTest {
           .isEqualTo(otpRef.creation());
     }
 
-    byte[] bytes3 = Bytes.allocate()
-        .put1B(NEWER_REFERENCE.getCode())
-        .put2B(3)
-        .put(new ErlangAtom("popa@localhost").toBytes())
-        .put4B(Integer.MAX_VALUE)
-        .put4B(Integer.MAX_VALUE)
-        .put4B(Integer.MAX_VALUE)
-        .put4B(Integer.MAX_VALUE)
+    byte[] bytes3 = Bytes.resizableArray()
+        .write1B(NEWER_REFERENCE.getCode())
+        .write2B(3)
+        .writeNB(new ErlangAtom("popa@localhost").toBytes())
+        .write4B(Integer.MAX_VALUE)
+        .write4B(Integer.MAX_VALUE)
+        .write4B(Integer.MAX_VALUE)
+        .write4B(Integer.MAX_VALUE)
         .array();
 
     try (val input = new OtpInputStream(bytes3)) {

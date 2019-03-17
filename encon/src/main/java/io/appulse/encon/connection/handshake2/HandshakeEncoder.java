@@ -14,9 +14,9 @@
  * limitations under the License.
  */
 
-package io.appulse.encon.connection.handshake;
+package io.appulse.encon.connection.handshake2;
 
-import io.appulse.encon.connection.handshake.message.Message;
+import io.appulse.encon.connection.handshake2.HandshakeMessage;
 
 import io.netty.buffer.ByteBuf;
 import io.netty.channel.ChannelHandler.Sharable;
@@ -26,12 +26,12 @@ import lombok.extern.slf4j.Slf4j;
 
 /**
  *
- * @since 1.0.0
+ * @since 2.0.0
  * @author Artem Labazin
  */
 @Slf4j
 @Sharable
-public class HandshakeEncoder extends MessageToByteEncoder<Message> {
+public class HandshakeEncoder extends MessageToByteEncoder<HandshakeMessage> {
 
   public HandshakeEncoder () {
     super(false);
@@ -47,10 +47,10 @@ public class HandshakeEncoder extends MessageToByteEncoder<Message> {
   }
 
   @Override
-  protected void encode (ChannelHandlerContext context, Message message, ByteBuf out) throws Exception {
+  protected void encode (ChannelHandlerContext context, HandshakeMessage message, ByteBuf out) throws Exception {
     try {
       message.writeTo(out);
-      log.debug("Message was sent");
+      log.debug("Message {} was sent", message);
     } catch (Exception ex) {
       log.error("Error during encoding message for {}\n  {}\n",
                 context.channel().remoteAddress(), message, ex);

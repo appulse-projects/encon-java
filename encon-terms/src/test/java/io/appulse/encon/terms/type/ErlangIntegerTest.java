@@ -125,9 +125,9 @@ class ErlangIntegerTest {
   @Test
   @DisplayName("decode instance from byte array and compare with jinterface result")
   void decode () throws Exception {
-    val bytes1 = Bytes.allocate()
-        .put1B(SMALL_INTEGER.getCode())
-        .put1B(255)
+    val bytes1 = Bytes.resizableArray()
+        .write1B(SMALL_INTEGER.getCode())
+        .write1B(255)
         .array();
 
     try (val input = new OtpInputStream(bytes1)) {
@@ -136,9 +136,9 @@ class ErlangIntegerTest {
           .isEqualTo(input.read_int());
     }
 
-    val bytes2 = Bytes.allocate()
-        .put1B(INTEGER.getCode())
-        .put4B(134217726)
+    val bytes2 = Bytes.resizableArray()
+        .write1B(INTEGER.getCode())
+        .write4B(134217726)
         .array();
 
     try (val input = new OtpInputStream(bytes2)) {
@@ -236,12 +236,12 @@ class ErlangIntegerTest {
   }
 
   private byte[] bigBytes (BigInteger value) {
-    Bytes buffer = Bytes.allocate();
+    Bytes buffer = Bytes.resizableArray();
 
     if (value.abs().toByteArray().length < 256) {
-        buffer.put1B(SMALL_BIG.getCode());
+        buffer.write1B(SMALL_BIG.getCode());
     } else {
-        buffer.put1B(LARGE_BIG.getCode());
+        buffer.write1B(LARGE_BIG.getCode());
     }
 
     byte[] bytes = value.abs().toByteArray();
@@ -261,15 +261,15 @@ class ErlangIntegerTest {
     }
 
     if ((length & 0xFF) == length) {
-    buffer.put1B(length); // length
+    buffer.write1B(length); // length
     } else {
-    buffer.put4B(length); // length
+    buffer.write4B(length); // length
     }
     val sign = value.signum() < 0
                 ? 1
                 : 0;
-    buffer.put1B(sign);
-    buffer.put(magnitude);
+    buffer.write1B(sign);
+    buffer.writeNB(magnitude);
     return buffer.array();
   }
 }

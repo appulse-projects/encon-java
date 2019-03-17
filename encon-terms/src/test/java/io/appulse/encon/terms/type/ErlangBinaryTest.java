@@ -62,10 +62,10 @@ class ErlangBinaryTest {
   void newInstance () {
     val value = new byte[] { 1, 2, 3 };
 
-    val bytes = Bytes.allocate()
-        .put1B(BINARY.getCode())
-        .put4B(value.length)
-        .put(value)
+    val bytes = Bytes.resizableArray()
+        .write1B(BINARY.getCode())
+        .write4B(value.length)
+        .writeNB(value)
         .array();
 
     ErlangBinary binary = ErlangTerm.newInstance(wrappedBuffer(bytes));
@@ -85,10 +85,10 @@ class ErlangBinaryTest {
   void toBytes () {
     val value = new byte[] { 1, 2, 3 };
 
-    val expected = Bytes.allocate()
-        .put1B(BINARY.getCode())
-        .put4B(value.length)
-        .put(value)
+    val expected = Bytes.resizableArray()
+        .write1B(BINARY.getCode())
+        .write4B(value.length)
+        .writeNB(value)
         .array();
 
     assertThat(Erlang.binary(value).toBytes())
@@ -108,10 +108,10 @@ class ErlangBinaryTest {
   void decode () throws Exception {
     val value = new byte[] { 1, 2, 3 };
 
-    val bytes = Bytes.allocate()
-        .put1B(BINARY.getCode())
-        .put4B(value.length)
-        .put(value)
+    val bytes = Bytes.resizableArray()
+        .write1B(BINARY.getCode())
+        .write4B(value.length)
+        .writeNB(value)
         .array();
 
     try (val input = new OtpInputStream(bytes)) {

@@ -118,7 +118,7 @@ class ModuleConnection implements Closeable {
 
   void add (@NonNull CompletableFuture<Connection> future) {
     future.thenAccept(it -> {
-      RemoteNode remote = it.getRemote();
+      RemoteNode remote = it.getDestination();
       log.debug("Connection was added for\n  {}", remote);
       cache.putIfAbsent(remote, completedFuture(it));
     });

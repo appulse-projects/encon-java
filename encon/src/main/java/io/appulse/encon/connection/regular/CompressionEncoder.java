@@ -77,9 +77,9 @@ public class CompressionEncoder extends ChannelOutboundHandlerAdapter {
     }
     deflater.end();
 
-    return Bytes.allocate()
-        .put1B(COMPRESSED.getCode())
-        .put4B(bytes.length)
+    return Bytes.resizableArray()
+        .write1B(COMPRESSED.getCode())
+        .write4B(bytes.length)
         .put(byteArrayOutputStream.toByteArray())
         .array();
   }

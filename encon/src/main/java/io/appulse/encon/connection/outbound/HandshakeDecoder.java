@@ -14,19 +14,17 @@
  * limitations under the License.
  */
 
-package io.appulse.encon.connection.handshake;
+package io.appulse.encon.connection.outbound;
 
-import static io.appulse.encon.connection.handshake.message.MessageType.CHALLENGE;
-import static io.appulse.encon.connection.handshake.message.MessageType.NAME;
-import static io.appulse.encon.connection.handshake.message.MessageType.UNDEFINED;
+import static io.appulse.encon.connection.handshake2.HandshakeMessage.Tag.NAME_REQUEST;
+import static io.appulse.encon.connection.handshake2.HandshakeMessage.Tag.UNKNOWN;
 import static lombok.AccessLevel.PRIVATE;
 
 import java.util.List;
 import java.util.stream.Stream;
 
-import io.appulse.encon.connection.handshake.exception.HandshakeException;
-import io.appulse.encon.connection.handshake.message.Message;
-import io.appulse.encon.connection.handshake.message.MessageType;
+import io.appulse.encon.connection.handshake2.HandshakeException;
+import io.appulse.encon.connection.handshake2.HandshakeMessage;
 
 import io.netty.buffer.ByteBuf;
 import io.netty.channel.ChannelHandler.Sharable;
@@ -39,16 +37,14 @@ import lombok.val;
 
 /**
  *
- * @since 1.0.0
+ * @since 2.0.0
  * @author Artem Labazin
  */
 @Slf4j
 @Sharable
 @RequiredArgsConstructor
 @FieldDefaults(level = PRIVATE, makeFinal = true)
-public class HandshakeDecoder extends MessageToMessageDecoder<ByteBuf> {
-
-  boolean isClient;
+class HandshakeDecoder extends MessageToMessageDecoder<ByteBuf> {
 
   @Override
   public void exceptionCaught (ChannelHandlerContext context, Throwable cause) throws Exception {
@@ -61,17 +57,16 @@ public class HandshakeDecoder extends MessageToMessageDecoder<ByteBuf> {
 
   @Override
   protected void decode (ChannelHandlerContext context, ByteBuf buffer, List<Object> out) throws Exception {
-    log.debug("decoding");
     buffer.readShort(); // skip size
 
-    val tag = buffer.getByte(buffer.readerIndex());
-    val message = Stream.of(MessageType.values())
-        .filter(it -> it != UNDEFINED)
-        .filter(it -> (isClient && it != NAME) || (!isClient && it != CHALLENGE))
-        .filter(it -> it.getTag() == tag)
-        .findFirst()
-        .map(it -> Message.parse(buffer, it.getType()))
-        .orElseThrow(() -> new HandshakeException("Unknown income message with tag " + tag));
+    val tagByte = buffer.readByte();
+    val message = Stream.of(HandshakeMessage.Tag.values())
+        .filter(it -> it.getCode() == tagByte)
+        .filter(it -> it != NAME_REQUEST)
+        .filter(it -> it != UNKNOWN)
+        .findAny()
+        .map(it -> HandshakeMessage.from(buffer, it))
+        .orElseThrow(() -> new HandshakeException("Unknown income message with tag '" + tagByte + '\''));;
 
     out.add(message);
   }

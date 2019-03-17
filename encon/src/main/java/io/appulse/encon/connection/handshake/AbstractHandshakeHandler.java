@@ -80,7 +80,8 @@ public abstract class AbstractHandshakeHandler extends ChannelInboundHandlerAdap
     AbstractHandshakeChannelInitializer.cleanup(pipeline);
     val handler = RegularPipeline.setup(pipeline, node, remote, channelCloseAction);
 
-    future.complete(new Connection(remote, handler));
+    // TODO: use new connection
+    // future.complete(new Connection(remote, handler));
 
     log.debug("Connection was added to pool for\n  {}\n", remote);
   }

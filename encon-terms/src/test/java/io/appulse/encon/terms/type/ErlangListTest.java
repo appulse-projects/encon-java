@@ -53,11 +53,11 @@ class ErlangListTest {
   @DisplayName("create new instance from bytes")
   void newInstance () {
     val value = new ErlangNil();
-    val bytes = Bytes.allocate()
-        .put1B(LIST.getCode())
-        .put4B(1)
-        .put(value.toBytes())
-        .put(new ErlangNil().toBytes())
+    val bytes = Bytes.resizableArray()
+        .write1B(LIST.getCode())
+        .write4B(1)
+        .writeNB(value.toBytes())
+        .writeNB(new ErlangNil().toBytes())
         .array();
 
     ErlangList list = ErlangTerm.newInstance(wrappedBuffer(bytes));
@@ -86,11 +86,11 @@ class ErlangListTest {
   @DisplayName("convert instance to byte array")
   void toBytes () {
     val value = new ErlangNil();
-    val expected = Bytes.allocate()
-        .put1B(LIST.getCode())
-        .put4B(1)
-        .put(value.toBytes())
-        .put(new ErlangNil().toBytes())
+    val expected = Bytes.resizableArray()
+        .write1B(LIST.getCode())
+        .write4B(1)
+        .writeNB(value.toBytes())
+        .writeNB(new ErlangNil().toBytes())
         .array();
 
     assertThat(new ErlangList(value).toBytes())

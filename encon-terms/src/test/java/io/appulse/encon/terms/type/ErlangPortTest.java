@@ -55,11 +55,11 @@ class ErlangPortTest {
     val id = 500;
     val creation = 42;
 
-    val bytes = Bytes.allocate()
-        .put1B(PORT.getCode())
-        .put(new ErlangAtom(node).toBytes())
-        .put4B(id & 0xFFFFFFF)
-        .put1B(creation & 0x3)
+    val bytes = Bytes.resizableArray()
+        .write1B(PORT.getCode())
+        .writeNB(new ErlangAtom(node).toBytes())
+        .write4B(id & 0xFFFFFFF)
+        .write1B(creation & 0x3)
         .array();
 
     ErlangPort port = ErlangTerm.newInstance(wrappedBuffer(bytes));
@@ -84,11 +84,11 @@ class ErlangPortTest {
     val id = 500;
     val creation = 42;
 
-    val expected = Bytes.allocate()
-        .put1B(PORT.getCode())
-        .put(new ErlangAtom(node).toBytes())
-        .put4B(id & 0xFFFFFFF)
-        .put1B(creation & 0x3)
+    val expected = Bytes.resizableArray()
+        .write1B(PORT.getCode())
+        .writeNB(new ErlangAtom(node).toBytes())
+        .write4B(id & 0xFFFFFFF)
+        .write1B(creation & 0x3)
         .array();
 
     assertThat(ErlangPort.builder()
@@ -127,11 +127,11 @@ class ErlangPortTest {
   @Test
   @DisplayName("decode instance from byte array and compare with jinterface result")
   void decode () throws Exception {
-    byte[] bytes1 = Bytes.allocate()
-        .put1B(PORT.getCode())
-        .put(new ErlangAtom("popa@localhost").toBytes())
-        .put4B(Integer.MAX_VALUE)
-        .put1B(Integer.MAX_VALUE)
+    byte[] bytes1 = Bytes.resizableArray()
+        .write1B(PORT.getCode())
+        .writeNB(new ErlangAtom("popa@localhost").toBytes())
+        .write4B(Integer.MAX_VALUE)
+        .write1B(Integer.MAX_VALUE)
         .array();
 
     try (val input = new OtpInputStream(bytes1)) {
@@ -148,11 +148,11 @@ class ErlangPortTest {
           .isEqualTo(otpPid.creation());
     }
 
-    byte[] bytes2 = Bytes.allocate()
-        .put1B(NEW_PORT.getCode())
-        .put(new ErlangAtom("popa@localhost").toBytes())
-        .put4B(Integer.MAX_VALUE)
-        .put4B(Integer.MAX_VALUE)
+    byte[] bytes2 = Bytes.resizableArray()
+        .write1B(NEW_PORT.getCode())
+        .writeNB(new ErlangAtom("popa@localhost").toBytes())
+        .write4B(Integer.MAX_VALUE)
+        .write4B(Integer.MAX_VALUE)
         .array();
 
     try (val input = new OtpInputStream(bytes2)) {
