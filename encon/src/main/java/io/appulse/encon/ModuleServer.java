@@ -84,7 +84,7 @@ class ModuleServer implements Closeable {
             .consumer(moduleConnection::add)
             .channelCloseAction(remote -> {
               log.debug("Closing connection to {}", remote);
-              node.moduleLookup.remove(remote);
+              node.moduleLookup.removeFromCache(remote);
               node.moduleConnection.remove(remote);
             })
             .build())

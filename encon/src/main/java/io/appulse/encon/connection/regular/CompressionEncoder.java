@@ -80,7 +80,7 @@ public class CompressionEncoder extends ChannelOutboundHandlerAdapter {
     return Bytes.resizableArray()
         .write1B(COMPRESSED.getCode())
         .write4B(bytes.length)
-        .put(byteArrayOutputStream.toByteArray())
+        .writeNB(byteArrayOutputStream.toByteArray())
         .array();
   }
 }

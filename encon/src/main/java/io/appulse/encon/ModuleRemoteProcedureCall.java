@@ -20,12 +20,14 @@ import static io.appulse.encon.terms.Erlang.NIL;
 import static io.appulse.encon.terms.Erlang.atom;
 import static io.appulse.encon.terms.Erlang.list;
 import static io.appulse.encon.terms.Erlang.tuple;
+import static io.appulse.utils.threads.FutureUtils.completedExceptionally;
 import static java.util.Optional.ofNullable;
 import static java.util.concurrent.TimeUnit.NANOSECONDS;
 import static lombok.AccessLevel.PACKAGE;
 import static lombok.AccessLevel.PRIVATE;
 
 import java.util.Optional;
+import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicReference;
 
@@ -36,9 +38,9 @@ import io.appulse.encon.exception.NoSuchRemoteNodeException;
 import io.appulse.encon.mailbox.Mailbox;
 import io.appulse.encon.terms.ErlangTerm;
 import io.appulse.encon.terms.type.ErlangAtom;
-
 import lombok.AllArgsConstructor;
 import lombok.NonNull;
+import lombok.RequiredArgsConstructor;
 import lombok.experimental.FieldDefaults;
 import lombok.val;
 
@@ -84,7 +86,11 @@ public class ModuleRemoteProcedureCall {
    *
    * @return response holder, instance of {@link RpcResponse}.
    */
-  public RpcResponse call (@NonNull String remoteNodeName, @NonNull String module, @NonNull String function, ErlangTerm ...args) {
+  public CompletableFuture<RpcResponse> call (@NonNull String remoteNodeName,
+                                              @NonNull String module,
+                                              @NonNull String function,
+                                              ErlangTerm ...args
+  ) {
     return call(remoteNodeName, atom(module), atom(function), args);
   }
 
@@ -118,7 +124,11 @@ public class ModuleRemoteProcedureCall {
    *
    * @return response holder, instance of {@link RpcResponse}.
    */
-  public RpcResponse call (@NonNull NodeDescriptor descriptor, @NonNull String module, @NonNull String function, ErlangTerm ...args) {
+  public CompletableFuture<RpcResponse> call (@NonNull NodeDescriptor descriptor,
+                                              @NonNull String module,
+                                              @NonNull String function,
+                                              ErlangTerm ...args
+  ) {
     return call(descriptor, atom(module), atom(function), args);
   }
 
@@ -152,7 +162,11 @@ public class ModuleRemoteProcedureCall {
    *
    * @return response holder, instance of {@link RpcResponse}.
    */
-  public RpcResponse call (@NonNull RemoteNode remote, @NonNull String module, @NonNull String function, ErlangTerm ...args) {
+  public CompletableFuture<RpcResponse> call (@NonNull RemoteNode remote,
+                                              @NonNull String module,
+                                              @NonNull String function,
+                                              ErlangTerm ...args
+  ) {
     return call(remote, atom(module), atom(function), args);
   }
 
@@ -186,7 +200,11 @@ public class ModuleRemoteProcedureCall {
    *
    * @return response holder, instance of {@link RpcResponse}.
    */
-  public RpcResponse call (@NonNull String remoteNodeName, @NonNull ErlangAtom module, @NonNull ErlangAtom function, ErlangTerm ...args) {
+  public CompletableFuture<RpcResponse> call (@NonNull String remoteNodeName,
+                                              @NonNull ErlangAtom module,
+                                              @NonNull ErlangAtom function,
+                                              ErlangTerm ...args
+  ) {
     val descriptor = NodeDescriptor.from(remoteNodeName);
     return call(descriptor, module, function, args);
   }
@@ -221,16 +239,16 @@ public class ModuleRemoteProcedureCall {
    *
    * @return response holder, instance of {@link RpcResponse}.
    */
-  public RpcResponse call (@NonNull NodeDescriptor descriptor,
-                           @NonNull ErlangAtom module,
-                           @NonNull ErlangAtom function,
-                           ErlangTerm ...args
+  public CompletableFuture<RpcResponse> call (@NonNull NodeDescriptor descriptor,
+                                              @NonNull ErlangAtom module,
+                                              @NonNull ErlangAtom function,
+                                              ErlangTerm ...args
   ) {
-    RemoteNode remote = node.lookup(descriptor);
-    if (remote == null) {
-      throw new NoSuchRemoteNodeException(descriptor);
-    }
-    return call(remote, module, function, args);
+    return node.lookup(descriptor)
+        .thenComposeAsync(response -> response.isPresent()
+            ? call(response.get(), module, function, args)
+            : completedExceptionally(new NoSuchRemoteNodeException(descriptor))
+        );
   }
 
   /**
@@ -263,8 +281,12 @@ public class ModuleRemoteProcedureCall {
    *
    * @return response holder, instance of {@link RpcResponse}.
    */
-  @SuppressWarnings("PMD.AccessorClassGeneration")
-  public RpcResponse call (@NonNull RemoteNode remote, @NonNull ErlangAtom module, @NonNull ErlangAtom function, ErlangTerm ...args) {
+  // @SuppressWarnings("PMD.AccessorClassGeneration")
+  public CompletableFuture<RpcResponse> call (@NonNull RemoteNode remote,
+                                              @NonNull ErlangAtom module,
+                                              @NonNull ErlangAtom function,
+                                              ErlangTerm ...args
+  ) {
     ErlangTerm argumentsList;
     if (args == null || args.length == 0) {
       argumentsList = NIL;
@@ -274,33 +296,31 @@ public class ModuleRemoteProcedureCall {
       argumentsList = list(args);
     }
 
-    Mailbox mailbox = node.mailbox().build();
-    mailbox.send(remote, "rex", tuple(
-        mailbox.getPid(),
-        tuple(
-            atom("call"),
-            module,
-            function,
-            argumentsList,
-            atom("user")
-        )
-    ));
-    return new RpcResponse(mailbox);
+    val mailbox = node.mailbox().build();
+    return mailbox.send(remote, "rex", tuple(
+            mailbox.getPid(),
+            tuple(
+                atom("call"),
+                module,
+                function,
+                argumentsList,
+                atom("user")
+            )
+        ))
+        .thenApplyAsync(v -> new RpcResponse(mailbox));
   }
 
   /**
    * Remote procedure call response holder.
    */
-  @FieldDefaults(level = PRIVATE)
+  @RequiredArgsConstructor
+  @FieldDefaults(level = PRIVATE, makeFinal = true)
   public static final class RpcResponse {
 
+    @NonNull
     Mailbox mailbox;
 
-    final AtomicReference<ErlangTerm> response = new AtomicReference<>(null);
-
-    private RpcResponse (Mailbox mailbox) {
-      this.mailbox = mailbox;
-    }
+    AtomicReference<ErlangTerm> response = new AtomicReference<>(null);
 
     /**
      * Checks if a response was coming or not.
@@ -308,7 +328,7 @@ public class ModuleRemoteProcedureCall {
      * @return {@code true} if this holder has a response, {@code false} otherwise.
      */
     public boolean hasResponse () {
-      return response.get() != null || (mailbox != null && mailbox.size() == 0);
+      return response.get() != null || mailbox.size() == 0;
     }
 
     /**
@@ -391,13 +411,11 @@ public class ModuleRemoteProcedureCall {
           .orElse(null);
     }
 
-    @SuppressWarnings("PMD.NullAssignment")
     private ErlangTerm process (ErlangTerm term) {
       if (!response.compareAndSet(null, term)) {
         return null;
       }
       mailbox.close();
-      mailbox = null;
       return term;
     }
   }

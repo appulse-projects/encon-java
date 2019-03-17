@@ -124,7 +124,7 @@ class ModuleClient implements Closeable {
             .remote(remote)
             .channelCloseAction(remoteNode -> {
               log.debug("Closing connection to {}", remoteNode);
-              node.moduleLookup.remove(remoteNode);
+              node.moduleLookup.removeFromCache(remoteNode);
               node.moduleConnection.remove(remoteNode);
             })
             .build()

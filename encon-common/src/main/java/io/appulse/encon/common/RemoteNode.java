@@ -16,6 +16,10 @@
 
 package io.appulse.encon.common;
 
+import java.io.IOException;
+import java.net.Socket;
+import java.util.Optional;
+
 import io.appulse.epmd.java.core.model.NodeType;
 import io.appulse.epmd.java.core.model.Protocol;
 import io.appulse.epmd.java.core.model.Version;
@@ -25,6 +29,7 @@ import lombok.EqualsAndHashCode;
 import lombok.NonNull;
 import lombok.ToString;
 import lombok.Value;
+import lombok.val;
 
 /**
  * Representation of remote Erlang node.
@@ -61,4 +66,19 @@ public class RemoteNode {
   Version low;
 
   int port;
+
+  @NonNull
+  Optional<byte[]> extra;
+
+  public boolean isAlive () {
+    try (val socket = new Socket(descriptor.getAddress(), port)) {
+      return !socket.isClosed();
+    } catch (IOException ex) {
+      return false;
+    }
+  }
+
+  public boolean isNotAlive () {
+    return !isAlive();
+  }
 }

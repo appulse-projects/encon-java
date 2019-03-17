@@ -19,6 +19,12 @@ package io.appulse.encon;
 import static io.appulse.encon.terms.Erlang.atom;
 import static io.appulse.encon.terms.Erlang.tuple;
 import static lombok.AccessLevel.PRIVATE;
+import static java.util.concurrent.TimeUnit.SECONDS;
+import static java.util.concurrent.CompletableFuture.completedFuture;
+import static java.lang.Boolean.TRUE;
+import static java.lang.Boolean.FALSE;
+
+import java.util.concurrent.CompletableFuture;
 
 import io.appulse.encon.common.NodeDescriptor;
 import io.appulse.encon.common.RemoteNode;
@@ -43,23 +49,27 @@ class ModulePing {
 
   Node node;
 
-  boolean ping (@NonNull String nodeName) {
+  CompletableFuture<Boolean> ping (@NonNull String nodeName) {
     log.debug("Ping node name: {}", nodeName);
     val remoteDescriptor = NodeDescriptor.from(nodeName);
     return ping(remoteDescriptor);
   }
 
-  boolean ping (@NonNull NodeDescriptor remoteDescriptor) {
+  CompletableFuture<Boolean> ping (@NonNull NodeDescriptor remoteDescriptor) {
     log.debug("Ping descriptor: {}", remoteDescriptor);
     if (node.getDescriptor().equals(remoteDescriptor)) {
-      return true;
+      return completedFuture(TRUE);
     }
-    RemoteNode remote = node.lookup(remoteDescriptor);
-    log.debug("Lookup result is present: {}", remote != null);
-    return remote != null && ping(remote);
+    return node.lookup(remoteDescriptor)
+        .thenComposeAsync(response -> {
+          log.debug("Lookup result is present: {}", response.isPresent());
+          return response.isPresent()
+                 ? ping(response.get())
+                 : completedFuture(FALSE);
+        });
   }
 
-  boolean ping (@NonNull RemoteNode remote) {
+  CompletableFuture<Boolean> ping (@NonNull RemoteNode remote) {
     log.debug("Ping remote node: {}", remote);
     Connection connection = null;
     try {
@@ -69,7 +79,7 @@ class ModulePing {
     }
     if (connection == null) {
       log.debug("Remote node {} is not available", remote);
-      return false;
+      return completedFuture(FALSE);
     }
     log.debug("Remote node {} is available", remote);
 
@@ -89,12 +99,13 @@ class ModulePing {
     ));
 
     try {
-      mailbox.receive();
+      // TODO: why sync?
+      mailbox.receive(2, SECONDS);
       mailbox.close();
       log.debug("Returning from ping method");
-      return true;
+      return completedFuture(TRUE);
     } catch (Exception ex) {
-      return false;
+      return completedFuture(FALSE);
     }
   }
 }

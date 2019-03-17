@@ -17,10 +17,13 @@
 package io.appulse.encon;
 
 import static lombok.AccessLevel.PRIVATE;
+import static java.util.Optional.of;
+import static java.util.concurrent.CompletableFuture.completedFuture;
 
 import java.util.Map;
+import java.util.Optional;
+import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.ConcurrentHashMap;
-import java.util.function.Function;
 
 import io.appulse.encon.common.NodeDescriptor;
 import io.appulse.encon.common.RemoteNode;
@@ -46,46 +49,53 @@ class ModuleLookup {
 
   Map<NodeDescriptor, RemoteNode> cache;
 
-  Function<NodeDescriptor, RemoteNode> compute;
-
   ModuleLookup (@NonNull EpmdClient epmd) {
     this.epmd = epmd;
-
     cache = new ConcurrentHashMap<>();
-    compute = descriptor -> {
-      return this.epmd
-          .lookup(descriptor.getNodeName(), descriptor.getAddress())
-          .filter(NodeInfo::isOk)
-          .map(it -> RemoteNode.builder()
-              .descriptor(descriptor)
-              .protocol(it.getProtocol().get())
-              .type(it.getType().get())
-              .high(it.getHigh().get())
-              .low(it.getLow().get())
-              .port(it.getPort().get())
-              .build()
-          )
-          .orElse(null);
-    };
   }
 
-  RemoteNode lookup (@NonNull String node) {
+  CompletableFuture<Optional<RemoteNode>> lookup (@NonNull String node) {
     val descriptor = NodeDescriptor.from(node);
     return lookup(descriptor);
   }
 
-  RemoteNode lookup (@NonNull ErlangPid pid) {
+  CompletableFuture<Optional<RemoteNode>> lookup (@NonNull ErlangPid pid) {
     val descriptor = pid.getDescriptor();
     return lookup(descriptor);
   }
 
-  RemoteNode lookup (@NonNull NodeDescriptor descriptor) {
-    return cache.computeIfAbsent(descriptor, compute);
+  CompletableFuture<Optional<RemoteNode>> lookup (@NonNull NodeDescriptor descriptor) {
+    val cached = cache.get(descriptor);
+    return cached == null || cached.isNotAlive()
+           ? findNode(descriptor)
+           : completedFuture(of(cached));
   }
 
-  void remove (@NonNull RemoteNode remoteNode) {
+  void removeFromCache (@NonNull RemoteNode remoteNode) {
     val remote = cache.remove(remoteNode.getDescriptor());
     log.debug("Clear lookup cache for {} (existed: {})",
               remoteNode, remote != null);
+  }
+
+  private CompletableFuture<Optional<RemoteNode>> findNode (NodeDescriptor descriptor) {
+    return epmd.lookup(descriptor.getNodeName(), descriptor.getAddress())
+        .thenApply(nodeInfo -> nodeInfo
+            .filter(NodeInfo::isOk)
+            .map(it -> RemoteNode.builder()
+                .descriptor(descriptor)
+                .protocol(it.getProtocol().get())
+                .type(it.getType().get())
+                .high(it.getHigh().get())
+                .low(it.getLow().get())
+                .port(it.getPort().get())
+                .extra(it.getExtra())
+                .build()
+            )
+            .filter(RemoteNode::isAlive)
+        )
+        .thenApply(optional -> {
+          optional.ifPresent(remoteNode -> cache.put(descriptor, remoteNode));
+          return optional;
+        });
   }
 }

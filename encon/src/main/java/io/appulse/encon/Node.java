@@ -17,9 +17,11 @@
 package io.appulse.encon;
 
 import static lombok.AccessLevel.PACKAGE;
+import static java.util.concurrent.TimeUnit.SECONDS;
 
 import java.io.Closeable;
 import java.util.Map;
+import java.util.Optional;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.TimeUnit;
 
@@ -38,6 +40,7 @@ import io.appulse.epmd.java.core.model.request.Registration;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.NonNull;
+import lombok.SneakyThrows;
 import lombok.ToString;
 import lombok.experimental.FieldDefaults;
 import lombok.extern.slf4j.Slf4j;
@@ -60,6 +63,7 @@ public final class Node implements Closeable {
 
   //  static Node newInstance (@NonNull String name, @NonNull Config config) {
   //    NodeConfig nodeConfig = config.get(NodeConfig.class, NodeConfig.DEFAULT);
+  @SneakyThrows
   static Node newInstance (@NonNull String name, @NonNull NodeConfig nodeConfig) {
     NodeConfig configCopy = new NodeConfig(nodeConfig);
 
@@ -75,15 +79,22 @@ public final class Node implements Closeable {
         .build();
 
     EpmdClient epmd = new EpmdClient(configCopy.getEpmdPort());
-    int creation = epmd.register(Registration.builder()
-        .name(descriptor.getNodeName())
-        .port(configCopy.getServer().getOrFindAndSetPort())
-        .type(meta.getType())
-        .protocol(meta.getProtocol())
-        .high(meta.getHigh())
-        .low(meta.getLow())
-        .build()
-    );
+    int creation = epmd
+        .register(Registration.builder()
+            .name(descriptor.getNodeName())
+            .port(configCopy.getServer().getOrFindAndSetPort())
+            .type(meta.getType())
+            .protocol(meta.getProtocol())
+            .high(meta.getHigh())
+            .low(meta.getLow())
+            .build())
+        .thenApply(response -> {
+          if (!response.isOk()) {
+            throw new IllegalStateException("Couldn't register the node " + name);
+          }
+          return response.getCreation();
+        })
+        .get(2, SECONDS);
     log.debug("Node '{}' was registered", descriptor.getFullName());
 
     Node node = Node.builder()
@@ -186,7 +197,7 @@ public final class Node implements Closeable {
    *
    * @return {@link RemoteNode} instance
    */
-  public RemoteNode lookup (String name) {
+  public CompletableFuture<Optional<RemoteNode>> lookup (String name) {
     return moduleLookup.lookup(name);
   }
 
@@ -197,7 +208,7 @@ public final class Node implements Closeable {
    *
    * @return {@link RemoteNode} instance
    */
-  public RemoteNode lookup (ErlangPid pid) {
+  public CompletableFuture<Optional<RemoteNode>> lookup (ErlangPid pid) {
     return moduleLookup.lookup(pid);
   }
 
@@ -208,7 +219,7 @@ public final class Node implements Closeable {
    *
    * @return {@link RemoteNode} instance
    */
-  public RemoteNode lookup (NodeDescriptor nodeDescriptor) {
+  public CompletableFuture<Optional<RemoteNode>> lookup (NodeDescriptor nodeDescriptor) {
     return moduleLookup.lookup(nodeDescriptor);
   }
 
@@ -219,7 +230,7 @@ public final class Node implements Closeable {
    *
    * @return future container with successful/unsuccessful result
    */
-  public boolean ping (String name) {
+  public CompletableFuture<Boolean> ping (String name) {
     return modulePing.ping(name);
   }
 
@@ -230,7 +241,7 @@ public final class Node implements Closeable {
    *
    * @return future container with successful/unsuccessful result
    */
-  public boolean ping (NodeDescriptor nodeDescriptor) {
+  public CompletableFuture<Boolean> ping (NodeDescriptor nodeDescriptor) {
     return modulePing.ping(nodeDescriptor);
   }
 
@@ -241,7 +252,7 @@ public final class Node implements Closeable {
    *
    * @return future container with successful/unsuccessful result
    */
-  public boolean ping (RemoteNode remote) {
+  public CompletableFuture<Boolean> ping (RemoteNode remote) {
     return modulePing.ping(remote);
   }
 
