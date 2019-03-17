@@ -45,7 +45,7 @@ import lombok.experimental.FieldDefaults;
 import lombok.val;
 
 /**
- * Module with set of methods for remote procedure calls.
+ * The module with set of methods for remote procedure calls.
  *
  * @since 2.0.0
  * @author Artem Labazin
@@ -244,7 +244,8 @@ public class ModuleRemoteProcedureCall {
                                               @NonNull ErlangAtom function,
                                               ErlangTerm ...args
   ) {
-    return node.lookup(descriptor)
+    return node.discovery()
+        .lookup(descriptor)
         .thenComposeAsync(response -> response.isPresent()
             ? call(response.get(), module, function, args)
             : completedExceptionally(new NoSuchRemoteNodeException(descriptor))
@@ -296,7 +297,7 @@ public class ModuleRemoteProcedureCall {
       argumentsList = list(args);
     }
 
-    val mailbox = node.mailbox().build();
+    val mailbox = node.mailboxes().create();
     return mailbox.send(remote, "rex", tuple(
             mailbox.getPid(),
             tuple(

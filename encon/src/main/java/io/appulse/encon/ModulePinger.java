@@ -18,6 +18,7 @@ package io.appulse.encon;
 
 import static io.appulse.encon.terms.Erlang.atom;
 import static io.appulse.encon.terms.Erlang.tuple;
+import static lombok.AccessLevel.PACKAGE;
 import static lombok.AccessLevel.PRIVATE;
 import static java.util.concurrent.TimeUnit.SECONDS;
 import static java.util.concurrent.CompletableFuture.completedFuture;
@@ -38,29 +39,46 @@ import lombok.extern.slf4j.Slf4j;
 import lombok.val;
 
 /**
+ * The module with set of methods for pinging the remote nodes.
  *
  * @since 1.2.0
  * @author Artem Labazin
  */
 @Slf4j
-@RequiredArgsConstructor
+@RequiredArgsConstructor(access = PACKAGE)
 @FieldDefaults(level = PRIVATE, makeFinal = true)
-class ModulePing {
+public class ModulePinger {
 
+  @NonNull
   Node node;
 
-  CompletableFuture<Boolean> ping (@NonNull String nodeName) {
+  /**
+   * Pings remote node by its name.
+   *
+   * @param name short (like 'node-name') or full (like 'node-name@example.com') remote node's name
+   *
+   * @return future container with successful/unsuccessful result
+   */
+  public CompletableFuture<Boolean> ping (@NonNull String nodeName) {
     log.debug("Ping node name: {}", nodeName);
     val remoteDescriptor = NodeDescriptor.from(nodeName);
     return ping(remoteDescriptor);
   }
 
-  CompletableFuture<Boolean> ping (@NonNull NodeDescriptor remoteDescriptor) {
+  /**
+   * Pings remote node by its identifier.
+   *
+   * @param nodeDescriptor identifier of the remote node
+   *
+   * @return future container with successful/unsuccessful result
+   */
+  public CompletableFuture<Boolean> ping (@NonNull NodeDescriptor remoteDescriptor) {
     log.debug("Ping descriptor: {}", remoteDescriptor);
     if (node.getDescriptor().equals(remoteDescriptor)) {
       return completedFuture(TRUE);
     }
-    return node.lookup(remoteDescriptor)
+    return node.discovery()
+        .lookup(remoteDescriptor)
         .thenComposeAsync(response -> {
           log.debug("Lookup result is present: {}", response.isPresent());
           return response.isPresent()
@@ -69,11 +87,18 @@ class ModulePing {
         });
   }
 
-  CompletableFuture<Boolean> ping (@NonNull RemoteNode remote) {
+  /**
+   * Pings remote node by its remote node descriptor.
+   *
+   * @param remote remote node descriptor
+   *
+   * @return future container with successful/unsuccessful result
+   */
+  public CompletableFuture<Boolean> ping (@NonNull RemoteNode remote) {
     log.debug("Ping remote node: {}", remote);
     Connection connection = null;
     try {
-      connection = node.connect(remote);
+      connection = node.client().connect(remote);
     } catch (Exception ex) {
       log.error("Error during node {} connection", remote, ex);
     }
@@ -83,8 +108,7 @@ class ModulePing {
     }
     log.debug("Remote node {} is available", remote);
 
-    Mailbox mailbox = node.mailbox()
-        .build();
+    Mailbox mailbox = node.mailboxes().create();
 
     mailbox.send(remote, "net_kernel", tuple(
         atom("$gen_call"),

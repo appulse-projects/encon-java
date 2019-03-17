@@ -24,6 +24,7 @@ import static io.netty.channel.ChannelOption.SO_KEEPALIVE;
 import static io.netty.channel.ChannelOption.TCP_NODELAY;
 import static io.netty.channel.ChannelOption.WRITE_BUFFER_WATER_MARK;
 import static java.util.concurrent.TimeUnit.SECONDS;
+import static lombok.AccessLevel.PACKAGE;
 import static lombok.AccessLevel.PRIVATE;
 
 import java.io.Closeable;
@@ -49,9 +50,9 @@ import lombok.val;
  * @author Artem Labazin
  */
 @Slf4j
-@RequiredArgsConstructor
+@RequiredArgsConstructor(access = PACKAGE)
 @FieldDefaults(level = PRIVATE, makeFinal = true)
-class ModuleClient implements Closeable {
+public class ModuleClient implements Closeable {
 
   @NonNull
   Node node;
@@ -61,14 +62,14 @@ class ModuleClient implements Closeable {
 
   boolean shortNamedNode;
 
-  @Override
-  public void close () {
-    log.debug("Closing sever module");
-    moduleConnection.close();
-    log.debug("Server module closed");
-  }
-
-  CompletableFuture<Connection> connectAsync (@NonNull RemoteNode remote) {
+  /**
+   * Asynchronous connection method to {@link RemoteNode}.
+   *
+   * @param remote remote node descriptor
+   *
+   * @return connection future container
+   */
+  public CompletableFuture<Connection> connectAsync (@NonNull RemoteNode remote) {
     if (shortNamedNode) {
       if (remote.getDescriptor().isLongName()) {
         val msg = String.format("Short-named node '%s' couldn't be connected to long-named node '%s'",
@@ -87,21 +88,53 @@ class ModuleClient implements Closeable {
     return moduleConnection.compute(remote, this::createConnection);
   }
 
-  Connection connect (@NonNull RemoteNode remote) {
+  /**
+   * Synchronous connection method to {@link RemoteNode}.
+   *
+   * @param remote remote node descriptor
+   *
+   * @return new or cached connection
+   */
+  public Connection connect (@NonNull RemoteNode remote) {
     return connect(remote, 5, SECONDS);
   }
 
+  /**
+   * Synchronous connection method to {@link RemoteNode}.
+   *
+   * @param remote  remote node descriptor
+   *
+   * @param timeout amount of units which need to wait of connection
+   *
+   * @param unit    timeout unit, like {@link TimeUnit#SECONDS}
+   *
+   * @return new or cached connection
+   */
   @SneakyThrows
-  Connection connect (@NonNull RemoteNode remote, long timeout, @NonNull TimeUnit unit) {
+  public Connection connect (@NonNull RemoteNode remote, long timeout, @NonNull TimeUnit unit) {
     return connectAsync(remote).get(timeout, unit);
   }
 
-  boolean isAvailable (@NonNull RemoteNode remote) {
+  /**
+   * Checks if a remote node is available or not.
+   *
+   * @param remote remote node descriptor
+   *
+   * @return {@code true} if node is accessable and {@code false} otherwise
+   */
+  public boolean isAvailable (@NonNull RemoteNode remote) {
     try {
       return connect(remote) != null;
     } catch (Exception ex) {
       return false;
     }
+  }
+
+  @Override
+  public void close () {
+    log.debug("Closing sever module");
+    moduleConnection.close();
+    log.debug("Server module closed");
   }
 
   private CompletableFuture<Connection> createConnection (@NonNull RemoteNode remote) {
@@ -124,7 +157,7 @@ class ModuleClient implements Closeable {
             .remote(remote)
             .channelCloseAction(remoteNode -> {
               log.debug("Closing connection to {}", remoteNode);
-              node.moduleLookup.removeFromCache(remoteNode);
+              node.moduleDiscovery.removeFromCache(remoteNode);
               node.moduleConnection.remove(remoteNode);
             })
             .build()

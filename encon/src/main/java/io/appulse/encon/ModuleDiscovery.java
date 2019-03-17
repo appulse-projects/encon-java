@@ -16,6 +16,7 @@
 
 package io.appulse.encon;
 
+import static lombok.AccessLevel.PACKAGE;
 import static lombok.AccessLevel.PRIVATE;
 import static java.util.Optional.of;
 import static java.util.concurrent.CompletableFuture.completedFuture;
@@ -32,39 +33,59 @@ import io.appulse.epmd.java.client.EpmdClient;
 import io.appulse.epmd.java.core.model.response.NodeInfo;
 
 import lombok.NonNull;
+import lombok.RequiredArgsConstructor;
 import lombok.experimental.FieldDefaults;
 import lombok.extern.slf4j.Slf4j;
 import lombok.val;
 
 /**
+ * The module with set of methods for searching the remote nodes.
  *
  * @since 1.2.0
  * @author Artem Labazin
  */
 @Slf4j
+@RequiredArgsConstructor(access = PACKAGE)
 @FieldDefaults(level = PRIVATE, makeFinal = true)
-class ModuleLookup {
+public class ModuleDiscovery {
 
+  @NonNull
   EpmdClient epmd;
 
-  Map<NodeDescriptor, RemoteNode> cache;
+  Map<NodeDescriptor, RemoteNode> cache = new ConcurrentHashMap<>();
 
-  ModuleLookup (@NonNull EpmdClient epmd) {
-    this.epmd = epmd;
-    cache = new ConcurrentHashMap<>();
-  }
-
-  CompletableFuture<Optional<RemoteNode>> lookup (@NonNull String node) {
+  /**
+   * Searches remote node (locally or on remote machine) by its name.
+   *
+   * @param name short (like 'node-name') or full (like 'node-name@example.com') remote node's name
+   *
+   * @return {@link RemoteNode} instance
+   */
+  public CompletableFuture<Optional<RemoteNode>> lookup (@NonNull String node) {
     val descriptor = NodeDescriptor.from(node);
     return lookup(descriptor);
   }
 
-  CompletableFuture<Optional<RemoteNode>> lookup (@NonNull ErlangPid pid) {
+  /**
+   * Searches remote node (locally or on remote machine) by its {@link ErlangPid}.
+   *
+   * @param pid remote's node pid
+   *
+   * @return {@link RemoteNode} instance
+   */
+  public CompletableFuture<Optional<RemoteNode>> lookup (@NonNull ErlangPid pid) {
     val descriptor = pid.getDescriptor();
     return lookup(descriptor);
   }
 
-  CompletableFuture<Optional<RemoteNode>> lookup (@NonNull NodeDescriptor descriptor) {
+  /**
+   * Searches remote node (locally or on remote machine) by its identifier.
+   *
+   * @param nodeDescriptor identifier of the remote node
+   *
+   * @return {@link RemoteNode} instance
+   */
+  public CompletableFuture<Optional<RemoteNode>> lookup (@NonNull NodeDescriptor descriptor) {
     val cached = cache.get(descriptor);
     return cached == null || cached.isNotAlive()
            ? findNode(descriptor)

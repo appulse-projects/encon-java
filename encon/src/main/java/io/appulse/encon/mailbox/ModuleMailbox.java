@@ -37,6 +37,7 @@ import lombok.experimental.FieldDefaults;
 import lombok.extern.slf4j.Slf4j;
 
 /**
+ * The module with set of methods for working with mailboxes.
  *
  * @since 1.0.0
  * @author Artem Labazin
@@ -64,10 +65,44 @@ public final class ModuleMailbox implements Closeable {
     names.clear();
   }
 
-  public NewMailboxBuilder mailbox () {
+  /**
+   * Creates a new mailbox builder.
+   *
+   * @return the new mailbox builder
+   */
+  public NewMailboxBuilder builder () {
     return new NewMailboxBuilder();
   }
 
+  /**
+   * Creates a new mailbox without name.
+   *
+   * @return the new mailbox
+   */
+  public Mailbox create () {
+    return builder().build();
+  }
+
+  /**
+   * Creates a new mailbox with name.
+   *
+   * @param name the name of the new mailbox
+   *
+   * @return the new mailbox
+   */
+  public Mailbox create (String name) {
+    return builder().name(name).build();
+  }
+
+  /**
+   * Registers already created mailbox with specific name.
+   *
+   * @param mailbox mailbox instance for registration
+   *
+   * @param name    mailbox's registration name
+   *
+   * @return {@code true} if it was registered successfully, {@code false} otherwise
+   */
   public boolean register (@NonNull Mailbox mailbox, @NonNull String name) {
     if (names.containsKey(name)) {
       return false;
@@ -78,6 +113,12 @@ public final class ModuleMailbox implements Closeable {
     return true;
   }
 
+  /**
+   * Deregisters a mailbox by its name.
+   * The mailbox keeps running, but it becomes unavailable by name anymore.
+   *
+   * @param name mailbox's registration name
+   */
   public void deregister (@NonNull String name) {
     ofNullable(names.remove(name))
         .ifPresent(it -> {
@@ -86,14 +127,33 @@ public final class ModuleMailbox implements Closeable {
         });
   }
 
-  public Mailbox mailbox (@NonNull String name) {
+  /**
+   * Searches local mailbox by its name.
+   *
+   * @param name the name of searching mailbox
+   *
+   * @return {@link Mailbox} instance
+   */
+  public Mailbox get (@NonNull String name) {
     return names.get(name);
   }
 
-  public Mailbox mailbox (@NonNull ErlangPid pid) {
+  /**
+   * Searches local mailbox by its pid.
+   *
+   * @param pid the pid of searching mailbox
+   *
+   * @return {@link Mailbox} instance
+   */
+  public Mailbox get (@NonNull ErlangPid pid) {
     return pids.get(pid);
   }
 
+  /**
+   * Removes a mailbox and cleanup its resources.
+   *
+   * @param mailbox the mailbox for removing
+   */
   public void remove (@NonNull Mailbox mailbox) {
     log.debug("Removing mailbox {}", mailbox);
 
@@ -104,23 +164,38 @@ public final class ModuleMailbox implements Closeable {
         .ifPresent(names::remove);
   }
 
+  /**
+   * Removes a mailbox and cleanup its resources by its name.
+   *
+   * @param name mailbox's registration name
+   */
   public void remove (@NonNull String name) {
     log.debug("Removing mailbox by its name '{}'", name);
-    Mailbox mailbox = mailbox(name);
+    Mailbox mailbox = get(name);
     if (mailbox != null) {
       remove(mailbox);
     }
   }
 
+  /**
+   * Removes a mailbox and cleanup its resources by its pid.
+   *
+   * @param pid the pid of searching mailbox
+   */
   public void remove (@NonNull ErlangPid pid) {
     log.debug("Removing mailbox by its pid '{}'", pid);
-    Mailbox mailbox = mailbox(pid);
+    Mailbox mailbox = get(pid);
     if (mailbox != null) {
       remove(mailbox);
     }
   }
 
-  public Map<ErlangPid, Mailbox> mailboxes () {
+  /**
+   * Returns a map of all available node's mailboxes.
+   *
+   * @return a map of all available node's mailboxes
+   */
+  public Map<ErlangPid, Mailbox> all () {
     return pids;
   }
 
