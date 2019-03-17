@@ -20,12 +20,10 @@ import static lombok.AccessLevel.PACKAGE;
 import static java.util.concurrent.TimeUnit.SECONDS;
 
 import java.io.Closeable;
-import java.util.concurrent.CompletableFuture;
 
 import io.appulse.encon.NodesConfig.NodeConfig;
 import io.appulse.encon.common.Meta;
 import io.appulse.encon.common.NodeDescriptor;
-import io.appulse.encon.common.RemoteNode;
 import io.appulse.encon.mailbox.ModuleMailbox;
 import io.appulse.encon.terms.type.ErlangReference;
 import io.appulse.epmd.java.client.EpmdClient;
