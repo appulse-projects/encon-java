@@ -70,6 +70,11 @@ public class RemoteNode {
   @NonNull
   Optional<byte[]> extra;
 
+  /**
+   * Tells if the remote node is alive or not.
+   *
+   * @return {@code true} if the node is alive, {@code false} otherwise
+   */
   public boolean isAlive () {
     try (val socket = new Socket(descriptor.getAddress(), port)) {
       return !socket.isClosed();
@@ -78,6 +83,11 @@ public class RemoteNode {
     }
   }
 
+  /**
+   * Tells if the remote node is not alive or not.
+   *
+   * @return {@code true} if the node is NOT alive, {@code false} otherwise
+   */
   public boolean isNotAlive () {
     return !isAlive();
   }

@@ -29,8 +29,10 @@ import static java.util.concurrent.TimeUnit.SECONDS;
 import static org.assertj.core.api.Assertions.assertThat;
 import static java.util.Optional.ofNullable;
 
+import java.net.InetAddress;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
+import java.util.concurrent.Future;
 import java.util.concurrent.ThreadLocalRandom;
 
 import io.appulse.encon.ModuleRemoteProcedureCall.RpcResponse;
@@ -40,11 +42,9 @@ import io.appulse.encon.mailbox.Mailbox;
 import io.appulse.encon.mailbox.exception.ReceivedExitException;
 import io.appulse.encon.terms.ErlangTerm;
 import io.appulse.encon.terms.type.ErlangAtom;
-import io.appulse.epmd.java.server.cli.CommonOptions;
-import io.appulse.epmd.java.server.command.server.ServerCommandExecutor;
-import io.appulse.epmd.java.server.command.server.ServerCommandOptions;
+import io.appulse.epmd.java.server.SubcommandServer;
 import io.appulse.utils.SocketUtils;
-
+import lombok.SneakyThrows;
 import lombok.val;
 import lombok.extern.slf4j.Slf4j;
 import org.assertj.core.api.SoftAssertions;
@@ -69,23 +69,36 @@ class NodeTest {
 
   private static ExecutorService executor;
 
-  private static ServerCommandExecutor epmdServer;
+  private static Future<?> future;
 
   Node node;
 
   @BeforeAll
+  @SneakyThrows
   static void beforeAll () {
     if (SocketUtils.isPortAvailable(4369)) {
       executor = Executors.newSingleThreadExecutor();
-      epmdServer = new ServerCommandExecutor(new CommonOptions(), new ServerCommandOptions());
-      executor.execute(epmdServer::execute);
+      val server = SubcommandServer.builder()
+          .port(SocketUtils.findFreePort().orElseThrow(RuntimeException::new))
+          .ip(InetAddress.getByName("0.0.0.0"))
+          .build();
+
+      future = executor.submit(() -> {
+        try {
+          server.run();
+        } catch (Throwable ex) {
+          log.error("popa", ex);
+        }
+      });
+
+      SECONDS.sleep(1);
     }
   }
 
   @AfterAll
   static void afterAll () {
-    ofNullable(epmdServer)
-      .ifPresent(ServerCommandExecutor::close);
+    ofNullable(future)
+      .ifPresent(it -> it.cancel(true));
 
     ofNullable(executor)
       .ifPresent(ExecutorService::shutdown);
@@ -106,6 +119,7 @@ class NodeTest {
   }
 
   @Test
+  @SneakyThrows
   @DisplayName("node registration")
   void register () {
     val name = createName();
@@ -114,7 +128,10 @@ class NodeTest {
     assertThat(node.newReference())
         .isNotNull();
 
-    val nodeInfo = node.lookup(name);
+    val nodeInfo = node.discovery()
+        .lookup(name)
+        .get(2, SECONDS)
+        .orElse(null);
     assertThat(nodeInfo).isNotNull();
 
     SoftAssertions.assertSoftly(softly -> {
@@ -136,6 +153,7 @@ class NodeTest {
   }
 
   @Test
+  @SneakyThrows
   @DisplayName("sending ping message")
   void ping () throws Exception {
     val name1 = createName();
@@ -146,19 +164,19 @@ class NodeTest {
         .build()
     );
 
-    assertThat(node.ping(ELIXIR_ECHO_SERVER))
+    assertThat(node.pinger().ping(ELIXIR_ECHO_SERVER).get())
         .isTrue();
-    assertThat(node.ping(ELIXIR_ECHO_SERVER))
+    assertThat(node.pinger().ping(ELIXIR_ECHO_SERVER).get())
         .isTrue();
-    assertThat(node.ping(ELIXIR_ECHO_SERVER))
+    assertThat(node.pinger().ping(ELIXIR_ECHO_SERVER).get())
         .isTrue();
-    assertThat(node.ping(ELIXIR_ECHO_SERVER))
-        .isTrue();
-
-    assertThat(node.ping(name1))
+    assertThat(node.pinger().ping(ELIXIR_ECHO_SERVER).get())
         .isTrue();
 
-    assertThat(node.ping(name2))
+    assertThat(node.pinger().ping(name1).get())
+        .isTrue();
+
+    assertThat(node.pinger().ping(name2).get())
         .isFalse();
 
     try (val node2 = Nodes.singleNode(name2, NodeConfig.builder()
@@ -166,10 +184,10 @@ class NodeTest {
                                       .cookie("secret")
                                       .build())) {
 
-      assertThat(node.ping(name2))
+      assertThat(node.pinger().ping(name2).get())
           .isTrue();
 
-      assertThat(node2.ping(name1))
+      assertThat(node2.pinger().ping(name1).get())
           .isTrue();
     }
   }
@@ -182,7 +200,7 @@ class NodeTest {
         .shortName(true)
         .build()
     );
-    assertThat(node.mailbox("one")).isNull();
+    assertThat(node.mailboxes().get("one")).isNull();
   }
 
   @Test
@@ -193,18 +211,14 @@ class NodeTest {
 
     node = Nodes.singleNode(name1, true);
 
-    Mailbox mailbox1 = node.mailbox()
-        .name("popa1")
-        .build();
+    Mailbox mailbox1 = node.mailboxes().create("popa1");
 
     try (val node2 = Nodes.singleNode(name2, true)) {
 
       String text1 = "Hello world 1";
       String text2 = "Hello world 2";
 
-      Mailbox mailbox2 = node2.mailbox()
-          .name("popa2")
-          .build();
+      Mailbox mailbox2 = node2.mailboxes().create("popa2");
 
       mailbox2.send(name1, "popa1", string(text1));
 
@@ -239,13 +253,8 @@ class NodeTest {
     try (Node node2 = Nodes.singleNode(name2, config)) {
       log.info("Node #2 was created: {}", name2);
 
-      Mailbox mailbox1 = node.mailbox()
-          .name("mail1")
-          .build();
-
-      Mailbox mailbox2 = node2.mailbox()
-          .name("mail2")
-          .build();
+      Mailbox mailbox1 = node.mailboxes().create("mail1");
+      Mailbox mailbox2 = node2.mailboxes().create("mail2");
 
       val reference = node.newReference();
       log.info("Sending message from {} to {}", name1, ELIXIR_ECHO_SERVER);
@@ -292,8 +301,7 @@ class NodeTest {
                             .build()
     );
 
-    Mailbox mailbox = node.mailbox()
-        .build();
+    Mailbox mailbox = node.mailboxes().create();
 
     val reference = node.newReference();
     mailbox.send(ELIXIR_ECHO_SERVER, "echo_server", tuple(
@@ -327,8 +335,8 @@ class NodeTest {
     val name = createName();
     node = Nodes.singleNode(name, true);
 
-    Mailbox mailbox1 = node.mailbox().build();
-    Mailbox mailbox2 = node.mailbox().build();
+    Mailbox mailbox1 = node.mailboxes().create();
+    Mailbox mailbox2 = node.mailboxes().create();
 
     mailbox1.link(mailbox2.getPid());
     SECONDS.sleep(1);
@@ -356,8 +364,8 @@ class NodeTest {
     val name = createName();
     node = Nodes.singleNode(name, true);
 
-    Mailbox mailbox1 = node.mailbox().build();
-    Mailbox mailbox2 = node.mailbox().build();
+    Mailbox mailbox1 = node.mailboxes().create();
+    Mailbox mailbox2 = node.mailboxes().create();
 
     mailbox2.link(mailbox1.getPid());
     SECONDS.sleep(1);
@@ -388,7 +396,8 @@ class NodeTest {
         .build());
 
     RpcResponse response = node.rpc()
-        .call(ELIXIR_ECHO_SERVER, "erlang", "date");
+        .call(ELIXIR_ECHO_SERVER, "erlang", "date")
+        .get(2, SECONDS);
 
     ErlangTerm payload = response.getSync(5, SECONDS);
 

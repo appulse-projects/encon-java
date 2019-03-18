@@ -18,15 +18,19 @@ package io.appulse.encon;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static java.util.Optional.ofNullable;
+import static java.util.concurrent.TimeUnit.SECONDS;
 
+import java.net.InetAddress;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
+import java.util.concurrent.Future;
 
 import io.appulse.encon.config.Config;
-import io.appulse.epmd.java.server.cli.CommonOptions;
-import io.appulse.epmd.java.server.command.server.ServerCommandExecutor;
-import io.appulse.epmd.java.server.command.server.ServerCommandOptions;
+import io.appulse.epmd.java.server.SubcommandServer;
 import io.appulse.utils.SocketUtils;
+import lombok.SneakyThrows;
+import lombok.val;
+import lombok.extern.slf4j.Slf4j;
 import io.appulse.encon.NodesConfig.NodeConfig;
 
 import org.junit.jupiter.api.AfterAll;
@@ -41,26 +45,40 @@ import org.junit.jupiter.api.TestInfo;
  * @author Artem Labazin
  * @since 1.0.0
  */
+@Slf4j
 @DisplayName("Nodes cluster tests")
 class NodesTest {
 
   private static ExecutorService executor;
 
-  private static ServerCommandExecutor epmdServer;
+  private static Future<?> future;
 
   @BeforeAll
-  static void beforeClass () {
+  @SneakyThrows
+  static void beforeAll () {
     if (SocketUtils.isPortAvailable(4369)) {
       executor = Executors.newSingleThreadExecutor();
-      epmdServer = new ServerCommandExecutor(new CommonOptions(), new ServerCommandOptions());
-      executor.execute(epmdServer::execute);
+      val server = SubcommandServer.builder()
+          .port(SocketUtils.findFreePort().orElseThrow(RuntimeException::new))
+          .ip(InetAddress.getByName("0.0.0.0"))
+          .build();
+
+      future = executor.submit(() -> {
+        try {
+          server.run();
+        } catch (Throwable ex) {
+          log.error("popa", ex);
+        }
+      });
+
+      SECONDS.sleep(1);
     }
   }
 
   @AfterAll
-  static void afterClass () {
-    ofNullable(epmdServer)
-      .ifPresent(ServerCommandExecutor::close);
+  static void afterAll () {
+    ofNullable(future)
+      .ifPresent(it -> it.cancel(true));
 
     ofNullable(executor)
       .ifPresent(ExecutorService::shutdown);

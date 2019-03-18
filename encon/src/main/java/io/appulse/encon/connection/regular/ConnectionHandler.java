@@ -212,7 +212,8 @@ public final class ConnectionHandler extends ByteToMessageDecoder implements Clo
 
     val mailbox = findMailbox(controlMessage);
     if (mailbox == null) {
-      log.warn("There is no mailbox for message\n  {}\n  {}", message, node.mailboxes().keySet());
+      val mailboxes = node.mailboxes().all();
+      log.warn("There is no mailbox for message\n  {}\n  {}", message, mailboxes);
     } else {
       mailbox.deliver(message);
     }
@@ -253,33 +254,33 @@ public final class ConnectionHandler extends ByteToMessageDecoder implements Clo
   private Mailbox handle (@NonNull Send header) {
     val destination = header.getTo();
     return destination.isAtom()
-           ? node.mailbox(destination.asText())
-           : node.mailbox(destination.asPid());
+           ? node.mailboxes().get(destination.asText())
+           : node.mailboxes().get(destination.asPid());
   }
 
   private Mailbox handle (@NonNull SendToRegisteredProcess header) {
     val atom = header.getTo();
     val mailboxName = atom.asText();
-    return node.mailbox(mailboxName);
+    return node.mailboxes().get(mailboxName);
   }
 
   private Mailbox handle (@NonNull Link header) {
     val toPid = header.getTo();
-    return node.mailbox(toPid);
+    return node.mailboxes().get(toPid);
   }
 
   private Mailbox handle (@NonNull Unlink header) {
     val toPid = header.getTo();
-    return node.mailbox(toPid);
+    return node.mailboxes().get(toPid);
   }
 
   private Mailbox handle (@NonNull Exit header) {
     val toPid = header.getTo();
-    return node.mailbox(toPid);
+    return node.mailboxes().get(toPid);
   }
 
   private Mailbox handle (@NonNull Exit2 header) {
     val toPid = header.getTo();
-    return node.mailbox(toPid);
+    return node.mailboxes().get(toPid);
   }
 }

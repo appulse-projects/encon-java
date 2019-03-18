@@ -18,6 +18,7 @@ package io.appulse.encon.connection.handshake;
 
 import static io.appulse.encon.connection.handshake.message.StatusMessage.Status.OK;
 import static lombok.AccessLevel.PRIVATE;
+import static java.util.concurrent.TimeUnit.SECONDS;
 
 import java.util.Arrays;
 import java.util.concurrent.CompletableFuture;
@@ -38,6 +39,7 @@ import io.appulse.encon.connection.handshake.message.StatusMessage;
 import io.netty.channel.ChannelFuture;
 import io.netty.channel.ChannelHandlerContext;
 import lombok.Builder;
+import lombok.SneakyThrows;
 import lombok.experimental.FieldDefaults;
 import lombok.experimental.NonFinal;
 import lombok.extern.slf4j.Slf4j;
@@ -79,11 +81,12 @@ class HandshakeHandlerServer extends AbstractHandshakeHandler {
     }
   }
 
+  @SneakyThrows
   private void handle (NameMessage message, ChannelHandlerContext context) {
-    remote = node.lookup(message.getFullNodeName());
-    if (remote == null) {
-      throw new HandshakeException();
-    }
+    remote = node.discovery()
+        .lookup(message.getFullNodeName())
+        .get(2, SECONDS)
+        .orElseThrow(HandshakeException::new);
 
     val statusMessage = StatusMessage.builder()
         .status(OK)

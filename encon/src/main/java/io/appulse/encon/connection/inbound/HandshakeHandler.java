@@ -17,6 +17,7 @@
 package io.appulse.encon.connection.inbound;
 
 import static lombok.AccessLevel.PRIVATE;
+import static java.util.concurrent.TimeUnit.SECONDS;
 
 import java.util.Arrays;
 import java.util.concurrent.ThreadLocalRandom;
@@ -36,6 +37,7 @@ import io.netty.channel.ChannelInboundHandlerAdapter;
 import io.netty.util.internal.shaded.org.jctools.queues.MessagePassingQueue.Consumer;
 import lombok.Builder;
 import lombok.NonNull;
+import lombok.SneakyThrows;
 import lombok.val;
 import lombok.experimental.FieldDefaults;
 import lombok.extern.slf4j.Slf4j;
@@ -86,11 +88,12 @@ class HandshakeHandler extends ChannelInboundHandlerAdapter {
     }
   }
 
+  @SneakyThrows
   private void handle (HandshakeMessageNameRequest nameRequest, ChannelHandlerContext context) {
-    remote = node.lookup(nameRequest.getNodeName());
-    if (remote == null) {
-      throw new HandshakeException();
-    }
+    remote = node.discovery()
+        .lookup(nameRequest.getNodeName())
+        .get(2, SECONDS)
+        .orElseThrow(HandshakeException::new);
 
     log.debug("'{}', sending OK status", state);
     context.write(HandshakeMessageStatusResponse.OK);
