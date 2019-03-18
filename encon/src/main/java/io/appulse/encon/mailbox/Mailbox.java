@@ -17,8 +17,10 @@
 package io.appulse.encon.mailbox;
 
 import static io.appulse.encon.terms.Erlang.atom;
+import static io.appulse.utils.threads.FutureUtils.completedExceptionally;
 import static lombok.AccessLevel.PACKAGE;
 import static lombok.AccessLevel.PRIVATE;
+import static java.util.concurrent.CompletableFuture.completedFuture;
 
 import java.io.Closeable;
 import java.util.Set;
@@ -154,7 +156,8 @@ public class Mailbox implements Closeable {
   public CompletableFuture<Void> send (@NonNull ErlangPid to, @NonNull ErlangTerm body) {
     val message = Message.send(to, body);
     if (isLocal(to)) {
-      return getMailbox(to).thenAccept(it -> it.deliver(message));
+      getMailbox(to).deliver(message);
+      return completedFuture(null);
     } else {
       return getConnection(to).thenCompose(it -> it.send(message));
     }
@@ -169,7 +172,8 @@ public class Mailbox implements Closeable {
    */
   public CompletableFuture<Void> send (@NonNull String mailbox, @NonNull ErlangTerm body) {
     val message = Message.send(mailbox, body);
-    return getMailbox(mailbox).thenAccept(it -> it.deliver(message));
+    getMailbox(mailbox).deliver(message);
+    return completedFuture(null);
   }
 
   /**
@@ -196,13 +200,11 @@ public class Mailbox implements Closeable {
    * @param body message payload
    */
   public CompletableFuture<Void> send (@NonNull NodeDescriptor descriptor, @NonNull String mailbox, @NonNull ErlangTerm body) {
-    val remote = node.lookup(descriptor);
-    if (remote == null) {
-      val future = new CompletableFuture<Void>();
-      future.completeExceptionally(new NoSuchRemoteNodeException(descriptor));
-      return future;
-    }
-    return send(remote, mailbox, body);
+    return node.discovery().lookup(descriptor)
+        .thenComposeAsync(response -> response
+            .map(it -> send(it, mailbox, body))
+            .orElseGet(() -> completedExceptionally(new NoSuchRemoteNodeException(descriptor)))
+        );
   }
 
   /**
@@ -218,8 +220,9 @@ public class Mailbox implements Closeable {
     if (isLocal(remote)) {
       return send(mailbox, body);
     }
-    return node.connect(remote)
-        .send(Message.sendToRegisteredProcess(pid, mailbox, body));
+    return node.client()
+        .connectAsync(remote)
+        .thenCompose(it -> it.send(Message.sendToRegisteredProcess(pid, mailbox, body)));
   }
 
 
@@ -233,8 +236,7 @@ public class Mailbox implements Closeable {
     if (isLocal(to)) {
       getMailbox(to).deliver(message);
     } else {
-      // TODO: use future!
-      getConnection(to).send(message, null);
+      getConnection(to).thenAccept(connection -> connection.send(message));
     }
     links.add(to);
   }
@@ -251,8 +253,7 @@ public class Mailbox implements Closeable {
     if (isLocal(to)) {
       getMailbox(to).deliver(message);
     } else {
-      // TODO: use future!
-      getConnection(to).send(message, null);
+      getConnection(to).thenAccept(connection -> connection.send(message));
     }
   }
 
@@ -270,17 +271,16 @@ public class Mailbox implements Closeable {
     log.debug("Exiting mailbox '{}:{}'. Reason: '{}'",
               pid, name, reason);
 
-    links.forEach(it -> {
-      val message = Message.exit(pid, it, reason);
-      if (isLocal(it)) {
-        getMailbox(it).deliver(message);
+    links.forEach(pid -> {
+      val message = Message.exit(pid, pid, reason);
+      if (isLocal(pid)) {
+        getMailbox(pid).deliver(message);
       } else {
-        // TODO: use future!
-        getConnection(it).send(message, null);
+        getConnection(pid).thenAccept(connection -> connection.send(message));
       }
     });
 
-    node.remove(this);
+    node.mailboxes().remove(this);
   }
 
   /**
@@ -319,34 +319,28 @@ public class Mailbox implements Closeable {
     exit("normal");
   }
 
-  private CompletableFuture<Mailbox> getMailbox (@NonNull String remoteName) {
-    val future = new CompletableFuture<Mailbox>();
-    val mailbox = node.mailbox(remoteName);
+  private Mailbox getMailbox (@NonNull String remoteName) {
+    val mailbox = node.mailboxes().get(remoteName);
     if (mailbox == null) {
-      future.completeExceptionally(new MailboxWithSuchNameDoesntExistException(remoteName));
-    } else {
-      future.complete(mailbox);
+      throw new MailboxWithSuchNameDoesntExistException(remoteName);
     }
-    return future;
+    return mailbox;
   }
 
-  private CompletableFuture<Mailbox> getMailbox (@NonNull ErlangPid remotePid) {
-    val future = new CompletableFuture<Mailbox>();
-    val mailbox = node.mailbox(remotePid);
+  private Mailbox getMailbox (@NonNull ErlangPid remotePid) {
+    val mailbox = node.mailboxes().get(remotePid);
     if (mailbox == null) {
-      future.completeExceptionally(new MailboxWithSuchPidDoesntExistException(remotePid));
-    } else {
-      future.complete(mailbox);
+      throw new MailboxWithSuchPidDoesntExistException(remotePid);
     }
-    return future;
+    return mailbox;
   }
 
   private CompletableFuture<Connection> getConnection (@NonNull ErlangPid remotePid) {
-    val remoteNode = node.lookup(remotePid);
-    if (remoteNode == null) {
-      throw new CouldntConnectException();
-    }
-    return node.connectAsync(remoteNode);
+    return node.discovery()
+        .lookup(remotePid)
+        .thenComposeAsync(optional -> optional
+            .map(remoteNode -> node.client().connectAsync(remoteNode))
+            .orElseThrow(CouldntConnectException::new));
   }
 
   private boolean isLocal (@NonNull ErlangPid remotePid) {
