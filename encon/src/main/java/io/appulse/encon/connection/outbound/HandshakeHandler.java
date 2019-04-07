@@ -53,6 +53,8 @@ class HandshakeHandler extends ChannelInboundHandlerAdapter {
 
   final Consumer<RemoteNode> onSuccess;
 
+  final Consumer<RemoteNode> onError;
+
   State state = State.SEND_NAME;
 
   RemoteNode remote;
@@ -60,9 +62,13 @@ class HandshakeHandler extends ChannelInboundHandlerAdapter {
   int myChallenge;
 
   @Builder
-  private HandshakeHandler (@NonNull Node node, @NonNull Consumer<RemoteNode> onSuccess) {
+  private HandshakeHandler (@NonNull Node node,
+                            @NonNull Consumer<RemoteNode> onSuccess,
+                            @NonNull Consumer<RemoteNode> onError
+  ) {
     this.node = node;
     this.onSuccess = onSuccess;
+    this.onError = onError;
   }
 
   @Override
@@ -103,6 +109,7 @@ class HandshakeHandler extends ChannelInboundHandlerAdapter {
       break;
     default:
       log.error("Unsupported handshake state '{}'", state);
+      onError.accept(remote);
     }
   }
 
@@ -119,6 +126,7 @@ class HandshakeHandler extends ChannelInboundHandlerAdapter {
       log.error("Unsupported status value {}, close connection",
                 statusResponse.getStatus());
       context.close();
+      onError.accept(remote);
     }
   }
 
