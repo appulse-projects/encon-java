@@ -185,7 +185,7 @@ public class NodeDescriptor implements Serializable {
 
   private static NodeDescriptor getFromCacheOrCreateNew (@NonNull String node) {
     val atIndex = node.indexOf('@');
-    val isShortName = atIndex < 0 || node.indexOf('.', atIndex) < 0;
+    boolean isShortName = atIndex < 0 || node.indexOf('.', atIndex) < 0;
     return getFromCacheOrCreateNew(node, isShortName);
   }
 

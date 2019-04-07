@@ -24,7 +24,6 @@ import static org.assertj.core.api.Assertions.assertThat;
 import io.appulse.encon.terms.Erlang;
 import io.appulse.encon.terms.ErlangTerm;
 import io.appulse.utils.Bytes;
-import io.appulse.utils.test.TestMethodNamePrinter;
 
 import erlang.OtpErlangBinary;
 import erlang.OtpInputStream;
@@ -43,9 +42,6 @@ import org.junit.rules.TestRule;
  */
 public class ErlangBinaryTest {
 
-  @Rule
-  public TestRule watcher = new TestMethodNamePrinter();
-
   @Test
   public void instantiate () {
     val value = new byte[] { 1, 2, 3 };
@@ -58,11 +54,11 @@ public class ErlangBinaryTest {
   public void newInstance () {
     val value = new byte[] { 1, 2, 3 };
 
-    val bytes = Bytes.allocate()
-        .put1B(BINARY.getCode())
-        .put4B(value.length)
-        .put(value)
-        .array();
+    val bytes = Bytes.resizableArray()
+        .write1B(BINARY.getCode())
+        .write4B(value.length)
+        .writeNB(value)
+        .arrayCopy();
 
     ErlangBinary binary = ErlangTerm.newInstance(wrappedBuffer(bytes));
     assertThat(binary).isNotNull();
@@ -80,11 +76,11 @@ public class ErlangBinaryTest {
   public void toBytes () {
     val value = new byte[] { 1, 2, 3 };
 
-    val expected = Bytes.allocate()
-        .put1B(BINARY.getCode())
-        .put4B(value.length)
-        .put(value)
-        .array();
+    val expected = Bytes.resizableArray()
+        .write1B(BINARY.getCode())
+        .write4B(value.length)
+        .writeNB(value)
+        .arrayCopy();
 
     assertThat(Erlang.binary(value).toBytes())
         .isEqualTo(expected);
@@ -101,11 +97,11 @@ public class ErlangBinaryTest {
   public void decode () throws Exception {
     val value = new byte[] { 1, 2, 3 };
 
-    val bytes = Bytes.allocate()
-        .put1B(BINARY.getCode())
-        .put4B(value.length)
-        .put(value)
-        .array();
+    val bytes = Bytes.resizableArray()
+        .write1B(BINARY.getCode())
+        .write4B(value.length)
+        .writeNB(value)
+        .arrayCopy();
 
     try (val input = new OtpInputStream(bytes)) {
       ErlangBinary binary = ErlangTerm.newInstance(wrappedBuffer(bytes));

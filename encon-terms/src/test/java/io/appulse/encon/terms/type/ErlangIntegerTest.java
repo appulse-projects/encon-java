@@ -30,7 +30,6 @@ import java.util.stream.IntStream;
 
 import io.appulse.encon.terms.ErlangTerm;
 import io.appulse.utils.Bytes;
-import io.appulse.utils.test.TestMethodNamePrinter;
 
 import erlang.OtpErlangLong;
 import erlang.OtpInputStream;
@@ -47,9 +46,6 @@ import org.junit.rules.TestRule;
  * @since 1.0.0
  */
 public class ErlangIntegerTest {
-
-  @Rule
-  public TestRule watcher = new TestMethodNamePrinter();
 
   @Test
   public void instantiate () {
@@ -120,10 +116,10 @@ public class ErlangIntegerTest {
 
   @Test
   public void decode () throws Exception {
-    val bytes1 = Bytes.allocate()
-        .put1B(SMALL_INTEGER.getCode())
-        .put1B(255)
-        .array();
+    val bytes1 = Bytes.resizableArray()
+        .write1B(SMALL_INTEGER.getCode())
+        .write1B(255)
+        .arrayCopy();
 
     try (val input = new OtpInputStream(bytes1)) {
       ErlangInteger inte = ErlangTerm.newInstance(wrappedBuffer(bytes1));
@@ -131,10 +127,10 @@ public class ErlangIntegerTest {
           .isEqualTo(input.read_int());
     }
 
-    val bytes2 = Bytes.allocate()
-        .put1B(INTEGER.getCode())
-        .put4B(134217726)
-        .array();
+    val bytes2 = Bytes.resizableArray()
+        .write1B(INTEGER.getCode())
+        .write4B(134217726)
+        .arrayCopy();
 
     try (val input = new OtpInputStream(bytes2)) {
       ErlangInteger inte = ErlangTerm.newInstance(wrappedBuffer(bytes2));
@@ -230,12 +226,12 @@ public class ErlangIntegerTest {
   }
 
   private byte[] bigBytes (BigInteger value) {
-    Bytes buffer = Bytes.allocate();
+    Bytes buffer = Bytes.resizableArray();
 
     if (value.abs().toByteArray().length < 256) {
-        buffer.put1B(SMALL_BIG.getCode());
+        buffer.write1B(SMALL_BIG.getCode());
     } else {
-        buffer.put1B(LARGE_BIG.getCode());
+        buffer.write1B(LARGE_BIG.getCode());
     }
 
     byte[] bytes = value.abs().toByteArray();
@@ -255,15 +251,15 @@ public class ErlangIntegerTest {
     }
 
     if ((length & 0xFF) == length) {
-    buffer.put1B(length); // length
+    buffer.write1B(length); // length
     } else {
-    buffer.put4B(length); // length
+    buffer.write4B(length); // length
     }
     val sign = value.signum() < 0
                 ? 1
                 : 0;
-    buffer.put1B(sign);
-    buffer.put(magnitude);
-    return buffer.array();
+    buffer.write1B(sign);
+    buffer.writeNB(magnitude);
+    return buffer.arrayCopy();
   }
 }

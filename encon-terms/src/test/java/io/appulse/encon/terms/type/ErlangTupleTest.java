@@ -29,7 +29,6 @@ import java.util.stream.Stream;
 
 import io.appulse.encon.terms.ErlangTerm;
 import io.appulse.utils.Bytes;
-import io.appulse.utils.test.TestMethodNamePrinter;
 
 import erlang.OtpErlangAtom;
 import erlang.OtpErlangInt;
@@ -53,9 +52,6 @@ import org.junit.rules.TestRule;
  */
 public class ErlangTupleTest {
 
-  @Rule
-  public TestRule watcher = new TestMethodNamePrinter();
-
   @Test
   public void instantiate () {
     assertThat(new ErlangTuple(new ErlangNil()).getType())
@@ -73,11 +69,11 @@ public class ErlangTupleTest {
   @Test
   public void newInstance () {
     val value = new ErlangNil();
-    val bytes = Bytes.allocate()
-        .put1B(SMALL_TUPLE.getCode())
-        .put1B(1)
-        .put(value.toBytes())
-        .array();
+    val bytes = Bytes.resizableArray()
+        .write1B(SMALL_TUPLE.getCode())
+        .write1B(1)
+        .writeNB(value.toBytes())
+        .arrayCopy();
 
     ErlangTuple tuple = ErlangTerm.newInstance(wrappedBuffer(bytes));
     assertThat(tuple).isNotNull();
@@ -101,11 +97,11 @@ public class ErlangTupleTest {
   @Test
   public void toBytes () {
     val value = new ErlangNil();
-    val expected = Bytes.allocate()
-        .put1B(SMALL_TUPLE.getCode())
-        .put1B(1)
-        .put(value.toBytes())
-        .array();
+    val expected = Bytes.resizableArray()
+        .write1B(SMALL_TUPLE.getCode())
+        .write1B(1)
+        .writeNB(value.toBytes())
+        .arrayCopy();
 
     assertThat(new ErlangTuple(value).toBytes())
         .isEqualTo(expected);

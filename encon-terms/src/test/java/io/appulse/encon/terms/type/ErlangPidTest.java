@@ -26,7 +26,6 @@ import erlang.OtpInputStream;
 import erlang.OtpOutputStream;
 import io.appulse.encon.terms.ErlangTerm;
 import io.appulse.utils.Bytes;
-import io.appulse.utils.test.TestMethodNamePrinter;
 import io.netty.buffer.Unpooled;
 import lombok.SneakyThrows;
 import lombok.val;
@@ -42,9 +41,6 @@ import org.junit.rules.TestRule;
  */
 public class ErlangPidTest {
 
-  @Rule
-  public TestRule watcher = new TestMethodNamePrinter();
-
   @Test
   public void newInstance () {
     val node = "popa";
@@ -52,13 +48,13 @@ public class ErlangPidTest {
     val serial = 10;
     val creation = 42;
 
-    val bytes = Bytes.allocate()
-        .put1B(PID.getCode())
-        .put(new ErlangAtom(node).toBytes())
-        .put4B(id & 0x7FFF)
-        .put4B(serial & 0x1FFF)
-        .put1B(creation & 0x3)
-        .array();
+    val bytes = Bytes.resizableArray()
+        .write1B(PID.getCode())
+        .writeNB(new ErlangAtom(node).toBytes())
+        .write4B(id & 0x7FFF)
+        .write4B(serial & 0x1FFF)
+        .write1B(creation & 0x3)
+        .arrayCopy();
 
     ErlangPid pid = ErlangTerm.newInstance(wrappedBuffer(bytes));
     assertThat(pid).isNotNull();
@@ -85,13 +81,13 @@ public class ErlangPidTest {
     val serial = 10;
     val creation = 42;
 
-    val expected = Bytes.allocate()
-        .put1B(PID.getCode())
-        .put(new ErlangAtom(node).toBytes())
-        .put4B(id & 0x7FFF)
-        .put4B(serial & 0x1FFF)
-        .put1B(creation & 0x3)
-        .array();
+    val expected = Bytes.resizableArray()
+        .write1B(PID.getCode())
+        .writeNB(new ErlangAtom(node).toBytes())
+        .write4B(id & 0x7FFF)
+        .write4B(serial & 0x1FFF)
+        .write1B(creation & 0x3)
+        .arrayCopy();
 
     assertThat(ErlangPid.builder()
         .node(node)
@@ -130,13 +126,13 @@ public class ErlangPidTest {
 
   @Test
   public void decode () throws Exception {
-    byte[] bytes1 = Bytes.allocate()
-        .put1B(PID.getCode())
-        .put(new ErlangAtom("popa@localhost").toBytes())
-        .put4B(Integer.MAX_VALUE)
-        .put4B(Integer.MAX_VALUE)
-        .put1B(Integer.MAX_VALUE)
-        .array();
+    byte[] bytes1 = Bytes.resizableArray()
+        .write1B(PID.getCode())
+        .writeNB(new ErlangAtom("popa@localhost").toBytes())
+        .write4B(Integer.MAX_VALUE)
+        .write4B(Integer.MAX_VALUE)
+        .write1B(Integer.MAX_VALUE)
+        .arrayCopy();
 
     try (val input = new OtpInputStream(bytes1)) {
       ErlangPid pid = ErlangTerm.newInstance(wrappedBuffer(bytes1));
@@ -155,13 +151,13 @@ public class ErlangPidTest {
           .isEqualTo(otpPid.serial());
     }
 
-    byte[] bytes2 = Bytes.allocate()
-        .put1B(NEW_PID.getCode())
-        .put(new ErlangAtom("popa@localhost").toBytes())
-        .put4B(Integer.MAX_VALUE)
-        .put4B(Integer.MAX_VALUE)
-        .put4B(Integer.MAX_VALUE)
-        .array();
+    byte[] bytes2 = Bytes.resizableArray()
+        .write1B(NEW_PID.getCode())
+        .writeNB(new ErlangAtom("popa@localhost").toBytes())
+        .write4B(Integer.MAX_VALUE)
+        .write4B(Integer.MAX_VALUE)
+        .write4B(Integer.MAX_VALUE)
+        .arrayCopy();
 
     try (val input = new OtpInputStream(bytes2)) {
       ErlangPid pid = ErlangTerm.newInstance(wrappedBuffer(bytes2));

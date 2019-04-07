@@ -25,7 +25,6 @@ import java.util.stream.IntStream;
 
 import io.appulse.encon.terms.ErlangTerm;
 import io.appulse.utils.Bytes;
-import io.appulse.utils.test.TestMethodNamePrinter;
 
 import erlang.OtpErlangString;
 import erlang.OtpInputStream;
@@ -42,9 +41,6 @@ import org.junit.rules.TestRule;
  * @since 1.0.0
  */
 public class ErlangStringTest {
-
-  @Rule
-  public TestRule watcher = new TestMethodNamePrinter();
 
   @Test
   public void encode () {
@@ -65,11 +61,11 @@ public class ErlangStringTest {
 
   @Test
   public void decode () throws Exception {
-    val bytes = Bytes.allocate()
-        .put1B(STRING.getCode())
-        .put2B("popa".length())
-        .put("popa", ISO_8859_1)
-        .array();
+    val bytes = Bytes.resizableArray()
+        .write1B(STRING.getCode())
+        .write2B("popa".length())
+        .writeNB("popa", ISO_8859_1)
+        .arrayCopy();
 
     try (val input = new OtpInputStream(bytes)) {
       ErlangString string = ErlangTerm.newInstance(wrappedBuffer(bytes));

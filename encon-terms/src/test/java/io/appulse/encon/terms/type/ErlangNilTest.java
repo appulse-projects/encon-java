@@ -22,7 +22,6 @@ import static org.assertj.core.api.Assertions.assertThat;
 
 import io.appulse.encon.terms.ErlangTerm;
 import io.appulse.utils.Bytes;
-import io.appulse.utils.test.TestMethodNamePrinter;
 
 import erlang.OtpOutputStream;
 import lombok.SneakyThrows;
@@ -38,14 +37,11 @@ import org.junit.rules.TestRule;
  */
 public class ErlangNilTest {
 
-  @Rule
-  public TestRule watcher = new TestMethodNamePrinter();
-
   @Test
   public void newInstance () {
-    val bytes = Bytes.allocate()
-        .put1B(NIL.getCode())
-        .array();
+    val bytes = Bytes.resizableArray()
+        .write1B(NIL.getCode())
+        .arrayCopy();
 
     ErlangNil nil = ErlangTerm.newInstance(wrappedBuffer(bytes));
     assertThat(nil).isNotNull();
@@ -55,9 +51,9 @@ public class ErlangNilTest {
 
   @Test
   public void toBytes () {
-    val expected = Bytes.allocate()
-        .put1B(NIL.getCode())
-        .array();
+    val expected = Bytes.resizableArray()
+        .write1B(NIL.getCode())
+        .arrayCopy();
 
     assertThat(new ErlangNil().toBytes())
         .isEqualTo(expected);

@@ -20,12 +20,8 @@ import static org.assertj.core.api.Assertions.assertThat;
 
 import java.net.InetAddress;
 
-import io.appulse.utils.test.TestMethodNamePrinter;
-
 import org.assertj.core.api.SoftAssertions;
-import org.junit.Rule;
 import org.junit.Test;
-import org.junit.rules.TestRule;
 
 /**
  *
@@ -33,9 +29,6 @@ import org.junit.rules.TestRule;
  * @since 1.0.0
  */
 public class NodeDescriptorTest {
-
-  @Rule
-  public TestRule watcher = new TestMethodNamePrinter();
 
   @Test
   public void fullShortName () throws Exception {

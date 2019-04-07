@@ -16,14 +16,19 @@
 
 package io.appulse.encon.benchmark;
 
+import static java.util.concurrent.TimeUnit.SECONDS;
+
 import java.io.IOException;
+import java.net.InetAddress;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
+import java.util.concurrent.Future;
 
-import io.appulse.epmd.java.server.cli.CommonOptions;
-import io.appulse.epmd.java.server.command.server.ServerCommandExecutor;
-import io.appulse.epmd.java.server.command.server.ServerCommandOptions;
+import io.appulse.epmd.java.server.SubcommandServer;
 import io.appulse.utils.SocketUtils;
+import lombok.SneakyThrows;
+import lombok.val;
+import lombok.extern.slf4j.Slf4j;
 
 import org.openjdk.jmh.runner.Defaults;
 import org.openjdk.jmh.runner.NoBenchmarksException;
@@ -39,11 +44,12 @@ import org.openjdk.jmh.runner.options.VerboseMode;
  * @since 1.6.0
  * @author Artem Labazin
  */
+@Slf4j
 public class Main {
 
   private static ExecutorService executor;
 
-  private static ServerCommandExecutor server;
+  private static Future<?> future;
 
   public static void main(String[] argv) throws RunnerException, IOException {
     try {
@@ -111,24 +117,35 @@ public class Main {
     }
   }
 
+  @SneakyThrows
   private static void startEpmd () {
     if (!SocketUtils.isPortAvailable(4369)) {
       return;
     }
     executor = Executors.newSingleThreadExecutor();
 
-    ServerCommandOptions options = new ServerCommandOptions();
-    options.setChecks(true);
+    val server = SubcommandServer.builder()
+        .port(SocketUtils.findFreePort().orElseThrow(RuntimeException::new))
+        .ip(InetAddress.getByName("0.0.0.0"))
+        .build();
 
-    server = new ServerCommandExecutor(new CommonOptions(), options);
-    executor.execute(server::execute);
+    future = executor.submit(() -> {
+      try {
+        server.run();
+      } catch (Throwable ex) {
+        log.error("popa", ex);
+      }
+    });
+    SECONDS.sleep(1);
   }
 
   private static void stopEpmd () {
     if (executor == null) {
       return;
     }
-    server.close();
+    if (future != null) {
+      future.cancel(true);
+    }
     executor.shutdown();
   }
 }

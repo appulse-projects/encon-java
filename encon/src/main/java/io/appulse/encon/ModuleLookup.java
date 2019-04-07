@@ -55,6 +55,7 @@ class ModuleLookup {
     compute = descriptor -> {
       return this.epmd
           .lookup(descriptor.getNodeName(), descriptor.getAddress())
+          .join()
           .filter(NodeInfo::isOk)
           .map(it -> RemoteNode.builder()
               .descriptor(descriptor)

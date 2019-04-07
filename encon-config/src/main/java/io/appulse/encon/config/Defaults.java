@@ -45,7 +45,7 @@ import java.util.Objects;
 import java.util.Set;
 
 import io.appulse.encon.common.DistributionFlag;
-import io.appulse.epmd.java.client.EpmdClient;
+import io.appulse.epmd.java.client.EpmdDefaults;
 import io.appulse.epmd.java.core.model.NodeType;
 import io.appulse.epmd.java.core.model.Protocol;
 import io.appulse.epmd.java.core.model.Version;
@@ -183,7 +183,7 @@ public class Defaults {
   }
 
   @Builder.Default
-  int epmdPort = EpmdClient.Default.PORT;
+  int epmdPort = EpmdDefaults.PORT;
 
   @Builder.Default
   NodeType type = R6_ERLANG;

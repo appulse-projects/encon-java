@@ -19,7 +19,6 @@ package io.appulse.encon;
 import static org.assertj.core.api.Assertions.assertThat;
 
 import io.appulse.encon.common.NodeDescriptor;
-import io.appulse.utils.test.TestMethodNamePrinter;
 import lombok.val;
 
 import org.assertj.core.api.SoftAssertions;
@@ -33,9 +32,6 @@ import org.junit.Test;
  * @since 1.0.0
  */
 public class GeneratorPortTest {
-
-  @Rule
-  public TestRule watcher = new TestMethodNamePrinter();
 
   @Test
   public void generate () {

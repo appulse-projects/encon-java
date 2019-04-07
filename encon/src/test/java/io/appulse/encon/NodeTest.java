@@ -30,8 +30,10 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static java.util.Optional.ofNullable;
 import static io.appulse.encon.connection.control.ControlMessageTag.SEND;
 
+import java.net.InetAddress;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
+import java.util.concurrent.Future;
 
 import io.appulse.encon.config.MailboxConfig;
 import io.appulse.encon.config.NodeConfig;
@@ -42,10 +44,7 @@ import io.appulse.encon.mailbox.Mailbox;
 import io.appulse.encon.mailbox.exception.ReceivedExitException;
 import io.appulse.encon.terms.ErlangTerm;
 import io.appulse.encon.terms.type.ErlangAtom;
-import io.appulse.utils.test.TestMethodNamePrinter;
-import io.appulse.epmd.java.server.cli.CommonOptions;
-import io.appulse.epmd.java.server.command.server.ServerCommandExecutor;
-import io.appulse.epmd.java.server.command.server.ServerCommandOptions;
+import io.appulse.epmd.java.server.SubcommandServer;
 import io.appulse.utils.SocketUtils;
 
 import java.util.concurrent.ThreadLocalRandom;
@@ -56,9 +55,7 @@ import org.assertj.core.api.SoftAssertions;
 import org.junit.AfterClass;
 import org.junit.BeforeClass;
 import org.junit.After;
-import org.junit.Rule;
 import org.junit.Test;
-import org.junit.rules.TestRule;
 
 /**
  *
@@ -72,27 +69,35 @@ public class NodeTest {
 
   private static ExecutorService executor;
 
-  private static ServerCommandExecutor epmdServer;
-
-  @Rule
-  public TestRule watcher = new TestMethodNamePrinter();
-
+  private static Future<?> future;
 
   Node node;
 
   @BeforeClass
-  public static void beforeClass () {
+  public static void beforeClass () throws Exception {
     if (SocketUtils.isPortAvailable(4369)) {
       executor = Executors.newSingleThreadExecutor();
-      epmdServer = new ServerCommandExecutor(new CommonOptions(), new ServerCommandOptions());
-      executor.execute(epmdServer::execute);
+      val server = SubcommandServer.builder()
+          .port(SocketUtils.findFreePort().orElseThrow(RuntimeException::new))
+          .ip(InetAddress.getByName("0.0.0.0"))
+          .build();
+
+      future = executor.submit(() -> {
+        try {
+          server.run();
+        } catch (Throwable ex) {
+          log.error("popa", ex);
+        }
+      });
+      SECONDS.sleep(1);
     }
   }
 
   @AfterClass
   public static void afterClass () {
-    ofNullable(epmdServer)
-      .ifPresent(ServerCommandExecutor::close);
+    if (future != null) {
+      future.cancel(true);
+    }
 
     ofNullable(executor)
       .ifPresent(ExecutorService::shutdown);

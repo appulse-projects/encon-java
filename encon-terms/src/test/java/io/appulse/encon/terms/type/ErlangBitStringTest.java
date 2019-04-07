@@ -26,7 +26,6 @@ import io.appulse.encon.terms.Erlang;
 import io.appulse.encon.terms.exception.ErlangTermValidationException;
 import io.appulse.encon.terms.ErlangTerm;
 import io.appulse.utils.Bytes;
-import io.appulse.utils.test.TestMethodNamePrinter;
 
 import erlang.OtpErlangBitstr;
 import erlang.OtpInputStream;
@@ -45,9 +44,6 @@ import org.junit.rules.TestRule;
  */
 public class ErlangBitStringTest {
 
-  @Rule
-  public TestRule watcher = new TestMethodNamePrinter();
-
   @Test
   public void erlangTermValidationException () {
     assertThatThrownBy(() -> new ErlangBitString(new byte[] { 1 }, -1))
@@ -64,12 +60,12 @@ public class ErlangBitStringTest {
     val value = new byte[] { 1, 2, 3 };
     val pad = 3;
 
-    val bytes = Bytes.allocate()
-        .put1B(BIT_BINNARY.getCode())
-        .put4B(value.length)
-        .put1B(8 - pad)
-        .put(value)
-        .array();
+    val bytes = Bytes.resizableArray()
+        .write1B(BIT_BINNARY.getCode())
+        .write4B(value.length)
+        .write1B(8 - pad)
+        .writeNB(value)
+        .arrayCopy();
 
     ErlangBitString bitString = ErlangTerm.newInstance(wrappedBuffer(bytes));
     assertThat(bitString).isNotNull();
@@ -88,12 +84,12 @@ public class ErlangBitStringTest {
     val bits = new byte[] { 1, 2, 3 };
     val pad = 3;
 
-    val bytes = Bytes.allocate()
-        .put1B(BIT_BINNARY.getCode())
-        .put4B(bits.length)
-        .put1B(8 - pad)
-        .put(new byte[] { 1, 2, 0 })
-        .array();
+    val bytes = Bytes.resizableArray()
+        .write1B(BIT_BINNARY.getCode())
+        .write4B(bits.length)
+        .write1B(8 - pad)
+        .writeNB(new byte[] { 1, 2, 0 })
+        .arrayCopy();
 
     assertThat(Erlang.bitstr(bits, pad).toBytes())
         .isEqualTo(bytes);
@@ -118,12 +114,12 @@ public class ErlangBitStringTest {
     val bits = new byte[] { 1, 2, 3 };
     val pad = 3;
 
-    val bytes = Bytes.allocate()
-        .put1B(BIT_BINNARY.getCode())
-        .put4B(bits.length)
-        .put1B(8 - pad)
-        .put(new byte[] { 1, 2, 0 })
-        .array();
+    val bytes = Bytes.resizableArray()
+        .write1B(BIT_BINNARY.getCode())
+        .write4B(bits.length)
+        .write1B(8 - pad)
+        .writeNB(new byte[] { 1, 2, 0 })
+        .arrayCopy();
 
     try (val input = new OtpInputStream(bytes)) {
       ErlangBitString bitString = ErlangTerm.newInstance(wrappedBuffer(bytes));

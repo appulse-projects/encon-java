@@ -44,15 +44,12 @@ import java.util.Map;
 import java.util.Set;
 
 import io.appulse.encon.common.DistributionFlag;
-import io.appulse.epmd.java.client.EpmdClient;
+import io.appulse.epmd.java.client.EpmdDefaults;
 import io.appulse.epmd.java.core.model.NodeType;
 import io.appulse.epmd.java.core.model.Protocol;
 import io.appulse.epmd.java.core.model.Version;
-import io.appulse.utils.test.TestMethodNamePrinter;
 
 import org.assertj.core.api.SoftAssertions;
-import org.junit.Rule;
-import org.junit.rules.TestRule;
 import org.junit.Test;
 
 /**
@@ -61,9 +58,6 @@ import org.junit.Test;
  * @since 1.0.0
  */
 public class ConfigTest {
-
-  @Rule
-  public TestRule watcher = new TestMethodNamePrinter();
 
   @Test
   public void defaultDefaults () {
@@ -79,7 +73,7 @@ public class ConfigTest {
 
     SoftAssertions.assertSoftly(softly -> {
       softly.assertThat(defaults.getEpmdPort())
-          .isEqualTo(EpmdClient.Default.PORT);
+          .isEqualTo(EpmdDefaults.PORT);
 
       softly.assertThat(defaults.getType())
           .isEqualTo(R6_ERLANG);
@@ -202,7 +196,7 @@ public class ConfigTest {
 
     SoftAssertions.assertSoftly(softly -> {
       softly.assertThat(nodeConfig.getEpmdPort())
-          .isEqualTo(EpmdClient.Default.PORT);
+          .isEqualTo(EpmdDefaults.PORT);
 
       softly.assertThat(nodeConfig.getType())
           .isEqualTo(R6_ERLANG);

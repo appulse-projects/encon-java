@@ -43,6 +43,7 @@ import io.appulse.encon.handler.message.matcher.MethodArgumentMatcher.StartsWith
  * @since 1.4.0
  * @author alabazin
  */
+@SuppressWarnings("PMD.LinguisticNaming")
 public final class Matchers {
 
   /**

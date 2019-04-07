@@ -30,6 +30,7 @@ import java.security.PrivilegedAction;
 import java.util.Collection;
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 import java.util.Set;
 
 import io.appulse.encon.databind.annotation.AsErlangList;
@@ -116,9 +117,10 @@ public final class FieldParser {
   }
 
   private static Serializer<?> parseSerializer (Field field) {
-    val optional = AnnotationUtils.findAnnotation(field, TermSerialize.class)
+    Optional<Serializer<?>> optional = AnnotationUtils.findAnnotation(field, TermSerialize.class)
         .map(TermSerialize::value)
-        .map(it -> SERIALIZERS.computeIfAbsent(it, NEW_SERIALIZER));
+        .map(it -> SERIALIZERS.computeIfAbsent(it, NEW_SERIALIZER))
+        .map(it -> (Serializer<?>) it);
 
     if (optional.isPresent()) {
       return optional.get();
@@ -143,7 +145,7 @@ public final class FieldParser {
   }
 
   private static Deserializer<?> parseDeserializer (Field field) {
-    val optional = AnnotationUtils.findAnnotation(field, TermDeserialize.class)
+    Optional<Deserializer<?>> optional = AnnotationUtils.findAnnotation(field, TermDeserialize.class)
         .map(TermDeserialize::value)
         .map(it -> DESERIALIZERS.computeIfAbsent(it, NEW_DESERIALIZER));
 

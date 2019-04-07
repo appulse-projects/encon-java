@@ -28,7 +28,6 @@ import java.util.stream.IntStream;
 import io.appulse.encon.terms.Erlang;
 import io.appulse.encon.terms.ErlangTerm;
 import io.appulse.utils.Bytes;
-import io.appulse.utils.test.TestMethodNamePrinter;
 
 import erlang.OtpInputStream;
 import erlang.OtpOutputStream;
@@ -47,9 +46,6 @@ import org.junit.rules.TestRule;
  */
 public class ErlangAtomTest {
 
-  @Rule
-  public TestRule watcher = new TestMethodNamePrinter();
-
   @Test
   public void instantiate () {
     assertThat(new ErlangAtom("hello").getType())
@@ -65,11 +61,11 @@ public class ErlangAtomTest {
   @Test
   public void newInstance () {
     val value = "hello";
-    val bytes = Bytes.allocate()
-        .put1B(SMALL_ATOM_UTF8.getCode())
-        .put1B(value.getBytes(UTF_8).length)
-        .put(value.getBytes(UTF_8))
-        .array();
+    val bytes = Bytes.resizableArray()
+        .write1B(SMALL_ATOM_UTF8.getCode())
+        .write1B(value.getBytes(UTF_8).length)
+        .writeNB(value.getBytes(UTF_8))
+        .arrayCopy();
 
     ErlangAtom atom = ErlangTerm.newInstance(wrappedBuffer(bytes));
     assertThat(atom).isNotNull();
@@ -89,11 +85,11 @@ public class ErlangAtomTest {
   @Test
   public void toBytes () {
     val value = "hello";
-    val expected = Bytes.allocate()
-        .put1B(SMALL_ATOM_UTF8.getCode())
-        .put1B(value.getBytes(UTF_8).length)
-        .put(value.getBytes(UTF_8))
-        .array();
+    val expected = Bytes.resizableArray()
+        .write1B(SMALL_ATOM_UTF8.getCode())
+        .write1B(value.getBytes(UTF_8).length)
+        .writeNB(value.getBytes(UTF_8))
+        .arrayCopy();
 
     assertThat(Erlang.atom(value).toBytes())
         .isEqualTo(expected);
@@ -134,11 +130,11 @@ public class ErlangAtomTest {
   @Test
   public void decode () throws Exception {
     val value1 = "hello";
-    val bytes1 = Bytes.allocate()
-        .put1B(SMALL_ATOM_UTF8.getCode())
-        .put1B(value1.getBytes(UTF_8).length)
-        .put(value1.getBytes(UTF_8))
-        .array();
+    val bytes1 = Bytes.resizableArray()
+        .write1B(SMALL_ATOM_UTF8.getCode())
+        .write1B(value1.getBytes(UTF_8).length)
+        .writeNB(value1.getBytes(UTF_8))
+        .arrayCopy();
 
     try (val input = new OtpInputStream(bytes1)) {
       ErlangAtom atom = ErlangTerm.newInstance(Unpooled.wrappedBuffer(bytes1));
@@ -148,11 +144,11 @@ public class ErlangAtomTest {
 
 
     val value2 = "попа";
-    val bytes2 = Bytes.allocate()
-        .put1B(ATOM_UTF8.getCode())
-        .put2B(value2.getBytes(UTF_8).length)
-        .put(value2.getBytes(UTF_8))
-        .array();
+    val bytes2 = Bytes.resizableArray()
+        .write1B(ATOM_UTF8.getCode())
+        .write2B(value2.getBytes(UTF_8).length)
+        .writeNB(value2.getBytes(UTF_8))
+        .arrayCopy();
 
     try (val input = new OtpInputStream(bytes2)) {
       ErlangAtom atom = ErlangTerm.newInstance(Unpooled.wrappedBuffer(bytes2));

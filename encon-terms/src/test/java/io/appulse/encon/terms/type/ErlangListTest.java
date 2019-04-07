@@ -25,7 +25,6 @@ import java.util.stream.Stream;
 
 import io.appulse.encon.terms.ErlangTerm;
 import io.appulse.utils.Bytes;
-import io.appulse.utils.test.TestMethodNamePrinter;
 
 import erlang.OtpErlangAtom;
 import erlang.OtpErlangList;
@@ -44,18 +43,15 @@ import org.junit.rules.TestRule;
  */
 public class ErlangListTest {
 
-  @Rule
-  public TestRule watcher = new TestMethodNamePrinter();
-
   @Test
   public void newInstance () {
     val value = new ErlangNil();
-    val bytes = Bytes.allocate()
-        .put1B(LIST.getCode())
-        .put4B(1)
-        .put(value.toBytes())
-        .put(new ErlangNil().toBytes())
-        .array();
+    val bytes = Bytes.resizableArray()
+        .write1B(LIST.getCode())
+        .write4B(1)
+        .writeNB(value.toBytes())
+        .writeNB(new ErlangNil().toBytes())
+        .arrayCopy();
 
     ErlangList list = ErlangTerm.newInstance(wrappedBuffer(bytes));
     assertThat(list).isNotNull();
@@ -82,12 +78,12 @@ public class ErlangListTest {
   @Test
   public void toBytes () {
     val value = new ErlangNil();
-    val expected = Bytes.allocate()
-        .put1B(LIST.getCode())
-        .put4B(1)
-        .put(value.toBytes())
-        .put(new ErlangNil().toBytes())
-        .array();
+    val expected = Bytes.resizableArray()
+        .write1B(LIST.getCode())
+        .write4B(1)
+        .writeNB(value.toBytes())
+        .writeNB(new ErlangNil().toBytes())
+        .arrayCopy();
 
     assertThat(new ErlangList(value).toBytes())
         .isEqualTo(expected);

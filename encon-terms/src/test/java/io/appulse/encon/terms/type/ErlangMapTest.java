@@ -24,7 +24,6 @@ import java.util.List;
 
 
 import io.appulse.encon.terms.ErlangTerm;
-import io.appulse.utils.test.TestMethodNamePrinter;
 
 import erlang.OtpErlangMap;
 import erlang.OtpErlangObject;
@@ -41,9 +40,6 @@ import org.junit.rules.TestRule;
  * @since 1.0.0
  */
 public class ErlangMapTest {
-
-  @Rule
-  public TestRule watcher = new TestMethodNamePrinter();
 
   @Test
   public void encode () {

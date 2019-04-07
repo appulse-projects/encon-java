@@ -16,6 +16,7 @@
 
 package io.appulse.encon;
 
+import static java.util.concurrent.TimeUnit.SECONDS;
 import static lombok.AccessLevel.PACKAGE;
 
 import java.io.Closeable;
@@ -38,6 +39,7 @@ import io.appulse.epmd.java.core.model.request.Registration;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.NonNull;
+import lombok.SneakyThrows;
 import lombok.ToString;
 import lombok.experimental.FieldDefaults;
 import lombok.extern.slf4j.Slf4j;
@@ -59,6 +61,7 @@ import lombok.val;
 @FieldDefaults(level = PACKAGE, makeFinal = true)
 public final class Node implements Closeable {
 
+  @SneakyThrows
   static Node newInstance (@NonNull String name, @NonNull NodeConfig config) {
 
     val descriptor = NodeDescriptor.from(name, config.getShortName());
@@ -81,7 +84,7 @@ public final class Node implements Closeable {
         .high(meta.getHigh())
         .low(meta.getLow())
         .build()
-    );
+    ).get(10, SECONDS).getCreation();
     log.debug("Node '{}' was registered", descriptor.getFullName());
 
     Node node = Node.builder()

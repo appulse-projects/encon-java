@@ -29,7 +29,6 @@ import erlang.OtpOutputStream;
 import io.appulse.encon.terms.Erlang;
 import io.appulse.encon.terms.ErlangTerm;
 import io.appulse.utils.Bytes;
-import io.appulse.utils.test.TestMethodNamePrinter;
 import lombok.SneakyThrows;
 import lombok.val;
 import org.junit.Rule;
@@ -42,9 +41,6 @@ import org.junit.rules.TestRule;
  * @since 1.0.0
  */
 public class ErlangFloatTest {
-
-  @Rule
-  public TestRule watcher = new TestMethodNamePrinter();
 
   @Test
   public void encode () {
@@ -69,10 +65,10 @@ public class ErlangFloatTest {
 
   @Test
   public void decode () throws Exception {
-    val bytes1 = Bytes.allocate()
-        .put1B(FLOAT.getCode())
-        .put(String.format("%031.20e", Float.MAX_VALUE).getBytes(ISO_8859_1))
-        .array();
+    val bytes1 = Bytes.resizableArray()
+        .write1B(FLOAT.getCode())
+        .writeNB(String.format("%031.20e", Float.MAX_VALUE).getBytes(ISO_8859_1))
+        .arrayCopy();
 
     try (val input = new OtpInputStream(bytes1)) {
       ErlangFloat fl = ErlangTerm.newInstance(wrappedBuffer(bytes1));
@@ -80,10 +76,10 @@ public class ErlangFloatTest {
           .isEqualTo(input.read_float());
     }
 
-    val bytes2 = Bytes.allocate()
-        .put1B(NEW_FLOAT.getCode())
-        .put8B(Double.doubleToLongBits(Double.MIN_VALUE))
-        .array();
+    val bytes2 = Bytes.resizableArray()
+        .write1B(NEW_FLOAT.getCode())
+        .write8B(Double.doubleToLongBits(Double.MIN_VALUE))
+        .arrayCopy();
 
     try (val input = new OtpInputStream(bytes2)) {
       ErlangFloat fl = ErlangTerm.newInstance(wrappedBuffer(bytes2));

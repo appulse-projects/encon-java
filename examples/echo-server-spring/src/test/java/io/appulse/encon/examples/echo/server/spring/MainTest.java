@@ -26,16 +26,18 @@ import static java.util.Collections.singleton;
 import static java.util.concurrent.TimeUnit.SECONDS;
 import static java.util.Optional.ofNullable;
 
+import java.net.InetAddress;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
+import java.util.concurrent.Future;
 
 import io.appulse.encon.spring.EnconProperties;
 import io.appulse.encon.terms.ErlangTerm;
-import io.appulse.epmd.java.server.cli.CommonOptions;
-import io.appulse.epmd.java.server.command.server.ServerCommandExecutor;
-import io.appulse.epmd.java.server.command.server.ServerCommandOptions;
+import io.appulse.epmd.java.server.SubcommandServer;
 import io.appulse.utils.SocketUtils;
-import io.appulse.utils.test.TestMethodNamePrinter;
+
+import lombok.val;
+import lombok.extern.slf4j.Slf4j;
 import org.junit.AfterClass;
 import org.junit.BeforeClass;
 import org.junit.Rule;
@@ -53,6 +55,7 @@ import org.springframework.context.annotation.ComponentScan;
  * @since 1.6.0
  * @author Artem Labazin
  */
+@Slf4j
 @SpringBootTest(properties = "spring.encon.defaults.short-name=true")
 @SpringBootConfiguration
 @ComponentScan(basePackageClasses = {
@@ -64,10 +67,7 @@ public class MainTest {
 
   private static ExecutorService executor;
 
-  private static ServerCommandExecutor epmdServer;
-
-  @Rule
-  public TestRule watcher = new TestMethodNamePrinter();
+  private static Future<?> future;
 
   @Autowired
   EchoClient client;
@@ -76,18 +76,30 @@ public class MainTest {
   EchoServer server;
 
   @BeforeClass
-  public static void beforeClass () {
+  public static void beforeClass () throws Exception {
     if (SocketUtils.isPortAvailable(4369)) {
       executor = Executors.newSingleThreadExecutor();
-      epmdServer = new ServerCommandExecutor(new CommonOptions(), new ServerCommandOptions());
-      executor.execute(epmdServer::execute);
+      val server = SubcommandServer.builder()
+          .port(SocketUtils.findFreePort().orElseThrow(RuntimeException::new))
+          .ip(InetAddress.getByName("0.0.0.0"))
+          .build();
+
+      future = executor.submit(() -> {
+        try {
+          server.run();
+        } catch (Throwable ex) {
+          log.error("popa", ex);
+        }
+      });
+      SECONDS.sleep(1);
     }
   }
 
   @AfterClass
   public static void afterClass () {
-    ofNullable(epmdServer)
-      .ifPresent(ServerCommandExecutor::close);
+    if (future != null) {
+      future.cancel(true);
+    }
 
     ofNullable(executor)
       .ifPresent(ExecutorService::shutdown);

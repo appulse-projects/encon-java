@@ -19,12 +19,12 @@ First of all, add databind's dependency:
   <dependency>
     <groupId>io.appulse.encon</groupId>
     <artifactId>encon</artifactId>
-    <version>1.6.7</version>
+    <version>1.6.8</version>
   </dependency>
   <dependency>
     <groupId>io.appulse.encon</groupId>
     <artifactId>encon-databind</artifactId>
-    <version>1.6.7</version>
+    <version>1.6.8</version>
   </dependency>
   ...
 </dependencies>
@@ -33,8 +33,8 @@ First of all, add databind's dependency:
 **Gradle**:
 
 ```groovy
-compile 'io.appulse.encon:encon:1.6.7'
-compile 'io.appulse.encon:encon-databind:1.6.7'
+compile 'io.appulse.encon:encon:1.6.8'
+compile 'io.appulse.encon:encon-databind:1.6.8'
 ```
 
 Let's imagine, you have POJO like this:
