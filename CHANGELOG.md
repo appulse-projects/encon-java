@@ -24,7 +24,7 @@ and this project adheres to [Semantic Versioning](http://semver.org/spec/v2.0.0.
 - Do we really need `ErlangInteger.cache` methods?
 - Add atom's table equivalent.
 
-## [1.6.8](https://github.com/appulse-projects/encon-java/releases/tag/1.6.8) - 2019-04-07
+## [1.6.9](https://github.com/appulse-projects/encon-java/releases/tag/1.6.9) - 2019-04-07
 
 ### Changed
 
