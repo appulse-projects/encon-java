@@ -22,6 +22,7 @@ import lombok.EqualsAndHashCode;
 import lombok.Value;
 
 /**
+ * Unknown mailbox exception.
  *
  * @since 1.0.0
  * @author Artem Labazin

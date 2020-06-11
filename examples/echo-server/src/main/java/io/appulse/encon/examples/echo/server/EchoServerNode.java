@@ -61,8 +61,6 @@ class EchoServerNode implements Runnable, Closeable {
 
   @Override
   public void run () {
-    ErlangPid myPid = mailbox.getPid();
-
     while (!Thread.interrupted()) {
       Message message = mailbox.receive();
       ErlangTerm body = message.getBody();

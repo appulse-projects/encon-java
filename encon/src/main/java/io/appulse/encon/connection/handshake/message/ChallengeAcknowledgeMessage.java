@@ -27,6 +27,7 @@ import lombok.ToString;
 import lombok.experimental.FieldDefaults;
 
 /**
+ * Challenge acknowledge message.
  *
  * @since 1.0.0
  * @author Artem Labazin

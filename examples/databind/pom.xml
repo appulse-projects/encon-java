@@ -25,7 +25,7 @@ limitations under the License.
   <parent>
     <groupId>io.appulse.encon</groupId>
     <artifactId>examples</artifactId>
-    <version>1.6.9</version>
+    <version>1.6.10</version>
   </parent>
 
   <groupId>io.appulse.encon.examples</groupId>
@@ -76,7 +76,7 @@ limitations under the License.
       <plugin>
         <groupId>org.apache.maven.plugins</groupId>
         <artifactId>maven-shade-plugin</artifactId>
-        <version>3.1.0</version>
+        <version>3.2.4</version>
         <configuration>
           <filters>
             <filter>

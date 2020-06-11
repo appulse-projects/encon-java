@@ -22,7 +22,6 @@ import static lombok.AccessLevel.PRIVATE;
 
 import java.util.LinkedHashMap;
 import java.util.Map;
-
 import javax.annotation.PostConstruct;
 
 import io.appulse.encon.config.Config;

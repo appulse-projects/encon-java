@@ -17,6 +17,7 @@
 package io.appulse.encon.mailbox.exception;
 
 /**
+ * Unknown mailbox exception.
  *
  * @since 1.0.0
  * @author Artem Labazin

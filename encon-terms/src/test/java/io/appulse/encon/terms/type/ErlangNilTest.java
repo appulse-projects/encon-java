@@ -26,9 +26,7 @@ import io.appulse.utils.Bytes;
 import erlang.OtpOutputStream;
 import lombok.SneakyThrows;
 import lombok.val;
-import org.junit.Rule;
 import org.junit.Test;
-import org.junit.rules.TestRule;
 
 /**
  *

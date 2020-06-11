@@ -31,6 +31,7 @@ import lombok.Value;
 import lombok.val;
 
 /**
+ * Send to registered process trace token control message.
  *
  * @since 1.0.0
  * @author Artem Labazin

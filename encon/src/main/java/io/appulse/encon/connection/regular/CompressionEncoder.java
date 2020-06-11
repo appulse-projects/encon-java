@@ -37,6 +37,7 @@ import lombok.extern.slf4j.Slf4j;
 import lombok.val;
 
 /**
+ * Encoder for compressed messages.
  *
  * @since 1.0.0
  * @author Artem Labazin

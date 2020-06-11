@@ -23,13 +23,14 @@ import io.appulse.utils.SocketUtils;
 import lombok.val;
 
 /**
+ * The ports generator class.
  *
  * @since 1.0.0
  * @author Artem Labazin
  */
 final class ServerPortGenerator {
 
-  private static final AtomicInteger UPPER_BOUND = new AtomicInteger(65535);
+  private static final AtomicInteger UPPER_BOUND = new AtomicInteger(65_535);
 
   static int nextPort () {
     while (true) {

@@ -37,7 +37,6 @@ import lombok.RequiredArgsConstructor;
 import lombok.experimental.FieldDefaults;
 import lombok.extern.slf4j.Slf4j;
 import lombok.val;
-import org.springframework.beans.BeansException;
 import org.springframework.beans.factory.config.BeanPostProcessor;
 import org.springframework.core.Ordered;
 import org.springframework.util.ReflectionUtils;
@@ -64,7 +63,7 @@ class BeanPostProcessorMailboxHandler implements BeanPostProcessor, Ordered {
   }
 
   @Override
-  public Object postProcessBeforeInitialization (Object bean, String beanName) throws BeansException {
+  public Object postProcessBeforeInitialization (Object bean, String beanName) {
     val annotation = AnnotationUtils.findAnnotation(bean.getClass(), ErlangMailbox.class);
     if (!annotation.isPresent()) {
       return bean;

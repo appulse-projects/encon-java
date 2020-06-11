@@ -32,6 +32,7 @@ import lombok.Value;
 import lombok.val;
 
 /**
+ * Send to registered process control message.
  *
  * @since 1.0.0
  * @author Artem Labazin

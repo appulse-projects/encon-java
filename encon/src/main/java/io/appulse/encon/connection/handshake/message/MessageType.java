@@ -21,6 +21,7 @@ import java.util.stream.Stream;
 import lombok.Getter;
 
 /**
+ * Type of the message.
  *
  * @since 1.0.0
  * @author Artem Labazin
@@ -28,11 +29,34 @@ import lombok.Getter;
 @Getter
 public enum MessageType {
 
+  /**
+   * Name message type.
+   */
   NAME('n', NameMessage.class),
+
+  /**
+   * Status message type.
+   */
   STATUS('s', StatusMessage.class),
+
+  /**
+   * Challenge message type.
+   */
   CHALLENGE('n', ChallengeMessage.class),
+
+  /**
+   * Challenge reply message type.
+   */
   CHALLENGE_REPLY('r', ChallengeReplyMessage.class),
+
+  /**
+   * Challenge acknowledge message type.
+   */
   CHALLENGE_ACKNOWLEDGE('a', ChallengeAcknowledgeMessage.class),
+
+  /**
+   * Unknown message type.
+   */
   UNDEFINED('0', Message.class);
 
   private final byte tag;

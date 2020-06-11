@@ -31,6 +31,7 @@ import lombok.experimental.FieldDefaults;
 import lombok.extern.slf4j.Slf4j;
 
 /**
+ * Connection abstraction for sending messages.
  *
  * @since 1.0.0
  * @author Artem Labazin

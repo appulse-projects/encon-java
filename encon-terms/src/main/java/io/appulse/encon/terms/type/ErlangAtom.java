@@ -47,14 +47,26 @@ import lombok.experimental.FieldDefaults;
  */
 @ToString
 @SuppressWarnings("deprecation")
-@EqualsAndHashCode(callSuper = true, of = "bytes")
+@EqualsAndHashCode(
+    of = "bytes",
+    callSuper = false,
+    doNotUseGetters = false
+)
 @FieldDefaults(level = PRIVATE, makeFinal = true)
 public class ErlangAtom extends ErlangTerm {
 
   private static final long serialVersionUID = -2748345367418129439L;
 
+  /**
+   * The {@code ErlangAtom} object corresponding to the atom
+   * value {@code true}.
+   */
   public static final ErlangAtom ATOM_TRUE = new ErlangAtom(true);
 
+  /**
+   * The {@code ErlangAtom} object corresponding to the atom
+   * value {@code false}.
+   */
   public static final ErlangAtom ATOM_FALSE = new ErlangAtom(false);
 
   private static final int MAX_ATOM_CODE_POINTS_LENGTH = 255;

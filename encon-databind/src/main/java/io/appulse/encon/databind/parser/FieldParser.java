@@ -127,7 +127,7 @@ public final class FieldParser {
     }
 
     Class<?> type = field.getType();
-    Serializer result = Serializer.findInPredefined(type);
+    Serializer<?> result = Serializer.findInPredefined(type);
     if (result != null) {
       return result;
     }

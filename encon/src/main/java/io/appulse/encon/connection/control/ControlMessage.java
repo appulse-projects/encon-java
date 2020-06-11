@@ -33,12 +33,16 @@ import lombok.NonNull;
 import lombok.val;
 
 /**
+ * Abstract control message.
  *
  * @since 1.0.0
  * @author Artem Labazin
  */
 public abstract class ControlMessage {
 
+  /**
+   * Unused term field.
+   */
   protected static final ErlangTerm UNUSED = new ErlangNil();
 
   @SuppressWarnings("unchecked")

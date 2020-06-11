@@ -53,6 +53,7 @@ import lombok.extern.slf4j.Slf4j;
 import lombok.val;
 
 /**
+ * Main connection handler.
  *
  * @since 1.6.2
  * @author Artem Labazin

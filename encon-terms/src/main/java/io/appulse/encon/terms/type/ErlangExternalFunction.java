@@ -40,7 +40,10 @@ import lombok.val;
  */
 @Getter
 @ToString
-@EqualsAndHashCode(callSuper = true)
+@EqualsAndHashCode(
+    callSuper = false,
+    doNotUseGetters = false
+)
 @FieldDefaults(level = PRIVATE, makeFinal = true)
 public class ErlangExternalFunction extends ErlangTerm {
 

@@ -42,6 +42,7 @@ import lombok.experimental.FieldDefaults;
 import lombok.extern.slf4j.Slf4j;
 
 /**
+ * Module for server functionality.
  *
  * @since 1.2.0
  * @author Artem Labazin

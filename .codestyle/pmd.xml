@@ -24,9 +24,12 @@ limitations under the License.
   <description>PMD Rules</description>
 
   <rule ref="category/java/bestpractices.xml">
+    <exclude name="AvoidPrintStackTrace" />
+    <exclude name="SystemPrintln" />
     <exclude name="UseVarargs" />
   </rule>
   <rule ref="category/java/codestyle.xml">
+    <exclude name="LinguisticNaming" />
     <exclude name="AbstractNaming" />
     <exclude name="AtLeastOneConstructor" />
     <exclude name="AvoidPrefixingMethodParameters" />
@@ -50,10 +53,12 @@ limitations under the License.
     <exclude name="AvoidRethrowingException" />
     <exclude name="AvoidThrowingNullPointerException" />
     <exclude name="CyclomaticComplexity" />
+    <exclude name="DataClass" />
     <exclude name="ExcessiveImports" />
     <exclude name="ExcessivePublicCount" />
     <exclude name="LawOfDemeter" />
     <exclude name="LoosePackageCoupling" />
+    <exclude name="SimplifyBooleanExpressions" />
     <exclude name="TooManyFields" />
     <exclude name="TooManyMethods" />
 
@@ -67,13 +72,18 @@ limitations under the License.
     <exclude name="CommentRequired" />
   </rule>
   <rule ref="category/java/errorprone.xml">
-    <exclude name="AvoidFieldNameMatchingTypeName" />
     <exclude name="AvoidFieldNameMatchingMethodName" />
+    <exclude name="AvoidFieldNameMatchingTypeName" />
     <exclude name="BeanMembersShouldSerialize" />
+    <exclude name="CompareObjectsWithEquals" />
     <exclude name="DataflowAnomalyAnalysis" />
+    <exclude name="DoNotCallSystemExit" />
+    <exclude name="DontImportSun" />
     <exclude name="MissingBreakInSwitch" />
   </rule>
   <rule ref="category/java/multithreading.xml">
+    <exclude name="AvoidSynchronizedAtMethodLevel" />
+    <exclude name="DoNotUseThreads" />
     <exclude name="UseConcurrentHashMap" />
   </rule>
   <rule ref="category/java/performance.xml">

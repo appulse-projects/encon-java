@@ -31,6 +31,7 @@ import lombok.Value;
 import lombok.val;
 
 /**
+ * Monitor process control message.
  *
  * @since 1.0.0
  * @author Artem Labazin

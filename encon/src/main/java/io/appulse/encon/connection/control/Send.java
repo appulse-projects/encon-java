@@ -28,6 +28,7 @@ import lombok.NonNull;
 import lombok.Value;
 
 /**
+ * Send control message.
  *
  * @since 1.0.0
  * @author Artem Labazin

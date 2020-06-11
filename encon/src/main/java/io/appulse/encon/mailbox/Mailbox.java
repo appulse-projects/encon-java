@@ -486,7 +486,7 @@ public class Mailbox implements Closeable {
    *
    * @return the second element of the tuple if the received message is a
    *         two-tuple, otherwise null. No further error checking is
-   *         performed. It also could return {@ null} if the specified
+   *         performed. It also could return {@null} if the specified
    *         waiting time elapses before an element is available
    */
   public ErlangTerm receiveRemoteProcedureResult (long timeout, TimeUnit unit) {
@@ -564,7 +564,6 @@ public class Mailbox implements Closeable {
   public void exit (@NonNull String reason) {
     exit(atom(reason));
   }
-
 
   /**
    * Exits this mailbox with 'normal' reason.

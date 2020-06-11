@@ -51,7 +51,10 @@ import lombok.experimental.NonFinal;
  * @author Artem Labazin
  */
 @Getter
-@EqualsAndHashCode(callSuper = true)
+@EqualsAndHashCode(
+    callSuper = false,
+    doNotUseGetters = false
+)
 @FieldDefaults(level = PRIVATE, makeFinal = true)
 public class ErlangPort extends ErlangTerm {
 

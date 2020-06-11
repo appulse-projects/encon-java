@@ -41,7 +41,10 @@ import lombok.val;
  * @author Artem Labazin
  */
 @ToString
-@EqualsAndHashCode(callSuper = true)
+@EqualsAndHashCode(
+    callSuper = false,
+    doNotUseGetters = false
+)
 @FieldDefaults(level = PRIVATE, makeFinal = true)
 public class ErlangString extends ErlangTerm {
 
@@ -72,7 +75,7 @@ public class ErlangString extends ErlangTerm {
     super();
 
     this.value = value;
-    if (value.length() > 65535 || !is8bitString()) {
+    if (value.length() > 65_535 || !is8bitString()) {
       setType(LIST);
     } else {
       setType(STRING);

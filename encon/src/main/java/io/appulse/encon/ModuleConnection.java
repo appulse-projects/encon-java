@@ -51,6 +51,7 @@ import lombok.extern.slf4j.Slf4j;
 import lombok.val;
 
 /**
+ * Module for handling connections.
  *
  * @since 1.2.0
  * @author Artem Labazin

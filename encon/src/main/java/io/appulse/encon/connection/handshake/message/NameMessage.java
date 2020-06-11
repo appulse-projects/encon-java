@@ -35,6 +35,7 @@ import lombok.ToString;
 import lombok.experimental.FieldDefaults;
 
 /**
+ * Name message.
  *
  * @since 1.0.0
  * @author Artem Labazin

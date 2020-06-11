@@ -23,6 +23,7 @@ import lombok.EqualsAndHashCode;
 import lombok.Value;
 
 /**
+ * Receiving runtime exception.
  *
  * @since 1.0.0
  * @author Artem Labazin

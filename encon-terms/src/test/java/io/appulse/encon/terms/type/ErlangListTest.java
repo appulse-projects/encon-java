@@ -32,9 +32,7 @@ import erlang.OtpOutputStream;
 import lombok.SneakyThrows;
 import lombok.val;
 import org.assertj.core.api.SoftAssertions;
-import org.junit.Rule;
 import org.junit.Test;
-import org.junit.rules.TestRule;
 
 /**
  *

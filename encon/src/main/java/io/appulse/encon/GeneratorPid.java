@@ -26,6 +26,7 @@ import lombok.RequiredArgsConstructor;
 import lombok.experimental.FieldDefaults;
 
 /**
+ * Process identifiers generator.
  *
  * @since 1.2.0
  * @author Artem Labazin

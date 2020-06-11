@@ -26,13 +26,10 @@ import erlang.OtpInputStream;
 import erlang.OtpOutputStream;
 import io.appulse.encon.terms.ErlangTerm;
 import io.appulse.utils.Bytes;
-import io.netty.buffer.Unpooled;
 import lombok.SneakyThrows;
 import lombok.val;
 import org.assertj.core.api.SoftAssertions;
-import org.junit.Rule;
 import org.junit.Test;
-import org.junit.rules.TestRule;
 
 /**
  *
@@ -175,6 +172,47 @@ public class ErlangPidTest {
       assertThat(pid.getSerial())
           .isEqualTo(otpPid.serial());
     }
+  }
+
+  @Test
+  public void equality () {
+    val pid1 = ErlangPid.builder()
+        .type(PID)
+        .node("node1")
+        .id(28)
+        .serial(97)
+        .creation(3)
+        .build();
+
+    pid1.getDescriptor();
+
+    val pid2 = ErlangPid.builder()
+        .type(NEW_PID)
+        .node("node1")
+        .id(28)
+        .serial(97)
+        .creation(3)
+        .build();
+
+    val pid3 = ErlangPid.builder()
+        .type(NEW_PID)
+        .node("node1")
+        .id(28)
+        .serial(96)
+        .creation(3)
+        .build();
+
+    val pid4 = ErlangPid.builder()
+        .type(NEW_PID)
+        .node("node2")
+        .id(28)
+        .serial(96)
+        .creation(3)
+        .build();
+
+    assertThat(pid1).isEqualTo(pid2);
+    assertThat(pid2).isNotEqualTo(pid3);
+    assertThat(pid3).isNotEqualTo(pid4);
   }
 
   @SneakyThrows

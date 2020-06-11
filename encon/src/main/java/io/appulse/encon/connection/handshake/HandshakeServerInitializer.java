@@ -34,6 +34,7 @@ import lombok.extern.slf4j.Slf4j;
 import lombok.val;
 
 /**
+ * Server initializer for handshake.
  *
  * @since 1.0.0
  * @author Artem Labazin

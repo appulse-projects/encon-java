@@ -37,6 +37,7 @@ import lombok.experimental.FieldDefaults;
 import lombok.extern.slf4j.Slf4j;
 
 /**
+ * Module for working with mailboxes.
  *
  * @since 1.0.0
  * @author Artem Labazin
@@ -106,6 +107,7 @@ public final class ModuleMailbox implements Closeable {
 
   public void remove (@NonNull String name) {
     log.debug("Removing mailbox by its name '{}'", name);
+    @SuppressWarnings("PMD.CloseResource")
     Mailbox mailbox = mailbox(name);
     if (mailbox != null) {
       remove(mailbox);
@@ -114,6 +116,7 @@ public final class ModuleMailbox implements Closeable {
 
   public void remove (@NonNull ErlangPid pid) {
     log.debug("Removing mailbox by its pid '{}'", pid);
+    @SuppressWarnings("PMD.CloseResource")
     Mailbox mailbox = mailbox(pid);
     if (mailbox != null) {
       remove(mailbox);
@@ -129,6 +132,7 @@ public final class ModuleMailbox implements Closeable {
       return;
     }
     ErlangPid pid = pidProducer.get();
+    @SuppressWarnings("PMD.CloseResource")
     Mailbox netKernel = new NetKernelMailbox(node, pid);
     pids.put(pid, netKernel);
     register(netKernel, "net_kernel");

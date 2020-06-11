@@ -26,6 +26,7 @@ import lombok.RequiredArgsConstructor;
 import lombok.experimental.FieldDefaults;
 
 /**
+ * Ports generator.
  *
  * @since 1.2.0
  * @author Artem Labazin

@@ -21,7 +21,6 @@ import static lombok.AccessLevel.PRIVATE;
 import java.util.Collection;
 import java.util.Map;
 import java.util.Objects;
-
 import javax.annotation.PostConstruct;
 
 import io.appulse.encon.Node;
@@ -82,7 +81,10 @@ class EnconAutoConfiguration {
 
   @Bean
   @ConditionalOnMissingBean
-  @SuppressWarnings("PMD.AvoidInstantiatingObjectsInLoops")
+  @SuppressWarnings({
+      "PMD.AvoidInstantiatingObjectsInLoops",
+      "PMD.CloseResource"
+  })
   public Nodes defaultEnconNodes (Config config) {
     val nodes = Nodes.start(config);
     for (Node node : nodes) {

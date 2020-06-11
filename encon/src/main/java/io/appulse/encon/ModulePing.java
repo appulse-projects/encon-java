@@ -22,9 +22,8 @@ import static lombok.AccessLevel.PRIVATE;
 
 import io.appulse.encon.common.NodeDescriptor;
 import io.appulse.encon.common.RemoteNode;
-import io.appulse.encon.connection.Connection;
-import io.appulse.encon.mailbox.Mailbox;
 
+import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import lombok.NonNull;
 import lombok.RequiredArgsConstructor;
 import lombok.experimental.FieldDefaults;
@@ -32,6 +31,7 @@ import lombok.extern.slf4j.Slf4j;
 import lombok.val;
 
 /**
+ * Module for ping messages.
  *
  * @since 1.2.0
  * @author Artem Labazin
@@ -59,38 +59,31 @@ class ModulePing {
     return remote != null && ping(remote);
   }
 
+  @SuppressFBWarnings("REC_CATCH_EXCEPTION")
   boolean ping (@NonNull RemoteNode remote) {
     log.debug("Ping remote node: {}", remote);
-    Connection connection = null;
-    try {
-      connection = node.connect(remote);
+    try (val connection = node.connect(remote)) {
+      log.debug("Remote node {} is available", remote);
     } catch (Exception ex) {
       log.error("Error during node {} connection", remote, ex);
-    }
-    if (connection == null) {
       log.debug("Remote node {} is not available", remote);
       return false;
     }
-    log.debug("Remote node {} is available", remote);
 
-    Mailbox mailbox = node.mailbox()
-        .build();
-
-    mailbox.send(remote, "net_kernel", tuple(
-        atom("$gen_call"),
-        tuple(
-            mailbox.getPid(),
-            node.newReference()
-        ),
-        tuple(
-            atom("is_auth"),
-            atom(node.getDescriptor().getFullName())
-        )
-    ));
-
-    try {
+    try (val mailbox = node.mailbox().build()) {
+      mailbox.send(remote, "net_kernel", tuple(
+          atom("$gen_call"),
+          tuple(
+              mailbox.getPid(),
+              node.newReference()
+          ),
+          tuple(
+              atom("is_auth"),
+              atom(node.getDescriptor().getFullName())
+          )
+      ));
       mailbox.receive();
-      mailbox.close();
+
       log.debug("Returning from ping method");
       return true;
     } catch (Exception ex) {

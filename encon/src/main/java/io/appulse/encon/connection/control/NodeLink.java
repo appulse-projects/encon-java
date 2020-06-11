@@ -26,6 +26,7 @@ import lombok.NoArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 
 /**
+ * Node link control message.
  *
  * @since 1.0.0
  * @author Artem Labazin

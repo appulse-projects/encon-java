@@ -16,7 +16,6 @@
 
 package io.appulse.encon.databind.serializer;
 
-import static io.appulse.encon.databind.serializer.Serializer.BYTE_ARRAY_SERIALIZER;
 import static java.util.Optional.ofNullable;
 
 import java.io.Serializable;

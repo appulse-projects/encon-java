@@ -50,7 +50,10 @@ import lombok.val;
  * @author Artem Labazin
  */
 @ToString
-@EqualsAndHashCode(callSuper = true)
+@EqualsAndHashCode(
+    callSuper = false,
+    doNotUseGetters = false
+)
 @SuppressWarnings("PMD.LooseCoupling") // we realy need to use LinkedHashMap
 @FieldDefaults(level = PRIVATE, makeFinal = true)
 public class ErlangMap extends ErlangTerm {

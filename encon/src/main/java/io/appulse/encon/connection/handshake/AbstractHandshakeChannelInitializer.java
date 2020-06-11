@@ -37,6 +37,7 @@ import lombok.experimental.FieldDefaults;
 import lombok.extern.slf4j.Slf4j;
 
 /**
+ * Abstract handshake channel initializer.
  *
  * @since 1.0.0
  * @author Artem Labazin

@@ -20,6 +20,7 @@ import lombok.Getter;
 import lombok.val;
 
 /**
+ * Enum of control message tags.
  *
  * @since 1.0.0
  * @author Artem Labazin
@@ -27,21 +28,84 @@ import lombok.val;
 @Getter
 public enum ControlMessageTag {
 
+  /**
+   * Link control message tag.
+   */
   LINK(1, Link.class),
+
+  /**
+   * Send control message tag.
+   */
   SEND(2, Send.class),
+
+  /**
+   * Exit control message tag.
+   */
   EXIT(3, Exit.class),
+
+  /**
+   * Unlink control message tag.
+   */
   UNLINK(4, Unlink.class),
+
+  /**
+   * Link node control message tag.
+   */
   NODE_LINK(5, NodeLink.class),
+
+  /**
+   * Registration control message tag.
+   */
   REG_SEND(6, SendToRegisteredProcess.class),
+
+  /**
+   * Group leader control message tag.
+   */
   GROUP_LEADER(7, GroupLeader.class),
+
+  /**
+   * Exit2 control message tag.
+   */
   EXIT2(8, Exit2.class),
+
+  /**
+   * Send trace token control message tag.
+   */
   SEND_TT(12, SendTraceToken.class),
+
+  /**
+   * Exit trace token control message tag.
+   */
   EXIT_TT(13, ExitTraceToken.class),
+
+  /**
+   * Send registration trace token control message tag.
+   */
   REG_SEND_TT(16, SendToRegisteredProcessTraceToken.class),
+
+  /**
+   * Exit2 trace token control message tag.
+   */
   EXIT2_TT(18, Exit2TraceToken.class),
+
+  /**
+   * Monitor process control message tag.
+   */
   MONITOR_P(19, MonitorProcess.class),
+
+  /**
+   * Demonitor process control message tag.
+   */
   DEMONITOR_P(20, DemonitorProcess.class),
+
+  /**
+   * Monitor process exit control message tag.
+   */
   MONITOR_P_EXIT(21, MonitorProcessExit.class),
+
+  /**
+   * Undefined control message tag.
+   */
   UNDEFINED(-1, ControlMessage.class);
 
   private final int code;

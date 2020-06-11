@@ -33,6 +33,7 @@ import lombok.experimental.FieldDefaults;
 import lombok.val;
 
 /**
+ * Status message.
  *
  * @since 1.0.0
  * @author Artem Labazin

@@ -31,6 +31,7 @@ import lombok.experimental.NonFinal;
 import lombok.val;
 
 /**
+ * Exit control message.
  *
  * @since 1.0.0
  * @author Artem Labazin

@@ -30,9 +30,7 @@ import erlang.OtpErlangObject;
 import erlang.OtpErlangString;
 import erlang.OtpOutputStream;
 import lombok.SneakyThrows;
-import org.junit.Rule;
 import org.junit.Test;
-import org.junit.rules.TestRule;
 
 /**
  *

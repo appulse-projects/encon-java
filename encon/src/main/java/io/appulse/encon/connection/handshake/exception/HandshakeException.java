@@ -17,6 +17,7 @@
 package io.appulse.encon.connection.handshake.exception;
 
 /**
+ * Exception for hanshake cases.
  *
  * @since 1.0.0
  * @author Artem Labazin

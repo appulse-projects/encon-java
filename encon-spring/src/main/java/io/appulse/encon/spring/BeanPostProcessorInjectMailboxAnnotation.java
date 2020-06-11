@@ -34,7 +34,6 @@ import lombok.RequiredArgsConstructor;
 import lombok.SneakyThrows;
 import lombok.experimental.FieldDefaults;
 import lombok.val;
-import org.springframework.beans.BeansException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.config.BeanPostProcessor;
 import org.springframework.context.support.AbstractApplicationContext;
@@ -65,7 +64,7 @@ class BeanPostProcessorInjectMailboxAnnotation implements BeanPostProcessor, Ord
 
   @Override
   @SneakyThrows
-  public Object postProcessBeforeInitialization (Object bean, String beanName) throws BeansException {
+  public Object postProcessBeforeInitialization (Object bean, String beanName) {
     val annotation = AnnotationUtils.findAnnotation(bean.getClass(), ErlangMailbox.class);
     if (!annotation.isPresent()) {
       return bean;

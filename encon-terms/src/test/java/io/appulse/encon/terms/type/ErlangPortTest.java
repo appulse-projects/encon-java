@@ -30,9 +30,7 @@ import erlang.OtpOutputStream;
 import lombok.SneakyThrows;
 import lombok.val;
 import org.assertj.core.api.SoftAssertions;
-import org.junit.Rule;
 import org.junit.Test;
-import org.junit.rules.TestRule;
 
 /**
  *
@@ -157,6 +155,33 @@ public class ErlangPortTest {
       assertThat(port.getCreation())
           .isEqualTo(otpPid.creation());
     }
+  }
+
+  @Test
+  public void equality () {
+    val port1 = ErlangPort.builder()
+        .type(PORT)
+        .node("node1")
+        .id(128)
+        .creation(2)
+        .build();
+
+    val port2 = ErlangPort.builder()
+        .type(NEW_PORT)
+        .node("node1")
+        .id(128)
+        .creation(2)
+        .build();
+
+    val port3 = ErlangPort.builder()
+        .type(PORT)
+        .node("node1")
+        .id(127)
+        .creation(2)
+        .build();
+
+    assertThat(port1).isEqualTo(port2);
+    assertThat(port1).isNotEqualTo(port3);
   }
 
   @SneakyThrows

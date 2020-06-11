@@ -20,6 +20,7 @@ import lombok.EqualsAndHashCode;
 import lombok.Value;
 
 /**
+ * Exception during parsing a field of a control message.
  *
  * @since 1.0.0
  * @author Artem Labazin

@@ -30,6 +30,7 @@ import lombok.Value;
 import lombok.val;
 
 /**
+ * Group leader control message.
  *
  * @since 1.0.0
  * @author Artem Labazin

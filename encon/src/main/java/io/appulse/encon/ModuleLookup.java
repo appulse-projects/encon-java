@@ -34,6 +34,7 @@ import lombok.extern.slf4j.Slf4j;
 import lombok.val;
 
 /**
+ * Lookup module.
  *
  * @since 1.2.0
  * @author Artem Labazin

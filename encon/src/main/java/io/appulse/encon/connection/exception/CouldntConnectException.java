@@ -17,6 +17,7 @@
 package io.appulse.encon.connection.exception;
 
 /**
+ * Unable to connect exception.
  *
  * @since 1.0.0
  * @author Artem Labazin

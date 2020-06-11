@@ -30,6 +30,7 @@ import lombok.extern.slf4j.Slf4j;
 import lombok.val;
 
 /**
+ * Default net_kernel mailbox.
  *
  * @since 1.2.0
  * @author Artem Labazin

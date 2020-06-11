@@ -23,6 +23,7 @@ import io.appulse.encon.terms.type.ErlangTuple;
 import lombok.val;
 
 /**
+ * Exception during parsing a control message.
  *
  * @since 1.0.0
  * @author Artem Labazin

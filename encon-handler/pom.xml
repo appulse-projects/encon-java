@@ -25,7 +25,7 @@ limitations under the License.
   <parent>
     <groupId>io.appulse.encon</groupId>
     <artifactId>encon-parent</artifactId>
-    <version>1.6.9</version>
+    <version>1.6.10</version>
   </parent>
 
   <artifactId>encon-handler</artifactId>
@@ -52,7 +52,7 @@ limitations under the License.
     <dependency>
       <groupId>cglib</groupId>
       <artifactId>cglib</artifactId>
-      <version>3.2.10</version>
+      <version>3.3.0</version>
     </dependency>
 
     <dependency>

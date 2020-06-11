@@ -16,8 +16,6 @@
 
 package io.appulse.encon.databind.annotation;
 
-import static io.appulse.encon.databind.deserializer.Deserializer.STRING_DESERIALIZER;
-import static io.appulse.encon.databind.serializer.Serializer.ATOM_SERIALIZER;
 import static java.lang.annotation.ElementType.FIELD;
 import static java.lang.annotation.RetentionPolicy.RUNTIME;
 

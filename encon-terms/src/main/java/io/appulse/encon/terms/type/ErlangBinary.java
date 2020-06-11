@@ -38,7 +38,10 @@ import lombok.val;
  * @author Artem Labazin
  */
 @ToString
-@EqualsAndHashCode(callSuper = true)
+@EqualsAndHashCode(
+    callSuper = false,
+    doNotUseGetters = false
+)
 @FieldDefaults(level = PRIVATE, makeFinal = true)
 public class ErlangBinary extends ErlangTerm {
 

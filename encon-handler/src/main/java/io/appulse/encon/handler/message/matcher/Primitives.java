@@ -29,7 +29,7 @@ final class Primitives {
   private static final Map<Class<?>, Object> PRIMITIVE_OR_WRAPPER_DEFAULT_VALUES;
 
   static {
-    PRIMITIVE_OR_WRAPPER_DEFAULT_VALUES = new HashMap<Class<?>, Object>();
+    PRIMITIVE_OR_WRAPPER_DEFAULT_VALUES = new HashMap<>();
     PRIMITIVE_OR_WRAPPER_DEFAULT_VALUES.put(Boolean.class, false);
     PRIMITIVE_OR_WRAPPER_DEFAULT_VALUES.put(Character.class, '\u0000');
     PRIMITIVE_OR_WRAPPER_DEFAULT_VALUES.put(Byte.class, (byte) 0);

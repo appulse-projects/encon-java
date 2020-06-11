@@ -46,7 +46,10 @@ import lombok.experimental.NonFinal;
  */
 @Getter
 @ToString
-@EqualsAndHashCode(callSuper = true)
+@EqualsAndHashCode(
+    callSuper = false,
+    doNotUseGetters = false
+)
 @FieldDefaults(level = PRIVATE, makeFinal = true)
 public class ErlangFunction extends ErlangTerm {
 

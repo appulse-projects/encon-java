@@ -25,6 +25,7 @@ import lombok.SneakyThrows;
 import lombok.experimental.FieldDefaults;
 
 /**
+ * Message container.
  *
  * @since 1.0.0
  * @author Artem Labazin

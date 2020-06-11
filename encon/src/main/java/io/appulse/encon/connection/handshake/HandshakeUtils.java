@@ -17,6 +17,7 @@
 package io.appulse.encon.connection.handshake;
 
 import static java.nio.charset.StandardCharsets.ISO_8859_1;
+import static java.util.Locale.ENGLISH;
 
 import java.security.MessageDigest;
 
@@ -30,6 +31,7 @@ import lombok.SneakyThrows;
 import lombok.val;
 
 /**
+ * Handshake utility functions.
  *
  * @since 1.0.0
  * @author Artem Labazin
@@ -39,14 +41,25 @@ public final class HandshakeUtils {
   public static Version findHighestCommonVerion (@NonNull Node node, @NonNull RemoteNode peer) {
     val meta = node.getMeta();
 
-    if (peer.getProtocol() != meta.getProtocol() ||
-        meta.getHigh().getCode() < peer.getLow().getCode() ||
-        meta.getLow().getCode() > peer.getHigh().getCode()) {
-      throw new HandshakeException("No common protocol found - cannot accept connection");
+    if (meta.getHigh().getCode() < peer.getLow().getCode()) {
+      val msg = String.format(ENGLISH, "local node's high version (%d) must be equal or higher than peer's low one one (%d)",
+                              meta.getHigh().getCode(), peer.getLow().getCode());
+      throw new HandshakeException("Cannot accept connection - " + msg);
     }
-    return peer.getHigh().getCode() > meta.getHigh().getCode()
+    if (meta.getLow().getCode() > peer.getHigh().getCode()) {
+      val msg = String.format(ENGLISH, "local node's low version (%d) must be equal or lower than peer's high one (%d)",
+                              meta.getLow().getCode(), peer.getHigh().getCode());
+      throw new HandshakeException("Cannot accept connection - " + msg);
+    }
+    if (peer.getProtocol() == meta.getProtocol()) {
+      return peer.getHigh().getCode() > meta.getHigh().getCode()
            ? meta.getHigh()
            : peer.getHigh();
+    }
+
+    val msg = String.format(ENGLISH, "the nodes use different protocols: local node - %s, peer - %s",
+                            peer.getProtocol(), meta.getProtocol());
+    throw new HandshakeException("Cannot accept connection - " + msg);
   }
 
   @SneakyThrows

@@ -240,6 +240,50 @@ public class ErlangReferenceTest {
     }
   }
 
+  @Test
+  public void equality () {
+    val ref1 = ErlangReference.builder()
+        .type(REFERENCE)
+        .node("node1")
+        .ids(new long[] { 1, 2, 3 })
+        .creation(3)
+        .build();
+
+    val ref2 = ErlangReference.builder()
+        .type(NEW_REFERENCE)
+        .node("node1")
+        .ids(new long[] { 1, 2, 3 })
+        .creation(3)
+        .build();
+
+    val ref3 = ErlangReference.builder()
+        .type(NEWER_REFERENCE)
+        .node("node1")
+        .ids(new long[] { 1, 2, 3 })
+        .creation(3)
+        .build();
+
+    val ref4 = ErlangReference.builder()
+        .type(NEWER_REFERENCE)
+        .node("node1")
+        .ids(new long[] { 1, 2, 3 })
+        .creation(2)
+        .build();
+
+    val ref5 = ErlangReference.builder()
+        .type(NEWER_REFERENCE)
+        .node("node2")
+        .ids(new long[] { 1, 2, 3 })
+        .creation(3)
+        .build();
+
+    assertThat(ref1).isEqualTo(ref2);
+    assertThat(ref1).isEqualTo(ref3);
+    assertThat(ref2).isEqualTo(ref3);
+    assertThat(ref3).isNotEqualTo(ref4);
+    assertThat(ref4).isNotEqualTo(ref5);
+  }
+
   @SneakyThrows
   private byte[] bytes (OtpErlangRef ref) {
     try (OtpOutputStream output = new OtpOutputStream()) {

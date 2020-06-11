@@ -27,6 +27,7 @@ import lombok.experimental.FieldDefaults;
 import lombok.val;
 
 /**
+ * References generator.
  *
  * @since 1.2.0
  * @author Artem Labazin

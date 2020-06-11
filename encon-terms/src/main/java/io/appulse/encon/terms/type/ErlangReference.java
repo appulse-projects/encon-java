@@ -43,8 +43,11 @@ import lombok.experimental.NonFinal;
  * @author Artem Labazin
  */
 @Getter
+@EqualsAndHashCode(
+    callSuper = false,
+    doNotUseGetters = false
+)
 @FieldDefaults(level = PRIVATE, makeFinal = true)
-@EqualsAndHashCode(callSuper = true)
 public class ErlangReference extends ErlangTerm {
 
   private static final long serialVersionUID = -868493639369161400L;
@@ -113,7 +116,7 @@ public class ErlangReference extends ErlangTerm {
     this.ids = ofNullable(ids)
         .map(it -> it.clone())
         .map(it -> {
-          long[] result = new long[] { 0, 0, 0 };
+          long[] result = { 0, 0, 0 };
           int length = it.length > 3
                        ? 3
                        : it.length;

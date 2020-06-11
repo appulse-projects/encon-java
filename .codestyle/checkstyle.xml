@@ -65,6 +65,9 @@ limitations under the License.
 
   <module name="SuppressWarningsFilter" />
 
+  <module name="LineLength">
+    <property name="max" value="140"/>
+  </module>
 
   <module name="TreeWalker">
     <module name="SuppressWarningsHolder" />
@@ -74,7 +77,6 @@ limitations under the License.
     <!-- <module name="JavadocMethod">
       <property name="scope" value="protected"/>
       <property name="allowedAnnotations" value="Override, Test"/>
-      <property name="allowThrowsTagsForSubclasses" value="true"/>
     </module>
     <module name="JavadocType">
       <property name="scope" value="protected"/>
@@ -181,9 +183,6 @@ limitations under the License.
     <!-- See http://checkstyle.sf.net/config_sizes.html -->
     <module name="AnonInnerLength">
       <property name="max" value="20"/>
-    </module>
-    <module name="LineLength">
-      <property name="max" value="140"/>
     </module>
     <module name="MethodLength">
       <property name="tokens" value="METHOD_DEF"/>
@@ -346,7 +345,6 @@ limitations under the License.
     <module name="OneStatementPerLine"/>
     <module name="PackageDeclaration"/>
     <module name="ParameterAssignment"/>
-    <module name="SimplifyBooleanExpression"/>
     <module name="SimplifyBooleanReturn"/>
     <module name="StringLiteralEquality"/>
     <module name="SuperClone"/>
@@ -382,7 +380,6 @@ limitations under the License.
       <property name="forceStrictCondition" value="false"/>
     </module>
     <module name="OuterTypeFilename"/>
-    <module name="TodoComment"/>
     <module name="UncommentedMain">
       <property name="excludedClasses" value="\.Main$"/>
     </module>

@@ -48,7 +48,10 @@ import lombok.experimental.FieldDefaults;
  * @author Artem Labazin
  */
 @ToString
-@EqualsAndHashCode(callSuper = true)
+@EqualsAndHashCode(
+    callSuper = false,
+    doNotUseGetters = false
+)
 @FieldDefaults(level = PRIVATE, makeFinal = true)
 public class ErlangTuple extends ErlangTerm {
 

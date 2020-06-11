@@ -34,6 +34,7 @@ import lombok.NonNull;
 import lombok.Value;
 
 /**
+ * Message container.
  *
  * @since 1.0.0
  * @author Artem Labazin
@@ -42,8 +43,14 @@ import lombok.Value;
 @SuppressWarnings("checkstyle:DesignForExtension")
 public class Message {
 
+  /**
+   * Pass throught tag.
+   */
   public static final int PASS_THROUGH_TAG = 0x70;
 
+  /**
+   * Version tag.
+   */
   public static final int VERSION_TAG = 0x83;
 
   public static Message sendToRegisteredProcess (@NonNull ErlangPid from,

@@ -31,9 +31,7 @@ import io.appulse.encon.terms.ErlangTerm;
 import io.appulse.utils.Bytes;
 import lombok.SneakyThrows;
 import lombok.val;
-import org.junit.Rule;
 import org.junit.Test;
-import org.junit.rules.TestRule;
 
 /**
  *

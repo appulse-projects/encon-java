@@ -22,6 +22,7 @@ import lombok.EqualsAndHashCode;
 import lombok.Value;
 
 /**
+ * Unknown remote node exception.
  *
  * @since 1.0.0
  * @author Artem Labazin

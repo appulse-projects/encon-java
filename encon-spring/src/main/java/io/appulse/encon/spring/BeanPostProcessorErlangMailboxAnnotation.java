@@ -32,7 +32,6 @@ import lombok.NonNull;
 import lombok.RequiredArgsConstructor;
 import lombok.experimental.FieldDefaults;
 import lombok.val;
-import org.springframework.beans.BeansException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.config.BeanPostProcessor;
 import org.springframework.context.support.AbstractApplicationContext;
@@ -62,12 +61,13 @@ class BeanPostProcessorErlangMailboxAnnotation implements BeanPostProcessor, Ord
   }
 
   @Override
-  public Object postProcessBeforeInitialization (Object bean, String beanName) throws BeansException {
+  public Object postProcessBeforeInitialization (Object bean, String beanName) {
     Optional<ErlangMailbox> annotation = AnnotationUtils.findAnnotation(bean.getClass(), ErlangMailbox.class);
     if (!annotation.isPresent()) {
       return bean;
     }
 
+    @SuppressWarnings("PMD.CloseResource")
     Node node = annotation
         .map(ErlangMailbox::node)
         .filter(Objects::nonNull)

@@ -25,6 +25,7 @@ import io.netty.handler.codec.MessageToByteEncoder;
 import lombok.extern.slf4j.Slf4j;
 
 /**
+ * Encoder for handshake messages.
  *
  * @since 1.0.0
  * @author Artem Labazin
