@@ -7,7 +7,7 @@ jdk:
   - openjdk8
 
 install:
-  mvn --settings .settings.xml install -DskipTests=true -Dmaven.javadoc.skip=true -Dgpg.skip -B -V
+  ./mvnw compile -B -U
 
 # Install Erlang for integration tests
 before_script:
@@ -21,15 +21,11 @@ before_script:
   - echo-service-elixir/echo --cookie=secret --name=echo@localhost &
 
 script:
-  mvn --settings .settings.xml clean verify -DskipTests=false -Dmaven.javadoc.skip=true -Dgpg.skip -B -U
+  ./mvnw install -B
 
 before_deploy:
   - mvn help:evaluate -N -Dexpression=project.version | grep -v '\['
   - export project_version=$(mvn help:evaluate -N -Dexpression=project.version | grep -v '\[')
-  - echo $GPG_SECRET_KEYS | base64 --decode | $GPG_EXECUTABLE --import
-  - echo $GPG_OWNERTRUST | base64 --decode | $GPG_EXECUTABLE --import-ownertrust
-  - sed -i -- "s/\${env.SONATYPE_PASSWORD}/$SONATYPE_PASSWORD/g" .settings.xml
-  - mvn --settings .settings.xml clean deploy -DskipTests=true -Dfindbugs.skip=true -Dpmd.skip=true -Dcheckstyle.skip -Dmaven.javadoc.skip=false -B -U
 
 deploy:
   provider: releases
@@ -57,7 +53,7 @@ deploy:
     - "encon-spring/target/encon-spring-$project_version.jar"
     - "encon-spring/target/encon-spring-$project_version-javadoc.jar"
     - "encon-spring/target/encon-spring-$project_version-sources.jar"
-  skip_cleanup: true
+  cleanup: false
   on:
     tags: true
     repo: appulse-projects/encon-java

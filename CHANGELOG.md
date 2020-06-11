@@ -34,7 +34,8 @@ and this project adheres to [Semantic Versioning](http://semver.org/spec/v2.0.0.
 
 - Updated dependencies;
 - Updated copyrights;
-- All terms don't use its `TermType` in `equals` and `hashCode` implementations.
+- All terms don't use its `TermType` in `equals` and `hashCode` implementations;
+- Deploy is in manual mode now.
 
 ## [1.6.9](https://github.com/appulse-projects/encon-java/releases/tag/1.6.9) - 2019-04-07
 
