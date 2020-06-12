@@ -127,17 +127,17 @@ limitations under the License.
       <dependency>
         <groupId>io.appulse.epmd.java</groupId>
         <artifactId>client</artifactId>
-        <version>2.0.1</version>
+        <version>2.0.2</version>
       </dependency>
       <dependency>
         <groupId>io.appulse.epmd.java</groupId>
         <artifactId>core</artifactId>
-        <version>2.0.1</version>
+        <version>2.0.2</version>
       </dependency>
       <dependency>
         <groupId>io.appulse.epmd.java</groupId>
         <artifactId>server</artifactId>
-        <version>2.0.1</version>
+        <version>2.0.2</version>
       </dependency>
 
       <dependency>
@@ -364,7 +364,7 @@ limitations under the License.
           <executions>
             <execution>
               <id>sign-artifacts</id>
-              <phase>deploy</phase>
+              <phase>install</phase>
               <goals>
                 <goal>sign</goal>
               </goals>
