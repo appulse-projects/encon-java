@@ -7,7 +7,7 @@ jdk:
   - openjdk8
 
 install:
-  ./mvnw compile -B -U
+  ./mvnw compile --batch-mode --update-snapshots
 
 # Install Erlang for integration tests
 before_script:
@@ -21,7 +21,7 @@ before_script:
   - echo-service-elixir/echo --cookie=secret --name=echo@localhost &
 
 script:
-  ./mvnw install -B
+  ./mvnw install --batch-mode -Dgpg.skip
 
 before_deploy:
   - mvn help:evaluate -N -Dexpression=project.version | grep -v '\['
